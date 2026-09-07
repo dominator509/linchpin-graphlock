@@ -1,0 +1,21 @@
+{
+  "node": "EP-000",
+  "status": "CLOSED_BLOCKED",
+  "candidate_epoch": 0,
+  "reason": "Exact required toolchain pins and a bootstrapped product repository are unavailable in the current environment.",
+  "evidence": [
+    ".agent/evidence/EP-000/STATUS.md",
+    "PREFLIGHT.md",
+    "TOOLCHAIN_PINS.md"
+  ],
+  "observed": {
+    "git": "2.43.0",
+    "rust": "1.98.1",
+    "node": "24.16.0",
+    "pnpm": "10.34.5",
+    "python": "3.12.3",
+    "uv": "0.11.32"
+  },
+  "unblock_condition": "Run EP-000 in an environment satisfying the exact pins and bootstrap a real product repository; rerun all affected verification stages.",
+  "external_side_effects": "none"
+}
