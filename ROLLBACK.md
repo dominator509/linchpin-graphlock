@@ -1,0 +1,2 @@
+# Rollback
+Rollback is artifact + schema aware. Before update, verify encrypted backup and current schema. Installer rollback may reinstall previous signed binary only if its reader supports current schema; otherwise migration rollback/forward repair follows the tested compatibility plan. User vaults are never deleted by binary rollback. Update failures surface recovery steps and keep the last verified artifact available.

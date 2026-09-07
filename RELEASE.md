@@ -1,0 +1,2 @@
+# Release
+A release candidate has immutable commit SHA + installer/app digests. GO requires zero blocked core nodes, all applicable DoD clauses, complete 484-ID accounting, product UO live-fire proofs, anti-gaming PASS, architecture-drift reconciliation, clean Win10/11 artifact tests, security/license/SBOM proof, manual accessibility/UAT where required, signed artifact verification and rollback proof. Auto-deploy is no; publication remains manual.

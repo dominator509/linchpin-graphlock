@@ -1,0 +1,2 @@
+# Harness Laws
+Registry rows are never deleted. Every ID gets one accounted status and evidence. Candidate code is immutable during auditor stages. Blockers are non-cascading. PASS requires executed evidence; N/A requires applicability evidence; long-running/human/external work keeps its honest status. Destructive/network tests run only where authorized and contained. Private chain-of-thought is never required evidence. Exact-artifact stages bind SHA-256. Gate changes are audited for weakening.

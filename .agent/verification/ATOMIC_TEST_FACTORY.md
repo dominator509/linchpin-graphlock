@@ -1,0 +1,2 @@
+# Atomic Test Factory
+For each registry ID: resolve applicability; locate exact source body by source_file/title; derive one or more executable cases tied to LINCHPIN architecture; declare authorization/environment/dependency; expected outcome and independent readback; negative/mutation where appropriate; evidence paths; timeout; cleanup; and final status. Never reduce a source prompt to a superficial grep when the source requires runtime behavior.

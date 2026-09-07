@@ -1,0 +1,2 @@
+# Operations
+Local-first operation requires vault backup/restore, index rebuild, provider/data-source diagnostics, deadline-scheduler health, migration recovery, signed update verification, crash-capsule export and safe uninstall. Every runbook is testable against a disposable workspace. The app must remain navigable when every external provider/data source is unavailable; eligible draft/review work can use the local model and cached evidence. Index corruption triggers rebuild, never canonical-data deletion.

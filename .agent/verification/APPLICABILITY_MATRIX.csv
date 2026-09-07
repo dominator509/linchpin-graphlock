@@ -1,0 +1,2 @@
+test_id,applicability,status,reason,evidence
+ALL-484,EVALUATE_PER_REGISTRY,NOT_STARTED,No registry row may be pruned,.agent/verification/MASTER_TEST_REGISTRY.csv

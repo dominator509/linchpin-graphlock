@@ -1,0 +1,2 @@
+# Deployment
+V1 deploy means produce a signed Windows 10/11 x64 installer and release manifest; auto-deploy is not authorized. Release pipeline: clean checkout -> frozen install -> tests -> SBOM/license/security -> build -> sign -> digest -> clean VM install -> smoke/E2E -> update/rollback -> uninstall/preserve-vault -> final accounting. Publishing a release is MANUAL after GO. Never test an updater against a user's production vault without a verified backup/rollback path.

@@ -1,0 +1,2 @@
+# Contributing
+All production changes start with requirement ID + failing acceptance oracle. Follow AGENTS.md, one writer lease per mutable path, commands only from COMMANDS.md, exact dependency pinning, no drive-by refactors, no gate weakening, no secrets/real invention fixtures, and a milestone commit with evidence. Security/provider/legal-boundary changes require ADR review. Pull requests include requirement mapping, tests, mutation/negative proof and architecture-drift impact.

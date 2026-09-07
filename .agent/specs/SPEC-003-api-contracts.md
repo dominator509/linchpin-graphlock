@@ -1,0 +1,2 @@
+# SPEC-003 API / IPC Contracts
+Tauri commands are versioned application use cases, not generic SQL/file/shell primitives. Contract namespaces: workspace, conception, opportunity, research, evidence, patent, filing, docket, prosecution, commercialization, provider, mcp, incident, export. Every command accepts workspace-scoped typed input and returns typed result/error with correlation ID. Provider JobEnvelope/JobResult and MCP grants are JSON-Schema versioned. No route accepts raw executable shell text from model output.

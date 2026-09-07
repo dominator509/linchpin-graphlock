@@ -1,0 +1,2 @@
+# Capability Matrix
+Core capabilities: local encrypted workspace; conception provenance; opportunity research; prior-art evidence; LINCHPIN/red-team; patent claim/spec/figure architecture; filing package/human handoff; docket/prosecution; commercialization; provider transport hub; local model; MCP; crash/repair; Windows packaging. Each maps to UO-01..12 and remains NOT_STARTED until real implementation evidence exists.

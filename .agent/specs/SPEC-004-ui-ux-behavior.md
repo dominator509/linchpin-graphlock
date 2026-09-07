@@ -1,0 +1,2 @@
+# SPEC-004 UI/UX
+Primary navigation: Dashboard, Opportunity Radar, Conception Lab, Research War Room, Patent Architect, Filing, Docket, Prosecution, Commercialize, Evidence Vault, Integrations, Incidents, Settings. Persistent top-level badges show workspace confidentiality, filing/priority state, evidence coverage and external-provider egress state. Legal-risk language uses "screen", "draft", "evidence", "uncertainty" rather than definitive legal conclusions. Destructive/high-impact actions use consequence-specific confirmation and audit. WCAG 2.2 AA target.

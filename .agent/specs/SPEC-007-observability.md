@@ -1,0 +1,2 @@
+# SPEC-007 Observability
+Structured event schema carries UTC time, level, correlation, workspace pseudonymous ID/hash, component, operation, duration, result and evidence IDs. No document bodies/secrets/provider tokens. Incident captures are local. Crash capsule export applies deterministic redaction rules and logs redaction counts/hashes. Release tests plant canary secret/invention strings and prove absence after export.

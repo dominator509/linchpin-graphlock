@@ -1,0 +1,9 @@
+| assumption | reason | risk if wrong | verification | blocks implementation |
+| --- | --- | --- | --- | --- |
+| Windows 10/11 x64 is v1 target | User requested local PC software | Installer/platform APIs differ | Confirm product scope in PROJECT_BRIEF.md and test on clean Win10/11 VMs | no |
+| No existing production repo | Uploaded bundle is a generator, not application source | Could duplicate unseen implementation | At executor start: `git status --porcelain=v1` and inventory repository before EP-001 | yes if repo is not greenfield |
+| Provider subscription transports remain permitted under current terms | Terms can change | Commercial integration could violate provider rules | EP-000 re-read first-party auth/CLI terms; record URLs/date/version | yes per adapter |
+| Patent Center has no supported general submission API for this product | Official workflow is interactive | Automation could be brittle or unlawful | EP-000 re-verify USPTO Patent Center/developer docs | yes for filing automation; package generation continues |
+| PQAI exact version/dependencies remain commercially acceptable | Repo currently advertises MIT | Transitive license/security risk | Pin commit/version; SBOM + license scan + benchmark before inclusion | no; optional subsystem |
+| Manual accessibility validators are available before GA | Required quality gate | GA cannot truthfully claim manual accessibility validation | Schedule keyboard/screen-reader UAT; evidence under V-021 | yes for GA |
+| A patent-professional workflow reviewer is available before broad commercial GA | High-stakes domain workflow | Legal UX defects may survive technical tests | Record independent review report; private beta may proceed with warnings | yes for broad GA, no for internal alpha |

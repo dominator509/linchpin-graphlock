@@ -1,0 +1,2 @@
+# Bounded Loops
+Implementation loop: read active ExecPlan -> define acceptance oracle -> prove expected red when feasible -> transcribe smallest production change -> run narrow proof -> mutation/negative proof -> full milestone command -> commit -> ledger event. Failure loop permits three distinct falsifiable hypotheses; preserve evidence each time and do not repeat an unchanged action. External/credential blockers close only affected lanes. Release remediation is capped at 5 candidate epochs; production-code changes create a new digest/epoch and invalidate descendants.

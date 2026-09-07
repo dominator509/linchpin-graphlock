@@ -1,0 +1,2 @@
+# Production Readiness
+The ship gate is EP-010 + verification V-000..V-021. Required evidence includes exact artifact digest, complete requirement traceability, 484 capability accounting, 42 DoD accounting, live-fire outcomes UO-01..UO-12, dependency/license/SBOM proof, cleanroom install/update/rollback, recovery/soak/performance, security/fuzz, accessibility/UAT and residual-risk report. A blocked core capability produces NO_GO.

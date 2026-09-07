@@ -1,0 +1,2 @@
+# SPEC-008 Production Readiness
+Release requires UO-01..12 live-fire; 484 registry accounting; 42 DoD accounting; no blocked core node; exact signed Windows artifact cleanroom tests; offline/local-model proof; at least one enabled official provider transport proof if commercially shipped; Patent Center package validation/human handoff proof; backup/restart/recovery; disclosure and inventorship controls; security/fuzz/license/SBOM; accessibility/UAT; performance/soak; update/rollback.

@@ -1,0 +1,12 @@
+TODO
+FIXME
+NotImplemented
+mock.*production
+fake.*provider
+return.*success
+NODE_ENV.*test
+pytest
+vitest
+fixture.*bypass
+skip
+xfail

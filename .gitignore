@@ -1,0 +1,19 @@
+.env
+.env.*
+!.env.example
+target/
+node_modules/
+dist/
+build/
+.venv/
+__pycache__/
+*.pyc
+*.pdb
+*.dmp
+*.log
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+Thumbs.db
+# Never ignore .agent/ or scripts/: GraphLock state/evidence definitions are versioned.
