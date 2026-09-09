@@ -8,4 +8,6 @@
 | 2026-09-09 | EP-002 | DONE_VERIFIED | EP-002-remediation-001 | .agent/evidence/EP-002/STATUS.md |
 | 2026-09-09 | EP-003 | DONE_VERIFIED | EP-003-remediation-001 | .agent/evidence/EP-003/STATUS.md |
 | 2026-09-09 | EP-004 | DONE_VERIFIED | EP-004-remediation-001 | .agent/evidence/EP-004/STATUS.md |
+| 2026-09-09 | EP-006 | DONE_VERIFIED | EP-006-remediation-001 | .agent/evidence/EP-006/STATUS.md |
 | 2026-09-09 | EP-005 | DONE_VERIFIED | EP-005-remediation-001 | .agent/evidence/EP-005/STATUS.md |
+| 2026-09-09 | EP-007 | DONE_VERIFIED | EP-007-remediation-001 | .agent/evidence/EP-007/STATUS.md |
