@@ -1,1 +1,3 @@
 {"event_id":"forge-0001","timestamp_utc":"2026-08-28T16:45:00Z","agent_id":"forge","mode":"FORGE","node_id":"FORGE","event":"PACK_GENERATED","candidate_epoch":0,"commit_sha":"UNINITIALIZED","artifact_digest":"NONE","command":"blueprint generation","exit_code":0,"evidence_paths":["RESEARCH_NOTES.md"],"evidence_sha256":[],"previous_event_hash":"GENESIS","event_hash":"TO_BE_REHASHED_BY_EXECUTOR_AT_REPO_INIT"}
+| 2026-09-07 | EP-000 | M1_M2_VERIFICATION_COMPLETE | 0 | toolchain versions audited; discrepancy vs pins logged |
+| 2026-09-07 | EP-000 | CLOSED | 0 | milestones M1-M5 discovery complete |
