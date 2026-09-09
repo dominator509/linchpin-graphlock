@@ -1,0 +1,27 @@
+[package]
+name = "linchpin-desktop"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "linchpin_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.0" }
+
+[dependencies]
+tauri = { version = "2.6.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+domain = { path = "../../../crates/domain" }
+application = { path = "../../../crates/application" }
+storage = { path = "../../../crates/storage" }
+evidence = { path = "../../../crates/evidence" }
+research = { path = "../../../crates/research" }
+patent = { path = "../../../crates/patent" }
+commercialization = { path = "../../../crates/commercialization" }
+provider_transport = { path = "../../../crates/provider_transport" }
+mcp_hub = { path = "../../../crates/mcp_hub" }
+crash_reporter = { path = "../../../crates/crash_reporter" }
+platform_windows = { path = "../../../crates/platform_windows" }
