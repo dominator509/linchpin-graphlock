@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/domain",
+  "crates/application",
+  "crates/storage",
+  "crates/evidence",
+  "crates/research",
+  "crates/patent",
+  "crates/commercialization",
+  "crates/provider_transport",
+  "crates/mcp_hub",
+  "crates/crash_reporter",
+  "crates/platform_windows",
+  "apps/desktop/src-tauri"
+]
