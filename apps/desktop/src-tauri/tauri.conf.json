@@ -1,5 +1,5 @@
 {
-  "": "https://schema.tauri.app/v2/config.json",
+  "$schema": "https://schema.tauri.app/v2/config.json",
   "productName": "LINCHPIN",
   "version": "0.1.0",
   "identifier": "com.linchpin.app",
