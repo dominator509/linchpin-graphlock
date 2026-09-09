@@ -11,3 +11,5 @@
 | 2026-09-09 | EP-006 | DONE_VERIFIED | EP-006-remediation-001 | .agent/evidence/EP-006/STATUS.md |
 | 2026-09-09 | EP-005 | DONE_VERIFIED | EP-005-remediation-001 | .agent/evidence/EP-005/STATUS.md |
 | 2026-09-09 | EP-007 | DONE_VERIFIED | EP-007-remediation-001 | .agent/evidence/EP-007/STATUS.md |
+| 2026-09-09 | EP-008 | DONE_VERIFIED | EP-008-remediation-001 | .agent/evidence/EP-008/STATUS.md |
+| 2026-09-09 | EP-009 | CLOSED_BLOCKED | EP-009-attempt-001 | missing windows environment; see .agent/evidence/EP-009/STATUS.md |
