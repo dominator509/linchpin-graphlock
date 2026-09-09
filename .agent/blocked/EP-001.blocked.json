@@ -1,0 +1,10 @@
+{
+  "node": "EP-001",
+  "status": "CLOSED_BLOCKED",
+  "candidate_epoch": "EP-001-attempt-001",
+  "reason": "missing declared Cargo workspace member, unavailable dependencies, and placeholder policy failure",
+  "evidence": [
+    ".agent/evidence/EP-001/STATUS.md"
+  ],
+  "unblock_condition": "remediation-001 completed"
+}
