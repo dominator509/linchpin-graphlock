@@ -7,3 +7,4 @@
 | 2026-09-09 | EP-001 | CLOSED_BLOCKED | EP-001-attempt-001 | missing declared Cargo workspace member, unavailable dependencies, and placeholder policy failure; see .agent/evidence/EP-001/STATUS.md |
 | 2026-09-09 | EP-002 | DONE_VERIFIED | EP-002-remediation-001 | .agent/evidence/EP-002/STATUS.md |
 | 2026-09-09 | EP-003 | DONE_VERIFIED | EP-003-remediation-001 | .agent/evidence/EP-003/STATUS.md |
+| 2026-09-09 | EP-004 | DONE_VERIFIED | EP-004-remediation-001 | .agent/evidence/EP-004/STATUS.md |
