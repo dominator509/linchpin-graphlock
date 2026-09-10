@@ -1,4 +1,6 @@
 use std::path::PathBuf;
+use std::collections::HashMap;
+use std::sync::Mutex;
 
 pub struct AppPaths {
     pub app_data_dir: PathBuf,
@@ -11,10 +13,7 @@ pub fn get_app_paths() -> AppPaths {
         .unwrap_or_else(|_| PathBuf::from("./.linchpin_data"));
     let app_data_dir = base.join("LINCHPIN");
     let vault_dir = app_data_dir.join("vaults");
-    AppPaths {
-        app_data_dir,
-        vault_dir,
-    }
+    AppPaths { app_data_dir, vault_dir }
 }
 
 pub trait KeyringStore: Send + Sync {
@@ -23,20 +22,20 @@ pub trait KeyringStore: Send + Sync {
 }
 
 pub struct MemoryKeyring {
-    store: std::sync::Mutex<std::collections::HashMap<String, String>>,
-}
-
-impl Default for MemoryKeyring {
-    fn default() -> Self {
-        Self::new()
-    }
+    store: Mutex<HashMap<String, String>>,
 }
 
 impl MemoryKeyring {
     pub fn new() -> Self {
         Self {
-            store: std::sync::Mutex::new(std::collections::HashMap::new()),
+            store: Mutex::new(HashMap::new()),
         }
+    }
+}
+
+impl Default for MemoryKeyring {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -68,10 +67,7 @@ mod tests {
     fn test_memory_keyring() {
         let keyring = MemoryKeyring::new();
         keyring.set_secret("master_key", "secret123").unwrap();
-        assert_eq!(
-            keyring.get_secret("master_key").unwrap(),
-            Some("secret123".to_string())
-        );
+        assert_eq!(keyring.get_secret("master_key").unwrap(), Some("secret123".to_string()));
         assert_eq!(keyring.get_secret("nonexistent").unwrap(), None);
     }
 }
