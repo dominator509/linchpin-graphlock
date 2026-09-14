@@ -1,0 +1,98 @@
+# DOD-001 — Unbound Requirements: Measured Implementation State
+
+Generated during the DOD-001 audit. Candidate `b511ae9` (base `962e365`).
+
+DOD-001 RULE: "Every promised behavior has a stable requirement ID and at least
+one acceptance test before implementation is declared complete."
+
+`scripts/bind-requirements.py` reports 35 of 59 requirements bound to executed
+acceptance tests. The remaining **24** are `NO_BOUND_TEST`. That single status
+conflates two very different situations, and the distinction decides what work
+is actually required:
+
+* **ABSENT behavior** — no acceptance test *can* pass, because the promised
+  behavior does not exist. The remedy is implementation, not a test.
+* **PRESENT behavior** — the behavior exists but nothing asserts it. The remedy
+  is a test.
+
+This file records the state of each unbound requirement **as directly
+verified**, and marks the rest `UNASSESSED` rather than guessing.
+
+## Method note — and a caution about automated probes
+
+A first attempt measured these requirements with regex probes over the source
+tree. It produced **false results in both directions** and was discarded:
+
+| Claim from probes | Direct verification | Why the probe lied |
+| --- | --- | --- |
+| REQ-UI-001 "nav Docket / nav Commercialize" present | absent | matched the words in other files, not the UI's navigation |
+| REQ-UI-004 "destructive confirm" present | absent | matched `confirmation_number`, a USPTO receipt field |
+| REQ-PAT-003 claim classes present | absent | `Select-String` is case-insensitive by default and matched the English word "observation" in a comment |
+
+Conclusion drawn and applied here: for a claim about the existence of a
+capability, **read the definition site**. A lexical probe over a concatenated
+tree is not evidence of implementation. Only rows verified by reading code are
+listed as findings below.
+
+## Verified findings
+
+| Requirement | State | Evidence (directly inspected) |
+| --- | --- | --- |
+| REQ-UI-001 | **ABSENT** | Promises 13 primary-navigation surfaces. `apps/desktop/src/App.tsx` renders 3 sections: `Conception Lab` (line 377), `Patent Architect` (line 466), `Filing` (line 497). No occurrence of Dashboard, Opportunity Radar, Research War Room, Docket, Prosecution, Commercialize, Evidence Vault, Integrations, Incidents or Settings anywhere in the file. |
+| REQ-UI-002 | **PARTIAL** | Promises 4 persistent badges (confidentiality, filing/priority, evidence coverage, provider egress). The file contains exactly one: `<p>Local-First Confidentiality Boundary Active.</p>` (line 360). No badge for filing/priority, evidence coverage or egress state. |
+| REQ-UI-003 | **PARTIAL** | The prohibition half holds and is covered by an executed E2E test (5 prohibited phrases asserted absent). The preferred vocabulary half is 1 of 4: `draft` appears 15 times; `screen`, `evidence` and `uncertainty` appear 0 times in `App.tsx`. |
+| REQ-UI-004 | **ABSENT** | No consequence-specific confirmation or audit for destructive/high-impact actions exists in the UI. The only `confirm` substring is `confirmation_number`, a filing-receipt field. |
+| REQ-DOM-005 | **ABSENT** | Promises the claim graph "enforces dependency/category/limitation identity". `crates/domain/src/lib.rs` `ClaimGraph::map_threat(reference_id, limitation_id, description)` (line 263) pushes the threat with **no validation** that either `EntityId` refers to an existing limitation or reference, and returns `ThreatMap`, not `Result`. The struct exists; the enforcement does not. |
+| REQ-DOM-006 | **ABSENT** | No support-matrix type or function exists. |
+| REQ-DOM-009 | **ABSENT** | No docket ruleset source/version type or function exists. |
+| REQ-DOM-010 | **PRESENT** | `RepairCapsule` and redaction exist in `crates/crash_reporter/src/lib.rs`, with a `RedactionReport`. Implementation is present; it has no acceptance test. |
+| REQ-PAT-003 | **ABSENT** | Promises each research claim carries exactly one of 7 classes (`OBSERVATION`, `HYPOTHESIS`, `INFERENCE`, `LEGAL_RULE_SUMMARY`, `MARKET_SIGNAL`, `PATENT_THREAT`, `COMMERCIAL_TARGET_ASSERTION`). There is no `ClaimClass` enum and no occurrence of any class name as an identifier anywhere in the Rust or TypeScript sources. |
+
+## Correction to the DOD-001 disposition's "UI/A11Y" grouping
+
+The previous DOD-001 note listed the unbound set as "UI/A11Y, licensing,
+release/provenance, some domain rules". For the UI subset that framing was too
+generous: REQ-UI-001 and REQ-UI-004 are not untested features, they are
+**unimplemented** features. Recorded here so the gap is not read as
+test-writing work.
+
+## UNASSESSED — explicitly not claimed either way
+
+These remain unmeasured. They are **not** reported as absent, and no probe
+result for them is trusted:
+
+REQ-COM-002, REQ-COM-003, REQ-DATA-003, REQ-FOUND-001, REQ-FOUND-002,
+REQ-LIC-001, REQ-LIC-002, REQ-LIC-003, REQ-OPS-002, REQ-PLAT-002, REQ-REL-001,
+REQ-REL-002, REQ-REL-004, REQ-REL-005, REQ-SCOPE-001.
+
+## Binder defect found and fixed
+
+`scripts/bind-requirements.py` scanned only `*.rs` sources and collected test
+IDs only from `cargo test --list`. The 14 executed Playwright acceptance tests
+in `apps/desktop/e2e/` were therefore **invisible**, so requirements they cover
+could never bind no matter how the spec was written. The binder now also
+discovers `*.spec.ts` under `apps/desktop/e2e` and attributes a requirement to a
+Playwright test only when an explicit `covers:` marker appears **inside that
+test's own body** — a file-level docblock mention is deliberately not counted,
+because it asserts suite-wide scope and would bind requirements to tests that do
+not exercise them. E2E test IDs count as collected only when Playwright's JSON
+report exists for the candidate, so presence in a spec file is never mistaken
+for execution.
+
+MUTATION-PROVEN: injecting `// covers: REQ-UI-003` into the language test's body
+raises bound requirements from 35 to 36 (`NO_BOUND_TEST` 24 → 23); restoring the
+file returns both counts to their prior values.
+
+This fix does **not** by itself change any status, and that is the honest
+outcome: the two UI requirements nearest to binding are only partially
+implemented (table above), so binding them would have **overstated** DOD-001
+compliance. The fix removes a real blind spot without inflating the result.
+
+## Consequence for DOD-001
+
+`DOD-001` stays **PARTIAL**. Of the 24 unbound requirements, 7 are directly
+verified absent or partial, 1 is verified present and merely untested, and 15
+remain unassessed. Closing DOD-001 requires implementation work for the absent
+behaviour (starting with REQ-DOM-005 enforcement and REQ-DOM-010's redaction
+guarantee, both of which are bounded and testable) plus a test for each
+present-but-untested behaviour — not merely writing more tests.

@@ -10,7 +10,7 @@ REQ-DOM-001,6,4,4,0,PASS,commands::tests::test_record_conception_labels_human_or
 REQ-DOM-002,3,3,3,0,PASS,commands::tests::test_record_conception_labels_ai_origin_distinctly;commands::tests::test_record_conception_persists_ai_origin_distinctly;origin_tests::test_human_vs_ai_origin,apps/desktop/src-tauri/src/commands.rs;crates/domain/src/lib.rs
 REQ-DOM-003,2,2,2,0,PASS,commands::tests::test_opportunity_requires_evidence_to_be_a_finding;opportunity_tests::test_opportunity_candidate,apps/desktop/src-tauri/src/commands.rs;crates/domain/src/lib.rs
 REQ-DOM-004,2,1,1,0,PASS,claim_tests::test_claim_graph_and_design_around,crates/domain/src/lib.rs
-REQ-DOM-005,0,0,0,0,NO_BOUND_TEST,,
+REQ-DOM-005,3,3,3,0,PASS,claim_tests::test_claim_graph_rejects_unknown_limitation_identity;claim_tests::test_claim_graph_rejects_unknown_reference_identity;claim_tests::test_design_around_requires_a_recorded_threat,crates/domain/src/lib.rs
 REQ-DOM-006,0,0,0,0,NO_BOUND_TEST,,
 REQ-DOM-007,3,3,3,0,PASS,commands::tests::test_docket_requires_filing_before_commercialization;commands::tests::test_opportunity_validates_scores_and_uncertainty;docket_tests::test_docket_state_machine,apps/desktop/src-tauri/src/commands.rs;crates/domain/src/lib.rs
 REQ-DOM-008,5,4,4,0,PASS,commands::tests::test_export_firewall_blocks_restricted_content;commands::tests::test_export_gateway_hardens_paths_and_blocks_restricted;commands::tests::test_research_validates_its_inputs;firewall_tests::test_disclosure_firewall,apps/desktop/src-tauri/src/commands.rs;crates/evidence/src/lib.rs

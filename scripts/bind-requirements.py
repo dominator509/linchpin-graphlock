@@ -34,6 +34,8 @@ LEDGER = Path(".agent/verification/state/REQUIREMENT_TEST_BINDINGS.jsonl")
 
 REQ_RE = re.compile(r"\bREQ-[A-Z]+-\d+\b")
 TEST_FN_RE = re.compile(r"^\s*(?:async\s+)?fn\s+([a-z0-9_]+)\s*\(", re.MULTILINE)
+# Playwright: test("title", async ({ page }) => { ... });
+E2E_TEST_RE = re.compile(r"""^\s*test\(\s*["'`]([^"'`]+)["'`]""", re.MULTILINE)
 
 SEARCH_DIRS = [Path("crates"), Path("apps"), Path("packages")]
 EXCLUDED = {"node_modules", "target", "dist", "gen", "build"}
@@ -83,6 +85,91 @@ def crate_module_prefix(path: Path) -> str | None:
     if name in {"lib", "main", "mod"}:
         return None
     return name
+
+
+def find_e2e_specs() -> list[Path]:
+    """Playwright specs under apps/desktop/e2e."""
+    root = Path("apps/desktop/e2e")
+    if not root.exists():
+        return []
+    return sorted(root.rglob("*.spec.ts"))
+
+
+def bind_e2e_requirements() -> dict[str, list[dict[str, str]]]:
+    """Map Playwright test titles -> requirement IDs declared inside that test.
+
+    Defect this fixes: the binder only scanned `*.rs` and only collected IDs via
+    `cargo test --list`, so the 14 executed Playwright acceptance tests were
+    invisible. Requirements they genuinely cover (REQ-UI-002, REQ-UI-003) were
+    reported NO_BOUND_TEST even though real, passing, executed tests existed.
+    Coverage was UNDERSTATED -- the same class of measurement error as the SBOM
+    undercount and the `cargo build` vs `tauri build` mistake.
+
+    Attribution is per-test, not per-file: a REQ marker is counted only when it
+    appears inside that test's own body. File-level docblock mentions are
+    deliberately NOT counted, because they assert suite-wide scope and would
+    bind requirements to tests that do not exercise them.
+    """
+    bindings: dict[str, list[dict[str, str]]] = {}
+
+    for path in find_e2e_specs():
+        text = path.read_text("utf-8", errors="replace")
+        starts = list(E2E_TEST_RE.finditer(text))
+        for idx, match in enumerate(starts):
+            title = match.group(1)
+            start = match.start()
+            end = starts[idx + 1].start() if idx + 1 < len(starts) else len(text)
+            body = text[start:end]
+
+            marker = re.search(
+                r"(?://|/\*|\*)\s*(?:covers|verifies|reqs?)\s*:\s*([^\n*]*)",
+                body,
+                re.IGNORECASE,
+            )
+            if not marker:
+                continue
+            reqs = sorted(set(REQ_RE.findall(marker.group(1))))
+            for req in reqs:
+                bindings.setdefault(req, []).append(
+                    {"test_id": f"e2e::{title}", "file": str(path).replace("\\", "/")}
+                )
+    return bindings
+
+
+def collect_e2e_test_ids() -> set[str]:
+    """Playwright test IDs, read from its JSON reporter output when present.
+
+    Only tests Playwright actually RAN count as collected. Presence in a spec
+    file is not execution, so without a report the set is empty and any bound
+    E2E requirement is reported BOUND_NOT_COLLECTED rather than PASS -- the
+    honest outcome when the browser lane has not run for this candidate.
+    """
+    report = Path("apps/desktop/e2e-report.json")
+    if not report.exists():
+        report = Path(".agent/state/e2e-report.json")
+    if not report.exists():
+        return set()
+    try:
+        data = json.loads(report.read_text("utf-8", errors="replace"))
+    except (json.JSONDecodeError, OSError):
+        return set()
+    ids: set[str] = set()
+
+    def walk(specs: list) -> None:
+        for spec in specs:
+            for suite in spec.get("suites", []) or []:
+                walk([suite])
+            title = spec.get("title")
+            if title and spec.get("ok") is not None:
+                ids.add(f"e2e::{title}")
+            for t in spec.get("tests", []) or []:
+                t_title = t.get("title")
+                if t_title:
+                    ids.add(f"e2e::{t_title}")
+
+    for suite in data.get("suites", []) or []:
+        walk([suite])
+    return ids
 
 
 def bind_requirements() -> dict[str, list[dict[str, str]]]:
@@ -201,6 +288,13 @@ def main() -> int:
 
     collected = collect_test_ids()
     bindings = bind_requirements()
+
+    # Merge Playwright bindings. A requirement bound by BOTH a Rust test and an
+    # E2E test keeps both, so the row reflects every executed acceptance test.
+    for req, items in bind_e2e_requirements().items():
+        bindings.setdefault(req, []).extend(items)
+
+    collected |= collect_e2e_test_ids()
     results = parse_results()
     requirements = all_requirements()
 

@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "1dace70",
+  "candidate_commit": "b511ae9",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -34,10 +34,10 @@
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
         "scripts\\artifact-e2e.sh": "66789e3a58097851dc57d7a8d6d06fbc7b3d6e23c3fe66c69144132a8c8be9f3",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
-        "scripts\\bind-requirements.py": "aefe9afc545f0db1d0f61767c9125d90788771c67094e98cb8c5b95dc253402d",
+        "scripts\\bind-requirements.py": "b5b3f5d11af024a5bd363c74cd133a696e64172f34064aae8fbb7b34f881c41f",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "b2a4a924641168715c2c38fa47e638a85b8a3ad688a877a288535f97221b69ca",
-        "scripts\\build-dod-status.py": "141f32e1be10e589b86c5c8a20b05e17c88dbd7c53e98df6f3196d7c91666a3b",
+        "scripts\\build-dod-status.py": "eac85a2ea5359f11b84f270bf01371bed34d98715dda710fd6c76453b5f97284",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "d73a6d9a2f432bef3c75dde37c5939b735e005fc747a1e1f75dff5c116b25db6",
@@ -171,7 +171,7 @@
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
         "crates\\commercialization\\src\\lib.rs": "59bbcf33978af42a76239d11583acb9fb8e132d382bd6b72edb2a7fc4411858f",
         "crates\\crash_reporter\\src\\lib.rs": "028f4140116be8d20d805a42839849d3b3111b9e57b3ea0a1d3cbf5e6c7cac0a",
-        "crates\\domain\\src\\lib.rs": "ec4272d6c05260bd87b42cf7bfc15be553a858b5640a47276f9e29e1648f3aa4",
+        "crates\\domain\\src\\lib.rs": "4d492108c95c17c408119574d08455c0ef4eadc44fbb2044a16ee93b670c6ca6",
         "crates\\evidence\\src\\lib.rs": "831478be7892eb838c88886cd10dd40ffad85ad2a1a62b04dc2bbd841f02fc2e",
         "crates\\mcp_hub\\src\\lib.rs": "bac47aab7e67b1e81cb3852515b18ca6006f548d69313d5036ee9646ec2222aa",
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
@@ -205,6 +205,6 @@
       ]
     }
   },
-  "epoch_digest": "d7e72ad1801c0596055b10bb0cd2278106b332837969f24409fa60aa42249944",
+  "epoch_digest": "bac7d2f08afadc7f78da14bfdc6909ff4c96827b4646200f2f2cf6d447a45ec0",
   "total_inputs": 112
 }

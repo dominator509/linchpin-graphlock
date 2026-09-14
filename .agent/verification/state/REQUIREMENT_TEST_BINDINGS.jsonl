@@ -28,6 +28,9 @@
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-003", "result": "PASS", "test_id": "commands::tests::test_opportunity_requires_evidence_to_be_a_finding"}
 {"collected": false, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-004", "result": "NOT_RUN", "test_id": "opportunity_tests::default"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-004", "result": "PASS", "test_id": "claim_tests::test_claim_graph_and_design_around"}
+{"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-005", "result": "PASS", "test_id": "claim_tests::test_claim_graph_rejects_unknown_limitation_identity"}
+{"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-005", "result": "PASS", "test_id": "claim_tests::test_claim_graph_rejects_unknown_reference_identity"}
+{"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-005", "result": "PASS", "test_id": "claim_tests::test_design_around_requires_a_recorded_threat"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-007", "result": "PASS", "test_id": "docket_tests::test_docket_state_machine"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-007", "result": "PASS", "test_id": "commands::tests::test_opportunity_validates_scores_and_uncertainty"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-007", "result": "PASS", "test_id": "commands::tests::test_docket_requires_filing_before_commercialization"}

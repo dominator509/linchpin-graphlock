@@ -204,7 +204,7 @@ pub struct PriorArtReference {
     pub citation: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ThreatMap {
     pub reference_id: EntityId,
     pub limitation_id: EntityId,
@@ -216,6 +216,27 @@ pub struct DesignAround {
     pub id: EntityId,
     pub threat_map: ThreatMap,
     pub mitigation_strategy: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ClaimGraphError {
+    /// The limitation id is not present in this graph.
+    UnknownLimitation,
+    /// The prior-art reference id is not present in this graph.
+    UnknownReference,
+    /// A design-around was attached to a threat that is not in this graph.
+    UnknownThreat,
+}
+
+impl std::fmt::Display for ClaimGraphError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let msg = match self {
+            ClaimGraphError::UnknownLimitation => "limitation id is not in the claim graph",
+            ClaimGraphError::UnknownReference => "reference id is not in the claim graph",
+            ClaimGraphError::UnknownThreat => "threat is not in the claim graph",
+        };
+        write!(f, "{msg}")
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -260,33 +281,53 @@ impl ClaimGraph {
         id
     }
 
+    /// Map a prior-art reference onto one of this graph's limitations.
+    ///
+    /// REQ-DOM-005 requires the claim graph to *enforce* dependency, category
+    /// and limitation identity. Both ids must already belong to this graph: a
+    /// threat naming an unknown limitation or reference is rejected rather than
+    /// stored, because the previous implementation accepted any `EntityId` and
+    /// therefore recorded threat mappings that pointed at nothing.
     pub fn map_threat(
         &mut self,
         reference_id: EntityId,
         limitation_id: EntityId,
         description: String,
-    ) -> ThreatMap {
+    ) -> Result<ThreatMap, ClaimGraphError> {
+        if !self.limitations.iter().any(|l| l.id == limitation_id) {
+            return Err(ClaimGraphError::UnknownLimitation);
+        }
+        if !self.references.iter().any(|r| r.id == reference_id) {
+            return Err(ClaimGraphError::UnknownReference);
+        }
         let threat = ThreatMap {
             reference_id,
             limitation_id,
             description,
         };
         self.threats.push(threat.clone());
-        threat
+        Ok(threat)
     }
 
+    /// Attach a design-around to a threat that this graph already holds.
+    ///
+    /// The dependency edge is enforced for the same reason: a design-around is
+    /// only meaningful relative to a recorded threat.
     pub fn add_design_around(
         &mut self,
         threat_map: ThreatMap,
         mitigation_strategy: String,
-    ) -> EntityId {
+    ) -> Result<EntityId, ClaimGraphError> {
+        if !self.threats.contains(&threat_map) {
+            return Err(ClaimGraphError::UnknownThreat);
+        }
         let id = EntityId(Uuid::new_v4());
         self.design_arounds.push(DesignAround {
             id: id.clone(),
             threat_map,
             mitigation_strategy,
         });
-        id
+        Ok(id)
     }
 }
 
@@ -302,16 +343,70 @@ mod claim_tests {
         let limit_id = graph.add_limitation("A distributed ledger".to_string());
         let ref_id = graph.add_reference("US1234567B2".to_string());
 
-        let threat = graph.map_threat(ref_id, limit_id, "Reference teaches a ledger".to_string());
+        let threat = graph
+            .map_threat(ref_id, limit_id, "Reference teaches a ledger".to_string())
+            .expect("both ids belong to the graph");
         assert_eq!(graph.threats.len(), 1);
 
-        let _design_around_id =
-            graph.add_design_around(threat, "Ours is non-deterministic".to_string());
+        let _design_around_id = graph
+            .add_design_around(threat, "Ours is non-deterministic".to_string())
+            .expect("threat was recorded by this graph");
         assert_eq!(graph.design_arounds.len(), 1);
         assert_eq!(
             graph.design_arounds[0].mitigation_strategy,
             "Ours is non-deterministic"
         );
+    }
+
+    /// covers: REQ-DOM-005
+    #[test]
+    fn test_claim_graph_rejects_unknown_limitation_identity() {
+        let mut graph = ClaimGraph::new();
+        let ref_id = graph.add_reference("US1234567B2".to_string());
+        let foreign_limit = EntityId(Uuid::new_v4());
+
+        let result = graph.map_threat(ref_id, foreign_limit, "unmapped".to_string());
+
+        assert_eq!(result, Err(ClaimGraphError::UnknownLimitation));
+        assert!(
+            graph.threats.is_empty(),
+            "a rejected threat must not be stored: the graph recorded {}",
+            graph.threats.len()
+        );
+    }
+
+    /// covers: REQ-DOM-005
+    #[test]
+    fn test_claim_graph_rejects_unknown_reference_identity() {
+        let mut graph = ClaimGraph::new();
+        let limit_id = graph.add_limitation("A distributed ledger".to_string());
+        let foreign_ref = EntityId(Uuid::new_v4());
+
+        let result = graph.map_threat(foreign_ref, limit_id, "unmapped".to_string());
+
+        assert_eq!(result, Err(ClaimGraphError::UnknownReference));
+        assert!(graph.threats.is_empty());
+    }
+
+    /// covers: REQ-DOM-005
+    #[test]
+    fn test_design_around_requires_a_recorded_threat() {
+        let mut graph = ClaimGraph::new();
+        let limit_id = graph.add_limitation("A distributed ledger".to_string());
+        let ref_id = graph.add_reference("US1234567B2".to_string());
+
+        // A threat value that was never returned by map_threat: same shape,
+        // none of this graph's recorded threat entries.
+        let unrecorded = ThreatMap {
+            reference_id: ref_id,
+            limitation_id: limit_id,
+            description: "never mapped".to_string(),
+        };
+
+        let result = graph.add_design_around(unrecorded, "mitigation".to_string());
+
+        assert_eq!(result, Err(ClaimGraphError::UnknownThreat));
+        assert!(graph.design_arounds.is_empty());
     }
 }
 
