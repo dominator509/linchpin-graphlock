@@ -2,17 +2,23 @@
 
 Scan command: `python3 scripts/anti-gaming-scan.py .`
 Scan date: 2026-09-10
-Candidate: `587cc0c` (base `962e365`)
+Candidate: `264913f` (base `962e365`)
 
-**STATUS: AG-001 through AG-005 have all been REPAIRED and verified.**
+**STATUS: AG-001 through AG-006 have all been REPAIRED and verified.**
 Each carries a mutation/negative proof showing the guarding test genuinely
 fails when the real behavior is removed (DOD-018). Re-run
 `python3 scripts/anti-gaming-scan.py .` to confirm the production hits are gone.
 
-Five defects were found, not three. AG-004 and AG-005 were located later, in
-`crates/patent`, by writing probe tests against the existing API rather than by
-reading code. That method is worth reusing: the compiler and tests surface
-fabrication faster than review does.
+Six defects were found, not three. AG-004, AG-005 and AG-006 were located by
+writing probe tests against existing APIs rather than by reading code — the
+AG-004 probe failed on its first run, which is what exposed it. That method is
+worth reusing: executable probes surface fabrication faster than review does.
+
+Severity note: AG-006 is the most serious, because it manufactured the
+**release-gating** live-fire evidence that REQ-SHIP-001 depends on. AG-004 is
+next, because it returned a wrong application number on a filing-evidence path
+(REQ-PAT-005). AG-001/AG-002 fabricated provider output and defeated an export
+safety guard.
 
 The tree-wide scan returned 371 matches at base revision, most of which are
 false positives in prose/spec documents (`AGENTS.md` DoD text legitimately uses
@@ -186,6 +192,49 @@ and that it changes when either input changes.
 Real OOXML/PDF rendering remains **INCOMPLETE** against REQ-PAT-002. That is
 recorded rather than implied: the honest move was to stop claiming a format the
 crate cannot produce, not to build a half-renderer.
+
+## Finding AG-006 — `commercialization` fabricated live-fire evidence — REPAIRED
+
+`crates/commercialization/src/lib.rs` (base revision)
+
+```rust
+pub fn run_uo_live_fire(&mut self) -> Result<(), &'static str> {
+    // Simulating UO-01..12 live fire
+    self.completed_runs = 12;
+    Ok(())
+}
+```
+
+plus its test:
+
+```rust
+assert!(orchestrator.run_uo_live_fire().is_ok());
+assert_eq!(orchestrator.completed_runs, 12);
+```
+
+`completed_runs` was set to 12 without executing anything, and the test asserted
+that value, so the fabrication was self-certifying. This is the **most serious
+defect found this session**: REQ-SHIP-001 states *"Release requires UO-01..12
+live-fire"*, so any release gate reading this counter would have been told
+live-fire passed when no run occurred. That is manufactured release evidence.
+
+**Resolution (commit `264913f`).** The counter is now computed from recorded
+runs. `record_run(outcome_id, passed, detail)` appends a `UoRun`;
+`completed_runs()` counts **distinct passing** outcomes; `missing_outcomes()`
+lists what is absent; `verify_domain_regression()` fails while anything is
+missing. There is no code path that reaches 12 without 12 real passing records.
+Failing runs are retained and do not count; duplicates count once.
+
+Also repaired in the same crate (AG-006b): `DataRoom::export_pitch_deck`
+returned the constant `"Pitch deck generated"`, discarding the room's targets,
+so every export was byte-identical and carried no information. It now renders
+the non-confidential target list, labelled as draft planning material with no
+valuation claim (REQ-COM-004, REQ-UI-003).
+
+Tests: `commercialization` 2 → 5, including
+`test_completed_runs_cannot_be_fabricated`,
+`test_failing_runs_do_not_count_as_completed` and
+`test_duplicate_runs_count_once`.
 
 ## Not findings (classified, cleared)
 
