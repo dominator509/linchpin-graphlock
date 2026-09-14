@@ -1,0 +1,20 @@
+# Normalize line endings in the repository.
+#
+# Windows checkouts with core.autocrlf=true rewrite LF to CRLF on checkout,
+# which makes Prettier's `--check` fail on files whose committed content is
+# already correctly formatted. That produced a false format-check failure with
+# an empty `git diff --ignore-cr-at-eol`. Pinning `text=lf` here makes the gate
+# deterministic on every platform instead of depending on local git config.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending converted.
+*.png binary
+*.ico binary
+*.icns binary
+*.dmp binary
+*.exe binary
+*.msi binary
+
+# Generated/derived files.
+Cargo.lock text eol=lf
+pnpm-lock.yaml text eol=lf
