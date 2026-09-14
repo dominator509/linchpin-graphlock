@@ -3,4 +3,15 @@ name = "platform_windows"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+
 [dependencies]
+# Already present in the workspace Cargo.lock (windows 0.61.3, pulled in by
+# Tauri). Used only for Win32_System_ProcessStatus / Win32_Foundation to read
+# the process working set, so soak tests can measure real resident memory
+# instead of declaring a fabricated leak (anti-gaming finding AG-007b).
+# No new transitive dependency is introduced.
+windows = { version = "0.61.3", features = [
+    "Win32_Foundation",
+    "Win32_System_ProcessStatus",
+    "Win32_System_Threading",
+] }
