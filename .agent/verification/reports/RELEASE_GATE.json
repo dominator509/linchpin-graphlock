@@ -18,14 +18,14 @@
     "DOD-019=PARTIAL",
     "DOD-021=FAIL",
     "DOD-040=PARTIAL",
-    "DOD-041=FAIL",
+    "DOD-041=PARTIAL",
     "DOD-042=FAIL"
   ],
   "candidate_commit": "1bca002",
   "dod_status_tally": {
     "EXTERNAL_REQUIRED": 1,
-    "FAIL": 18,
-    "PARTIAL": 16,
+    "FAIL": 17,
+    "PARTIAL": 17,
     "PASS": 7
   },
   "external_clauses": [],

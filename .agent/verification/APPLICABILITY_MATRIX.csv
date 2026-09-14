@@ -1,2 +1,485 @@
-test_id,applicability,status,reason,evidence
-ALL-484,EVALUATE_PER_REGISTRY,NOT_STARTED,No registry row may be pruned,.agent/verification/MASTER_TEST_REGISTRY.csv
+test_id,source_group,registry_applicability,decision,status,evidence
+GEN-001,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-002,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-003,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-004,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-005,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-006,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-007,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-008,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-009,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-010,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-011,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-012,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-013,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-014,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-015,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-016,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-017,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-018,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (19-EXTERNAL-HUMAN); no case material executed for this ID yet.
+GEN-019,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-020,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (19-EXTERNAL-HUMAN); no case material executed for this ID yet.
+GEN-021,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (19-EXTERNAL-HUMAN); no case material executed for this ID yet.
+GEN-022,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-023,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-024,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-025,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-026,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-027,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-028,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-029,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-030,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-031,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-032,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-033,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-034,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-035,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-036,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-037,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-038,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-039,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-040,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-041,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-042,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-043,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-044,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-045,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-046,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-047,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-048,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-049,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-050,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-051,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-052,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-053,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-054,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-055,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-056,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-057,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-058,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-059,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-060,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-061,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-062,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-063,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (17-RECOVERY-OBSERVABILITY); no case material executed for this ID yet.
+GEN-064,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-065,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-066,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-067,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-068,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-069,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-070,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-071,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-072,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-073,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-074,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-075,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-076,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-077,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-078,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-079,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-080,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-081,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-082,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-083,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-084,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-085,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-086,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-087,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-088,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-089,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-090,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-091,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-092,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-093,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-094,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-095,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-096,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-097,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-098,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-099,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-100,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-101,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (03-STATIC-DESIGN-SUPPLY-CHAIN); no case material executed for this ID yet.
+GEN-102,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-103,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (19-EXTERNAL-HUMAN); no case material executed for this ID yet.
+GEN-104,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (11-FORMAL-PROPERTY-REGRESSION); no case material executed for this ID yet.
+GEN-105,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-106,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (11-FORMAL-PROPERTY-REGRESSION); no case material executed for this ID yet.
+GEN-107,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (11-FORMAL-PROPERTY-REGRESSION); no case material executed for this ID yet.
+GEN-108,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-109,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (11-FORMAL-PROPERTY-REGRESSION); no case material executed for this ID yet.
+GEN-110,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-111,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (17-RECOVERY-OBSERVABILITY); no case material executed for this ID yet.
+GEN-112,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-113,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-114,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (15-17-PERFORMANCE-STRESS-RECOVERY); no case material executed for this ID yet.
+GEN-115,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (15-17-PERFORMANCE-STRESS-RECOVERY); no case material executed for this ID yet.
+GEN-116,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-117,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (04-BUILD-ARTIFACT-DEPLOYMENT); no case material executed for this ID yet.
+GEN-118,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (17-RECOVERY-OBSERVABILITY); no case material executed for this ID yet.
+GEN-119,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (17-RECOVERY-OBSERVABILITY); no case material executed for this ID yet.
+GEN-120,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-121,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+GEN-122,General,evaluate,APPLICABLE,NOT_STARTED,applicability requires per-case evaluation at its default stage (12-DYNAMIC-SECURITY); no case material executed for this ID yet.
+HIPAA-001,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-002,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-003,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-004,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-005,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-006,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-007,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-008,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-009,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-010,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-011,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-012,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-013,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-014,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-015,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-016,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-017,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-018,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-019,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-020,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-021,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-022,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-023,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-024,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-025,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-026,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-027,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-028,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-029,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-030,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-031,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-032,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-033,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-034,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-035,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-036,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-037,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-038,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-039,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-040,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-041,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-042,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-043,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-044,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-045,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-046,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-047,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-048,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-049,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-050,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-051,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-052,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-053,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-054,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-055,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-056,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-057,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-058,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-059,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-060,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-061,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-062,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-063,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-064,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-065,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-066,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-067,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-068,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-069,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-070,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-071,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-072,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-073,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-074,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-075,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-076,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-077,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-078,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-079,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-080,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-081,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-082,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-083,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-084,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-085,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-086,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-087,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-088,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-089,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-090,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-091,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-092,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-093,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-094,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-095,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-096,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-097,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-098,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-099,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-100,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-101,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-102,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-103,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-104,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-105,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-106,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-107,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-108,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-109,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-110,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-111,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-112,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-113,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-114,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-115,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-116,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-117,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-118,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-119,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-120,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-121,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-122,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-123,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-124,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+HIPAA-125,HIPAA,conditional,NOT_APPLICABLE,NOT_APPLICABLE,"HIPAA pack not activated: LINCHPIN is a patent intelligence tool, not a covered entity or business associate. Evidence: no match for any of ['\\bphi\\b', 'protected health', '\\bhipaa\\b', 'patient record'] in first-party source."
+BC-001,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-002,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-003,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-004,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-005,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-006,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-007,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-008,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-009,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-010,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-011,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-012,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-013,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-014,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-015,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-016,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-017,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-018,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-019,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-020,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-021,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-022,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-023,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-024,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-025,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-026,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-027,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-028,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-029,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-030,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-031,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-032,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-033,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-034,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-035,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-036,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-037,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-038,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-039,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-040,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-041,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-042,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-043,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-044,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-045,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-046,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-047,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-048,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-049,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-050,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-051,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-052,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-053,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-054,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-055,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-056,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-057,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-058,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-059,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-060,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-061,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-062,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-063,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-064,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-065,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-066,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-067,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-068,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-069,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-070,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-071,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-072,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-073,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-074,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-075,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-076,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-077,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-078,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-079,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-080,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-081,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-082,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-083,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-084,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-085,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-086,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-087,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-088,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-089,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-090,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-091,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-092,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-093,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-094,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-095,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-096,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-097,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-098,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-099,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-100,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-101,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-102,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-103,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-104,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-105,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-106,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-107,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-108,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-109,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-110,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-111,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-112,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-113,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-114,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-115,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-116,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-117,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-118,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-119,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-120,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-121,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-122,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-123,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-124,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-125,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-126,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-127,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-128,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-129,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-130,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-131,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-132,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-133,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-134,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-135,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-136,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-137,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-138,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-139,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-140,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-141,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-142,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-143,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-144,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-145,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-146,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-147,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-148,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-149,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-150,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-151,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-152,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-153,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-154,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-155,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-156,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-157,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-158,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-159,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-160,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-161,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-162,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-163,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-164,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-165,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-166,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-167,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-168,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-169,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-170,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-171,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-172,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-173,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-174,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-175,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-176,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-177,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-178,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-179,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-180,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-181,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-182,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-183,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-184,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-185,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-186,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-187,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-188,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-189,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-190,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-191,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-192,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-193,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-194,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-195,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-196,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-197,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-198,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-199,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-200,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-201,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+BC-202,Blockchain,conditional,APPLICABLE,NOT_STARTED,blockchain surface detected: matched /blockchain/ in first-party source
+E2E-001,E2E,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+E2E-002,E2E,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+E2E-003,E2E,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+E2E-004,E2E,conditional-api,APPLICABLE,NOT_STARTED,typed IPC API exists: matched /tauri::command/ in first-party source
+E2E-005,E2E,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+E2E-006,E2E,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+E2E-007,E2E,conditional-interface,APPLICABLE,NOT_STARTED,interface exists: matched /tauri::command/ in first-party source
+E2E-008,E2E,conditional-runtime,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-009,E2E,conditional-runtime,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-010,E2E,conditional-stateful,APPLICABLE,NOT_STARTED,stateful surface exists: matched /rusqlite/ in first-party source
+E2E-011,E2E,conditional-distributable,APPLICABLE,NOT_STARTED,"installer bundling configured: matched /""bundle""/ in first-party source"
+E2E-012,E2E,conditional-persistence,APPLICABLE,NOT_STARTED,SQLite persistence exists: matched /rusqlite/ in first-party source
+E2E-013,E2E,conditional-versioned-distributed,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-014,E2E,conditional-versioned-stateful,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-015,E2E,conditional-data-portability,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-016,E2E,conditional-time,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-017,E2E,conditional-text-globalization,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-018,E2E,conditional-long-running,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+E2E-019,E2E,conditional-ai,APPLICABLE,NOT_STARTED,AI surface exists (provider/MCP crates) but no live provider is configured (PF-011 unmet). Evidence: matched /provider_transport/ in first-party source.
+E2E-020,E2E,conditional-human,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+SUP-001,Supplemental,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+SUP-002,Supplemental,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+SUP-003,Supplemental,conditional-distributable,APPLICABLE,NOT_STARTED,"installer bundling configured: matched /""bundle""/ in first-party source"
+SUP-004,Supplemental,conditional-buildable,APPLICABLE,NOT_STARTED,"buildable surface: Cargo.toml present=True, pnpm-lock.yaml present=True (repository root)"
+SUP-005,Supplemental,conditional-versioned-stateful,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+SUP-006,Supplemental,conditional-stateful-distributed,APPLICABLE,NOT_STARTED,stateful surface exists: matched /rusqlite/ in first-party source
+SUP-007,Supplemental,conditional-configurable,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+SUP-008,Supplemental,conditional-support-matrix,APPLICABLE,NOT_STARTED,Windows-only support matrix declared; Windows 11 untested. Evidence: matched /windows/ in first-party source.
+SUP-009,Supplemental,broadly-applicable,APPLICABLE,NOT_STARTED,broadly applicable to any shipped software product; no case material executed for this ID yet.
+SUP-010,Supplemental,conditional-gui,APPLICABLE,NOT_STARTED,desktop GUI surface exists but this case has not been executed. Evidence: matched /tauri/ in first-party source.
+SUP-011,Supplemental,conditional-runtime,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+SUP-012,Supplemental,conditional-service,APPLICABLE,NOT_STARTED,conditional capability of the shipped product; no case material executed for this ID yet (see COMPLETE_TEST_ACCOUNTING.csv).
+SUP-013,Supplemental,conditional-deployable,NOT_APPLICABLE,NOT_APPLICABLE,"deployment lifecycle not activated: RELEASE.md states auto-deploy is no and publication remains manual, so there is no promotion pipeline to verify. Evidence: RELEASE.md."
+SUP-014,Supplemental,conditional-multitenant,NOT_APPLICABLE,NOT_APPLICABLE,"multi-tenant pack not activated: LINCHPIN is local-first single-user; workspace scoping is not tenancy isolation. Evidence: no match for any of ['tenant_id', 'multi[-_ ]?tenant'] in first-party source."
+SUP-015,Supplemental,conditional-gui-human,APPLICABLE,NOT_STARTED,desktop GUI surface exists but this case has not been executed. Evidence: matched /tauri/ in first-party source.
