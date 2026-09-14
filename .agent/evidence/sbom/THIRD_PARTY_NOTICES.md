@@ -13,7 +13,7 @@ after any dependency change.
 
 ## Artifact identity
 
-- `target\release\linchpin-desktop.exe` sha256 `a6a3c43adbdead1f8dc3367f73be9389408a406e7fa030cac3203d44718b6d01`
+- `target\release\linchpin-desktop.exe` sha256 `9504cd8d90328435d11f9bb9dd67d03f2dfdeb41c4aee6bd6a59077421dc4842`
 - `Cargo.lock` sha256 `e4b6581bcd9abb74c7c5f4ac9155ad95d168dead52caf7f42f138d67b8380cfb`
 - `pnpm-lock.yaml` sha256 `45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf`
 

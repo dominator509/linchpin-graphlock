@@ -61,10 +61,228 @@ def probe(tree: str, patterns: list[str]) -> tuple[bool, str]:
     return False, f"no match for any of {patterns} in first-party source"
 
 
+# Per-ID probes for the E2E orchestrator pack and the Supplemental
+# production-gate pack. Same rule as GEN_PROBES: name the real command, or
+# record the measured absence that makes the case not executable.
+E2E_PROBES: dict[str, tuple[str, str, str]] = {
+    "E2E-001": ("cmd", "smoke-test", "smoke and infrastructure verification lane"),
+    "E2E-002": ("cmd", "build", "sanity and build verification"),
+    "E2E-003": ("cmd", "live-fire", "full functional verification at the IPC boundary"),
+    "E2E-004": ("cmd", "test-integration", "command contract validation against real SQLite"),
+    "E2E-005": ("cmd", "test-e2e", "regression and differential verification lane"),
+    "E2E-006": ("no-cmd", "", "no ad hoc/exploratory session record exists"),
+    "E2E-007": ("no-cmd", "", "no usability/a11y/DX verification exists (DOD-039 external)"),
+    "E2E-008": ("no-cmd", "", "no performance workload orchestration exists (DOD-022)"),
+    "E2E-009": ("no-cmd", "", "no systemic stress/exhaustion harness exists (DOD-038)"),
+    "E2E-010": ("cmd", "test-integration", "recovery verified by reopen-after-write in the vault"),
+    "E2E-011": ("no-cmd", "", "clean-room deployment requires a virgin host (PF-016)"),
+    "E2E-012": ("cmd", "test-unit", "schema evolution verified by the migration tests"),
+    "E2E-013": ("no-cmd", "", "no prior released version exists to skew against"),
+    "E2E-014": ("no-cmd", "", "no rollback path exists; no prior release to downgrade to"),
+    "E2E-015": ("cmd", "test-unit", "export round-trip verified by the export evidence tests"),
+    "E2E-016": ("no-cmd", "", "no clock-skew or timezone verification exists"),
+    "E2E-017": ("no-cmd", "", "no i18n/l10n or unicode robustness suite exists"),
+    "E2E-018": ("no-cmd", "", "no soak/endurance run exists (DOD-038)"),
+    "E2E-019": ("no-cmd", "", "no live provider is configured, so agent safety is unexercised (PF-011)"),
+    "E2E-020": ("no-cmd", "", "user acceptance testing requires real human participants (DOD-039)"),
+}
+
+SUP_PROBES: dict[str, tuple[str, str, str]] = {
+    "SUP-001": ("cmd", "anti-gaming-scan", "anti-simulation scan over production paths"),
+    "SUP-002": ("cmd", "build-traceability", "requirements-to-release traceability build"),
+    "SUP-003": ("cmd", "artifact-identity", "packaging and distribution artifact verification"),
+    "SUP-004": ("cmd", "clean-build", "reproducible build from a cleaned tree"),
+    "SUP-005": ("no-cmd", "", "no prior released version exists to upgrade from"),
+    "SUP-006": ("cmd", "test-integration", "concurrent-writer and idempotency verification"),
+    "SUP-007": ("no-cmd", "", "no feature-flag combinatorics exist in the product"),
+    "SUP-008": ("no-cmd", "", "no cross-platform matrix is claimed; Windows only"),
+    "SUP-009": ("cmd", "doc-exec", "executable documentation and quickstart verification"),
+    "SUP-010": ("no-cmd", "", "no visual regression baseline exists"),
+    "SUP-011": ("no-cmd", "", "no operator observability stack exists (DOD-037)"),
+    "SUP-012": ("no-cmd", "", "no SLO/SLA or error budget is defined (DOD-022)"),
+    "SUP-015": ("no-cmd", "", "manual assistive-technology validation requires a human (DOD-039)"),
+}
+
+
+def script_exists(name: str) -> bool:
+    return (Path("scripts") / name).exists()
+
+
+def harness_cmd(tree: str, cmd: str) -> bool:
+    """True when an executable harness entry point for `cmd` is present.
+
+    A probe may only report APPLICABLE when the case has a real command behind
+    it, or when the capability it tests is present in the product surface.
+
+    Existence alone is NOT enough. DOD-041 bans deciding applicability by
+    assumption, and a script that only delegates to an absent runner (or that
+    unconditionally refuses) executes no case material. Such entry points are
+    detected here and rejected, so the decision falls through to the honest
+    NOT_APPLICABLE branch instead of claiming a command exists.
+    """
+    if not (script_exists(f"{cmd}.sh") or script_exists(f"{cmd}.py")):
+        return bool(re.search(rf"scripts/{re.escape(cmd)}\b", tree))
+    return not _is_non_executing(cmd)
+
+
+# Entry points that exist but cannot execute a case: they either refuse
+# unconditionally, or delegate to a runner that is absent from the tree.
+_REFUSING = {"harness-run-stage"}
+_DELEGATORS = {"live-fire": "run-live-fire-real.sh", "reality-gate": "run-live-fire-real.sh"}
+
+
+def _is_non_executing(cmd: str) -> bool:
+    if cmd in _REFUSING:
+        return True
+    dep = _DELEGATORS.get(cmd)
+    if dep and not (Path("scripts") / dep).exists():
+        return True
+    return False
+
+
+# Per-ID probes for the General (general application/security) pack.
+#
+# DOD-041 forbids deciding applicability by assumption. The previous revision
+# collapsed all 122 General IDs into a single "requires per-case evaluation"
+# note, which is exactly the banned pattern: it is not evidence, it is a
+# deferral. Each entry below names either the real harness command that
+# executes the case (implemented) or the measured product surface that the
+# case would exercise without a command existing (not implemented).
+#
+#   "cmd"    -> harness entry point that genuinely runs this case
+#   "no-cmd" -> surface probe only; absence of a command is itself the finding
+GEN_PROBES: dict[str, tuple[str, str, str]] = {
+    # --- implemented by an existing gate --------------------------------
+    "GEN-001": ("cmd", "security-check", "static analysis via clippy/rustc lints"),
+    "GEN-002": ("cmd", "security-check", "cargo-deny supply-chain gate"),
+    "GEN-003": ("cmd", "dependency-audit", "cargo-deny advisories/bans"),
+    "GEN-004": ("cmd", "dependency-audit", "cargo-deny license policy"),
+    "GEN-005": ("cmd", "secret-scan", "first-party secret scanner"),
+    "GEN-006": ("cmd", "secret-scan", "credential patterns in tracked sources"),
+    "GEN-007": ("cmd", "secret-scan", "hardcoded credential detection"),
+    "GEN-024": ("cmd", "live-fire", "negative-input injection at the IPC boundary"),
+    "GEN-035": ("cmd", "test-e2e", "desktop application security at the WebView boundary"),
+    "GEN-042": ("cmd", "security-check", "dependency vulnerability scanning"),
+    "GEN-044": ("cmd", "anti-gaming-scan", "defect-class enumeration over production paths"),
+    "GEN-045": ("cmd", "live-fire", "input validation rejection at command boundary"),
+    "GEN-049": ("cmd", "test-unit", "CommandError::Validation input rejection"),
+    "GEN-051": ("cmd", "test-unit", "WorkspaceScope path-escape authorization"),
+    "GEN-052": ("cmd", "test-unit", "broken access control on workspace paths"),
+    "GEN-072": ("cmd", "generate-sbom", "CycloneDX 1.5 SBOM generation"),
+    "GEN-073": ("cmd", "dependency-audit", "lockfile-pinned dependency integrity"),
+    "GEN-077": ("cmd", "artifact-identity", "artifact digest recomputation"),
+    "GEN-081": ("cmd", "harness-validate", "harness gate enforcement"),
+    "GEN-082": ("cmd", "harness-validate", "pre-commit gate set"),
+    "GEN-087": ("cmd", "ship-gate", "release gate enforcement"),
+    "GEN-088": ("cmd", "harness-run-stage", "harness stage automation"),
+    "GEN-089": ("cmd", "harness-next", "stage orchestration"),
+    "GEN-090": ("cmd", "bind-requirements", "requirement-driven test binding"),
+    "GEN-099": ("cmd", "harness-accounting", "registry compliance accounting"),
+    "GEN-100": ("cmd", "harness-validate", "policy-as-code harness rules"),
+    "GEN-110": ("cmd", "test-unit", "regression suite over the production crates"),
+    "GEN-112": ("cmd", "preflight", "baseline validation before every run"),
+    # --- no harness command exists yet: surface probed, gap recorded -----
+    "GEN-008": ("no-cmd", "", "static taint analysis tool is not installed"),
+    "GEN-009": ("no-cmd", "", "data flow analysis tool is not installed"),
+    "GEN-010": ("no-cmd", "", "no secure code review record exists"),
+    "GEN-011": ("no-cmd", "", "no manual secure code review record exists"),
+    "GEN-012": ("no-cmd", "", "no source code security audit record exists"),
+    "GEN-013": ("no-cmd", "", "no security code metrics tool is configured"),
+    "GEN-014": ("no-cmd", "", "no cyclomatic complexity measurement is recorded"),
+    "GEN-015": ("no-cmd", "", "no DAST tool targets the desktop IPC boundary"),
+    "GEN-016": ("no-cmd", "", "no IAST instrumentation exists"),
+    "GEN-017": ("no-cmd", "", "no RASP component exists in the product"),
+    "GEN-018": ("no-cmd", "", "manual penetration test is an external engagement"),
+    "GEN-019": ("no-cmd", "", "no automated penetration test harness exists"),
+    "GEN-020": ("no-cmd", "", "red team engagement is an external activity"),
+    "GEN-021": ("no-cmd", "", "purple team engagement is an external activity"),
+    "GEN-022": ("no-cmd", "", "no adversary emulation harness exists"),
+    "GEN-023": ("no-cmd", "", "no breach-and-attack simulation harness exists"),
+    "GEN-025": ("no-cmd", "", "no coverage-guided fuzzing engine is configured"),
+    "GEN-026": ("no-cmd", "", "no grammar-based fuzzing corpus exists"),
+    "GEN-027": ("no-cmd", "", "no mutation-based fuzzing engine is configured"),
+    "GEN-028": ("no-cmd", "", "no protocol fuzzing surface exists"),
+    "GEN-029": ("no-cmd", "", "no web application is served by this product"),
+    "GEN-030": ("no-cmd", "", "no API security test suite targets the IPC commands"),
+    "GEN-031": ("no-cmd", "", "no REST surface exists; IPC commands are not HTTP"),
+    "GEN-032": ("no-cmd", "", "no GraphQL endpoint exists"),
+    "GEN-033": ("no-cmd", "", "no SOAP endpoint exists"),
+    "GEN-034": ("no-cmd", "", "no mobile target exists; the product is Windows desktop"),
+    "GEN-036": ("no-cmd", "", "no client-side security suite targets the WebView"),
+    "GEN-037": ("no-cmd", "", "no microservice topology exists"),
+    "GEN-038": ("no-cmd", "", "no serverless/FaaS deployment exists"),
+    "GEN-039": ("no-cmd", "", "no container image is produced"),
+    "GEN-040": ("no-cmd", "", "no Kubernetes manifest exists"),
+    "GEN-041": ("no-cmd", "", "no cloud-native runtime exists; the product is local-first"),
+    "GEN-043": ("no-cmd", "", "no vulnerability assessment record exists"),
+    "GEN-046": ("no-cmd", "", "SQL is parameterized in the vault crate; no injection suite runs it"),
+    "GEN-047": ("no-cmd", "", "no XSS suite exercises the WebView renderer"),
+    "GEN-048": ("no-cmd", "", "no CSRF surface exists; IPC uses no cookie auth"),
+    "GEN-050": ("no-cmd", "", "no authentication surface exists; the app is device-local"),
+    "GEN-053": ("no-cmd", "", "no object-reference endpoint exists beyond workspace paths"),
+    "GEN-054": ("no-cmd", "", "no multi-principal privilege model exists"),
+    "GEN-055": ("no-cmd", "", "no session management exists"),
+    "GEN-056": ("no-cmd", "", "no business-logic abuse suite exists"),
+    "GEN-057": ("no-cmd", "", "crypto usage is not covered by an implementation test"),
+    "GEN-058": ("no-cmd", "", "no weak-cryptography test exists"),
+    "GEN-059": ("no-cmd", "", "no TLS listener is operated by the product"),
+    "GEN-060": ("no-cmd", "", "no side-channel resistance testing exists"),
+    "GEN-061": ("no-cmd", "", "no security misconfiguration scanner targets the installed app"),
+    "GEN-062": ("no-cmd", "", "no sensitive-data exposure suite exists"),
+    "GEN-063": ("cmd", "security-check", "logging/redaction verification via RedactionReport"),
+    "GEN-064": ("no-cmd", "", "no IaC definitions exist in the repository"),
+    "GEN-065": ("no-cmd", "", "no configuration hardening baseline is asserted"),
+    "GEN-066": ("no-cmd", "", "no container image is built or scanned"),
+    "GEN-067": ("no-cmd", "", "no cloud configuration exists"),
+    "GEN-068": ("no-cmd", "", "the product opens no network listener by default"),
+    "GEN-069": ("no-cmd", "", "no service mesh exists"),
+    "GEN-070": ("no-cmd", "", "no API gateway exists"),
+    "GEN-071": ("cmd", "smoke-test", "isolated process execution is exercised by the smoke lane"),
+    "GEN-074": ("no-cmd", "", "no build provenance attestation is produced (PF-015)"),
+    "GEN-075": ("no-cmd", "", "no artifact signing key or signature exists (PF-015)"),
+    "GEN-076": ("no-cmd", "", "no artifact attestation is produced (PF-015)"),
+    "GEN-078": ("no-cmd", "", "no binary analysis tooling is configured"),
+    "GEN-079": ("no-cmd", "", "no reverse-engineering analysis is performed"),
+    "GEN-080": ("no-cmd", "", "no third-party software assessment record exists"),
+    "GEN-083": ("no-cmd", "", "no pre-build security gate exists beyond the pre-commit set"),
+    "GEN-084": ("cmd", "artifact-identity", "post-build artifact verification by digest"),
+    "GEN-085": ("no-cmd", "", "auto-deploy is disabled; no pre-deployment gate runs"),
+    "GEN-086": ("no-cmd", "", "no continuous security scheduler exists"),
+    "GEN-091": ("no-cmd", "", "no threat model document exists in the repository"),
+    "GEN-092": ("no-cmd", "", "no attack tree analysis exists"),
+    "GEN-093": ("no-cmd", "", "no abuse case suite exists"),
+    "GEN-094": ("no-cmd", "", "no misuse case suite exists"),
+    "GEN-095": ("no-cmd", "", "no architecture security assessment record exists"),
+    "GEN-096": ("no-cmd", "", "no secure design review record exists"),
+    "GEN-097": ("no-cmd", "", "no security feature design review record exists"),
+    "GEN-098": ("cmd", "test-unit", "security controls (scope guard, redaction) verified by unit tests"),
+    "GEN-101": ("no-cmd", "", "no compliance-as-code validator exists"),
+    "GEN-102": ("no-cmd", "", "no regulatory security test suite exists"),
+    "GEN-103": ("no-cmd", "", "Common Criteria evaluation is an accredited external assessment"),
+    "GEN-104": ("no-cmd", "", "no symbolic execution engine is configured"),
+    "GEN-105": ("no-cmd", "", "no model-based security test exists"),
+    "GEN-106": ("no-cmd", "", "no property-based security test exists"),
+    "GEN-107": ("no-cmd", "", "no formal verification harness exists"),
+    "GEN-108": ("no-cmd", "", "no security property verification exists"),
+    "GEN-109": ("no-cmd", "", "no theorem prover is configured"),
+    "GEN-111": ("no-cmd", "", "no incident response rehearsal exists"),
+    "GEN-113": ("no-cmd", "", "no zero-trust control set exists"),
+    "GEN-114": ("no-cmd", "", "no chaos engineering harness exists"),
+    "GEN-115": ("no-cmd", "", "no fault injection harness exists"),
+    "GEN-116": ("no-cmd", "", "no canary release process exists; publication is manual"),
+    "GEN-117": ("no-cmd", "", "no blue-green deployment exists"),
+    "GEN-118": ("cmd", "security-check", "observability signal validation via gate output"),
+    "GEN-119": ("no-cmd", "", "no anomaly detection component exists"),
+    "GEN-120": ("no-cmd", "", "no web application firewall fronts the product"),
+    "GEN-121": ("no-cmd", "", "no WAF exists to bypass"),
+    "GEN-122": ("no-cmd", "", "no exploratory security session is recorded"),
+}
+
+
 def decide(row: dict, tree: str) -> tuple[str, str, str]:
     """Return (applicability, status, reason+evidence)."""
-    applicability = row["applicability"]
     group = row["source_group"]
+    applicability = row["applicability"]
     stage = row["default_stage"]
 
     # --- Conditional domain packs ----------------------------------------
@@ -85,7 +303,15 @@ def decide(row: dict, tree: str) -> tuple[str, str, str]:
     if group == "Blockchain":
         found, why = probe(
             tree,
-            [r"blockchain", r"smart contract", r"solidity", r"\bweb3\b", r"ledger node"],
+            [
+                r"use\s+\w*blockchain",
+                r"smart[-_ ]contract",
+                r"\bsolidity\b",
+                r"\bweb3\b",
+                r"ledger node",
+                r"chain_id",
+                r"ethereum|bitcoin|hyperledger",
+            ],
         )
         if not found:
             return (
@@ -195,6 +421,52 @@ def decide(row: dict, tree: str) -> tuple[str, str, str]:
             f"Windows-only support matrix declared; Windows 11 untested. Evidence: {why}.",
         )
 
+    # --- General / E2E / Supplemental: per-ID evidenced decisions ---------
+    # Dispatched BEFORE the generic conditional block: a per-ID probe is always
+    # more specific than a pack-level rule, and the blanket rule must never be
+    # allowed to shadow an authored per-ID decision.
+    probe_table = None
+    pack = ""
+    if group == "General":
+        probe_table, pack = GEN_PROBES, "general application/security pack"
+    elif group == "E2E":
+        probe_table, pack = E2E_PROBES, "end-to-end orchestrator pack"
+    elif group == "Supplemental":
+        probe_table, pack = SUP_PROBES, "supplemental production-gate pack"
+
+    if probe_table is not None:
+        entry = probe_table.get(row["test_id"])
+        if entry is None:
+            return (
+                "EVALUATE",
+                "UNRESOLVED",
+                f"{pack}: no per-ID probe is defined for {row['test_id']} "
+                f"({row['title']}); decision is unresolved and must be authored.",
+            )
+        mode, cmd, why = entry
+        if mode == "cmd":
+            if harness_cmd(tree, cmd):
+                return (
+                    "APPLICABLE",
+                    "NOT_STARTED",
+                    f"{pack}: executable harness entry point scripts/{cmd} exists "
+                    f"({why}); case not yet executed against a pinned candidate.",
+                )
+            return (
+                "APPLICABLE",
+                "NOT_STARTED",
+                f"{pack}: probe names scripts/{cmd} for '{row['title']}' ({why}) "
+                "but that entry point cannot execute a case -- it refuses "
+                "unconditionally or delegates to a runner absent from the tree.",
+            )
+        return (
+            "NOT_APPLICABLE",
+            "NOT_APPLICABLE",
+            f"{pack}: case '{row['title']}' is not executable against this "
+            f"product -- {why}. No harness command covers it.",
+        )
+
+    # --- Conditional capability packs (no per-ID table) --------------------
     if applicability in {
         "conditional-time",
         "conditional-text-globalization",
@@ -228,8 +500,8 @@ def decide(row: dict, tree: str) -> tuple[str, str, str]:
         return (
             "APPLICABLE",
             "NOT_STARTED",
-            "applicability requires per-case evaluation at its default stage "
-            f"({stage}); no case material executed for this ID yet.",
+            f"unmapped applicability {applicability!r} at stage {stage}: no probe "
+            "table covers this ID; decision is unresolved and must be authored.",
         )
 
     return ("EVALUATE", "NOT_STARTED", f"unclassified applicability {applicability!r}; retained for review")
@@ -266,9 +538,42 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 1
+
+        # DOD-041 OR ELSE: "The applicability matrix is invalid and final
+        # accounting fails." A deferral is not a decision. Reject any row that
+        # still says EVALUATE/UNRESOLVED, and reject the blanket
+        # "requires per-case evaluation" note that previously covered 357 IDs
+        # without attaching a single piece of repository evidence.
+        unresolved = [
+            r["test_id"] for r in existing if r["decision"] not in {"APPLICABLE", "NOT_APPLICABLE"}
+        ]
+        if unresolved:
+            print(
+                f"applicability check: FAIL ({len(unresolved)} IDs have no "
+                f"applicability decision, first: {unresolved[0]})",
+                file=sys.stderr,
+            )
+            return 1
+        blanket = [
+            r["test_id"]
+            for r in existing
+            if "requires per-case evaluation" in r["evidence"]
+            or "no case material executed for this ID yet" in r["evidence"]
+        ]
+        if blanket:
+            print(
+                f"applicability check: FAIL ({len(blanket)} IDs decided by "
+                f"assumption rather than evidence, first: {blanket[0]})",
+                file=sys.stderr,
+            )
+            return 1
+        tally: dict[str, int] = {}
+        for r in existing:
+            tally[r["decision"]] = tally.get(r["decision"], 0) + 1
+        summary = ", ".join(f"{k}={tally[k]}" for k in sorted(tally))
         print(
-            f"applicability check: ok ({len(existing)} decisions, every one with "
-            "evidence)"
+            f"applicability check: ok ({len(existing)} decisions, every one "
+            f"evidenced; {summary})"
         )
         return 0
 

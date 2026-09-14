@@ -104,6 +104,7 @@
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_token_shaped_secrets_are_scrubbed_without_registration"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_empty_secret_is_not_registered"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "commands::tests::test_repair_capsule_redacts_secrets"}
+{"collected": true, "file": "crates/evidence/src/lib.rs", "requirement_id": "REQ-REPAIR-002", "result": "PASS", "test_id": "redaction_tests::test_redaction_report_evidences_the_pass"}
 {"collected": false, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-002", "result": "NOT_RUN", "test_id": "incident_tests::redact_token_like"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-002", "result": "PASS", "test_id": "capsule_tests::test_sanitized_repair_capsule"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-RES-001", "result": "PASS", "test_id": "commands::tests::test_research_lifecycle_happy_path"}

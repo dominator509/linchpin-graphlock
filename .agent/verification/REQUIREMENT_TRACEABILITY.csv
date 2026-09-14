@@ -45,7 +45,7 @@ REQ-REL-003,1,1,1,0,PASS,commands::tests::test_filing_handoff_reports_blockers_a
 REQ-REL-004,0,0,0,0,NO_BOUND_TEST,,
 REQ-REL-005,0,0,0,0,NO_BOUND_TEST,,
 REQ-REPAIR-001,5,5,5,0,PASS,capsule_tests::test_empty_secret_is_not_registered;capsule_tests::test_flag_alone_is_not_sufficient;capsule_tests::test_redaction_actually_removes_invention_content;capsule_tests::test_token_shaped_secrets_are_scrubbed_without_registration;commands::tests::test_repair_capsule_redacts_secrets,apps/desktop/src-tauri/src/commands.rs;crates/crash_reporter/src/lib.rs
-REQ-REPAIR-002,2,1,1,0,PASS,capsule_tests::test_sanitized_repair_capsule,crates/crash_reporter/src/lib.rs
+REQ-REPAIR-002,3,2,2,0,PASS,capsule_tests::test_sanitized_repair_capsule;redaction_tests::test_redaction_report_evidences_the_pass,crates/crash_reporter/src/lib.rs;crates/evidence/src/lib.rs
 REQ-RES-001,3,3,3,0,PASS,commands::tests::test_research_citation_accumulates_and_is_refused_when_finished;commands::tests::test_research_lifecycle_happy_path;commands::tests::test_research_rejects_illegal_transition,apps/desktop/src-tauri/src/commands.rs
 REQ-RES-002,2,1,1,0,PASS,vault::tests::test_migrations_are_recorded_and_idempotent,crates/storage/src/vault.rs
 REQ-SCOPE-001,0,0,0,0,NO_BOUND_TEST,,
