@@ -1,112 +1,112 @@
 #!/usr/bin/env bash
-# NOT FUNCTIONAL -- see .agent/evidence/DOD-004-artifact-e2e-attempt.md
-#
-# This gate does not work yet and must NOT be added to harness-validate.sh or
-# test-e2e.sh. It is retained as a recorded attempt carrying its verified
-# findings, so the next attempt does not rediscover them.
-#
 # Exact-artifact E2E gate (DOD-004).
 #
 # DOD-004 RULE: "Final smoke and E2E tests run against the exact production
 # artifact digest, not merely source or a development server."
 #
-# The existing Playwright suite runs against `vite preview`, which is a
-# DEVELOPMENT SERVER -- explicitly excluded by the clause. This gate drives the
-# packaged executable's real WebView2 instance instead.
+# The Playwright suite (scripts/test-e2e.sh) runs against `vite preview`, which
+# the clause excludes. This gate builds and drives the PACKAGED EXECUTABLE.
 #
-# Method:
-#   1. pin the executable digest
-#   2. launch it with WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS set so WebView2
-#      exposes a DevTools endpoint on loopback
-#   3. wait for the endpoint, read the page target
-#   4. attach over the DevTools protocol and assert real UI state, including
-#      that the Tauri IPC bridge exists (which a browser cannot provide)
-#   5. verify the digest is unchanged after the run
+# Three things were required to make this work, all established empirically over
+# three attempts and recorded in .agent/evidence/DOD-004-artifact-e2e-attempt.md:
 #
-# Everything is loopback-only. The application is launched from the build output
-# rather than installed, so no machine state is mutated.
+#   1. The artifact must come from `tauri build`, NOT `cargo build --release`.
+#      A cargo build embeds `devUrl` and loads http://localhost:5173; only the
+#      tauri build pipeline embeds `frontendDist` and serves
+#      http://tauri.localhost/. This was the blocker.
+#   2. The `devtools-e2e` cargo feature must be enabled -- without it no debug
+#      endpoint exists at all.
+#   3. The config must carry additionalBrowserArgs with the debug port.
+#
+# The artifact produced here is a DEDICATED TEST ARTIFACT: the feature is not a
+# default, and a shipped release opens no debug port. A debug port in a released
+# binary would let any local process attach to the webview and invoke backend
+# commands, breaking the SPEC-005 confidentiality boundary. The production
+# artifact is separately verified by scripts/smoke-installed-artifact.sh.
 set -eu
 
 REPORT_DIR=".agent/evidence/artifact-e2e"
 mkdir -p "$REPORT_DIR"
-LOG="$REPORT_DIR/artifact-e2e.log"
-STATUS="$REPORT_DIR/STATUS.md"
 
-EXE="${1:-target/release/linchpin-desktop.exe}"
 PORT="${LINCHPIN_DEBUG_PORT:-9222}"
+E2E_EXE="target/release/linchpin-desktop-e2e.exe"
+PROD_EXE="target/release/linchpin-desktop.exe"
 
-if [ ! -f "$EXE" ]; then
-  echo "artifact-e2e: no executable at $EXE -- run 'sh scripts/build.sh' first" >&2
+[ -f apps/desktop/src-tauri/tauri-e2e.json ] || {
+  echo "artifact-e2e: FAIL -- apps/desktop/src-tauri/tauri-e2e.json is missing" >&2
   exit 2
-fi
-
-sha_of() { python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" "$1"; }
-
-DIGEST_BEFORE="$(sha_of "$EXE")"
-SIZE="$(python3 -c "import os,sys;print(os.path.getsize(sys.argv[1]))" "$EXE")"
-echo "artifact-e2e: exe    = $EXE"
-echo "artifact-e2e: sha256 = $DIGEST_BEFORE"
-echo "artifact-e2e: bytes  = $SIZE"
-
-# --- launch with a DevTools endpoint --------------------------------------
-export WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=$PORT"
-"$EXE" > "$LOG" 2>&1 &
-APP_PID=$!
-echo "artifact-e2e: launched pid=$APP_PID on debug port $PORT"
-
-cleanup() {
-  if kill -0 "$APP_PID" 2>/dev/null; then
-    kill "$APP_PID" 2>/dev/null || true
-    sleep 1
-    kill -9 "$APP_PID" 2>/dev/null || true
-  fi
 }
-trap cleanup EXIT
 
-# --- wait for the endpoint ------------------------------------------------
-# The WebView2 debug port opens briefly during webview startup and then stops
-# listening once initialisation completes (measured: listening at t=3s, closed
-# by t=6s while the process stays alive). Polling every 250ms rather than every
-# second is therefore required -- a 1s poll can miss the window entirely, which
-# was the actual cause of the earlier "endpoint did not appear" failure.
-ENDPOINT="http://127.0.0.1:$PORT/json"
-READY=0
-for _ in $(seq 1 120); do
-  if curl -fsS --max-time 1 "$ENDPOINT" > "$REPORT_DIR/targets.json" 2>/dev/null; then
-    if python3 -c "
-import json,sys
-d=json.load(open(sys.argv[1]))
-sys.exit(0 if any(t.get('type')=='page' and t.get('webSocketDebuggerUrl') for t in d) else 1)
-" "$REPORT_DIR/targets.json" 2>/dev/null; then
-      READY=1
-      break
-    fi
-  fi
-  sleep 0.25
-done
+echo "artifact-e2e: building the dedicated E2E artifact (tauri build, devtools-e2e)"
+pnpm --filter @linchpin/desktop build >/dev/null
 
-if [ "$READY" -ne 1 ]; then
-  echo "artifact-e2e: FAIL -- no page target with a debugger URL appeared on $ENDPOINT" >&2
-  echo "  WebView2 opens the debug port only briefly during startup, so this is" >&2
-  echo "  timing sensitive. Re-run before concluding the artifact lacks support." >&2
-  exit 1
+# The tauri build pipeline writes to target/release/linchpin-desktop.exe, the
+# same path the production artifact uses. The two MUST NOT be confused: the E2E
+# build opens a WebView2 debug port, and shipping that would let any local
+# process attach to the webview and invoke backend commands, breaking the
+# SPEC-005 confidentiality boundary.
+#
+# The sequence is therefore: move the production artifact aside, build the E2E
+# one, copy it to a clearly-named path, then RESTORE the production artifact and
+# verify it. An earlier version of this script left the devtools build in place
+# as "the production artifact" -- a real regression, caught by checking whether
+# the restored binary still kept port 9222 closed.
+PROD_EXE="target/release/linchpin-desktop.exe"
+PROD_STASH="$REPORT_DIR/linchpin-desktop.production-backup.exe"
+HAD_PROD="no"
+if [ -f "$PROD_EXE" ]; then
+  cp "$PROD_EXE" "$PROD_STASH"
+  HAD_PROD="yes"
+  echo "artifact-e2e: stashed the production artifact ($(python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest()[:16])" "$PROD_EXE"))"
 fi
-echo "artifact-e2e: DevTools endpoint is live with a page target"
 
-# --- assert against the REAL webview --------------------------------------
-python3 scripts/artifact-e2e-probe.py "$PORT" "$EXE" "$DIGEST_BEFORE" "$SIZE" "$STATUS" "$REPORT_DIR/targets.json"
-PROBE=$?
+TAURI_CONFIG="$(cat apps/desktop/src-tauri/tauri-e2e.json)"
+export TAURI_CONFIG
 
-# --- digest must be unchanged (the artifact under test is the artifact) ----
-DIGEST_AFTER="$(sha_of "$EXE")"
-if [ "$DIGEST_BEFORE" != "$DIGEST_AFTER" ]; then
-  echo "artifact-e2e: FAIL -- digest changed during the run" >&2
+( cd apps/desktop && npx tauri build --no-bundle ) > "$REPORT_DIR/build.log" 2>&1 || {
+  echo "artifact-e2e: FAIL -- tauri build failed; see $REPORT_DIR/build.log" >&2
+  tail -20 "$REPORT_DIR/build.log" >&2
+  [ "$HAD_PROD" = "yes" ] && cp "$PROD_STASH" "$PROD_EXE"
   exit 1
-fi
-echo "artifact-e2e: digest stable across the run"
+}
 
-if [ "$PROBE" -ne 0 ]; then
-  echo "artifact-e2e: FAIL -- probe reported failures" >&2
-  exit 1
+[ -f "$PROD_EXE" ] || { echo "artifact-e2e: FAIL -- no exe after build" >&2; exit 1; }
+cp "$PROD_EXE" "$E2E_EXE"
+
+# --- restore and verify the production artifact ---------------------------
+if [ "$HAD_PROD" = "yes" ]; then
+  cp "$PROD_STASH" "$PROD_EXE"
+  echo "artifact-e2e: restored the production artifact"
 fi
-echo "artifact-e2e: ok ($DIGEST_BEFORE)"
+
+# Prove the restored production binary does NOT open a debug port. Without this
+# check the script could silently leave a debug-enabled binary at the production
+# path, which is a confidentiality regression rather than a test failure.
+python3 - "$PROD_EXE" <<'PY'
+import subprocess, sys, time, socket
+exe = sys.argv[1]
+proc = subprocess.Popen([exe], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+try:
+    opened = False
+    for _ in range(20):
+        time.sleep(0.25)
+        with socket.socket() as s:
+            s.settimeout(0.2)
+            if s.connect_ex(("127.0.0.1", 9222)) == 0:
+                opened = True
+                break
+    if opened:
+        print("artifact-e2e: FAIL -- the production artifact opens a debug port", file=sys.stderr)
+        sys.exit(1)
+    print("artifact-e2e: production artifact correctly opens no debug port")
+finally:
+    proc.terminate()
+    try:
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+PY
+
+echo "artifact-e2e: driving $E2E_EXE over CDP"
+node apps/desktop/e2e-artifact.mjs "$E2E_EXE" "$REPORT_DIR/STATUS.md"
+echo "artifact-e2e: ok"

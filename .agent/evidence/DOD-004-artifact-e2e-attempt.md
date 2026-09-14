@@ -1,6 +1,70 @@
-# DOD-004 Artifact-Bound E2E — attempt record (NOT WORKING)
+# DOD-004 Artifact-Bound E2E — CLOSED (three attempts)
 
-Status: **NOT FUNCTIONAL — do not wire into any gate.**
+Status: **WORKING.** `scripts/artifact-e2e.sh` drives the packaged executable's
+real WebView2 over CDP and 15 assertions pass against a pinned digest. Both E2E
+lanes now run from `scripts/test-e2e.sh`.
+
+This file is retained because the two failed attempts contain the findings that
+made the third one work.
+
+## The blocker was artifact production, not CDP
+
+A raw `cargo build --release` embeds `devUrl` and makes the app load
+`http://localhost:5173` — a development server, which DOD-004 excludes. Only an
+artifact produced by **`tauri build`** embeds `frontendDist` and serves the app
+from `http://tauri.localhost/`.
+
+Measured difference, same source:
+
+| Build | `index-n_ittevb.js` embedded | Loaded origin |
+| --- | --- | --- |
+| `cargo build --release` | no | `chrome-error://chromewebdata/` (localhost:5173 refused) |
+| `tauri build --no-bundle` | yes | `http://tauri.localhost/` |
+
+Two rounds were spent suspecting the CDP client. The CDP client was fine:
+`chromium.connectOverCDP` attaches and `window.__TAURI_INTERNALS__` is present.
+
+## Also required
+
+- `devtools-e2e = ["tauri/devtools"]`, a non-default feature: without it no
+  debug endpoint exists at all.
+- A config carrying `additionalBrowserArgs: "--remote-debugging-port=<port>"`.
+  Setting only `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` in the environment did
+  **not** work.
+- The port opens briefly at startup and closes once the webview finishes
+  initialising (measured open at t=3s, closed by t=6s). Poll at 250ms or the
+  window is missed.
+- Wait for `domcontentloaded` / `readyState === "complete"` before evaluating:
+  the webview starts at `about:blank` and navigating destroys the execution
+  context mid-flight. That was the cause of the empty-evaluation symptom.
+
+## Security regression found and fixed while wiring the gate
+
+`tauri build` writes to `target/release/linchpin-desktop.exe`, the SAME path the
+production artifact uses. An early version of the gate therefore **left the
+devtools-enabled binary sitting at the production path** — a released binary
+that opens a debug port, letting any local process attach to the webview and
+invoke backend commands. That breaks the SPEC-005 confidentiality boundary.
+
+The gate now stashes the production artifact, builds the test one, restores, and
+**proves the restored binary keeps port 9222 closed** before running any
+assertion. Verified: "production artifact correctly opens no debug port".
+
+## What is verified
+
+15 assertions against the pinned executable digest, including that the loaded
+origin is the embedded frontend, that the Tauri IPC bridge exists, that
+`get_system_health` and `get_namespace_status` round-trip, and that
+`record_conception` — a state-changing command — writes a `sha256:` content
+address into the durable vault with `HumanConception` origin preserved. The
+digest is re-verified unchanged after the run.
+
+## Remaining limitation
+
+The executable is launched from build output rather than installed from the MSI;
+`scripts/smoke-installed-artifact.sh` covers the install path. A virgin
+clean-room install (DOD-034) remains EXTERNAL_REQUIRED.
+
 
 `scripts/artifact-e2e.sh` and `scripts/artifact-e2e-probe.py` were written this
 round to satisfy DOD-004's requirement that E2E run "against the exact

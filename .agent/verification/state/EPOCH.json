@@ -1,12 +1,12 @@
 {
-  "candidate_commit": "c46e8be",
+  "candidate_commit": "d767ec9",
   "classes": {
     "artifact": {
       "count": 3,
       "files": {
-        "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi": "64095bd533482658052a1ddf5138cb51c33036ce7fdfe30fb0d52edf26b474cd",
-        "target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe": "6033fc60269766594e028072ff0ccde806799a11f581e1151a53fede3a504262",
-        "target\\release\\linchpin-desktop.exe": "9d40cf1f0ea06eb65ea3b2ff5059859d9e67cd152e272ee431a91d37bf7b320c"
+        "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi": "7a513c18d6238cb2b0042ad04e73be4ab97bca853f6dd3c3996c947892ac1ca7",
+        "target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe": "5490af1bc814071aca17c48dd55489338f7d5a8cb31d6196fc034c2c55fde57e",
+        "target\\release\\linchpin-desktop.exe": "a6a3c43adbdead1f8dc3367f73be9389408a406e7fa030cac3203d44718b6d01"
       },
       "rules": [
         "V-020 exact artifact",
@@ -28,17 +28,16 @@
       ]
     },
     "gate-script": {
-      "count": 50,
+      "count": 49,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\artifact-e2e-probe.py": "c5efface3e6ff428da8d141d4d3b5b2fc0daf5b0742d340d77c086902f7b6a75",
-        "scripts\\artifact-e2e.sh": "ae37a9b0821333d0cbf89a7999bb858b09ce17f82a0d9fded64d628ccc70d82b",
+        "scripts\\artifact-e2e.sh": "74c5b97617e14a2b962f642a15334759b09591df4a86ffc24e80db617bff4668",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\bind-requirements.py": "aefe9afc545f0db1d0f61767c9125d90788771c67094e98cb8c5b95dc253402d",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "6285076849d8d847a17be1fd80bf5bd4b67246b1fbbfff1327ddd32648cc72db",
-        "scripts\\build-dod-status.py": "2348c21a10633b7393d59d1b58b36308ed4c3d09cdf5f53488a9046e13939d80",
+        "scripts\\build-dod-status.py": "83d17f311f6d0eae2d063226c1a8fc6912e461696ed89718ac6d1e574389ac3e",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "1fb0fcfa770bf67efa1db47b63b7922e57cf014b86f95e7ac3bf5f1e11113e15",
@@ -72,7 +71,7 @@
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
         "scripts\\test-collection-guard.py": "83a92ac7dbcbcbff78c04fa60c23776ceb7234ad7b59e03c9bb6fcfe315767ab",
         "scripts\\test-collection-guard.sh": "82c46b21641211877d13314c012fc40f3a8bc7f06930a513b9a7b32a83200958",
-        "scripts\\test-e2e.sh": "919b708368de5105dea96f11a7137eb86571870277553a645dd962b7ececbe32",
+        "scripts\\test-e2e.sh": "1079092f3a695bea66a0efcef186b3e4ea0979a71468e02551ac4261945cc5aa",
         "scripts\\test-integration.sh": "2acaa6c1f4f01d9b4c6f498bbf2a08cfd4b4797674624c5dc2277b71629fcbad",
         "scripts\\test-unit.sh": "0feb713f778b4416900735069b515d236c3dbc485271590123d6157b54d8bce4",
         "scripts\\typecheck.sh": "54c88db43635e1b09da1a11ea730dcf0595e4389f79b63ff0644be1473094ed8",
@@ -198,6 +197,6 @@
       ]
     }
   },
-  "epoch_digest": "5a528137fabd8c69e085497fa531a51e94a7e029cddd23580bd5cb12214f1b95",
-  "total_inputs": 110
+  "epoch_digest": "1cd1acf40947adcb4a095a3ad7702aaa7deaac171ba067ef54333c911ff94d4d",
+  "total_inputs": 109
 }

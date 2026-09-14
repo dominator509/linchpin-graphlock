@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `5a528137fabd8c69e085497fa531a51e94a7e029cddd23580bd5cb12214f1b95`
-- Candidate commit at generation: `c46e8be`
-- Total tracked inputs: 110
-- Previous epoch digest: `e4879ffa0c1ecf0ab73ef7b819df56d996ac0c487108c24cd1181039ac05b654`
-- **Changed input classes since that epoch: rust-manifest, artifact**
+- Current epoch digest: `1cd1acf40947adcb4a095a3ad7702aaa7deaac171ba067ef54333c911ff94d4d`
+- Candidate commit at generation: `d767ec9`
+- Total tracked inputs: 109
+- Previous epoch digest: `740a92508a3ad3bc340473348be9fc9ef60ea9dde4003c072f71f9d40210259f`
+- **Changed input classes since that epoch: gate-script**
 
 ## Input classes and what a change invalidates
 
@@ -22,9 +22,9 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-020 exact artifact
 - invalidates: V-021 final accounting
 
-  - `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `64095bd533482658…`
-  - `target\release\bundle\nsis\LINCHPIN_0.1.0_x64-setup.exe` `6033fc6026976659…`
-  - `target\release\linchpin-desktop.exe` `9d40cf1f0ea06eb6…`
+  - `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `7a513c18d6238cb2…`
+  - `target\release\bundle\nsis\LINCHPIN_0.1.0_x64-setup.exe` `5490af1bc814071a…`
+  - `target\release\linchpin-desktop.exe` `a6a3c43adbdead1f…`
 
 ### `config` — 5 file(s)
 
@@ -37,16 +37,16 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 50 file(s)
+### `gate-script` — 49 file(s)
 
 - invalidates: all stages that invoke the changed gate
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
-  - `scripts\artifact-e2e-probe.py` `c5efface3e6ff428…`
-  - `scripts\artifact-e2e.sh` `ae37a9b0821333d0…`
+  - `scripts\artifact-e2e.sh` `74c5b97617e14a2b…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
-  - … and 45 more
+  - `scripts\bind-requirements.py` `aefe9afc545f0db1…`
+  - … and 44 more
 
 ### `js-manifest` — 7 file(s)
 
