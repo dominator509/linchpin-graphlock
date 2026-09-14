@@ -1,12 +1,12 @@
 {
-  "candidate_commit": "2a95872",
+  "candidate_commit": "c46e8be",
   "classes": {
     "artifact": {
       "count": 3,
       "files": {
         "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi": "64095bd533482658052a1ddf5138cb51c33036ce7fdfe30fb0d52edf26b474cd",
         "target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe": "6033fc60269766594e028072ff0ccde806799a11f581e1151a53fede3a504262",
-        "target\\release\\linchpin-desktop.exe": "2b0e4dbf55934178963dfad9217bf25d7be3f5e25d7b56b0c0b52b6442cc1072"
+        "target\\release\\linchpin-desktop.exe": "9d40cf1f0ea06eb65ea3b2ff5059859d9e67cd152e272ee431a91d37bf7b320c"
       },
       "rules": [
         "V-020 exact artifact",
@@ -136,7 +136,7 @@
       "count": 15,
       "files": {
         "Cargo.toml": "0d0b50947cf1f81b5558affaa372df36b1611d888d8da47b3697cec9f546e9f7",
-        "apps\\desktop\\src-tauri\\Cargo.toml": "05409d1dc3acd9de7860912a200655f5da8733e4d9c02667dacf0f0b8c72176f",
+        "apps\\desktop\\src-tauri\\Cargo.toml": "9360ecae2ff3d0b2de8619327613f37578f6643fdfbaaf95633afc5c67676121",
         "crates\\application\\Cargo.toml": "e00d97aec3cee509460c1260e9a2b296bc353370012916f649df1ef5b8cb25be",
         "crates\\commercialization\\Cargo.toml": "67245a3fe78ea355f1ba6a46d5a5161774e2859a0fd4dccb9dd138f8e93adc97",
         "crates\\crash_reporter\\Cargo.toml": "be20a3f1e5b5e0b5c03784f30ef5501410d75eabd4ff11b4386b9c51da1f7752",
@@ -198,6 +198,6 @@
       ]
     }
   },
-  "epoch_digest": "e4879ffa0c1ecf0ab73ef7b819df56d996ac0c487108c24cd1181039ac05b654",
+  "epoch_digest": "5a528137fabd8c69e085497fa531a51e94a7e029cddd23580bd5cb12214f1b95",
   "total_inputs": 110
 }

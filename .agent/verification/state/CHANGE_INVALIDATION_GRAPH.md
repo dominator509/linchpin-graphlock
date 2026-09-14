@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `e4879ffa0c1ecf0ab73ef7b819df56d996ac0c487108c24cd1181039ac05b654`
-- Candidate commit at generation: `2a95872`
+- Current epoch digest: `5a528137fabd8c69e085497fa531a51e94a7e029cddd23580bd5cb12214f1b95`
+- Candidate commit at generation: `c46e8be`
 - Total tracked inputs: 110
-- Previous epoch digest: `75a981a292d807bab56ff8c24e5b4a5d14eeca8080b1a4452a5a16baaae85916`
-- **Changed input classes since that epoch: gate-script, artifact**
+- Previous epoch digest: `e4879ffa0c1ecf0ab73ef7b819df56d996ac0c487108c24cd1181039ac05b654`
+- **Changed input classes since that epoch: rust-manifest, artifact**
 
 ## Input classes and what a change invalidates
 
@@ -24,7 +24,7 @@ definition and its PASS status is revoked until rerun.
 
   - `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `64095bd533482658…`
   - `target\release\bundle\nsis\LINCHPIN_0.1.0_x64-setup.exe` `6033fc6026976659…`
-  - `target\release\linchpin-desktop.exe` `2b0e4dbf55934178…`
+  - `target\release\linchpin-desktop.exe` `9d40cf1f0ea06eb6…`
 
 ### `config` — 5 file(s)
 
@@ -89,7 +89,7 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-020 exact artifact
 
   - `Cargo.toml` `0d0b50947cf1f81b…`
-  - `apps\desktop\src-tauri\Cargo.toml` `05409d1dc3acd9de…`
+  - `apps\desktop\src-tauri\Cargo.toml` `9360ecae2ff3d0b2…`
   - `crates\application\Cargo.toml` `e00d97aec3cee509…`
   - `crates\commercialization\Cargo.toml` `67245a3fe78ea355…`
   - `crates\crash_reporter\Cargo.toml` `be20a3f1e5b5e0b5…`

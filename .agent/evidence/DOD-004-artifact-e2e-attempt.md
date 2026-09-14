@@ -58,10 +58,76 @@ output, so the failure mode is not yet characterised.
   launches the build output; `scripts/smoke-installed-artifact.sh` covers the
   install path separately).
 
+## Round 23 — connectOverCDP tried; the WebSocket layer was not the problem
+
+The hand-rolled RFC 6455 client was replaced with Playwright's
+`chromium.connectOverCDP` (already a devDependency via ADR-004). This is a
+**strict improvement and the WebSocket layer was NOT the failure**:
+
+    targets: page:about:blank
+    contexts: 1
+    pages: 1
+    page url: chrome-error://chromewebdata/
+    title: "localhost"
+    h1: "Hmmm… can't reach this page"
+    hasIpc: true          <-- the REAL Tauri webview context IS reachable
+
+`hasIpc: true` is the significant result. `window.__TAURI_INTERNALS__` is
+present, so CDP is attached to the genuine webview context, not a stray target.
+The earlier empty-evaluation failure was **a navigation race**: the webview
+starts at `about:blank` and navigates, and evaluating before the new document
+loads destroys the execution context. Waiting for `domcontentloaded`,
+`readyState === "complete"` and an `h1` selector does not fix it here only
+because the navigation now fails outright (below).
+
+### The real blocker: the test artifact loads the DEV SERVER, which is not running
+
+The page ends at `chrome-error://chromewebdata/` with "can't reach this page"
+against **`localhost:5173`** — Tauri's `devUrl`. So the artifact under test tries
+to load a development server, which is precisely the condition DOD-004 excludes.
+Measured: nothing listens on 5173.
+
+Attempts that did **not** resolve it:
+
+- Removing `devUrl` from a `TAURI_CONFIG` overlay. The `localhost:5173` string is
+  present in the binary from the **committed** `tauri.conf.json` regardless, and
+  a normal release build contains it too — so its presence is not by itself
+  evidence of which path is used at runtime.
+- Forcing the tauri build script to re-run (`rm -rf target/release/build/linchpin-desktop-*`)
+  after changing the overlay. No change.
+- Confirmed the config overlay IS being read: with the overlay the debug port
+  opens; with the committed config (and the same `devtools-e2e` feature) port
+  9222 stays closed. So `additionalBrowserArgs` is honoured but the `build`
+  section resolves differently than assumed.
+
+Not yet established: whether `cargo build --release` without `tauri build` even
+honours `frontendDist`, or whether the dev/prod selection depends on how the
+binary was produced. That is the next thing to determine, and it is a question
+about Tauri's build pipeline rather than about CDP.
+
+### What is kept
+
+- `devtools-e2e = ["tauri/devtools"]` in the desktop manifest. Verified: this is
+  what makes the endpoint available at all, it is not a default feature, and a
+  release build without the config overlay does not open the port.
+- This record.
+
+### What was reverted
+
+The `tauri.e2e.conf.json` overlay and the CDP probe script, because neither
+works yet and an unverified security-relevant build flag is not worth carrying.
+
+## Not attempted
+
+- Installing the artifact and driving the installed copy (`scripts/smoke-installed-artifact.sh`
+  covers the install path separately).
+- Producing the test artifact with `tauri build` rather than `cargo build`,
+  which is the most likely reason `frontendDist` is not being applied.
+
 ## Honest status
 
-DOD-004 remains **PARTIAL**. Nothing about this attempt changes its disposition,
-and the two scripts are inert. The verified parts — that the endpoint needs an
-explicit opt-in, that it is open only briefly, and that enabling it by default
-would be a security regression — are recorded here so the next attempt does not
-rediscover them.
+DOD-004 remains **PARTIAL**. Two rounds have now been spent here without closing
+it. The results are negative but not wasted: CDP attachment to the real webview
+is proven to work (`hasIpc: true`), so the remaining problem is scoped to how the
+test artifact is produced, not to how it is driven.
+

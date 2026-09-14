@@ -29,6 +29,18 @@ mcp_hub = { path = "../../../crates/mcp_hub" }
 crash_reporter = { path = "../../../crates/crash_reporter" }
 platform_windows = { path = "../../../crates/platform_windows" }
 
+[features]
+# Enables the WebView2 DevTools endpoint so the packaged executable can be
+# driven by scripts/artifact-e2e.mjs (DOD-004 requires E2E against the exact
+# artifact rather than a development server).
+#
+# DELIBERATELY NOT a default feature and never present in a release build: a
+# debugging port in a shipped binary would let any local process attach to the
+# webview and invoke backend commands, breaking the SPEC-005 confidentiality
+# boundary. The gate builds a dedicated artifact with `--features devtools-e2e`
+# and tests THAT digest.
+devtools-e2e = ["tauri/devtools"]
+
 [dev-dependencies]
 # Already in the workspace Cargo.lock (tokio 1.53.1). Needed only to drive the
 # async provider transport from tests. No new transitive package.
