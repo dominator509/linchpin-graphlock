@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+pub mod vault;
+
+pub use vault::{MIGRATIONS, StoredConceptionEvent, Vault, VaultError, sha256_hex};
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VaultRecord {
     pub id: String,

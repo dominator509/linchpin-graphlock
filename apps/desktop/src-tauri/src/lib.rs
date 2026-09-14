@@ -29,6 +29,9 @@ fn get_system_health() -> Result<application::SystemHealth, String> {
 }
 
 /// Record a human conception event (REQ-DOM-001, REQ-DOM-002).
+///
+/// The vault is resolved from the platform app-data directory so the event is
+/// durably committed rather than merely acknowledged.
 #[tauri::command]
 fn record_conception(
     workspace_id: String,
@@ -36,7 +39,16 @@ fn record_conception(
     author_is_human: bool,
 ) -> commands::CommandResult<commands::RecordConceptionOutcome> {
     let scope = commands::WorkspaceScope { workspace_id };
-    commands::record_conception(&scope, &content, author_is_human)
+    let vault_path = vault_file();
+    commands::record_conception(&scope, &content, author_is_human, Some(&vault_path))
+}
+
+/// Path to the durable vault database.
+fn vault_file() -> PathBuf {
+    let root = storage_root();
+    // The vault directory must exist before SQLite can create the file.
+    let _ = std::fs::create_dir_all(&root);
+    root.join("linchpin-vault.db")
 }
 
 /// Report SPEC-003 namespace coverage.

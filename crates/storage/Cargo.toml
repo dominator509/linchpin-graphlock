@@ -3,7 +3,11 @@ name = "storage"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+
 [dependencies]
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 tantivy = "0.26.2"
 uuid = { version = "1.26.0", features = ["v4"] }
+# Already in the workspace Cargo.lock (sha2 0.10.9). Required by REQ-DATA-002:
+# "Evidence blobs are content-addressed SHA-256". No new transitive package.
+sha2 = "0.10.9"

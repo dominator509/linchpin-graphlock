@@ -174,10 +174,16 @@ pub struct RecordConceptionOutcome {
 /// recorded distinctly; an AI suggestion may never be filed as human
 /// conception (`PATENT_DOMAIN_MODEL.md` forbids the transition from AI
 /// suggestion directly to `CONCEPTION_CONFIRMED`).
+///
+/// When `vault_path` is supplied the event is durably committed through
+/// `storage::Vault` (REQ-DATA-001, REQ-DATA-002) and `persisted` reports the
+/// real outcome. When no vault path is supplied nothing is written and the
+/// result says so — the command never claims a side effect it did not perform.
 pub fn record_conception(
     scope: &WorkspaceScope,
     content: &str,
     author_is_human: bool,
+    vault_path: Option<&std::path::Path>,
 ) -> CommandResult<RecordConceptionOutcome> {
     let correlation = CorrelationId::new();
 
@@ -204,20 +210,54 @@ pub fn record_conception(
         domain::AuthorOrigin::HumanConception(_) => "HumanConception",
         domain::AuthorOrigin::AiSuggestion(_) => "AiSuggestion",
     };
+    let event_id = block.id.0.to_string();
+
+    let (persisted, hash, storage_detail) = match vault_path {
+        Some(path) => match storage::Vault::open(path) {
+            Ok(vault) => {
+                if let Err(e) = vault.create_workspace(&scope.workspace_id) {
+                    return CommandResult::failure(
+                        correlation,
+                        CommandError::validation(format!("workspace: {e}")),
+                    );
+                }
+                match vault.put_conception_event(&scope.workspace_id, &event_id, origin, content) {
+                    Ok(stored) => (
+                        true,
+                        stored.content_hash,
+                        format!("committed to {}", path.display()),
+                    ),
+                    Err(e) => {
+                        return CommandResult::failure(
+                            correlation,
+                            CommandError::validation(format!("vault write failed: {e}")),
+                        );
+                    }
+                }
+            }
+            Err(e) => {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::validation(format!("vault open failed: {e}")),
+                );
+            }
+        },
+        None => (
+            false,
+            content_hash(content),
+            "not persisted: no vault path supplied".to_string(),
+        ),
+    };
 
     let outcome = RecordConceptionOutcome {
         event: ConceptionEventView {
-            event_id: block.id.0.to_string(),
-            content_hash: content_hash(content),
+            event_id,
+            content_hash: hash,
             content_bytes: content.len(),
             origin: origin.to_string(),
         },
-        // This command does NOT yet write to durable storage: the vault wiring
-        // (REQ-DATA-001) is not implemented. Saying so is required by DOD-026;
-        // claiming persistence here would be a fabricated side effect.
-        persisted: false,
-        storage_detail: "not persisted: vault write path is not implemented (REQ-DATA-001 open)"
-            .to_string(),
+        persisted,
+        storage_detail,
     };
 
     CommandResult::success(correlation, outcome)
@@ -499,7 +539,7 @@ mod tests {
         let scope = WorkspaceScope {
             workspace_id: "ws-1".to_string(),
         };
-        let result = record_conception(&scope, "a self-sealing valve", true);
+        let result = record_conception(&scope, "a self-sealing valve", true, None);
         assert!(result.ok);
         assert!(!result.correlation_id.is_empty());
 
@@ -516,8 +556,12 @@ mod tests {
         let scope = WorkspaceScope {
             workspace_id: "ws-1".to_string(),
         };
-        let human = record_conception(&scope, "same text", true).value.unwrap();
-        let ai = record_conception(&scope, "same text", false).value.unwrap();
+        let human = record_conception(&scope, "same text", true, None)
+            .value
+            .unwrap();
+        let ai = record_conception(&scope, "same text", false, None)
+            .value
+            .unwrap();
 
         assert_eq!(human.event.origin, "HumanConception");
         assert_eq!(ai.event.origin, "AiSuggestion");
@@ -532,30 +576,117 @@ mod tests {
         let bad_scope = WorkspaceScope {
             workspace_id: "   ".to_string(),
         };
-        let r = record_conception(&bad_scope, "text", true);
+        let r = record_conception(&bad_scope, "text", true, None);
         assert!(!r.ok);
         assert!(matches!(r.error, Some(CommandError::Validation { .. })));
 
         let scope = WorkspaceScope {
             workspace_id: "ws-1".to_string(),
         };
-        let r2 = record_conception(&scope, "   ", true);
+        let r2 = record_conception(&scope, "   ", true, None);
         assert!(!r2.ok);
         assert!(matches!(r2.error, Some(CommandError::Validation { .. })));
     }
 
-    /// DOD-026: the command must not claim a side effect it did not perform.
+    /// DOD-026: with no vault path the command must not claim a side effect it
+    /// did not perform.
     #[test]
-    fn test_record_conception_does_not_claim_unimplemented_persistence() {
+    fn test_record_conception_does_not_claim_persistence_without_vault() {
         let scope = WorkspaceScope {
             workspace_id: "ws-1".to_string(),
         };
-        let outcome = record_conception(&scope, "content", true).value.unwrap();
+        let outcome = record_conception(&scope, "content", true, None)
+            .value
+            .unwrap();
         assert!(
             !outcome.persisted,
-            "command claimed persistence while the vault write path is unimplemented"
+            "command claimed persistence with no vault path"
         );
         assert!(outcome.storage_detail.contains("not persisted"));
+    }
+
+    fn temp_db(tag: &str) -> (std::path::PathBuf, std::path::PathBuf) {
+        let mut dir = std::env::temp_dir();
+        dir.push(format!(
+            "linchpin-cmd-{tag}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        let db = dir.join("vault.db");
+        (dir, db)
+    }
+
+    /// The durable path must genuinely commit: the event is written through
+    /// `storage::Vault` and read back with a real SHA-256 content address
+    /// (REQ-DATA-001, REQ-DATA-002).
+    #[test]
+    fn test_record_conception_persists_through_the_vault() {
+        let (dir, db) = temp_db("vault");
+        let scope = WorkspaceScope {
+            workspace_id: "ws-persist".to_string(),
+        };
+        let outcome = record_conception(&scope, "a self-sealing graphene valve", true, Some(&db))
+            .value
+            .expect("value on success");
+
+        assert!(
+            outcome.persisted,
+            "durable write did not report persistence"
+        );
+        assert!(
+            outcome.event.content_hash.starts_with("sha256:"),
+            "expected a SHA-256 content address, got {}",
+            outcome.event.content_hash
+        );
+        assert_eq!(
+            outcome.event.content_hash,
+            storage::sha256_hex(b"a self-sealing graphene valve"),
+            "content hash does not match the stored bytes"
+        );
+
+        // Independent read-back through a fresh connection.
+        let vault = storage::Vault::open(&db).expect("reopen vault");
+        let stored = vault
+            .get_conception_event(&outcome.event.event_id)
+            .expect("query")
+            .expect("event must be present after the command returned");
+        assert_eq!(stored.content, "a self-sealing graphene valve");
+        assert_eq!(stored.origin, "HumanConception");
+        assert_eq!(stored.workspace_id, "ws-persist");
+        vault.verify_audit_chain().expect("chain must verify");
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// An AI suggestion must persist with its distinct origin label, so the
+    /// conception record cannot be retroactively blurred (REQ-DOM-002).
+    #[test]
+    fn test_record_conception_persists_ai_origin_distinctly() {
+        let (dir, db) = temp_db("ai");
+        let scope = WorkspaceScope {
+            workspace_id: "ws-ai".to_string(),
+        };
+        let outcome = record_conception(&scope, "an AI idea", false, Some(&db))
+            .value
+            .unwrap();
+        assert!(outcome.persisted);
+        assert_eq!(outcome.event.origin, "AiSuggestion");
+
+        let vault = storage::Vault::open(&db).unwrap();
+        let stored = vault
+            .get_conception_event(&outcome.event.event_id)
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            stored.origin, "AiSuggestion",
+            "AI origin was not preserved through persistence"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]
@@ -744,6 +875,7 @@ mod tests {
             },
             "content",
             true,
+            None,
         );
         let json = serde_json::to_string(&result).expect("serialize");
         assert!(json.contains("correlation_id"), "got {json}");
