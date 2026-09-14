@@ -2008,6 +2008,7 @@ dependencies = [
  "storage",
  "tauri",
  "tauri-build",
+ "tokio",
  "uuid",
 ]
 

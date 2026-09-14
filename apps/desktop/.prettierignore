@@ -13,6 +13,10 @@ node_modules/
 # Emitted by tauri-build on every build; not authored source.
 src-tauri/gen/
 
+# Playwright run artifacts, regenerated on every test run.
+test-results/
+playwright-report/
+
 # Binary assets.
 *.png
 *.ico

@@ -28,3 +28,8 @@ provider_transport = { path = "../../../crates/provider_transport" }
 mcp_hub = { path = "../../../crates/mcp_hub" }
 crash_reporter = { path = "../../../crates/crash_reporter" }
 platform_windows = { path = "../../../crates/platform_windows" }
+
+[dev-dependencies]
+# Already in the workspace Cargo.lock (tokio 1.53.1). Needed only to drive the
+# async provider transport from tests. No new transitive package.
+tokio = { version = "1.53.1", features = ["rt", "macros"] }

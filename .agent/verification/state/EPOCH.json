@@ -1,0 +1,195 @@
+{
+  "candidate_commit": "7b75b65",
+  "classes": {
+    "artifact": {
+      "count": 3,
+      "files": {
+        "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi": "64095bd533482658052a1ddf5138cb51c33036ce7fdfe30fb0d52edf26b474cd",
+        "target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe": "6033fc60269766594e028072ff0ccde806799a11f581e1151a53fede3a504262",
+        "target\\release\\linchpin-desktop.exe": "159e4ec82b75e989b01540b47b788fbd0af376fc2ebc0f3ab55e402c1b16428c"
+      },
+      "rules": [
+        "V-020 exact artifact",
+        "V-021 final accounting"
+      ]
+    },
+    "config": {
+      "count": 5,
+      "files": {
+        ".gitattributes": "3de8a5dfac003c5fcb8cf674d6b0eb545c663d97c36a4da2dee7f7725517cd56",
+        ".prettierignore": "f6bc22748f98df5307f79b0f7f03d11b0410a31089c04b2ec01400af9c39ac03",
+        "apps\\desktop\\playwright.config.ts": "44233624cd581b09f8db578c11d7b7ad2ec66d2f4e43f0e263849fb0623c1c1c",
+        "apps\\desktop\\src-tauri\\tauri.conf.json": "950dc4ba958823127e61c28f97f0693013fef91537ee9a0c1f4409a006909622",
+        "apps\\desktop\\vitest.config.ts": "d0adc5ef1e028cc988da921a9224b3bb82652f005a09450ff39718b385eb06ac"
+      },
+      "rules": [
+        "V-005 clean build",
+        "V-011 configuration matrix"
+      ]
+    },
+    "gate-script": {
+      "count": 42,
+      "files": {
+        "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
+        "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
+        "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
+        "scripts\\build-applicability.py": "6285076849d8d847a17be1fd80bf5bd4b67246b1fbbfff1327ddd32648cc72db",
+        "scripts\\build-dod-status.py": "225450844066239007cab01951f64703ddd49b12ae33551901cdecaac9e3e112",
+        "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
+        "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
+        "scripts\\change-invalidation.py": "1fb0fcfa770bf67efa1db47b63b7922e57cf014b86f95e7ac3bf5f1e11113e15",
+        "scripts\\dependency-audit.sh": "b1a896cc77726d1894b704f37a36714d65182905771ec0a576688d115c434f5e",
+        "scripts\\dod-gate.sh": "26d4e578e6c62da5c946fc433be1d3d5226fd520fe062cfbf01f71aef12fd6bb",
+        "scripts\\format-check.sh": "d01f04988dbdf9a0ef7039e7ae628a94bad8c55fe304f8d341c6803175d6d2bd",
+        "scripts\\generate-icons.py": "cd5649efa6ea2a9ee8d35c95e097c17e1bfff88edf526f2bd7a75c9a0e16a1fe",
+        "scripts\\generate-sbom.py": "f91fdb62bf30575d85269f8c2eb1b0e5895cfc3c2b92314f29045968c3417069",
+        "scripts\\graph-next.sh": "3f73444ecc2008a54a7487e6db42f34191f658b5a44bfb5c4739f50ba59c514a",
+        "scripts\\harness-accounting.sh": "4e354312bb083d102f8705fa1978b7e5eeffdd0353ea5cc84f9b651c597283b9",
+        "scripts\\harness-init.sh": "9e5861aecd7507382f83a2559d85f38aa5a9c0bf3ae7c5e25319c1812cda96fd",
+        "scripts\\harness-next.sh": "e448ad424fd26160328f81c237ec5d4289b562acb590b47cb07878390d344096",
+        "scripts\\harness-run-stage.sh": "c17cbbb510a23399dadbc9461346f72d22f848aac165fe9f2970bf8003f6f5ae",
+        "scripts\\harness-validate.sh": "09a7511dcb97a3717608a498b64a45dfb26bd4f66ad1453c9a239f7157b14335",
+        "scripts\\install.sh": "bacd8c9db15ef395239a6e706187ee7f8126568ba943c3dd29ec0994400973f7",
+        "scripts\\ledger.sh": "81b5ebc8c4ea7b64fe446a869b0080dceea7ae756eb72de59d26f63604eeb755",
+        "scripts\\lint.sh": "e7207554e234483238ed9d211df7c0c4b11550b055f75d44ef652f25254c086e",
+        "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
+        "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
+        "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
+        "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
+        "scripts\\reality-gate.sh": "918672a312f0cc08055d18656135e336045f0fd8bbfaf75763f401d2c0afb973",
+        "scripts\\run-integration-real.sh": "a1f218daae2ab710aa9fc1ffd4df4b399bfa55c3212a8e9a909548d4a030d685",
+        "scripts\\security-check.sh": "272ffd3f9804d6edc0217c0c0c51959f0efbb6d8785bc0ad0a7bb284e04d0e40",
+        "scripts\\ship-gate.py": "c7650a1f78b9b256dfe7ca7e968cfedc129b50aaa374494a790f9961e465f5cc",
+        "scripts\\smoke-installed-artifact.sh": "71de10b34c0a69e915773b1bcc92a8a08d4757b9c7a4e5dd963a343a4f4448ac",
+        "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
+        "scripts\\test-collection-guard.py": "83a92ac7dbcbcbff78c04fa60c23776ceb7234ad7b59e03c9bb6fcfe315767ab",
+        "scripts\\test-collection-guard.sh": "82c46b21641211877d13314c012fc40f3a8bc7f06930a513b9a7b32a83200958",
+        "scripts\\test-e2e.sh": "919b708368de5105dea96f11a7137eb86571870277553a645dd962b7ececbe32",
+        "scripts\\test-integration.sh": "2acaa6c1f4f01d9b4c6f498bbf2a08cfd4b4797674624c5dc2277b71629fcbad",
+        "scripts\\test-unit.sh": "0feb713f778b4416900735069b515d236c3dbc485271590123d6157b54d8bce4",
+        "scripts\\typecheck.sh": "54c88db43635e1b09da1a11ea730dcf0595e4389f79b63ff0644be1473094ed8",
+        "scripts\\update-test-manifest.py": "98025fb12b2a4b4650ce0f6388a47f849fdfc7231198fe807d1e8bf7157b3ec3",
+        "scripts\\validate-generated-pack.py": "50dc425bbcc17145e559a7fc1eccc9957b0ecbcbb6b6539a2ac5cde1cb8adf47",
+        "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
+        "scripts\\verify.sh": "a63eba9c031cb3a2fb3cce604e5d2866d98d6bf5602d24582a64953ea6b7689e"
+      },
+      "rules": [
+        "all stages that invoke the changed gate"
+      ]
+    },
+    "js-manifest": {
+      "count": 7,
+      "files": {
+        "apps\\desktop\\package.json": "d18a1ec62a81c654e8c4185395c9595c77b1757095623c65cf72c6358911c766",
+        "apps\\desktop\\tsconfig.json": "1103540815beff5bd5ee7c657bdf30c87f5692de58bd983721bcd4f088207887",
+        "package.json": "a134a377a798dbc2a903d6fabbeab711d074ffda8d84fa2bbef3ee71ee17ba6e",
+        "packages\\contracts\\package.json": "590af66611d4d9a6db19829961e7edcca9d86f88266c58b83c9d274888714cb3",
+        "packages\\contracts\\tsconfig.json": "53c70f0a66f811ad34ffaa5ee2f0353ac04d087a2911262dadbe7c03ae7d25f5",
+        "packages\\ui\\package.json": "e4b3caf000781a3fa96745c133013258c8aece4c83240d9d4bfa913e6e08052f",
+        "packages\\ui\\tsconfig.json": "53c70f0a66f811ad34ffaa5ee2f0353ac04d087a2911262dadbe7c03ae7d25f5"
+      },
+      "rules": [
+        "V-004 supply chain",
+        "V-005 clean build"
+      ]
+    },
+    "js-source": {
+      "count": 9,
+      "files": {
+        "apps\\desktop\\e2e\\shell.spec.ts": "bc69a5b585c1040007318cfba5ca2739d18cedfae9c19a81287055b163f079d3",
+        "apps\\desktop\\src\\App.tsx": "bf4715bfaae5bef7ae2fb7178fc2735cd9d325cbdb65c98f5f9e332db9f3a19f",
+        "apps\\desktop\\src\\main.tsx": "bfcf131d8fb04a4dadcdd633c0bdbefea3f3a7af5bb35d34dc55588991887654",
+        "apps\\desktop\\tests\\has-ipc.test.ts": "8f2e208b7f1499e680843f672d5ebe4c6be7dd528740e5ff1f1bf7e8d09ba10c",
+        "packages\\contracts\\src\\index.ts": "72fd005dc2fdd303863557b1adf8b594509112d5ea55642b960093676ef8bd06",
+        "packages\\contracts\\src\\validate.ts": "573922fbd05736d7bf9adb6f671c891b2b224f1f677a16c2ff3247d5f2ce5bea",
+        "packages\\contracts\\tests\\validate.test.ts": "04de828602a4c215f12acd940e164a87d20884f6e71a3a36a8cc952e0c128af7",
+        "packages\\ui\\src\\index.ts": "b7a79d06b89c59d9aef635f69f1baa15755a04266790633f31ccc0855dcc7499",
+        "packages\\ui\\tests\\index.test.ts": "f5ecf3cbb6217514ab49f10e40b9b2c1fb2f9bf25771bfdbf12a2fffb027227f"
+      },
+      "rules": [
+        "V-005 clean build",
+        "V-008 full functionality",
+        "V-015 usability/accessibility"
+      ]
+    },
+    "lockfile": {
+      "count": 2,
+      "files": {
+        "Cargo.lock": "e4b6581bcd9abb74c7c5f4ac9155ad95d168dead52caf7f42f138d67b8380cfb",
+        "pnpm-lock.yaml": "45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf"
+      },
+      "rules": [
+        "V-004 supply chain",
+        "V-005 clean build",
+        "DOD-021 license gate"
+      ]
+    },
+    "rust-manifest": {
+      "count": 15,
+      "files": {
+        "Cargo.toml": "0d0b50947cf1f81b5558affaa372df36b1611d888d8da47b3697cec9f546e9f7",
+        "apps\\desktop\\src-tauri\\Cargo.toml": "05409d1dc3acd9de7860912a200655f5da8733e4d9c02667dacf0f0b8c72176f",
+        "crates\\application\\Cargo.toml": "e00d97aec3cee509460c1260e9a2b296bc353370012916f649df1ef5b8cb25be",
+        "crates\\commercialization\\Cargo.toml": "67245a3fe78ea355f1ba6a46d5a5161774e2859a0fd4dccb9dd138f8e93adc97",
+        "crates\\crash_reporter\\Cargo.toml": "be20a3f1e5b5e0b5c03784f30ef5501410d75eabd4ff11b4386b9c51da1f7752",
+        "crates\\domain\\Cargo.toml": "d4dc23027ba512c3fe91e7ed9f3990d21a03cbc14658fa3ed1d5ec92d7cddc39",
+        "crates\\evidence\\Cargo.toml": "ce1616d9781c52937a83e40b9968dcfdcfdbe0fe572c2866fa6a590d1b23c97d",
+        "crates\\mcp_hub\\Cargo.toml": "93fa1c930b882292a38ea2b333b3786b805c04ad3630759bb1703b40a9449ff4",
+        "crates\\patent\\Cargo.toml": "bb4d8802e8d730d5aca824d8bb1a6d9b0b70cc857d7252cf692d3f8b8b9e2835",
+        "crates\\platform_windows\\Cargo.toml": "5dd766ee7b6d6ffc2d1d11a2a3172f52ae14a4ef68b5001ade753d0699fa4504",
+        "crates\\provider_transport\\Cargo.toml": "c373ec6b9be27b1f7f2bb83425ddb3444dd4bce6294644ed5d3acf5e528b4937",
+        "crates\\research\\Cargo.toml": "231cd899881a14253d8caf831a95fe6dd7bd1184b3abbe6d9204c495f95bfd10",
+        "crates\\storage\\Cargo.toml": "3efd2a85bbc12a11cdeb0990ce88c717e78a46ef405a5502e73319d21a1a05cf",
+        "deny.toml": "3fea1dc0716ba323feb74a52cf3365bc531eac1fda24639d63f50f57f79138e7",
+        "rust-toolchain.toml": "89d9c3c3266967c0be43405f082a94cda8eab9b2cfdf28538eda48fa5e08c398"
+      },
+      "rules": [
+        "V-004 supply chain",
+        "V-005 clean build",
+        "V-020 exact artifact"
+      ]
+    },
+    "rust-source": {
+      "count": 16,
+      "files": {
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "9eaa42e5369c29b258ff278d9287e525627d8ab12af718b790b08bc7f79a5824",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "b4b05e50b426cf8694836b497ac14ecb2768c5e75ee8d1e5f27cc46c60511147",
+        "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
+        "crates\\application\\src\\lib.rs": "bc2ea5da83149389b1dfaea1cc3cf8de84db20478aec4cd5a3c89a26d8fe3e5e",
+        "crates\\commercialization\\src\\lib.rs": "a8f62448b5c02a8b3eeb1d46e8cb246091be8852bc2904ffc8c300f4c3979a6e",
+        "crates\\crash_reporter\\src\\lib.rs": "ca0bb2a4bfe2d9dd13a13b13eca355daceababcf8583e7d3909691dbb2b080d7",
+        "crates\\domain\\src\\lib.rs": "e443aa580d539625bfdccbb7c7872d9dc4c376bdbea20f254733b11395a87fe0",
+        "crates\\evidence\\src\\lib.rs": "5a637ac316886bc3f15d1d5fa461ce5b24ee8c82e151642dc95c631a41062120",
+        "crates\\mcp_hub\\src\\lib.rs": "13f8beec4940ac8107117f8a082911d0fab8cf9da36e8bee87ac0b5f3f8676c5",
+        "crates\\patent\\src\\lib.rs": "9f707b630a3fb4d1141080a93f84385cc6c8255d9c387a49b799c45d64b8639a",
+        "crates\\platform_windows\\src\\lib.rs": "1a2652471b8b55dd34980f5fd1e4365354445939b74a84f7fc5aac061786acdb",
+        "crates\\provider_transport\\src\\lib.rs": "45b1bc0afb80d2ae3afa556792b35d079fe1b0de1db6d31ed39108e42f4e7c11",
+        "crates\\research\\src\\lib.rs": "c1e1f7baa1604787e44673624d00a705ffe6fdfbb68dccfb8f237a6609b619e5",
+        "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
+        "crates\\storage\\src\\vault.rs": "b7a3bb57e497fed2172c96b6cd708097a2a583e221f1722654e0d4086169f02e",
+        "crates\\storage\\tests\\integration_real_dependencies.rs": "f1a3c433b86e22cdddfaaa95d1658e76b1c2a81414a06bd33299da73f7d51539"
+      },
+      "rules": [
+        "V-005 clean build",
+        "V-006 smoke",
+        "V-007 sanity",
+        "V-008 full functionality",
+        "V-009 integration/concurrency",
+        "V-012 regression/mutation"
+      ]
+    },
+    "test-oracle": {
+      "count": 3,
+      "files": {
+        ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
+        ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "c929a696ed80d2c1e28ab907dbcda317da5837e553b7d6ee5fa96746047ef0f1"
+      },
+      "rules": [
+        "every stage whose result the oracle guards"
+      ]
+    }
+  },
+  "epoch_digest": "180e06df373f26871fb2cd8e076481e558d2c77fe419dbdea6eae3ee89556010",
+  "total_inputs": 102
+}

@@ -206,6 +206,13 @@ test.describe("LINCHPIN desktop shell", () => {
     await expect(
       page.getByText(/no lane performs inference on this host/),
     ).toBeVisible();
+
+    // DOD-019: the provider transport must be reachable from the UI rather than
+    // being an inert adapter. The control exists; without a served model the
+    // backend reports "not live", and the UI must never show generated text.
+    await expect(
+      page.getByRole("button", { name: "Probe local model" }),
+    ).toBeVisible();
   });
 
   test("exposes the Patent Architect claim linter", async ({ page }) => {

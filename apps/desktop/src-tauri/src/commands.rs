@@ -929,6 +929,104 @@ pub struct CommercializationView {
     pub payload: String,
 }
 
+/// Run inference through the local provider lane.
+///
+/// GraphLock context (DOD-019): `provider_transport::generate` existed but was
+/// called ONLY from its own tests -- no production path ever reached it, so the
+/// crate was an inert adapter. This command is that production path.
+///
+/// It is honest about the boundary:
+///   * the endpoint is loopback-only, enforced by `LocalModelAdapter::new`,
+///     which refuses a non-loopback host so invention content cannot leave the
+///     device (SECURITY.md);
+///   * when no model is served the real transport error is returned verbatim
+///     (`Unreachable` / `ProviderFailure` / `InvalidResponse`), never a
+///     fabricated completion (DOD-014, anti-gaming finding AG-001);
+///   * the returned `live` flag states whether a real inference boundary was
+///     reached, so a caller cannot mistake an error path for output.
+///
+/// PF-011 (a served local model) is unmet on this host, so in practice this
+/// returns a transport error. That is the correct result, not a defect.
+pub async fn run_local_inference(
+    endpoint: &str,
+    model_id: &str,
+    prompt: &str,
+) -> CommandResult<InferenceOutcome> {
+    let correlation = CorrelationId::new();
+
+    if prompt.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("prompt cannot be empty"),
+        );
+    }
+
+    let adapter = match provider_transport::LocalModelAdapter::new(
+        endpoint,
+        model_id,
+        provider_transport::LocalFlavor::Ollama,
+    ) {
+        Ok(a) => a,
+        Err(e) => {
+            // A rejected endpoint is a POLICY matter: the operator asked for a
+            // destination the confidentiality boundary forbids.
+            return CommandResult::failure(correlation, CommandError::policy(e.to_string()));
+        }
+    };
+
+    let transport = provider_transport::ProviderTransport::identity(&adapter).to_string();
+    let request = provider_transport::ModelRequest {
+        prompt: prompt.to_string(),
+        model_id: model_id.to_string(),
+    };
+
+    match provider_transport::ProviderTransport::generate(&adapter, request).await {
+        Ok(response) => CommandResult::success(
+            correlation,
+            InferenceOutcome {
+                live: true,
+                transport,
+                text: Some(response.text),
+                error_class: None,
+                detail: response.metadata,
+            },
+        ),
+        Err(e) => {
+            let class = match e {
+                provider_transport::TransportError::InvalidRequest(_) => "INVALID_REQUEST",
+                provider_transport::TransportError::Unreachable(_) => "UNREACHABLE",
+                provider_transport::TransportError::ProviderFailure { .. } => "PROVIDER_FAILURE",
+                provider_transport::TransportError::InvalidResponse(_) => "INVALID_RESPONSE",
+                provider_transport::TransportError::Unimplemented(_) => "UNIMPLEMENTED",
+            };
+            CommandResult::success(
+                correlation,
+                InferenceOutcome {
+                    live: false,
+                    transport,
+                    // No text is produced on a failed transport. Returning any
+                    // here would be the AG-001 fabrication defect.
+                    text: None,
+                    error_class: Some(class.to_string()),
+                    detail: e.to_string(),
+                },
+            )
+        }
+    }
+}
+
+/// Result of a provider inference attempt.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct InferenceOutcome {
+    /// True only when a real inference boundary was reached.
+    pub live: bool,
+    pub transport: String,
+    /// Present only when `live` is true.
+    pub text: Option<String>,
+    pub error_class: Option<String>,
+    pub detail: String,
+}
+
 /// Report provider transport availability honestly.
 ///
 /// `PROVIDER_TRANSPORT_MATRIX.md` defines the lanes. No live provider is
@@ -1551,6 +1649,58 @@ mod tests {
         let google = lanes.iter().find(|l| l.lane == "google").unwrap();
         assert!(!google.transport_available);
         assert!(google.detail.contains("disabled by provider policy"));
+    }
+
+    // --- provider inference (DOD-019: the production path) ------------------
+
+    /// DOD-019 / AG-001: with no model served, the real transport must fail and
+    /// the command must return NO text. Returning anything here would be the
+    /// fabricated-completion defect.
+    #[tokio::test]
+    async fn test_local_inference_returns_no_text_when_no_model_is_served() {
+        let result = run_local_inference("http://127.0.0.1:1", "llama3", "hello").await;
+        assert!(
+            result.ok,
+            "the command itself succeeds; the outcome reports"
+        );
+        let outcome = result.value.expect("value present");
+        assert!(
+            !outcome.live,
+            "inference claimed to be live with no model served"
+        );
+        assert!(
+            outcome.text.is_none(),
+            "fabricated text was returned on a failed transport: {:?}",
+            outcome.text
+        );
+        assert!(
+            outcome.error_class.is_some(),
+            "a failed transport must report an error class"
+        );
+        assert_eq!(outcome.error_class.as_deref(), Some("UNREACHABLE"));
+    }
+
+    /// The endpoint must be loopback-only, so invention content cannot be sent
+    /// off-device (SECURITY.md).
+    #[tokio::test]
+    async fn test_local_inference_refuses_non_loopback_endpoint() {
+        let result = run_local_inference("https://api.example.com", "m", "hello").await;
+        assert!(!result.ok);
+        assert!(
+            matches!(result.error, Some(CommandError::Policy { .. })),
+            "a non-loopback endpoint must be a POLICY refusal, got {:?}",
+            result.error
+        );
+    }
+
+    #[tokio::test]
+    async fn test_local_inference_rejects_empty_prompt() {
+        let result = run_local_inference("http://127.0.0.1:1", "m", "   ").await;
+        assert!(!result.ok);
+        assert!(matches!(
+            result.error,
+            Some(CommandError::Validation { .. })
+        ));
     }
 
     // --- mcp namespace -----------------------------------------------------

@@ -177,6 +177,18 @@ fn provider_status() -> commands::CommandResult<Vec<commands::ProviderLane>> {
     commands::provider_status()
 }
 
+/// Run inference through the local provider lane (DOD-019 production path).
+///
+/// Async because the transport is async; Tauri drives it on its own runtime.
+#[tauri::command]
+async fn run_local_inference(
+    endpoint: String,
+    model_id: String,
+    prompt: String,
+) -> commands::CommandResult<commands::InferenceOutcome> {
+    commands::run_local_inference(&endpoint, &model_id, &prompt).await
+}
+
 /// Check an MCP capability grant (SPEC-005).
 #[tauri::command]
 fn check_mcp_capability(
@@ -225,6 +237,7 @@ pub fn run() {
             draft_office_action_response,
             build_commercialization_package,
             provider_status,
+            run_local_inference,
             check_mcp_capability,
             build_repair_capsule,
             export_evidence

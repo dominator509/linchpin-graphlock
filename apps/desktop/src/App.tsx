@@ -94,6 +94,14 @@ interface McpDecision {
   reason: string;
 }
 
+interface InferenceOutcome {
+  live: boolean;
+  transport: string;
+  text?: string;
+  error_class?: string;
+  detail: string;
+}
+
 /** True when running inside the Tauri shell where IPC is available. */
 export function hasIpc(): boolean {
   return (
@@ -135,6 +143,8 @@ export default function App() {
   const [providerLanes, setProviderLanes] = useState<ProviderLane[]>([]);
   const [mcpDecision, setMcpDecision] = useState<McpDecision | null>(null);
   const [opsError, setOpsError] = useState<string | null>(null);
+  const [inference, setInference] =
+    useState<CommandResult<InferenceOutcome> | null>(null);
 
   useEffect(() => {
     if (!hasIpc()) {
@@ -206,6 +216,24 @@ export default function App() {
   }, []);
 
   const implemented = namespaces.filter((n) => n.implemented);
+
+  const onRunInference = useCallback(async () => {
+    if (!hasIpc()) {
+      setOpsError("Cannot probe provider: desktop backend unavailable.");
+      return;
+    }
+    try {
+      setInference(
+        await invoke<CommandResult<InferenceOutcome>>("run_local_inference", {
+          endpoint: "http://127.0.0.1:11434",
+          modelId: "unset",
+          prompt: "ping",
+        }),
+      );
+    } catch (err) {
+      setOpsError(String(err));
+    }
+  }, []);
 
   const onLintClaims = useCallback(async () => {
     if (!hasIpc()) {
@@ -525,6 +553,18 @@ export default function App() {
           <p>
             MCP {mcpDecision.requested}:{" "}
             {mcpDecision.allowed ? "allowed" : "denied"} — {mcpDecision.reason}
+          </p>
+        )}
+
+        <button type="button" onClick={() => void onRunInference()}>
+          Probe local model
+        </button>
+        {inference && inference.value && (
+          <p>
+            Local inference:{" "}
+            {inference.value.live
+              ? `live via ${inference.value.transport}`
+              : `not live (${inference.value.error_class}): ${inference.value.detail}`}
           </p>
         )}
       </section>
