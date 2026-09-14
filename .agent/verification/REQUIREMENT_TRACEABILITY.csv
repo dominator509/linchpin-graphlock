@@ -1,13 +1,23 @@
-requirement_id,spec,execplan,planned_test,planned_evidence,status
-UO-01,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-001,.agent/evidence/live-fire/UO-01/,PLANNED
-UO-02,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-002,.agent/evidence/live-fire/UO-02/,PLANNED
-UO-03,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-003,.agent/evidence/live-fire/UO-03/,PLANNED
-UO-04,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-004,.agent/evidence/live-fire/UO-04/,PLANNED
-UO-05,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-005,.agent/evidence/live-fire/UO-05/,PLANNED
-UO-06,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-006,.agent/evidence/live-fire/UO-06/,PLANNED
-UO-07,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-007,.agent/evidence/live-fire/UO-07/,PLANNED
-UO-08,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-008,.agent/evidence/live-fire/UO-08/,PLANNED
-UO-09,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-009,.agent/evidence/live-fire/UO-09/,PLANNED
-UO-10,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-010,.agent/evidence/live-fire/UO-10/,PLANNED
-UO-11,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-011,.agent/evidence/live-fire/UO-11/,PLANNED
-UO-12,SPEC-000,EP-002..EP-010 per outcome,LIN-E2E-012,.agent/evidence/live-fire/UO-12/,PLANNED
+requirement_id,owning_node,spec,implementation_paths,mapped_test_count,executed_pass,executed_partial,status
+REQ-PLAT-001,EP-000,UNDEFINED,crates/platform_windows/src;rust-toolchain.toml,15,0,2,NO_SPEC_DEFINITION
+REQ-PLAT-002,EP-000,UNDEFINED,crates/platform_windows/src;rust-toolchain.toml,15,0,2,NO_SPEC_DEFINITION
+REQ-LIC-001,EP-000,UNDEFINED,LICENSE_ALLOWLIST.md;deny.toml,15,0,2,NO_SPEC_DEFINITION
+REQ-FOUND-001,EP-001,UNDEFINED,crates;apps;packages,0,0,0,NO_SPEC_DEFINITION
+REQ-SEC-001,EP-001,UNDEFINED,crates/evidence/src;crates/crash_reporter/src,449,0,0,NO_SPEC_DEFINITION
+REQ-DOM-001,EP-002,SPEC-001-core-domain.md,crates/domain/src,122,0,0,NOT_STARTED
+REQ-DOM-010,EP-002,SPEC-001-core-domain.md,crates/domain/src,122,0,0,NOT_STARTED
+REQ-DATA-001,EP-003,UNDEFINED,crates/storage/src,122,0,0,NO_SPEC_DEFINITION
+REQ-RES-001,EP-003,UNDEFINED,crates/storage/src;crates/research/src,0,0,0,NO_SPEC_DEFINITION
+REQ-LLM-001,EP-004,UNDEFINED,crates/provider_transport/src,20,0,1,NO_SPEC_DEFINITION
+REQ-MCP-001,EP-004,UNDEFINED,crates/mcp_hub/src,20,0,1,NO_SPEC_DEFINITION
+REQ-RES-002,EP-004,UNDEFINED,crates/storage/src;crates/research/src,0,0,0,NO_SPEC_DEFINITION
+REQ-UI-001,EP-005,UNDEFINED,apps/desktop/src;packages/ui/src,20,0,1,NO_SPEC_DEFINITION
+REQ-SEC-002,EP-006,UNDEFINED,crates/evidence/src;crates/crash_reporter/src,449,0,0,NO_SPEC_DEFINITION
+REQ-SEC-010,EP-006,UNDEFINED,crates/evidence/src;crates/crash_reporter/src,449,0,0,NO_SPEC_DEFINITION
+REQ-PAT-001,EP-007,UNDEFINED,crates/patent/src,0,0,0,NO_SPEC_DEFINITION
+REQ-COM-001,EP-007,UNDEFINED,crates/commercialization/src,0,0,0,NO_SPEC_DEFINITION
+REQ-OPS-001,EP-008,UNDEFINED,crates/application/src;crates/platform_windows/src,15,0,2,NO_SPEC_DEFINITION
+REQ-REPAIR-001,EP-008,UNDEFINED,crates/crash_reporter/src,15,0,2,NO_SPEC_DEFINITION
+REQ-REL-001,EP-009,UNDEFINED,apps/desktop/src-tauri;scripts,15,0,2,NO_SPEC_DEFINITION
+REQ-REL-005,EP-009,UNDEFINED,apps/desktop/src-tauri;scripts,15,0,2,NO_SPEC_DEFINITION
+REQ-SHIP-001,EP-010,UNDEFINED,scripts,15,0,2,NO_SPEC_DEFINITION
