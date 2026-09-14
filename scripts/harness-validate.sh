@@ -23,10 +23,5 @@ python3 scripts/bind-requirements.py --check
 python3 scripts/secret-scan.py --check
 python3 scripts/collect-skip-report.py --check
 python3 scripts/reachability.py --check
-# NOTE: rerun-invalidated.py --check is deliberately NOT wired in here.
-# It would be circular: harness-validate.sh is itself an invalidated stage when
-# gate scripts change, so running it inside this script advances the epoch and
-# immediately invalidates the rerun record it just verified. The rerun check is
-# owned by scripts/rerun-invalidated.py and run as its own step (and by
-# scripts/verify.sh), after the epoch has settled.
+python3 scripts/fix-trailing-and-lanes.py --check
 echo "harness-validate: ok"

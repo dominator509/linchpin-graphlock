@@ -80,9 +80,13 @@ COMMIT="$(git -C "$SRC" rev-parse HEAD)"
 # `target/` and `node_modules/` must be absent either way: their presence is the
 # hidden state this gate exists to remove.
 CLEAN_TARGET="no"
-[ -d "$CLEAN/target" ] && CLEAN_TARGET="yes"
+if [ -d "$CLEAN/target" ]; then
+  CLEAN_TARGET="yes"
+fi
 CLEAN_NM="no"
-[ -d "$CLEAN/node_modules" ] && CLEAN_NM="yes"
+if [ -d "$CLEAN/node_modules" ]; then
+  CLEAN_NM="yes"
+fi
 if [ "$DIRTY_MODE" = "yes" ]; then
   # A working-tree copy has no .git, so `git status` cannot be used; the
   # exclusion list above is what guarantees cleanliness.

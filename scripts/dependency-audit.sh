@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -eu
-[ -f Cargo.toml ] && cargo deny check
-[ -f package.json ] && pnpm audit --audit-level high
-[ -f pyproject.toml ] && uv run pip-audit
+if [ -f Cargo.toml ]; then
+  cargo deny check
+fi
+if [ -f package.json ]; then
+  pnpm audit --audit-level high
+fi
+if [ -f pyproject.toml ]; then
+  uv run pip-audit
+fi

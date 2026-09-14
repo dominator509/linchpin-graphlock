@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 set -eu
-[ -f Cargo.toml ] && cargo clippy --workspace --all-targets --locked -- -D warnings
-[ -f package.json ] && pnpm -r lint
+if [ -f Cargo.toml ]; then
+  cargo clippy --workspace --all-targets --locked -- -D warnings
+fi
+if [ -f package.json ]; then
+  pnpm -r lint
+fi

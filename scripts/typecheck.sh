@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 set -eu
-[ -f Cargo.toml ] && cargo check --workspace --all-targets --locked
-[ -f package.json ] && pnpm -r typecheck
+if [ -f Cargo.toml ]; then
+  cargo check --workspace --all-targets --locked
+fi
+if [ -f package.json ]; then
+  pnpm -r typecheck
+fi
