@@ -116,6 +116,98 @@ fn check_filing_handoff(
     commands::check_filing_handoff(&forms, fee_paid)
 }
 
+/// Evaluate an opportunity candidate (REQ-DOM-003).
+#[tauri::command]
+#[allow(clippy::too_many_arguments)]
+fn evaluate_opportunity(
+    workspace_id: String,
+    description: String,
+    technical_feasibility: f32,
+    market_potential: f32,
+    legal_risk: f32,
+    uncertainty: String,
+    evidence_uris: Vec<String>,
+) -> commands::CommandResult<commands::OpportunityView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::evaluate_opportunity(
+        &scope,
+        &description,
+        technical_feasibility,
+        market_potential,
+        legal_risk,
+        &uncertainty,
+        &evidence_uris,
+    )
+}
+
+/// Advance a docket record (REQ-DOM-007).
+#[tauri::command]
+fn advance_docket(
+    workspace_id: String,
+    current_state: String,
+    receipt: Option<String>,
+    commercialize: bool,
+) -> commands::CommandResult<commands::DocketView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::advance_docket(&scope, &current_state, receipt.as_deref(), commercialize)
+}
+
+/// Draft an office-action response workspace.
+#[tauri::command]
+fn draft_office_action_response(
+    action_type: String,
+    cited_art: Vec<String>,
+) -> commands::CommandResult<commands::OfficeActionView> {
+    commands::draft_office_action_response(&action_type, &cited_art)
+}
+
+/// Build a commercialization package (REQ-COM-004).
+#[tauri::command]
+fn build_commercialization_package(
+    workspace_id: String,
+    target_names: Vec<String>,
+) -> commands::CommandResult<commands::CommercializationView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::build_commercialization_package(&scope, &target_names)
+}
+
+/// Report provider lane availability (never performs inference).
+#[tauri::command]
+fn provider_status() -> commands::CommandResult<Vec<commands::ProviderLane>> {
+    commands::provider_status()
+}
+
+/// Check an MCP capability grant (SPEC-005).
+#[tauri::command]
+fn check_mcp_capability(
+    granted: Vec<String>,
+    requested: String,
+) -> commands::CommandResult<commands::McpDecision> {
+    commands::check_mcp_capability(&granted, &requested)
+}
+
+/// Build a sanitized repair capsule (REQ-DOM-010).
+#[tauri::command]
+fn build_repair_capsule(
+    incident_detail: String,
+    agent_brief: String,
+    secrets_to_redact: Vec<String>,
+) -> commands::CommandResult<commands::RepairCapsuleView> {
+    commands::build_repair_capsule(&incident_detail, &agent_brief, &secrets_to_redact)
+}
+
+/// Export evidence through the hardened gateway (REQ-DOM-008).
+#[tauri::command]
+fn export_evidence(
+    workspace_id: String,
+    path: String,
+    content: String,
+    sensitivity: String,
+) -> commands::CommandResult<commands::ExportReceipt> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::export_evidence(&scope, &path, &content, &sensitivity)
+}
+
 pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -127,7 +219,15 @@ pub fn run() {
             lint_claims,
             build_filing_package,
             import_receipt,
-            check_filing_handoff
+            check_filing_handoff,
+            evaluate_opportunity,
+            advance_docket,
+            draft_office_action_response,
+            build_commercialization_package,
+            provider_status,
+            check_mcp_capability,
+            build_repair_capsule,
+            export_evidence
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

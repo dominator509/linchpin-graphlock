@@ -185,9 +185,27 @@ test.describe("LINCHPIN desktop shell", () => {
 
     if ((await page.getByText("Capability Coverage").count()) > 0) {
       // If it did render, it must match the honest count reported by the
-      // backend (6 of 14 at this revision), never a full-coverage claim.
-      await expect(page.getByText("6 of 14")).toBeVisible();
+      // backend (14 of 14 at this revision), never an inflated claim.
+      await expect(page.getByText("14 of 14")).toBeVisible();
     }
+  });
+
+  test("exposes the operations panel without claiming a live provider", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // PF-011 is unmet, so no provider lane may be presented as configured and
+    // the UI must not claim inference is happening.
+    await expect(
+      page.getByRole("heading", { name: "Operations" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Load operational status" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/no lane performs inference on this host/),
+    ).toBeVisible();
   });
 
   test("exposes the Patent Architect claim linter", async ({ page }) => {

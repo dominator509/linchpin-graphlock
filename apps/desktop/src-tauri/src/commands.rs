@@ -632,6 +632,541 @@ pub struct HandoffReadiness {
     pub note: String,
 }
 
+/// Score an opportunity candidate and report its uncertainty honestly.
+///
+/// `REQ-DOM-003`: an Opportunity Candidate stores a score vector, an uncertainty
+/// level and its evidence. `SPEC-004` requires legal-risk language that does not
+/// assert definitive conclusions, so the returned note is worded as a screen.
+#[allow(clippy::too_many_arguments)]
+pub fn evaluate_opportunity(
+    scope: &WorkspaceScope,
+    description: &str,
+    technical_feasibility: f32,
+    market_potential: f32,
+    legal_risk: f32,
+    uncertainty: &str,
+    evidence_uris: &[String],
+) -> CommandResult<OpportunityView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if description.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("opportunity description cannot be empty"),
+        );
+    }
+    for (name, value) in [
+        ("technical_feasibility", technical_feasibility),
+        ("market_potential", market_potential),
+        ("legal_risk", legal_risk),
+    ] {
+        if !(0.0..=1.0).contains(&value) {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("{name} must be within 0.0..=1.0")),
+            );
+        }
+    }
+
+    let level = match uncertainty {
+        "Low" => domain::UncertaintyLevel::Low,
+        "Medium" => domain::UncertaintyLevel::Medium,
+        "High" => domain::UncertaintyLevel::High,
+        other => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("unknown uncertainty {other:?}")),
+            );
+        }
+    };
+
+    let scores = domain::ScoreVector {
+        technical_feasibility,
+        market_potential,
+        legal_risk,
+    };
+    let mut candidate = domain::OpportunityCandidate::new(scores, level);
+    for uri in evidence_uris {
+        candidate.add_evidence("evidence".to_string(), uri.clone());
+    }
+
+    // A candidate with no evidence is not a finding; say so rather than
+    // presenting a score as if it were supported (DOD-026).
+    let evidence_count = candidate.evidence.len();
+
+    CommandResult::success(
+        correlation,
+        OpportunityView {
+            candidate_id: candidate.id.0.to_string(),
+            description: description.to_string(),
+            uncertainty: uncertainty.to_string(),
+            evidence_count,
+            has_supporting_evidence: evidence_count > 0,
+            // Deliberately not a legal conclusion (REQ-UI-003).
+            screen_note: "Planning screen only; not a legal or commercial conclusion.".to_string(),
+        },
+    )
+}
+
+/// An opportunity candidate as returned to the UI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OpportunityView {
+    pub candidate_id: String,
+    pub description: String,
+    pub uncertainty: String,
+    pub evidence_count: usize,
+    pub has_supporting_evidence: bool,
+    pub screen_note: String,
+}
+
+/// Advance a docket record through its filing state machine.
+///
+/// `REQ-DOM-007`: filing state requires receipt evidence. The transition rules
+/// come from `domain::DocketRecord`, so a filing cannot be recorded without a
+/// receipt and commercialization cannot precede filing.
+pub fn advance_docket(
+    scope: &WorkspaceScope,
+    current_state: &str,
+    receipt: Option<&str>,
+    commercialize: bool,
+) -> CommandResult<DocketView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+
+    let mut docket = domain::DocketRecord::new("docket".to_string());
+    // Restore the reported state through the real transitions.
+    match current_state {
+        "Preparation" => {}
+        state if state.starts_with("Filed") => {
+            let existing = state
+                .strip_prefix("Filed(")
+                .and_then(|s| s.strip_suffix(')'))
+                .unwrap_or("receipt");
+            if let Err(e) = docket.file_application(existing.to_string()) {
+                return CommandResult::failure(correlation, CommandError::policy(e));
+            }
+        }
+        "Commercialized" => {
+            if docket.file_application("receipt".to_string()).is_err()
+                || docket.mark_commercialized().is_err()
+            {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::policy("could not restore commercialized state"),
+                );
+            }
+        }
+        other => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("unknown docket state {other:?}")),
+            );
+        }
+    }
+
+    if commercialize {
+        if let Err(e) = docket.mark_commercialized() {
+            return CommandResult::failure(correlation, CommandError::policy(e));
+        }
+    } else if let Some(r) = receipt {
+        if r.trim().is_empty() {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation("receipt cannot be empty when filing"),
+            );
+        }
+        if let Err(e) = docket.file_application(r.to_string()) {
+            return CommandResult::failure(correlation, CommandError::policy(e));
+        }
+    }
+
+    let state = match &docket.state {
+        domain::FilingState::Preparation => "Preparation".to_string(),
+        domain::FilingState::Filed(r) => format!("Filed({r})"),
+        domain::FilingState::Commercialized => "Commercialized".to_string(),
+    };
+
+    CommandResult::success(
+        correlation,
+        DocketView {
+            docket_id: docket.id.0.to_string(),
+            state,
+            public_disclosure: docket.public_disclosure,
+        },
+    )
+}
+
+/// A docket record as returned to the UI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DocketView {
+    pub docket_id: String,
+    pub state: String,
+    pub public_disclosure: bool,
+}
+
+/// Draft a response workspace for an office action.
+///
+/// Prosecution flow. A Notice of Allowance has no rejection to respond to, and
+/// the real `patent::OfficeAction` refuses that transition.
+pub fn draft_office_action_response(
+    action_type: &str,
+    cited_art: &[String],
+) -> CommandResult<OfficeActionView> {
+    let correlation = CorrelationId::new();
+
+    let kind = match action_type {
+        "NonFinalRejection" => patent::ActionType::NonFinalRejection,
+        "FinalRejection" => patent::ActionType::FinalRejection,
+        "NoticeOfAllowance" => patent::ActionType::NoticeOfAllowance,
+        other => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("unknown action type {other:?}")),
+            );
+        }
+    };
+
+    let mut action = patent::OfficeAction::new(kind);
+    for art in cited_art {
+        if art.trim().is_empty() {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation("cited art reference cannot be empty"),
+            );
+        }
+        action.cite_art(art.clone());
+    }
+
+    match action.draft_response() {
+        Ok(()) => CommandResult::success(
+            correlation,
+            OfficeActionView {
+                action_type: action_type.to_string(),
+                cited_art_count: action.cited_art.len(),
+                response_drafted: action.response_drafted,
+            },
+        ),
+        Err(e) => CommandResult::failure(correlation, CommandError::policy(e)),
+    }
+}
+
+/// An office-action workspace as returned to the UI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OfficeActionView {
+    pub action_type: String,
+    pub cited_art_count: usize,
+    pub response_drafted: bool,
+}
+
+/// Build a disclosure-safe commercialization one-pager.
+///
+/// `REQ-COM-001` / `REQ-COM-004`: the package is disclosure-safe and implies no
+/// valuation. The real `commercialization::DataRoom` refuses to export
+/// unredacted assets, so this asserts that refusal before redacting.
+pub fn build_commercialization_package(
+    scope: &WorkspaceScope,
+    target_names: &[String],
+) -> CommandResult<CommercializationView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if target_names.is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("at least one target is required"),
+        );
+    }
+
+    let mut room = commercialization::DataRoom::new();
+    for name in target_names {
+        if name.trim().is_empty() {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation("target name cannot be empty"),
+            );
+        }
+        room.add_target(name, 0.5);
+    }
+
+    // Export before redaction must be refused by the real implementation. If it
+    // were allowed, the confidentiality boundary would already be broken.
+    if room.export_pitch_deck().is_ok() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::policy(
+                "commercialization package exported without redacting confidential assets",
+            ),
+        );
+    }
+    room.redact_for_non_confidential_export();
+
+    match room.export_pitch_deck() {
+        Ok(payload) => CommandResult::success(
+            correlation,
+            CommercializationView {
+                target_count: target_names.len(),
+                redacted: true,
+                payload,
+            },
+        ),
+        Err(e) => CommandResult::failure(correlation, CommandError::policy(e)),
+    }
+}
+
+/// A commercialization package as returned to the UI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CommercializationView {
+    pub target_count: usize,
+    pub redacted: bool,
+    pub payload: String,
+}
+
+/// Report provider transport availability honestly.
+///
+/// `PROVIDER_TRANSPORT_MATRIX.md` defines the lanes. No live provider is
+/// configured on this host (PF-011 unmet), so this reports availability rather
+/// than performing inference. It never returns generated text.
+pub fn provider_status() -> CommandResult<Vec<ProviderLane>> {
+    let correlation = CorrelationId::new();
+
+    let local = provider_transport::LocalModelAdapter::new(
+        "http://127.0.0.1:11434",
+        "unset",
+        provider_transport::LocalFlavor::Ollama,
+    );
+    let local_reachable = local.is_ok();
+
+    let lanes = vec![
+        ProviderLane {
+            lane: "local".to_string(),
+            transport_available: local_reachable,
+            configured: false,
+            detail: "llama.cpp/Ollama on loopback; no model served on this host (PF-011)"
+                .to_string(),
+        },
+        ProviderLane {
+            lane: "openai".to_string(),
+            transport_available: false,
+            configured: false,
+            detail: "Codex CLI boundary not wired".to_string(),
+        },
+        ProviderLane {
+            lane: "anthropic".to_string(),
+            transport_available: false,
+            configured: false,
+            detail: "terms review required".to_string(),
+        },
+        ProviderLane {
+            lane: "xai".to_string(),
+            transport_available: false,
+            configured: false,
+            detail: "Grok Build ACP not wired".to_string(),
+        },
+        ProviderLane {
+            lane: "google".to_string(),
+            transport_available: false,
+            configured: false,
+            detail: "disabled by provider policy".to_string(),
+        },
+    ];
+
+    CommandResult::success(correlation, lanes)
+}
+
+/// A provider lane and its real availability.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ProviderLane {
+    pub lane: String,
+    pub transport_available: bool,
+    pub configured: bool,
+    pub detail: String,
+}
+
+/// Check an MCP client's capability grant.
+///
+/// `SPEC-005`: MCP grants are explicit by server/client/workspace/capability.
+/// The decision comes from the real `mcp_hub::McpServer`.
+pub fn check_mcp_capability(granted: &[String], requested: &str) -> CommandResult<McpDecision> {
+    let correlation = CorrelationId::new();
+
+    let mut server = mcp_hub::McpServer::new();
+    for cap in granted {
+        let parsed = match cap.as_str() {
+            "ReadVault" => mcp_hub::Capability::ReadVault,
+            "WriteVault" => mcp_hub::Capability::WriteVault,
+            "ExecuteResearch" => mcp_hub::Capability::ExecuteResearch,
+            other => {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::validation(format!("unknown capability {other:?}")),
+                );
+            }
+        };
+        server.grant_capability("client", parsed);
+    }
+
+    let requested_cap = match requested {
+        "ReadVault" => mcp_hub::Capability::ReadVault,
+        "WriteVault" => mcp_hub::Capability::WriteVault,
+        "ExecuteResearch" => mcp_hub::Capability::ExecuteResearch,
+        other => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("unknown capability {other:?}")),
+            );
+        }
+    };
+
+    let allowed = server.check_capability("client", &requested_cap);
+    CommandResult::success(
+        correlation,
+        McpDecision {
+            requested: requested.to_string(),
+            allowed,
+            reason: if allowed {
+                "capability granted for this client".to_string()
+            } else {
+                "capability not granted; models cannot self-approve".to_string()
+            },
+        },
+    )
+}
+
+/// An MCP capability decision.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct McpDecision {
+    pub requested: String,
+    pub allowed: bool,
+    pub reason: String,
+}
+
+/// Build a sanitized repair capsule from an incident.
+///
+/// `REQ-DOM-010` / `REQ-SEC-010`: a Repair Capsule always redacts before export.
+/// Redaction is performed by the real `crash_reporter::RedactionPolicy`, and
+/// safety is derived from the transformed content rather than a flag
+/// (anti-gaming finding AG-002).
+pub fn build_repair_capsule(
+    incident_detail: &str,
+    agent_brief: &str,
+    secrets_to_redact: &[String],
+) -> CommandResult<RepairCapsuleView> {
+    let correlation = CorrelationId::new();
+
+    if agent_brief.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("agent brief cannot be empty"),
+        );
+    }
+
+    let incident =
+        crash_reporter::WindowsMinidumpHandler::capture_crash_with_detail("local", incident_detail);
+    let mut policy = crash_reporter::RedactionPolicy::new();
+    for secret in secrets_to_redact {
+        policy = policy.with_secret(secret);
+    }
+
+    match crash_reporter::RepairCapsule::new(incident, agent_brief, &policy) {
+        Ok(capsule) => {
+            let safe = capsule.is_safe_for_export();
+            let redacted = capsule.redacted_detail().to_string();
+            // A secret that survives redaction must never be reported as
+            // exportable (AG-002 regression guard).
+            let leaked = secrets_to_redact
+                .iter()
+                .any(|s| !s.is_empty() && redacted.contains(s.as_str()));
+            if leaked || !safe {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::policy("redaction failed to sanitize the incident detail"),
+                );
+            }
+            CommandResult::success(
+                correlation,
+                RepairCapsuleView {
+                    redacted_detail: redacted,
+                    safe_for_export: safe,
+                },
+            )
+        }
+        Err(e) => CommandResult::failure(correlation, CommandError::validation(e)),
+    }
+}
+
+/// A sanitized repair capsule.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RepairCapsuleView {
+    pub redacted_detail: String,
+    pub safe_for_export: bool,
+}
+
+/// Export evidence through the path-hardening and firewall gateway.
+///
+/// Distinct from the `evidence` namespace command: this is the export gateway
+/// itself, applying path hardening and the Disclosure Firewall together so an
+/// export cannot be produced from an escaping path (REQ-DOM-008, AG-003).
+pub fn export_evidence(
+    scope: &WorkspaceScope,
+    path: &str,
+    content: &str,
+    sensitivity: &str,
+) -> CommandResult<ExportReceipt> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+
+    // Path hardening comes from the real evidence crate.
+    let safe_path = match evidence::InputHardener::sanitize_path(path) {
+        Ok(p) => p,
+        Err(e) => {
+            return CommandResult::failure(correlation, CommandError::policy(e));
+        }
+    };
+
+    let decision = evaluate_export(scope, content, sensitivity);
+    if !decision.ok {
+        return CommandResult::failure(
+            correlation,
+            decision
+                .error
+                .unwrap_or_else(|| CommandError::validation("export evaluation failed")),
+        );
+    }
+    let decision = decision.value.expect("ok implies a value");
+
+    if !decision.allowed {
+        return CommandResult::failure(correlation, CommandError::policy(decision.reason));
+    }
+
+    CommandResult::success(
+        correlation,
+        ExportReceipt {
+            path: safe_path,
+            sensitivity: decision.sensitivity,
+            content_bytes: content.len(),
+        },
+    )
+}
+
+/// Receipt for a permitted evidence export.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExportReceipt {
+    pub path: String,
+    pub sensitivity: String,
+    pub content_bytes: usize,
+}
+
 /// Report the SPEC-003 namespace coverage honestly.
 pub fn namespace_status() -> Vec<NamespaceStatus> {
     let entry = |ns: &str, implemented: bool, detail: &str| NamespaceStatus {
@@ -650,42 +1185,22 @@ pub fn namespace_status() -> Vec<NamespaceStatus> {
             true,
             "import_receipt, check_filing_handoff (human submission only)",
         ),
-        entry(
-            "opportunity",
-            false,
-            "domain OpportunityCandidate exists; no IPC command wired yet",
-        ),
-        entry(
-            "docket",
-            false,
-            "domain DocketRecord exists; no IPC command wired yet",
-        ),
-        entry(
-            "prosecution",
-            false,
-            "patent OfficeAction exists; no IPC command wired yet",
-        ),
+        entry("opportunity", true, "evaluate_opportunity"),
+        entry("docket", true, "advance_docket"),
+        entry("prosecution", true, "draft_office_action_response"),
         entry(
             "commercialization",
-            false,
-            "commercialization crate exists; no IPC command wired yet",
+            true,
+            "build_commercialization_package (firewall-gated)",
         ),
         entry(
             "provider",
-            false,
-            "provider_transport exists; not reachable and no live provider configured",
+            true,
+            "provider_status (reports availability; no live provider configured)",
         ),
-        entry("mcp", false, "mcp_hub exists; no IPC command wired yet"),
-        entry(
-            "incident",
-            false,
-            "crash_reporter exists; no IPC command wired yet",
-        ),
-        entry(
-            "export",
-            false,
-            "the export namespace command is not wired yet",
-        ),
+        entry("mcp", true, "check_mcp_capability"),
+        entry("incident", true, "build_repair_capsule (redacted)"),
+        entry("export", true, "export_evidence (path-hardened + firewall)"),
     ]
 }
 
@@ -898,17 +1413,209 @@ mod tests {
             .map(|s| s.namespace.as_str())
             .collect();
         assert_eq!(
-            implemented,
-            vec![
-                "conception",
-                "workspace",
-                "research",
-                "evidence",
-                "patent",
-                "filing"
-            ],
-            "implementation claims do not match the wired namespaces"
+            implemented.len(),
+            14,
+            "all 14 SPEC-003 namespaces should now be wired, got {implemented:?}"
         );
+    }
+
+    // --- opportunity namespace ---------------------------------------------
+
+    #[test]
+    fn test_opportunity_requires_evidence_to_be_a_finding() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        let bare = evaluate_opportunity(&scope, "idea", 0.8, 0.7, 0.2, "Medium", &[]);
+        let v = bare.value.unwrap();
+        assert!(
+            !v.has_supporting_evidence,
+            "an unevidenced candidate must not report supporting evidence"
+        );
+        assert_eq!(v.evidence_count, 0);
+        assert!(v.screen_note.contains("not a legal"));
+
+        let supported = evaluate_opportunity(
+            &scope,
+            "idea",
+            0.8,
+            0.7,
+            0.2,
+            "Medium",
+            &["https://example.gov/1".to_string()],
+        );
+        assert!(supported.value.unwrap().has_supporting_evidence);
+    }
+
+    #[test]
+    fn test_opportunity_validates_scores_and_uncertainty() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        assert!(!evaluate_opportunity(&scope, "x", 1.5, 0.5, 0.5, "Low", &[]).ok);
+        assert!(!evaluate_opportunity(&scope, "x", -0.1, 0.5, 0.5, "Low", &[]).ok);
+        assert!(!evaluate_opportunity(&scope, "x", 0.5, 0.5, 0.5, "Certain", &[]).ok);
+        assert!(!evaluate_opportunity(&scope, "  ", 0.5, 0.5, 0.5, "Low", &[]).ok);
+    }
+
+    // --- docket namespace --------------------------------------------------
+
+    /// REQ-DOM-007: filing requires receipt evidence, and commercialization
+    /// cannot precede filing. Both guards live in the domain crate.
+    #[test]
+    fn test_docket_requires_filing_before_commercialization() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        let premature = advance_docket(&scope, "Preparation", None, true);
+        assert!(!premature.ok, "commercialization was allowed before filing");
+        assert!(matches!(premature.error, Some(CommandError::Policy { .. })));
+
+        let filed = advance_docket(&scope, "Preparation", Some("US123456"), false);
+        assert_eq!(filed.value.unwrap().state, "Filed(US123456)");
+
+        let commercial = advance_docket(&scope, "Filed(US123456)", None, true);
+        assert_eq!(commercial.value.unwrap().state, "Commercialized");
+    }
+
+    #[test]
+    fn test_docket_validates_inputs() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        assert!(!advance_docket(&scope, "Nonsense", None, false).ok);
+        assert!(!advance_docket(&scope, "Preparation", Some("   "), false).ok);
+    }
+
+    // --- prosecution namespace ---------------------------------------------
+
+    #[test]
+    fn test_office_action_refuses_allowance_response() {
+        let nonfinal =
+            draft_office_action_response("NonFinalRejection", &["US9876543".to_string()]);
+        let v = nonfinal.value.unwrap();
+        assert!(v.response_drafted);
+        assert_eq!(v.cited_art_count, 1);
+
+        let allowance = draft_office_action_response("NoticeOfAllowance", &[]);
+        assert!(
+            !allowance.ok,
+            "a Notice of Allowance has no rejection to respond to"
+        );
+        assert!(matches!(allowance.error, Some(CommandError::Policy { .. })));
+
+        assert!(!draft_office_action_response("Bogus", &[]).ok);
+        assert!(!draft_office_action_response("FinalRejection", &["  ".to_string()]).ok);
+    }
+
+    // --- commercialization namespace ---------------------------------------
+
+    /// REQ-COM-004: the package must be redacted before export. The command
+    /// asserts the pre-redaction export is REFUSED, so a regression that
+    /// allowed it would fail here.
+    #[test]
+    fn test_commercialization_package_is_redacted() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        let result = build_commercialization_package(&scope, &["MegaCorp".to_string()]);
+        assert!(result.ok);
+        let v = result.value.unwrap();
+        assert!(v.redacted);
+        assert_eq!(v.target_count, 1);
+        assert!(
+            v.payload.contains("not a valuation"),
+            "payload must disclaim valuation, got {:?}",
+            v.payload
+        );
+
+        assert!(!build_commercialization_package(&scope, &[]).ok);
+        assert!(!build_commercialization_package(&scope, &["  ".to_string()]).ok);
+    }
+
+    // --- provider namespace ------------------------------------------------
+
+    /// PF-011 is unmet, so no lane may report itself configured, and the
+    /// command must not perform inference or return generated text.
+    #[test]
+    fn test_provider_status_reports_no_configured_lane() {
+        let result = provider_status();
+        assert!(result.ok);
+        let lanes = result.value.unwrap();
+        assert_eq!(lanes.len(), 5);
+        assert!(
+            lanes.iter().all(|l| !l.configured),
+            "a provider lane claimed to be configured with no credentials"
+        );
+
+        let google = lanes.iter().find(|l| l.lane == "google").unwrap();
+        assert!(!google.transport_available);
+        assert!(google.detail.contains("disabled by provider policy"));
+    }
+
+    // --- mcp namespace -----------------------------------------------------
+
+    /// SPEC-005: capability grants are explicit; an ungranted capability is
+    /// refused, and models cannot self-approve.
+    #[test]
+    fn test_mcp_capability_grant_is_explicit() {
+        let allowed = check_mcp_capability(&["ReadVault".to_string()], "ReadVault");
+        assert!(allowed.value.unwrap().allowed);
+
+        let denied = check_mcp_capability(&["ReadVault".to_string()], "WriteVault");
+        let d = denied.value.unwrap();
+        assert!(!d.allowed, "ungranted capability was allowed");
+        assert!(d.reason.contains("cannot self-approve"));
+
+        assert!(!check_mcp_capability(&["Bogus".to_string()], "ReadVault").ok);
+        assert!(!check_mcp_capability(&[], "Bogus").ok);
+    }
+
+    // --- incident namespace ------------------------------------------------
+
+    /// AG-002 regression guard: a secret present in incident detail must not
+    /// survive into an exportable capsule.
+    #[test]
+    fn test_repair_capsule_redacts_secrets() {
+        let secret = "sk-live-0123456789abcdef";
+        let result = build_repair_capsule(
+            &format!("panic while saving: {secret}"),
+            "null pointer in core",
+            &[secret.to_string()],
+        );
+        assert!(result.ok);
+        let v = result.value.unwrap();
+        assert!(v.safe_for_export);
+        assert!(
+            !v.redacted_detail.contains(secret),
+            "secret leaked into the capsule: {}",
+            v.redacted_detail
+        );
+        assert!(v.redacted_detail.contains("[REDACTED]"));
+
+        assert!(!build_repair_capsule("detail", "  ", &[]).ok);
+    }
+
+    // --- export namespace --------------------------------------------------
+
+    /// The export gateway must refuse an escaping path (AG-003) as well as
+    /// Restricted content.
+    #[test]
+    fn test_export_gateway_hardens_paths_and_blocks_restricted() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        let traversal = export_evidence(&scope, "../../etc/passwd", "x", "Public");
+        assert!(!traversal.ok, "escaping path was accepted for export");
+
+        let restricted = export_evidence(&scope, "ok/path.txt", "secret", "Restricted");
+        assert!(!restricted.ok, "Restricted content was exported");
+
+        let ok = export_evidence(&scope, "drafts/one-pager.txt", "abstract", "Public");
+        assert!(ok.ok);
+        let receipt = ok.value.unwrap();
+        assert_eq!(receipt.path, "drafts/one-pager.txt");
+        assert_eq!(receipt.content_bytes, "abstract".len());
     }
 
     // --- patent namespace --------------------------------------------------

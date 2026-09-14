@@ -81,6 +81,19 @@ interface HandoffReadiness {
   note: string;
 }
 
+interface ProviderLane {
+  lane: string;
+  transport_available: boolean;
+  configured: boolean;
+  detail: string;
+}
+
+interface McpDecision {
+  requested: string;
+  allowed: boolean;
+  reason: string;
+}
+
 /** True when running inside the Tauri shell where IPC is available. */
 export function hasIpc(): boolean {
   return (
@@ -119,6 +132,9 @@ export default function App() {
     useState<CommandResult<ReceiptView> | null>(null);
   const [handoffResult, setHandoffResult] =
     useState<CommandResult<HandoffReadiness> | null>(null);
+  const [providerLanes, setProviderLanes] = useState<ProviderLane[]>([]);
+  const [mcpDecision, setMcpDecision] = useState<McpDecision | null>(null);
+  const [opsError, setOpsError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!hasIpc()) {
@@ -167,6 +183,27 @@ export default function App() {
       setIpcError(String(err));
     }
   }, [draft, authorIsHuman]);
+
+  const onLoadOps = useCallback(async () => {
+    if (!hasIpc()) {
+      setOpsError("Cannot load status: desktop backend unavailable.");
+      return;
+    }
+    try {
+      const lanes =
+        await invoke<CommandResult<ProviderLane[]>>("provider_status");
+      if (lanes.ok && lanes.value) setProviderLanes(lanes.value);
+
+      const mcp = await invoke<CommandResult<McpDecision>>(
+        "check_mcp_capability",
+        { granted: ["ReadVault"], requested: "WriteVault" },
+      );
+      if (mcp.ok && mcp.value) setMcpDecision(mcp.value);
+      setOpsError(null);
+    } catch (err) {
+      setOpsError(String(err));
+    }
+  }, []);
 
   const implemented = namespaces.filter((n) => n.implemented);
 
@@ -462,6 +499,34 @@ export default function App() {
           </p>
         )}
         <p>Human submission only: LINCHPIN does not sign, pay or submit.</p>
+      </section>
+
+      <section aria-labelledby="ops-heading">
+        <h2 id="ops-heading">Operations</h2>
+        <p>
+          Provider lanes, MCP grants and incident capsules are reported from the
+          backend; no lane performs inference on this host.
+        </p>
+        <button type="button" onClick={() => void onLoadOps()}>
+          Load operational status
+        </button>
+        {opsError && <p role="alert">{opsError}</p>}
+        {providerLanes.length > 0 && (
+          <ul>
+            {providerLanes.map((l) => (
+              <li key={l.lane}>
+                {l.lane}: {l.configured ? "configured" : "not configured"} —{" "}
+                {l.detail}
+              </li>
+            ))}
+          </ul>
+        )}
+        {mcpDecision && (
+          <p>
+            MCP {mcpDecision.requested}:{" "}
+            {mcpDecision.allowed ? "allowed" : "denied"} — {mcpDecision.reason}
+          </p>
+        )}
       </section>
 
       {namespaces.length > 0 && (
