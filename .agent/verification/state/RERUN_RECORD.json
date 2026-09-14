@@ -1,16 +1,15 @@
 {
   "changed_classes": [
-    "gate-script",
-    "artifact-inputs"
+    "gate-script"
   ],
-  "epoch_digest": "ea9c6ac628346f7780fec8e20c022af995ef11ecb7aee6ef679d9be0f37bb84a",
+  "epoch_digest": "17d5fd0f31187065a51ab37ccb3f9b98f1739678537c98b5d574643bfcff12aa",
   "failures": 0,
   "results": [
     {
       "command": "sh scripts/harness-validate.sh",
-      "duration_s": 34.81,
+      "duration_s": 34.1,
       "exit_code": 0,
-      "output_sha256": "fee533bf90bec1e01d94500902a656a12a90a15c0bd47ecc5233c175f82ddbab",
+      "output_sha256": "a9e6cbb8bd3cda0dd08a6bc9218f03ffbc24ceab028162a256d91f70db4e540c",
       "output_tail": [
         "collect-skip check: ok (collected 129, ignored 0, markers 0, waivers 0)",
         "reachability check: ok (147 public fns, 18 entry points, 0 unreachable)",
@@ -21,9 +20,9 @@
     },
     {
       "command": "sh scripts/build.sh",
-      "duration_s": 78.4,
+      "duration_s": 84.12,
       "exit_code": 0,
-      "output_sha256": "eed4ef728e3910146f9359b45e541e7ea321864ce5528c9fe04aa2f4e4b6f04f",
+      "output_sha256": "5f001ea743ace7c1b4f4e9ae27707688eff21004747c6ee03454d4aeacc41a93",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -34,9 +33,9 @@
     },
     {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 16.76,
+      "duration_s": 18.17,
       "exit_code": 0,
-      "output_sha256": "b4a0e0e9516895256f937532e634fd3b2bec326d0f3f7b73410a377aeffc7ff2",
+      "output_sha256": "0680161b11eb1d00c91edd3070f748f83073d75247190ca05e5dcc041c24bcba",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -47,50 +46,15 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 1.78,
+      "duration_s": 1.97,
       "exit_code": 0,
-      "output_sha256": "9da635c858dddef25263ac1b6339670ad7c6542241dc2967d7c97fcc1945afcb",
+      "output_sha256": "b2ac99061ccfee70bf922a2a4bed0c64187744f3b0248a00ed5743b9bdf5aecb",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.55s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.57s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-40d0be70daa3bb16.exe)"
       ],
       "stage": "V-009 integration/concurrency",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/artifact-e2e.sh",
-      "duration_s": 83.72,
-      "exit_code": 0,
-      "output_sha256": "92144d4a076eabc0c8bc72a40d79184aee220cc6325c8b4a0e9975e2b29791e1",
-      "output_tail": [
-        "  PASS: artifact digest unchanged across the run -- 5a67fd392de6d798",
-        "artifact-e2e: wrote .agent/evidence/artifact-e2e/STATUS.md",
-        "artifact-e2e: ok"
-      ],
-      "stage": "V-020 exact artifact",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/harness-accounting.sh",
-      "duration_s": 0.14,
-      "exit_code": 0,
-      "output_sha256": "4abfb44fd4b899654c606aeef0442b156a45d80302a4d5f58fe0ac5c07329efc",
-      "output_tail": [
-        "registry 484 accounted 484"
-      ],
-      "stage": "V-021 final accounting",
-      "status": "PASS"
-    },
-    {
-      "command": "python3 scripts/ship-gate.py --check",
-      "duration_s": 0.14,
-      "exit_code": 0,
-      "output_sha256": "68a93dd282d643d8dba01089ae52eb1c013014dd342130a8a2039065d229d799",
-      "output_tail": [
-        "ship-gate check: ok (verdict NO_GO, unchanged)"
-      ],
-      "stage": "V-021 final accounting",
       "status": "PASS"
     }
   ],
@@ -98,8 +62,6 @@
     "V-000 harness validation",
     "V-005 clean build",
     "V-008 full functionality",
-    "V-009 integration/concurrency",
-    "V-020 exact artifact",
-    "V-021 final accounting"
+    "V-009 integration/concurrency"
   ]
 }

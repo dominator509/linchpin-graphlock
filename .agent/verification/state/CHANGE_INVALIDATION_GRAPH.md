@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `ea9c6ac628346f7780fec8e20c022af995ef11ecb7aee6ef679d9be0f37bb84a`
-- Candidate commit at generation: `43a6392`
+- Current epoch digest: `17d5fd0f31187065a51ab37ccb3f9b98f1739678537c98b5d574643bfcff12aa`
+- Candidate commit at generation: `b69ca28`
 - Total tracked inputs: 110
-- Previous epoch digest: `ea9c6ac628346f7780fec8e20c022af995ef11ecb7aee6ef679d9be0f37bb84a`
+- Previous epoch digest: `17d5fd0f31187065a51ab37ccb3f9b98f1739678537c98b5d574643bfcff12aa`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -46,7 +46,7 @@ definition and its PASS status is revoked until rerun.
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
-  - `scripts\artifact-e2e.sh` `74c5b97617e14a2b…`
+  - `scripts\artifact-e2e.sh` `66789e3a58097851…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
   - `scripts\bind-requirements.py` `aefe9afc545f0db1…`
   - … and 45 more
