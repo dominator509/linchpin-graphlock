@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `93075f9e16ae893e876ece6733328d84db88abb24fdc3410570b45d602fdb1af`
-- Candidate commit at generation: `338727a`
-- Total tracked inputs: 106
-- Previous epoch digest: `c60e344027b48425789e61e195b2508c0c51db993e5ca3d616f7b460f68f1dc4`
-- **Changed input classes since that epoch: gate-script**
+- Current epoch digest: `f2b3206f0780c76fbc80e6947c64826a6a636b06dde9ef78b7ee31f3575ccac9`
+- Candidate commit at generation: `71dd8e0`
+- Total tracked inputs: 107
+- Previous epoch digest: `93075f9e16ae893e876ece6733328d84db88abb24fdc3410570b45d602fdb1af`
+- **Changed input classes since that epoch: rust-source, gate-script**
 
 ## Input classes and what a change invalidates
 
@@ -37,7 +37,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 46 file(s)
+### `gate-script` — 47 file(s)
 
 - invalidates: all stages that invoke the changed gate
 
@@ -46,7 +46,7 @@ definition and its PASS status is revoked until rerun.
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
   - `scripts\bind-requirements.py` `aefe9afc545f0db1…`
   - `scripts\build-accounting.py` `7eee6a642222843a…`
-  - … and 41 more
+  - … and 42 more
 
 ### `js-manifest` — 7 file(s)
 

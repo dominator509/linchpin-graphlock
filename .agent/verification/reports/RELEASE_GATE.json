@@ -10,7 +10,6 @@
   },
   "blocking_clauses": [
     "DOD-001=PARTIAL",
-    "DOD-002=PARTIAL",
     "DOD-003=PARTIAL",
     "DOD-004=PARTIAL",
     "DOD-019=PARTIAL",
@@ -23,8 +22,8 @@
   "dod_status_tally": {
     "EXTERNAL_REQUIRED": 1,
     "FAIL": 15,
-    "PARTIAL": 17,
-    "PASS": 9
+    "PARTIAL": 16,
+    "PASS": 10
   },
   "external_clauses": [],
   "inconclusive_reasons": [],
