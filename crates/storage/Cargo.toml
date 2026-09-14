@@ -2,7 +2,7 @@
 name = "storage"
 version = "0.1.0"
 edition = "2024"
-
+license = "MIT OR Apache-2.0"
 [dependencies]
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 tantivy = "0.26.2"

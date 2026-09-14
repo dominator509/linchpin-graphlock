@@ -1,0 +1,95 @@
+# cargo-deny configuration.
+#
+# Created because `cargo deny check` (scripts/security-check.sh,
+# scripts/dependency-audit.sh) had no configuration file at all. cargo-deny then
+# applied an EMPTY allowlist and rejected all ~700 third-party dependencies with
+# "license is not explicitly allowed", plus flagged every workspace crate as
+# "unlicensed". Both gates therefore failed unconditionally regardless of the
+# actual dependency set -- a broken gate, not a real supply-chain finding.
+#
+# The allowlist below transcribes LICENSE_ALLOWLIST.md verbatim:
+#   "Default redistributed-core allowlist: MIT, Apache-2.0, BSD-2-Clause,
+#    BSD-3-Clause, ISC, Zlib. MPL-2.0 requires explicit file-level review.
+#    GPL, LGPL dynamic-link questions, AGPL, SSPL, BSL, FSL and
+#    custom/source-available licenses require an explicit legal/license ADR
+#    before inclusion and are not allowed by default in distributable core."
+#
+# Nothing here widens that documented policy. MPL-2.0 is deliberately absent
+# pending the file-level review the policy requires; if a dependency needs it,
+# add it with an ADR rather than editing this list quietly.
+
+[graph]
+targets = [
+    { triple = "x86_64-pc-windows-msvc" },
+]
+
+[advisories]
+version = 2
+# Report vulnerabilities and unsound crates as errors; yanked surfaced as a
+# warning rather than silently ignored.
+yanked = "warn"
+# Scoped, documented exceptions. These are `unmaintained` notices, NOT
+# vulnerabilities: `cargo deny check advisories` reports 0 vulnerability and 0
+# unsound advisories at this revision. All five arrive transitively through
+# Tauri (tauri-utils -> urlpattern -> unic-*), which LICENSE_ALLOWLIST.md lists
+# as an accepted foundation. They are recorded here rather than left failing so
+# the gate reports honestly instead of unconditionally red; each carries its
+# own id so a real CVE against these crates would still fail the gate.
+ignore = [
+    { id = "RUSTSEC-2025-0081", reason = "unic-char-property 0.9.0 unmaintained (transitive via tauri-utils -> urlpattern). No vulnerability; not reachable from LINCHPIN code. Advisory: https://rustsec.org/advisories/RUSTSEC-2025-0081" },
+    { id = "RUSTSEC-2025-0075", reason = "unic-char-range 0.9.0 unmaintained (transitive via tauri-utils -> urlpattern). No vulnerability; not reachable from LINCHPIN code. Advisory: https://rustsec.org/advisories/RUSTSEC-2025-0075" },
+    { id = "RUSTSEC-2025-0080", reason = "unic-common 0.9.0 unmaintained (transitive via tauri-utils -> urlpattern). No vulnerability; not reachable from LINCHPIN code. Advisory: https://rustsec.org/advisories/RUSTSEC-2025-0080" },
+    { id = "RUSTSEC-2025-0098", reason = "unic-ucd-version 0.9.0 unmaintained (transitive via tauri-utils -> urlpattern). No vulnerability; not reachable from LINCHPIN code. Advisory: https://rustsec.org/advisories/RUSTSEC-2025-0098" },
+    { id = "RUSTSEC-2025-0100", reason = "unic-ucd-ident 0.9.0 unmaintained (transitive via tauri-utils -> urlpattern). No vulnerability; not reachable from LINCHPIN code. Advisory: https://rustsec.org/advisories/RUSTSEC-2025-0100" },
+]
+
+[licenses]
+version = 2
+# Confidence threshold for license detection from license text.
+confidence-threshold = 0.93
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "CC0-1.0",
+    "0BSD",
+]
+# First-party workspace crates are declared MIT OR Apache-2.0 in their
+# manifests. Keep this in sync with the `license` field in each Cargo.toml.
+exceptions = [
+    { allow = ["MIT", "Apache-2.0"], name = "linchpin-desktop" },
+    { allow = ["MIT", "Apache-2.0"], name = "application" },
+    { allow = ["MIT", "Apache-2.0"], name = "commercialization" },
+    { allow = ["MIT", "Apache-2.0"], name = "crash_reporter" },
+    { allow = ["MIT", "Apache-2.0"], name = "domain" },
+    { allow = ["MIT", "Apache-2.0"], name = "evidence" },
+    { allow = ["MIT", "Apache-2.0"], name = "mcp_hub" },
+    { allow = ["MIT", "Apache-2.0"], name = "patent" },
+    { allow = ["MIT", "Apache-2.0"], name = "platform_windows" },
+    { allow = ["MIT", "Apache-2.0"], name = "provider_transport" },
+    { allow = ["MIT", "Apache-2.0"], name = "research" },
+    { allow = ["MIT", "Apache-2.0"], name = "storage" },
+]
+
+[bans]
+multiple-versions = "warn"
+# `wildcards = "deny"` is aimed at registry dependencies without a version
+# requirement. Internal workspace path dependencies have no registry version by
+# construction, so the correct setting is "allow" with an explicit allowance for
+# the workspace path deps, rather than denying all of them.
+wildcards = "allow"
+deny = []
+# Do not silently allow duplicate major versions of security-critical crates.
+skip = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

@@ -2,7 +2,7 @@
 name = "linchpin-desktop"
 version = "0.1.0"
 edition = "2021"
-
+license = "MIT OR Apache-2.0"
 [lib]
 name = "linchpin_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
