@@ -2,12 +2,17 @@
 
 Scan command: `python3 scripts/anti-gaming-scan.py .`
 Scan date: 2026-09-10
-Candidate: `bcc54a0` (base `962e365`)
+Candidate: `587cc0c` (base `962e365`)
 
-**STATUS: AG-001, AG-002 and AG-003 have all been REPAIRED and verified.**
+**STATUS: AG-001 through AG-005 have all been REPAIRED and verified.**
 Each carries a mutation/negative proof showing the guarding test genuinely
 fails when the real behavior is removed (DOD-018). Re-run
 `python3 scripts/anti-gaming-scan.py .` to confirm the production hits are gone.
+
+Five defects were found, not three. AG-004 and AG-005 were located later, in
+`crates/patent`, by writing probe tests against the existing API rather than by
+reading code. That method is worth reusing: the compiler and tests surface
+fabrication faster than review does.
 
 The tree-wide scan returned 371 matches at base revision, most of which are
 false positives in prose/spec documents (`AGENTS.md` DoD text legitimately uses
@@ -108,6 +113,79 @@ the test vacuous. `test_archive_entry_rejects_zip_slip` was added.
 **Mutation proof.** Removing the `path.contains("..")` guard fails the corpus
 test with `permissive acceptance of escaping path: "..%2efile.txt"`
 (exit 101) — the generated corpus found a real bypass class. Restored, green.
+
+## Finding AG-004 — `patent` receipt import returned hardcoded values — REPAIRED
+
+`crates/patent/src/lib.rs::ReceiptImport::import` (base revision)
+
+```rust
+pub fn import(ack_file_content: &str) -> Result<Self, &'static str> {
+    // Mock parsing logic
+    if ack_file_content.contains("AppNumber:") && ack_file_content.contains("ConfNumber:") {
+        Ok(ReceiptImport {
+            application_number: "12/345,678".to_string(),
+            confirmation_number: "9876".to_string(),
+        })
+    } else {
+        Err("Invalid receipt format")
+    }
+}
+```
+
+It checked only that the input *contained* two labels, then returned hardcoded
+literals. Its own test asserted those literals, so the fabrication was locked
+in and **every** receipt imported successfully with the wrong application number.
+
+**Proven by probe before the fix** (DOD-019 worked example):
+
+```
+ReceiptImport::import("AppNumber: 99/888,777\nConfNumber: 1234")
+  -> application_number == "12/345,678"
+  assertion `left == right` failed: import ignored the supplied application number
+  left: "12/345,678"  right: "99/888,777"
+  [exit 101]
+```
+
+**Resolution (commit `587cc0c`).** Real line-anchored field extraction with
+fail-closed validation. Missing or empty labels, non-numeric confirmation
+numbers and malformed application numbers all return `Err`. A realistic
+multi-line USPTO acknowledgement receipt round-trips correctly. Tests: 4 added
+including 6 negative cases.
+
+In a filing-evidence path a wrong application number is a record-integrity
+failure (REQ-PAT-005), so this is a correctness defect as well as an
+anti-gaming one.
+
+## Finding AG-005 — `patent` package builder labelled strings as DOCX/PDF — REPAIRED
+
+`crates/patent/src/lib.rs::PackageBuilder` (base revision)
+
+```rust
+pub fn build_docx(claims: &str, spec: &str) -> Result<PatentPackage, &'static str> {
+    // Mock deterministic DOCX package
+    Ok(PatentPackage {
+        content: format!("DOCX: Claims: {} | Spec: {}", claims, spec),
+        format: "DOCX".to_string(),
+    })
+}
+```
+
+Neither builder produced a DOCX or a PDF. Both produced a Rust `String` with the
+format name prefixed and a `format` field claiming the document type, so a
+caller could not distinguish a real package from that string. REQ-PAT-002
+requires real package artifacts plus a manifest SHA-256.
+
+**Resolution (commit `587cc0c`).** The builders now emit an explicit,
+self-describing `MANIFEST` whose `format` is `"MANIFEST"` — never `"DOCX"` or
+`"PDF"` — and whose content carries a real dependency-free FNV-1a digest of both
+inputs. The digest function is named `input_digest` and documented as a content
+fingerprint, **not** a cryptographic signature, so it cannot be mistaken for
+one. Tests assert the format is not DOCX/PDF, that the digest is deterministic,
+and that it changes when either input changes.
+
+Real OOXML/PDF rendering remains **INCOMPLETE** against REQ-PAT-002. That is
+recorded rather than implied: the honest move was to stop claiming a format the
+crate cannot produce, not to build a half-renderer.
 
 ## Not findings (classified, cleared)
 
