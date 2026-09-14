@@ -1,8 +1,200 @@
+import { useCallback, useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+
+/**
+ * LINCHPIN desktop shell.
+ *
+ * GraphLock context (SUP-001 "disconnected UI" finding): this component
+ * previously rendered two static sentences and called nothing. The Tauri
+ * backend now exposes real commands (`get_system_health`, `record_conception`,
+ * `get_namespace_status`) and this UI invokes them, so the wiring is
+ * bidirectional and observable.
+ *
+ * Runs outside Tauri (plain browser / E2E) degrade explicitly rather than
+ * silently: `invoke` rejects when there is no IPC bridge, and the UI surfaces
+ * that instead of pretending to be connected.
+ */
+
+interface SystemHealth {
+  status: string;
+  version: string;
+  storage_ok: boolean;
+}
+
+interface NamespaceStatus {
+  namespace: string;
+  implemented: boolean;
+  detail: string;
+}
+
+interface ConceptionEventView {
+  event_id: string;
+  content_hash: string;
+  content_bytes: number;
+  origin: string;
+}
+
+interface RecordConceptionOutcome {
+  event: ConceptionEventView;
+  persisted: boolean;
+  storage_detail: string;
+}
+
+interface CommandResult<T> {
+  correlation_id: string;
+  ok: boolean;
+  value?: T;
+  error?: { class: string; message: string };
+}
+
+/** True when running inside the Tauri shell where IPC is available. */
+export function hasIpc(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof (window as { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__ !==
+      "undefined"
+  );
+}
+
 export default function App() {
+  const [health, setHealth] = useState<SystemHealth | null>(null);
+  const [namespaces, setNamespaces] = useState<NamespaceStatus[]>([]);
+  const [ipcError, setIpcError] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [authorIsHuman, setAuthorIsHuman] = useState(true);
+  const [lastRecord, setLastRecord] =
+    useState<CommandResult<RecordConceptionOutcome> | null>(null);
+
+  useEffect(() => {
+    if (!hasIpc()) {
+      // Honest state: outside the Tauri shell there is no backend to report on.
+      setIpcError(
+        "Desktop backend unavailable (running outside the Tauri shell).",
+      );
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const [h, ns] = await Promise.all([
+          invoke<SystemHealth>("get_system_health"),
+          invoke<NamespaceStatus[]>("get_namespace_status"),
+        ]);
+        if (cancelled) return;
+        setHealth(h);
+        setNamespaces(ns);
+      } catch (err) {
+        if (cancelled) return;
+        setIpcError(String(err));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const onRecord = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot record: desktop backend unavailable.");
+      return;
+    }
+    try {
+      const result = await invoke<CommandResult<RecordConceptionOutcome>>(
+        "record_conception",
+        {
+          workspaceId: "local-workspace",
+          content: draft,
+          authorIsHuman,
+        },
+      );
+      setLastRecord(result);
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, [draft, authorIsHuman]);
+
+  const implemented = namespaces.filter((n) => n.implemented);
+
   return (
     <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>LINCHPIN Patent Intelligence OS</h1>
       <p>Local-First Confidentiality Boundary Active.</p>
+
+      <section aria-labelledby="health-heading">
+        <h2 id="health-heading">System Health</h2>
+        {ipcError && <p role="alert">{ipcError}</p>}
+        {health ? (
+          <ul>
+            <li>Status: {health.status}</li>
+            <li>Version: {health.version}</li>
+            <li>Storage writable: {String(health.storage_ok)}</li>
+          </ul>
+        ) : (
+          !ipcError && <p>Checking…</p>
+        )}
+      </section>
+
+      <section aria-labelledby="conception-heading">
+        <h2 id="conception-heading">Conception Lab</h2>
+        <label htmlFor="conception-input">Describe your conception</label>
+        <textarea
+          id="conception-input"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          rows={4}
+          style={{ display: "block", width: "100%", maxWidth: "40rem" }}
+        />
+        <label htmlFor="origin-select">Origin</label>
+        <select
+          id="origin-select"
+          value={authorIsHuman ? "human" : "ai"}
+          onChange={(e) => setAuthorIsHuman(e.target.value === "human")}
+        >
+          <option value="human">Human conception</option>
+          <option value="ai">AI suggestion</option>
+        </select>
+        <button type="button" onClick={() => void onRecord()}>
+          Record conception event
+        </button>
+
+        {lastRecord && (
+          <div>
+            {lastRecord.ok && lastRecord.value ? (
+              <>
+                <p>Origin: {lastRecord.value.event.origin}</p>
+                <p>Content hash: {lastRecord.value.event.content_hash}</p>
+                <p>
+                  Persisted: {String(lastRecord.value.persisted)} —{" "}
+                  {lastRecord.value.storage_detail}
+                </p>
+              </>
+            ) : (
+              <p role="alert">
+                {lastRecord.error?.class}: {lastRecord.error?.message}
+              </p>
+            )}
+            <p>Correlation: {lastRecord.correlation_id}</p>
+          </div>
+        )}
+      </section>
+
+      {namespaces.length > 0 && (
+        <section aria-labelledby="ns-heading">
+          <h2 id="ns-heading">Capability Coverage</h2>
+          <p>
+            {implemented.length} of {namespaces.length} contract namespaces
+            implemented.
+          </p>
+          <ul>
+            {namespaces.map((n) => (
+              <li key={n.namespace}>
+                {n.namespace}:{" "}
+                {n.implemented ? "available" : "not yet available"}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

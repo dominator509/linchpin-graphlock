@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+pub mod commands;
+
 /// Where LINCHPIN stores its local data.
 ///
 /// Uses the same resolution as `platform_windows::get_app_paths` so the health
@@ -13,7 +15,7 @@ fn storage_root() -> PathBuf {
 /// GraphLock context (anti-gaming finding AG-007a): this command previously
 /// returned `application::check_system_health()`, a constant
 /// `SystemHealth { status: "OK", storage_ok: true }` that checked nothing. This
-/// is the only Tauri command the shipped desktop app exposes, so the product's
+/// was the ONLY Tauri command the shipped desktop app exposed, so the product's
 /// single runtime self-report was a hard-coded success — the exact
 /// "health signals must never lie" failure DOD-037 prohibits.
 ///
@@ -26,9 +28,30 @@ fn get_system_health() -> Result<application::SystemHealth, String> {
     Ok(application::check_system_health_with(&[probe]))
 }
 
+/// Record a human conception event (REQ-DOM-001, REQ-DOM-002).
+#[tauri::command]
+fn record_conception(
+    workspace_id: String,
+    content: String,
+    author_is_human: bool,
+) -> commands::CommandResult<commands::RecordConceptionOutcome> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::record_conception(&scope, &content, author_is_human)
+}
+
+/// Report SPEC-003 namespace coverage.
+#[tauri::command]
+fn get_namespace_status() -> Vec<commands::NamespaceStatus> {
+    commands::namespace_status()
+}
+
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_system_health])
+        .invoke_handler(tauri::generate_handler![
+            get_system_health,
+            record_conception,
+            get_namespace_status
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

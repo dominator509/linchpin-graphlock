@@ -14,6 +14,9 @@ tauri-build = { version = "2.6.0", features = [] }
 tauri = { version = "2.6.0", features = [] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+# Already in the workspace Cargo.lock (uuid 1.26.0, via domain). Needed for
+# correlation IDs (SPEC-003) and domain entity construction. No new package.
+uuid = { version = "1.26.0", features = ["v4", "serde"] }
 domain = { path = "../../../crates/domain" }
 application = { path = "../../../crates/application" }
 storage = { path = "../../../crates/storage" }
