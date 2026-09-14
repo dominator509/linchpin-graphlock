@@ -2,23 +2,32 @@
 
 Scan command: `python3 scripts/anti-gaming-scan.py .`
 Scan date: 2026-09-10
-Candidate: `264913f` (base `962e365`)
+Candidate: `41bc9bb` (base `962e365`)
 
-**STATUS: AG-001 through AG-006 have all been REPAIRED and verified.**
+**STATUS: AG-001 through AG-009 have all been REPAIRED and verified.**
 Each carries a mutation/negative proof showing the guarding test genuinely
 fails when the real behavior is removed (DOD-018). Re-run
 `python3 scripts/anti-gaming-scan.py .` to confirm the production hits are gone.
 
-Six defects were found, not three. AG-004, AG-005 and AG-006 were located by
-writing probe tests against existing APIs rather than by reading code — the
-AG-004 probe failed on its first run, which is what exposed it. That method is
-worth reusing: executable probes surface fabrication faster than review does.
+Nine defects were found, not three. AG-004 through AG-009 were located by
+writing **probe tests** against existing APIs rather than by reading code — the
+AG-004 probe failed on its first run, and the AG-008 probe likewise, which is
+what exposed each. That method is worth reusing: executable probes surface
+fabrication faster than review does.
 
-Severity note: AG-006 is the most serious, because it manufactured the
-**release-gating** live-fire evidence that REQ-SHIP-001 depends on. AG-004 is
-next, because it returned a wrong application number on a filing-evidence path
-(REQ-PAT-005). AG-001/AG-002 fabricated provider output and defeated an export
-safety guard.
+Severity ordering:
+
+| Finding | Why it matters |
+| --- | --- |
+| AG-006 | Manufactured the **release-gating** UO-01..12 live-fire evidence (REQ-SHIP-001) |
+| AG-007a | The product's only runtime self-report was a hard-coded "OK" |
+| AG-004 | Returned a wrong application number on a filing-evidence path (REQ-PAT-005) |
+| AG-002 | Export guard reported safe while unredacted invention content passed |
+| AG-008 | Security control bypassable by lower case |
+| AG-009 | Prior-art design-around verdict could never be negative |
+| AG-001 | Fabricated provider inference |
+| AG-005 | Labelled plain strings as DOCX/PDF |
+| AG-007b | Declared a memory leak without measuring memory |
 
 The tree-wide scan returned 371 matches at base revision, most of which are
 false positives in prose/spec documents (`AGENTS.md` DoD text legitimately uses
@@ -235,6 +244,98 @@ Tests: `commercialization` 2 → 5, including
 `test_completed_runs_cannot_be_fabricated`,
 `test_failing_runs_do_not_count_as_completed` and
 `test_duplicate_runs_count_once`.
+
+## Finding AG-007 — `application` constant health, mock soak, unmeasured leak — REPAIRED
+
+`crates/application/src/lib.rs` (base revision)
+
+**(a)** `check_system_health()` returned a constant
+`SystemHealth { status: "OK", storage_ok: true }` and checked nothing. It is
+bound to `get_system_health`, the **only** Tauri command in the packaged desktop
+app, so the product's single piece of runtime self-report was a hard-coded
+success — the exact failure DOD-037 ("health signals never lie") and SUP-011
+("a process must not report ready when a critical dependency is unavailable")
+prohibit.
+
+**(b)** `OperationsSoakTest` contained:
+
+```rust
+// Mock leak condition for proof
+if self.iteration_count > 100 { self.memory_leak_detected = true; }
+```
+
+Nothing was measured; the "leak" was a counter threshold, and its test asserted
+that the fabricated condition fired. DOD-038 requires soak evidence with real
+telemetry.
+
+**Resolution (commit `8796d2e`).** Health is now derived from real probes:
+`probe_storage(path)` verifies the path exists, is a directory, and is genuinely
+writable; `check_system_health_with(&[probes])` reports `"OK"` only when every
+probe passed, otherwise `"DEGRADED"`, and no path reports OK with a failing
+probe. The version comes from `env!("CARGO_PKG_VERSION")`, not a literal.
+
+Measured: the app data directory `%LOCALAPPDATA%\LINCHPIN` **did not exist** on
+this host, so the probe correctly reports `DEGRADED` / `storage_ok=false`.
+`test_health_against_real_app_data_path` asserts that against the real runtime
+path the packaged app uses.
+
+Soak now reads the real process working set via
+`platform_windows::current_rss_bytes()` (`GetProcessMemoryInfo`, windows
+0.61.3 already in `Cargo.lock` — **zero new packages**) and returns `Err` from
+`stop_and_reconcile()` when no measurement is available rather than assuming
+health. The measurement is *proven* real: `test_current_rss_bytes_is_a_real_measurement`
+allocates and touches 8 MiB and asserts the working set grows.
+
+## Finding AG-008 — `mcp_hub` injection filter bypassed by lower case — REPAIRED
+
+`crates/mcp_hub/src/lib.rs` (base revision)
+
+```rust
+if payload.contains("IGNORE ALL PREVIOUS INSTRUCTIONS") {
+    return Err("Prompt injection detected");
+}
+```
+
+A single case-sensitive literal. **Proven by probe:** the lowercase string
+`"ignore all previous instructions"` was **accepted**, as were the mixed-case,
+extra-whitespace, `"disregard"`-synonym and `"ignore the above instructions"`
+forms. The existing test only exercised the exact uppercase literal, so the
+filter looked effective while being bypassed with a shift key.
+
+**Resolution (commit `41bc9bb`).** Case-normalized, whitespace-collapsed matching
+against six instruction-override patterns. Documented as **defence in depth, not
+a guarantee** — MCP grants remain the actual security boundary. Tests cover both
+directions: the variants must be rejected, and ordinary text (including the
+benign phrase *"Please ignore the formatting and extract the claims."*) must
+still pass, because a filter that blocks everything is a denial of service, not
+a control. `grant_capability` was also made idempotent.
+
+## Finding AG-009 — `research` tournament always returned "valid" — REPAIRED
+
+`crates/research/src/lib.rs` (base revision)
+
+```rust
+for _ in &self.strategies {
+    // Mock independent evaluation, all returning true (valid design around)
+    self.isolated_runs.push(true);
+}
+```
+
+It claimed to run independent evaluations and unconditionally recorded every
+strategy as valid, so the verdict could never be false. A prior-art design-around
+assessment that always reports "valid" is worse than none, because it invites
+reliance.
+
+**Resolution (commit `41bc9bb`).** `execute_independent_runs(evaluate)` takes an
+explicit predicate and records its real verdict; `passing_count()` and
+`failing_count()` expose the split.
+`test_failing_strategy_is_recorded_as_failure` asserts `vec![false, true]` — an
+outcome the old implementation could not produce.
+
+**Scaffold residue removed** in the same commit: `research` and `mcp_hub` both
+carried `cargo new` defaults — `pub fn add(left: u64, right: u64)` and an
+`it_works` test asserting `2 + 2 == 4` — which are DOD-019 unfinished-code
+residue in production crates. Verified zero remain.
 
 ## Not findings (classified, cleared)
 
