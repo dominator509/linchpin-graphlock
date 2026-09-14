@@ -1,6 +1,6 @@
 {
   "_comment": "Real executed case results. Only IDs whose acceptance oracle genuinely ran may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
-  "candidate_commit": "f4f41cc",
+  "candidate_commit": "1bca002",
   "candidate_epoch": "EP-009-attempt-002",
   "environment": {
     "host": "Windows 10 Home 10.0.19045 x64",

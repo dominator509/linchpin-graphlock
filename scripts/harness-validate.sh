@@ -15,4 +15,5 @@ python3 scripts/build-accounting.py --check
 python3 scripts/build-traceability.py --check
 python3 scripts/build-dod-status.py --check
 python3 scripts/test-collection-guard.py --check
+python3 scripts/ship-gate.py --check
 echo "harness-validate: ok"
