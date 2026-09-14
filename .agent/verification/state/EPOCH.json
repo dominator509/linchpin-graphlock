@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "b69ca28",
+  "candidate_commit": "2c166e4",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -37,7 +37,7 @@
         "scripts\\bind-requirements.py": "aefe9afc545f0db1d0f61767c9125d90788771c67094e98cb8c5b95dc253402d",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "6285076849d8d847a17be1fd80bf5bd4b67246b1fbbfff1327ddd32648cc72db",
-        "scripts\\build-dod-status.py": "4f6249d8639e0e1b42201cc198aa8566a092ce92ca6b0e2f257354816b9b2a8a",
+        "scripts\\build-dod-status.py": "47851992018739a2aac9270742c037adf0f8541ab3cd4604451ffba1c7f5c175",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "d73a6d9a2f432bef3c75dde37c5939b735e005fc747a1e1f75dff5c116b25db6",
@@ -203,6 +203,6 @@
       ]
     }
   },
-  "epoch_digest": "17d5fd0f31187065a51ab37ccb3f9b98f1739678537c98b5d574643bfcff12aa",
+  "epoch_digest": "efde155f8b15039ec4949771067fd4eb38b8f005de8d8eae1a689f9836713107",
   "total_inputs": 110
 }

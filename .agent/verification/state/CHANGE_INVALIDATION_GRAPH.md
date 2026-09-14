@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `17d5fd0f31187065a51ab37ccb3f9b98f1739678537c98b5d574643bfcff12aa`
-- Candidate commit at generation: `b69ca28`
+- Current epoch digest: `efde155f8b15039ec4949771067fd4eb38b8f005de8d8eae1a689f9836713107`
+- Candidate commit at generation: `2c166e4`
 - Total tracked inputs: 110
 - Previous epoch digest: `17d5fd0f31187065a51ab37ccb3f9b98f1739678537c98b5d574643bfcff12aa`
-- Changed input classes since that epoch: none
+- **Changed input classes since that epoch: gate-script**
 
 ## Input classes and what a change invalidates
 
