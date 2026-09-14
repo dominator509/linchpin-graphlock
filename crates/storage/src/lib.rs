@@ -217,29 +217,69 @@ mod tests {
     }
 }
 
+/// Contract for a prior-art / official-record source adapter.
+///
+/// GraphLock context (anti-gaming finding AG-010): `fetch_official_record`
+/// previously returned
+/// `format!("Mocked record content for {record_id} from {source_id}")` — a
+/// fabricated string — while its name advertised an *official* record, and the
+/// `endpoint` field was **never read** (measured: zero `self.endpoint` usages).
+/// Its test asserted only that the output contained the record id and source
+/// name, so the fabrication passed.
+///
+/// The danger is not the missing HTTP call; it is that a caller cannot tell a
+/// fabricated record from a real one. In a prior-art workflow (REQ-RES-001,
+/// REQ-DATA-001) that is an evidence-integrity failure: a "record" that no
+/// external source ever produced could be cited as prior art.
+///
+/// This type is now **explicitly unimplemented**: the constructor validates the
+/// endpoint is a real absolute URL, and `fetch_official_record` always returns
+/// `Err`. A caller therefore cannot obtain a fabricated official record. Real
+/// HTTP fetching is INCOMPLETE and recorded as such rather than faked.
 #[derive(Debug, Clone)]
 pub struct SourceAdapterContract {
     pub source_id: String,
     pub endpoint: String,
 }
 
+/// Reason every fetch fails until a real transport is implemented.
+pub const SOURCE_FETCH_UNIMPLEMENTED: &str =
+    "source adapter transport is not implemented; refusing to fabricate an official record";
+
 impl SourceAdapterContract {
-    pub fn new(source_id: &str, endpoint: &str) -> Self {
-        SourceAdapterContract {
+    /// Build an adapter, validating that the endpoint is a well-formed absolute
+    /// URL. This makes the `endpoint` field load-bearing rather than decorative.
+    pub fn new(source_id: &str, endpoint: &str) -> Result<Self, &'static str> {
+        if source_id.trim().is_empty() {
+            return Err("source_id cannot be empty");
+        }
+        if !(endpoint.starts_with("https://") || endpoint.starts_with("http://")) {
+            return Err("endpoint must be an absolute http(s) URL");
+        }
+        if endpoint.len() <= "https://".len() || endpoint.ends_with("://") {
+            return Err("endpoint must include a host");
+        }
+        Ok(SourceAdapterContract {
             source_id: source_id.to_string(),
             endpoint: endpoint.to_string(),
-        }
+        })
     }
 
+    /// Always fails.
+    ///
+    /// Returning `Err` is the honest behaviour while no real transport exists.
+    /// See the type documentation for why a fabricated success is not
+    /// acceptable here.
     pub fn fetch_official_record(&self, record_id: &str) -> Result<String, &'static str> {
-        // Mock readback mechanism for testing until actual EP-003 M4 HTTP fetching is needed
-        if record_id.is_empty() {
+        if record_id.trim().is_empty() {
             return Err("Empty record ID");
         }
-        Ok(format!(
-            "Mocked record content for {} from {}",
-            record_id, self.source_id
-        ))
+        Err(SOURCE_FETCH_UNIMPLEMENTED)
+    }
+
+    /// True when this adapter can reach a real source. Currently always false.
+    pub fn is_live(&self) -> bool {
+        false
     }
 }
 
@@ -247,12 +287,47 @@ impl SourceAdapterContract {
 mod adapter_tests {
     use super::*;
 
+    /// AG-010 regression: a caller must never receive a fabricated "official"
+    /// record. The probe that exposed this asserted the returned string
+    /// contained the record id and source name — which a mock satisfies. This
+    /// asserts the fetch fails instead.
     #[test]
-    fn test_source_adapter_contract() {
-        let uspto = SourceAdapterContract::new("uspto", "https://ped.uspto.gov/");
-        let record = uspto.fetch_official_record("US123456").unwrap();
-        assert!(record.contains("US123456"));
-        assert!(record.contains("uspto"));
+    fn test_source_adapter_never_fabricates_a_record() {
+        let uspto = SourceAdapterContract::new("uspto", "https://ped.uspto.gov/").unwrap();
+        assert!(!uspto.is_live());
+
+        let result = uspto.fetch_official_record("US123456");
+        assert!(
+            result.is_err(),
+            "adapter returned a fabricated record: {result:?}"
+        );
+        assert_eq!(result.unwrap_err(), SOURCE_FETCH_UNIMPLEMENTED);
+    }
+
+    #[test]
+    fn test_source_adapter_validates_endpoint() {
+        assert!(SourceAdapterContract::new("", "https://example.gov").is_err());
+        assert!(SourceAdapterContract::new("uspto", "").is_err());
+        assert!(SourceAdapterContract::new("uspto", "ped.uspto.gov").is_err());
+        assert!(SourceAdapterContract::new("uspto", "ftp://example.gov").is_err());
+        assert!(SourceAdapterContract::new("uspto", "https://").is_err());
+
+        let ok = SourceAdapterContract::new("uspto", "https://ped.uspto.gov/").unwrap();
+        assert_eq!(ok.source_id, "uspto");
+        assert_eq!(ok.endpoint, "https://ped.uspto.gov/");
+    }
+
+    #[test]
+    fn test_source_adapter_rejects_empty_record_id() {
+        let adapter = SourceAdapterContract::new("uspto", "https://ped.uspto.gov/").unwrap();
+        assert_eq!(
+            adapter.fetch_official_record("").unwrap_err(),
+            "Empty record ID"
+        );
+        assert_eq!(
+            adapter.fetch_official_record("   ").unwrap_err(),
+            "Empty record ID"
+        );
     }
 }
 
