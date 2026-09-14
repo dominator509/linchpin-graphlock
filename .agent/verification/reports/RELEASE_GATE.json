@@ -13,8 +13,7 @@
     "DOD-002=PARTIAL",
     "DOD-003=PARTIAL",
     "DOD-004=PARTIAL",
-    "DOD-006=FAIL",
-    "DOD-007=PARTIAL",
+    "DOD-006=PARTIAL",
     "DOD-019=PARTIAL",
     "DOD-021=FAIL",
     "DOD-040=PARTIAL",
@@ -24,9 +23,9 @@
   "candidate_commit": "1bca002",
   "dod_status_tally": {
     "EXTERNAL_REQUIRED": 1,
-    "FAIL": 17,
+    "FAIL": 16,
     "PARTIAL": 17,
-    "PASS": 7
+    "PASS": 8
   },
   "external_clauses": [],
   "inconclusive_reasons": [],
