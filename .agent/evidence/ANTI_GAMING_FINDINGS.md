@@ -2,48 +2,57 @@
 
 Scan command: `python3 scripts/anti-gaming-scan.py .`
 Scan date: 2026-09-10
-Candidate: `41e0b20` (base `962e365`)
+Candidate: `bcc54a0` (base `962e365`)
 
-The tree-wide scan returns 371 matches, most of which are false positives in
-prose/spec documents (`AGENTS.md` DoD text legitimately uses words like
-"simulate", "placeholder", "bypass" to *forbid* them). This file classifies the
-matches that occur in **production code paths**. Per AGENTS.md §12 and DOD-019,
-unexplained production hits are release blockers or the affected claim must be
-marked incomplete.
+**STATUS: AG-001, AG-002 and AG-003 have all been REPAIRED and verified.**
+Each carries a mutation/negative proof showing the guarding test genuinely
+fails when the real behavior is removed (DOD-018). Re-run
+`python3 scripts/anti-gaming-scan.py .` to confirm the production hits are gone.
 
-## Finding AG-001 — `provider_transport` returns fabricated model output
+The tree-wide scan returned 371 matches at base revision, most of which are
+false positives in prose/spec documents (`AGENTS.md` DoD text legitimately uses
+words like "simulate", "placeholder", "bypass" to *forbid* them). This file
+classifies the matches that occur in **production code paths**. Per AGENTS.md
+§12 and DOD-019, unexplained production hits are release blockers or the
+affected claim must be marked incomplete.
 
-`crates/provider_transport/src/lib.rs`
+## Finding AG-001 — `provider_transport` returned fabricated model output — REPAIRED
+
+`crates/provider_transport/src/lib.rs` (base revision)
 
 | Line | Code | Problem |
 | --- | --- | --- |
-| 47-50 | `text: format!("Local generation for: {}", request.prompt)`, `metadata: "simulated-local-inference"` | `LocalModelAdapter::generate` performs **no inference**. It echoes the prompt and self-labels the result simulated. |
-| 102-109 | `// Without making actual network calls, simulate terms-gated response` … `text: format!("OpenAI mock generation for: {}", …)` | `OpenAiAdapter::generate` makes **no network call** and returns a literal `"OpenAI mock generation"` string. |
-| 132, 74 | assertions `contains("Analyze patent")` / `metadata == "simulated-local-inference"` | The tests **assert the mock text**, so they lock in the fabricated behavior and would pass forever. |
+| 47-50 | `text: format!("Local generation for: {}", request.prompt)`, `metadata: "simulated-local-inference"` | `LocalModelAdapter::generate` performed **no inference**. It echoed the prompt and self-labelled the result simulated. |
+| 102-109 | `// Without making actual network calls, simulate terms-gated response` … `text: format!("OpenAI mock generation for: {}", …)` | `OpenAiAdapter::generate` made **no network call** and returned a literal `"OpenAI mock generation"` string. |
+| 132, 74 | assertions `contains("Analyze patent")` / `metadata == "simulated-local-inference"` | The tests **asserted the mock text**, locking in the fabricated behavior so it would pass forever. |
 
-**Why this matters (DOD-019, DOD-020, DOD-010, §9 Reality law).** The crate's
-own identifiers claim production capability (`openai-official`, `local-llama3-proof`,
-`LocalModelAdapter`, `OpenAiAdapter`), but neither adapter reaches a real
-dependency boundary. `OpenAiAdapter::new` stores an `api_key_ref` and only
-checks `is_empty()` — no keyring read, no HTTP, no auth. This is precisely the
-"appears to work is a failure state" pattern. Any claim that LINCHPIN performs
-provider inference is currently **UNVERIFIED / SIMULATED**.
+**Resolution (commit `bcc54a0`).** The fake success paths were removed.
+`PROVIDER_TRANSPORT_MATRIX.md` requires "Local | llama.cpp / Ollama | local
+process/HTTP on loopback", so:
 
-**Reachability (measured).**
-`grep provider_transport apps/desktop/src-tauri/src/*.rs` → **no matches**. The
-desktop entry point (`apps/desktop/src-tauri/src/lib.rs`) registers exactly one
-command, `get_system_health`. The crate is a workspace member and compiles, but
-**is not wired into any user-facing path**.
+- `LocalModelAdapter::new` validates a loopback-only endpoint and **refuses**
+  non-loopback hosts, so prompts cannot leave the device (SECURITY.md).
+- `generate` performs a real `reqwest` POST to `/completion` (llama.cpp) or
+  `/api/generate` (Ollama) and extracts the real generated text.
+- `TransportError` distinguishes `InvalidRequest` / `Unreachable` /
+  `ProviderFailure` / `InvalidResponse` / `Unimplemented` (DOD-014).
+- The fabricated OpenAI path was replaced by `UnimplementedTransport`, which
+  **always** returns `Unimplemented` and reports `is_live() == false`.
+- `ProviderTransport` gained `is_live()` so callers cannot assume success.
 
-This is a mitigating fact that must be stated precisely: because the adapters are
-unreachable from the desktop boundary, they cannot yet mislead a user at
-runtime. It does **not** clear the finding — the crate exists as a production
-workspace member and the capability claim is unproven. Disposition:
-**INCOMPLETE / SIMULATED**, not PASS.
+**Negative proof.** `test_unreachable_endpoint_fails_closed_not_fabricated`
+hits the real network boundary at `127.0.0.1:1` and asserts a genuine
+`Unreachable` error. `test_unimplemented_transport_never_succeeds` proves the
+unwired lane cannot return success. `provider_transport` went 2 → 6 tests.
 
-## Finding AG-002 — `crash_reporter` redaction is a no-op assignment
+Dependencies: `reqwest 0.13.5` / `serde_json 1.0.151` were already in
+`Cargo.lock`; the diff adds them to this crate only and introduces **zero new
+packages**. Remaining honesty caveat: the crate is still unreachable from the
+desktop boundary, so no end-to-end provider claim is made.
 
-`crates/crash_reporter/src/lib.rs:113-116`
+## Finding AG-002 — `crash_reporter` redaction was a no-op assignment — REPAIRED
+
+`crates/crash_reporter/src/lib.rs:113-116` (base revision)
 
 ```rust
 if !incident.redacted {
@@ -52,16 +61,26 @@ if !incident.redacted {
 }
 ```
 
-Setting a boolean does **not** redact anything. `is_safe_for_export()` returns
-that same flag, so the safety gate is self-certifying. A capsule holding
-unredacted invention content would report `is_safe_for_export() == true`.
-This is a security-relevant gap under SECURITY.md (invention content is
-Confidential/device-only by default). Disposition: **INCOMPLETE** — the flag is
-asserted, not earned. Marked for EP-006 remediation.
+Setting a boolean redacts nothing, and `is_safe_for_export()` returned that same
+self-certifying flag, so a capsule holding unredacted invention content would
+report `is_safe_for_export() == true`.
 
-## Finding AG-003 — `evidence` "fuzz target" exercises nothing
+**Resolution (commit `1c4341b`).** Flag-setting was replaced with real content
+transformation: `RedactionPolicy::apply` rewrites registered secrets to
+`[REDACTED]` and also scrubs token-shaped substrings (`sk-`, `ghp_`, `gho_`,
+32+ hex). `RepairCapsule::new(incident, brief, &policy)` redacts the detail,
+clears the raw field on the retained incident, and `is_safe_for_export()` now
+requires both `redacted` and an empty raw detail. `redacted_detail()` is the
+only detail egress.
 
-`crates/evidence/src/lib.rs:137-144`
+**Mutation proof.** Replacing `policy.apply(..)` with a pass-through clone makes
+`test_redaction_actually_removes_invention_content` fail with
+`raw invention content leaked into redacted detail` (exit 101). Restored,
+green. `crash_reporter` went 2 → 7 tests.
+
+## Finding AG-003 — `evidence` "fuzz target" exercised nothing — REPAIRED
+
+`crates/evidence/src/lib.rs:137-144` (base revision)
 
 ```rust
 // A mock fuzz target (would normally be in `fuzz/` dir with `cargo fuzz`)
@@ -74,11 +93,21 @@ fn test_fuzz_target_simulation() {
 }
 ```
 
-Discards every result and asserts only "did not panic" over four hand-written
-strings. It is named a fuzz target but performs no mutation, no corpus, no
-generation. It provides **no coverage credit** for any fuzz claim and must not
-be cited as evidence of fuzzing (DOD-038). Disposition: **INCOMPLETE** — rename
-or replace with a real fuzzing harness; the claim must not be counted.
+It discarded every return value and asserted only "did not panic" over four
+hand-written strings — no generation, no corpus, no oracle, so it could never
+fail and provided no coverage credit for any fuzzing claim (DOD-038).
+
+**Resolution (commit `9255b8d`).** Replaced with
+`test_sanitize_path_property_over_generated_corpus`: a deterministic xorshift64
+PRNG (no new dependency, AGENTS.md §10) generates 20,000 paths from a
+traversal-heavy alphabet and asserts the real invariant — every path containing
+`..` or rooted at `/` is rejected, every other path accepted. It also asserts
+both branches were exercised >1000 times so a degenerate generator cannot make
+the test vacuous. `test_archive_entry_rejects_zip_slip` was added.
+
+**Mutation proof.** Removing the `path.contains("..")` guard fails the corpus
+test with `permissive acceptance of escaping path: "..%2efile.txt"`
+(exit 101) — the generated corpus found a real bypass class. Restored, green.
 
 ## Not findings (classified, cleared)
 
@@ -88,14 +117,31 @@ or replace with a real fuzzing harness; the claim must not be counted.
 | `simulate`/`placeholder`/`bypass`/`stub` | `AGENTS.md`, `.agent/**`, `*.md` specs | Control-plane prose that *prohibits* these patterns. Cleared. |
 | `SKIP_DIRS` bypass in the scanner itself | `scripts/anti-gaming-scan.py` | Scanner implementation detail. Cleared. |
 
-## Required action before any GO verdict
+### Residual production-path hits after repair (all cleared as prose)
 
-1. Either implement real provider transports against a declared boundary
-   (DOD-010 real/sandbox execution), or mark `REQ-*` provider claims
-   INCOMPLETE and remove them from any production-ready statement.
-2. Make `crash_reporter` redaction actually transform content, with a negative
-   test proving unredacted input cannot report `is_safe_for_export() == true`.
-3. Replace or rename the `evidence` fuzz simulation.
-4. Re-run this scan and confirm zero *unclassified* production hits
+Post-repair the scan reports 7 hits under `crates/`. Each was read and
+classified; none is executable fabricated behavior:
+
+| Location | Line content | Class |
+| --- | --- | --- |
+| `provider_transport/src/lib.rs:17` | `//! * [UnimplementedTransport] -- an explicit, non-succeeding placeholder` | doc comment |
+| `provider_transport/src/lib.rs:45` | `/// accurately, never degrade into simulated success.` | doc comment |
+| `provider_transport/src/lib.rs:70` | `TransportError::Unimplemented(m) => write!(f, "not implemented: {m}")` | error message emitted **because** the lane is unimplemented |
+| `provider_transport/src/lib.rs:221` | `/// Explicit placeholder for provider lanes that are not yet wired...` | doc comment |
+| `evidence/src/lib.rs:158` | `/// ...replaces the previous test_fuzz_target_simulation, which...` | doc comment |
+| `crash_reporter/src/lib.rs:146` | `/// Replace every registered secret with a fixed placeholder and drop` | doc comment |
+| `crash_reporter/src/lib.rs:292` | `// Simulate the old behavior: flip the flag, leave content intact.` | comment inside the DOD-018 negative proof |
+
+The `Unimplemented` error string is the mechanism by which an unwired lane fails
+honestly; removing it would restore the fabricated-success defect. The remaining
+six are comments. Zero unexplained *executable* production hits remain.
+
+## Still required before any GO verdict
+
+1. `provider_transport` must be **wired** to a user-facing path and proven
+   against a live loopback llama.cpp/Ollama server (DOD-010 real dependency
+   execution, PF-011). Until then the provider capability stays INCOMPLETE.
+2. Provider claims must not appear as production-ready in UI/docs until (1).
+3. Re-run this scan and confirm zero *unclassified* production hits
    (DOD-019 REQUIRED EVIDENCE: lexical scan, reachability trace, allowlist
    decisions, findings).
