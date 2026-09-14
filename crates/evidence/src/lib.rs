@@ -134,13 +134,87 @@ mod hardening_tests {
         assert!(InputHardener::sanitize_path("/absolute/path.txt").is_err());
     }
 
-    // A mock fuzz target (would normally be in `fuzz/` dir with `cargo fuzz`)
-    #[test]
-    fn test_fuzz_target_simulation() {
-        let fuzz_inputs = vec!["..", "/", "a/b/c", "a/../b"];
-        for input in fuzz_inputs {
-            let _ = InputHardener::sanitize_path(input); // Should not panic
+    /// Deterministic xorshift64 PRNG. Avoids adding a dependency (AGENTS.md
+    /// §10) while still generating a large, varied, reproducible corpus.
+    struct Rng(u64);
+
+    impl Rng {
+        fn next(&mut self) -> u64 {
+            let mut x = self.0;
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            self.0 = x;
+            x
         }
+
+        fn pick<'a>(&mut self, alphabet: &[&'a str]) -> &'a str {
+            alphabet[(self.next() % alphabet.len() as u64) as usize]
+        }
+    }
+
+    /// Property test over generated inputs: `sanitize_path` must never panic,
+    /// and must reject every path that resolves to an escape or an absolute
+    /// root. This replaces the previous `test_fuzz_target_simulation`, which
+    /// discarded results and asserted nothing about correctness (AG-003).
+    #[test]
+    fn test_sanitize_path_property_over_generated_corpus() {
+        const ALPHABET: &[&str] = &[
+            "", ".", "..", "a", "b", "c", "dir", "file.txt", "/", "\\", ":", "%2e", "~", "..\\",
+        ];
+        let mut rng = Rng(0x2545F4914F6CDD1D);
+        let mut traversals_seen = 0usize;
+        let mut accepted_seen = 0usize;
+
+        for _ in 0..20_000 {
+            let parts = (rng.next() % 5) as usize + 1;
+            let mut candidate = String::new();
+            for i in 0..parts {
+                if i > 0 && rng.next() % 3 == 0 {
+                    candidate.push('/');
+                }
+                candidate.push_str(rng.pick(ALPHABET));
+            }
+
+            // Must never panic.
+            let verdict = InputHardener::sanitize_path(&candidate);
+
+            let is_absolute = candidate.starts_with('/');
+            let has_traversal = candidate.contains("..");
+            if is_absolute || has_traversal {
+                traversals_seen += 1;
+                assert!(
+                    verdict.is_err(),
+                    "permissive acceptance of escaping path: {candidate:?}"
+                );
+            } else {
+                accepted_seen += 1;
+                assert!(
+                    verdict.is_ok(),
+                    "false rejection of benign path: {candidate:?}"
+                );
+            }
+        }
+
+        // Prove the corpus actually exercised both branches, so a degenerate
+        // generator cannot make this test vacuous.
+        assert!(
+            traversals_seen > 1000,
+            "corpus failed to generate enough escaping paths: {traversals_seen}"
+        );
+        assert!(
+            accepted_seen > 1000,
+            "corpus failed to generate enough benign paths: {accepted_seen}"
+        );
+    }
+
+    /// Archive entries must be held to the same rule as plain paths; a zip-slip
+    /// entry must not be accepted.
+    #[test]
+    fn test_archive_entry_rejects_zip_slip() {
+        assert!(InputHardener::sanitize_archive_entry("ok/inside.txt").is_ok());
+        assert!(InputHardener::sanitize_archive_entry("../../etc/passwd").is_err());
+        assert!(InputHardener::sanitize_archive_entry("/etc/passwd").is_err());
     }
 }
 
