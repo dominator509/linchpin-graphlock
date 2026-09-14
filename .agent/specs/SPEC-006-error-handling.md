@@ -1,2 +1,7 @@
 # SPEC-006 Error Handling
-Error classes: VALIDATION, POLICY, AUTH, EXTERNAL_TRANSIENT, EXTERNAL_PERMANENT, STORAGE, CRYPTO, PARSER, CONFLICT, CANCELLED, LEGAL_RULE_UNCERTAIN, INTEGRITY. Errors never silently degrade a legal/research conclusion. Retry only EXTERNAL_TRANSIENT with bounded policy. Partial research persists checkpoints and marks incomplete coverage. UI shows safe message + correlation ID; evidence retains technical cause locally.
+
+REQ-OPS-001 Error classes: VALIDATION, POLICY, AUTH, EXTERNAL_TRANSIENT, EXTERNAL_PERMANENT, STORAGE, CRYPTO, PARSER, CONFLICT, CANCELLED, LEGAL_RULE_UNCERTAIN, INTEGRITY. Errors never silently degrade a legal/research conclusion.
+
+REQ-OPS-002 Retry only EXTERNAL_TRANSIENT with bounded policy. Partial research persists checkpoints and marks incomplete coverage.
+
+REQ-OPS-003 UI shows safe message + correlation ID; evidence retains technical cause locally.

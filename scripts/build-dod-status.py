@@ -31,8 +31,8 @@ OUT = Path(".agent/verification/state/DOD_STATUS.jsonl")
 # Per-clause disposition grounded in measured state at candidate 4f54de5.
 # evidence path + reason must be real; no clause is PASS without executed proof.
 DISPOSITIONS: dict[str, tuple[str, str, str]] = {
-    "DOD-001": ("FAIL", ".agent/evidence/DOD-001-traceability-finding.md",
-                "20 of 22 requirement IDs have no spec definition; no requirement-to-test mapping row existed before this session. OR ELSE: NODE_DONE/GO prohibited."),
+    "DOD-001": ("PARTIAL", ".agent/evidence/ADR-003-requirement-declarations.md",
+                "Addressability gap CLOSED under ADR-003: SPEC-002..SPEC-010 now declare requirement IDs against existing prose, so NO_SPEC_DEFINITION fell from 20 to 0 of 22. Not PASS: a declaration is not an acceptance test. Every requirement still maps to zero executed PASS (5 have NO_MAPPED_TEST, 6 NOT_STARTED, 11 PARTIAL). Requirement-to-executed-evidence mapping remains largely absent."),
     "DOD-002": ("PARTIAL", ".agent/evidence/EP-009/M1/STATUS.md",
                 "Builds from a clean checkout with the locked toolchain (rustc/cargo 1.98.0, --locked, exit 0). Not PASS: no clean-environment image/manifest or lockfile digest record."),
     "DOD-003": ("PARTIAL", ".agent/evidence/EP-009/M3/STATUS.md",
