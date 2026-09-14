@@ -2,17 +2,17 @@
 
 Scan command: `python3 scripts/anti-gaming-scan.py .`
 Scan date: 2026-09-10
-Candidate: `41bc9bb` (base `962e365`)
+Candidate: `e4b1273` (base `962e365`)
 
-**STATUS: AG-001 through AG-009 have all been REPAIRED and verified.**
+**STATUS: AG-001 through AG-012 have all been REPAIRED and verified.**
 Each carries a mutation/negative proof showing the guarding test genuinely
-fails when the real behavior is removed (DOD-018). Re-run
-`python3 scripts/anti-gaming-scan.py .` to confirm the production hits are gone.
+fails when the real behavior is removed (DOD-018). Zero unexplained executable
+production hits remain (classification table near the end of this file).
 
-Nine defects were found, not three. AG-004 through AG-009 were located by
-writing **probe tests** against existing APIs rather than by reading code — the
-AG-004 probe failed on its first run, and the AG-008 probe likewise, which is
-what exposed each. That method is worth reusing: executable probes surface
+Twelve defects were found, not three. **AG-004 onward were all located by
+writing probe tests against existing APIs rather than by reading code** — the
+AG-004, AG-008 and AG-011 probes each failed on their first run, which is what
+exposed the defect. That method is worth reusing: executable probes surface
 fabrication faster than review does.
 
 Severity ordering:
@@ -21,9 +21,12 @@ Severity ordering:
 | --- | --- |
 | AG-006 | Manufactured the **release-gating** UO-01..12 live-fire evidence (REQ-SHIP-001) |
 | AG-007a | The product's only runtime self-report was a hard-coded "OK" |
+| AG-010 | Could return a fabricated "official" prior-art record |
 | AG-004 | Returned a wrong application number on a filing-evidence path (REQ-PAT-005) |
 | AG-002 | Export guard reported safe while unredacted invention content passed |
+| AG-012 | A string lookup was named "signature verification" |
 | AG-008 | Security control bypassable by lower case |
+| AG-011 | Redactor leaked unregistered credentials |
 | AG-009 | Prior-art design-around verdict could never be negative |
 | AG-001 | Fabricated provider inference |
 | AG-005 | Labelled plain strings as DOCX/PDF |
@@ -336,6 +339,91 @@ outcome the old implementation could not produce.
 carried `cargo new` defaults — `pub fn add(left: u64, right: u64)` and an
 `it_works` test asserting `2 + 2 == 4` — which are DOD-019 unfinished-code
 residue in production crates. Verified zero remain.
+
+## Finding AG-010 — `storage` fabricated "official" source records — REPAIRED
+
+`crates/storage/src/lib.rs::SourceAdapterContract` (base revision)
+
+```rust
+pub fn fetch_official_record(&self, record_id: &str) -> Result<String, &'static str> {
+    // Mock readback mechanism for testing until actual EP-003 M4 HTTP fetching is needed
+    Ok(format!("Mocked record content for {} from {}", record_id, self.source_id))
+}
+```
+
+The name advertises an **official** record; the body returns a synthetic string.
+Measured: `self.endpoint` had **zero** usages, so the endpoint field was
+decorative. Its test asserted only that the output contained the record id and
+source name — which a mock trivially satisfies.
+
+The danger is not the missing HTTP call. It is that a caller cannot distinguish
+a fabricated record from a real one. In a prior-art workflow (REQ-RES-001,
+REQ-DATA-001) a "record" no external source ever produced could be cited as
+prior art. Reachability measured: **not** wired into the desktop boundary
+currently, which limits blast radius but does not clear the finding.
+
+**Resolution (commit `e4b1273`).** The type is now **explicitly unimplemented**.
+`new()` validates the endpoint is an absolute http(s) URL with a host — making
+the field load-bearing — and `fetch_official_record` **always** returns
+`SOURCE_FETCH_UNIMPLEMENTED`. A caller cannot obtain a fabricated official
+record. `is_live()` reports `false`. Real HTTP fetching is recorded INCOMPLETE
+rather than faked.
+
+## Finding AG-011 — `evidence` redactor missed unregistered secrets — REPAIRED
+
+`crates/evidence/src/lib.rs::LogRedactor` (base revision)
+
+Two gaps, both proven by probe:
+
+1. **Unregistered secret-shaped tokens passed through untouched.** A "redactor"
+   that only removes strings you already knew about offers little protection: a
+   token reaching the log by a path the caller did not anticipate survives.
+   Probe output: `leaked: auth failed for sk-live-0123456789abcdef and
+   ghp_ABCDEFGHIJKLMNOP`.
+2. **`register_secret("")` stored an empty string**, and `str::replace("")`
+   matches at every byte offset, so an entire log message was mangled into
+   placeholders.
+
+**Resolution (commit `e4b1273`).** Empty registrations are ignored, and
+`redact()` additionally scrubs token-shaped words (`sk-`, `ghp_`, `gho_`,
+`ghs_`, `xoxb-` prefixes and 32+ hex runs), matching the `crash_reporter`
+policy so the two redactors agree. Documented as defence in depth, not a
+guarantee.
+
+## Finding AG-012 — `evidence` "signature verification" was a string lookup — REPAIRED
+
+`crates/evidence/src/lib.rs::UpdateThreatControl::verify_update_payload` (base)
+
+```rust
+if self.allowed_signatures.contains(&signature.to_string()) { Ok(()) }
+```
+
+That is an in-memory string allow-list lookup: no public key, no digest, no
+cryptographic check. The method name asserted a security property the code did
+not provide, in an update path (REQ-REL-005, DOD-035) where a caller could
+reasonably believe a payload's signature had been validated.
+
+**Resolution (commit `e4b1273`).** Renamed to
+`UpdateSignerAllowlist::is_allowlisted`, documented plainly as an **identity
+allow-list, NOT signature verification**, with an explicit warning that callers
+must not treat `true` as proof of signing. Empty keys are rejected; registration
+is idempotent. Cryptographic verification is recorded INCOMPLETE.
+
+## Post-repair production-path scan (all 15 hits classified)
+
+`python3 scripts/anti-gaming-scan.py .` reports 15 hits under `crates/`. Each
+was read and classified; **none is executable fabricated behavior**:
+
+- **13 are documentation comments** (`///`, `//!`) that describe the defects
+  fixed in this file, or explain why a function returns `None` rather than a
+  placeholder value.
+- **2 are error-message strings** — `"source adapter transport is not
+  implemented; refusing to fabricate an official record"`
+  (`storage`) and `"not implemented: {m}"` (`provider_transport`). These are the
+  *mechanism by which unimplemented lanes fail honestly*; removing them would
+  restore the fabricated-success defects AG-001 and AG-010.
+
+Zero unexplained executable production hits remain.
 
 ## Not findings (classified, cleared)
 
