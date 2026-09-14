@@ -17,4 +17,5 @@ python3 scripts/build-dod-status.py --check
 python3 scripts/test-collection-guard.py --check
 python3 scripts/ship-gate.py --check
 python3 scripts/build-applicability.py --check
+python3 scripts/generate-sbom.py --check
 echo "harness-validate: ok"
