@@ -52,7 +52,7 @@ pnpm --filter @linchpin/desktop build >/dev/null
 # as "the production artifact" -- a real regression, caught by checking whether
 # the restored binary still kept port 9222 closed.
 PROD_EXE="target/release/linchpin-desktop.exe"
-PROD_STASH="$REPORT_DIR/linchpin-desktop.production-backup.exe"
+PROD_STASH="target/release/linchpin-desktop.production-stash.exe"
 HAD_PROD="no"
 if [ -f "$PROD_EXE" ]; then
   cp "$PROD_EXE" "$PROD_STASH"

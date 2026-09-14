@@ -9,22 +9,22 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `a02c5af9229ed10869c147d0578fdf1f5d04b8d05404ebb95dbf4223169d3f15`
-- Candidate commit at generation: `c0c9a18`
-- Total tracked inputs: 109
-- Previous epoch digest: `1cd1acf40947adcb4a095a3ad7702aaa7deaac171ba067ef54333c911ff94d4d`
-- **Changed input classes since that epoch: gate-script**
+- Current epoch digest: `ea9c6ac628346f7780fec8e20c022af995ef11ecb7aee6ef679d9be0f37bb84a`
+- Candidate commit at generation: `43a6392`
+- Total tracked inputs: 110
+- Previous epoch digest: `ea9c6ac628346f7780fec8e20c022af995ef11ecb7aee6ef679d9be0f37bb84a`
+- Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
 
-### `artifact` — 3 file(s)
+### `artifact-inputs` — 3 file(s)
 
 - invalidates: V-020 exact artifact
 - invalidates: V-021 final accounting
 
-  - `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `7a513c18d6238cb2…`
-  - `target\release\bundle\nsis\LINCHPIN_0.1.0_x64-setup.exe` `5490af1bc814071a…`
-  - `target\release\linchpin-desktop.exe` `a6a3c43adbdead1f…`
+  - `Cargo.toml` `0d0b50947cf1f81b…`
+  - `apps\desktop\src-tauri\Cargo.toml` `9360ecae2ff3d0b2…`
+  - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
 
 ### `config` — 5 file(s)
 
@@ -37,16 +37,19 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 49 file(s)
+### `gate-script` — 50 file(s)
 
-- invalidates: all stages that invoke the changed gate
+- invalidates: V-000 harness validation
+- invalidates: V-005 clean build
+- invalidates: V-008 full functionality
+- invalidates: V-009 integration/concurrency
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
   - `scripts\artifact-e2e.sh` `74c5b97617e14a2b…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
   - `scripts\bind-requirements.py` `aefe9afc545f0db1…`
-  - … and 44 more
+  - … and 45 more
 
 ### `js-manifest` — 7 file(s)
 
@@ -113,7 +116,9 @@ definition and its PASS status is revoked until rerun.
 
 ### `test-oracle` — 3 file(s)
 
-- invalidates: every stage whose result the oracle guards
+- invalidates: V-008 full functionality
+- invalidates: V-012 regression/mutation
+- invalidates: DOD-007 collection guard
 
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
@@ -124,11 +129,14 @@ definition and its PASS status is revoked until rerun.
 When the epoch digest changes, the following must be rerun before any
 PASS recorded against the prior epoch may be reinstated:
 
-- (`artifact` changed) → rerun V-020 exact artifact
-- (`artifact` changed) → rerun V-021 final accounting
+- (`artifact-inputs` changed) → rerun V-020 exact artifact
+- (`artifact-inputs` changed) → rerun V-021 final accounting
 - (`config` changed) → rerun V-005 clean build
 - (`config` changed) → rerun V-011 configuration matrix
-- (`gate-script` changed) → rerun all stages that invoke the changed gate
+- (`gate-script` changed) → rerun V-000 harness validation
+- (`gate-script` changed) → rerun V-005 clean build
+- (`gate-script` changed) → rerun V-008 full functionality
+- (`gate-script` changed) → rerun V-009 integration/concurrency
 - (`js-manifest` changed) → rerun V-004 supply chain
 - (`js-manifest` changed) → rerun V-005 clean build
 - (`js-source` changed) → rerun V-005 clean build
@@ -146,7 +154,9 @@ PASS recorded against the prior epoch may be reinstated:
 - (`rust-source` changed) → rerun V-008 full functionality
 - (`rust-source` changed) → rerun V-009 integration/concurrency
 - (`rust-source` changed) → rerun V-012 regression/mutation
-- (`test-oracle` changed) → rerun every stage whose result the oracle guards
+- (`test-oracle` changed) → rerun V-008 full functionality
+- (`test-oracle` changed) → rerun V-012 regression/mutation
+- (`test-oracle` changed) → rerun DOD-007 collection guard
 
 ## Honest limitation
 

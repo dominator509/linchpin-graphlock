@@ -59,10 +59,26 @@ INVALIDATION_RULES: dict[str, list[str]] = {
     ],
     "js-manifest": ["V-004 supply chain", "V-005 clean build"],
     "lockfile": ["V-004 supply chain", "V-005 clean build", "DOD-021 license gate"],
-    "gate-script": ["all stages that invoke the changed gate"],
-    "test-oracle": ["every stage whose result the oracle guards"],
+    # A gate-script change must rerun the gates themselves: editing a checker
+    # can make it pass vacuously, so the harness and the build/test lanes are
+    # all suspect until re-executed. The earlier value here was the prose
+    # "all stages that invoke the changed gate", which maps to no command and
+    # was therefore never actually run.
+    "gate-script": [
+        "V-000 harness validation",
+        "V-005 clean build",
+        "V-008 full functionality",
+        "V-009 integration/concurrency",
+    ],
+    # A test-oracle change invalidates whatever the oracle guards. The registry
+    # and manifest are the oracles for the whole suite, so the suite is rerun.
+    "test-oracle": [
+        "V-008 full functionality",
+        "V-012 regression/mutation",
+        "DOD-007 collection guard",
+    ],
     "config": ["V-005 clean build", "V-011 configuration matrix"],
-    "artifact": ["V-020 exact artifact", "V-021 final accounting"],
+    "artifact-inputs": ["V-020 exact artifact", "V-021 final accounting"],
 }
 
 INPUT_GLOBS: dict[str, list[str]] = {
@@ -103,10 +119,23 @@ INPUT_GLOBS: dict[str, list[str]] = {
         "apps/desktop/vitest.config.ts",
         "apps/desktop/playwright.config.ts",
     ],
-    "artifact": [
-        "target/release/linchpin-desktop.exe",
-        "target/release/bundle/msi/*.msi",
-        "target/release/bundle/nsis/*.exe",
+    # The ARTIFACT class deliberately does NOT hash build output.
+    #
+    # Hashing target/** made the epoch churn on every build, and every build was
+    # itself a rerun obligation, so the check could never be satisfied: measured,
+    # the epoch moved on each pass and RERUN_RECORD was permanently stale. That
+    # is a self-defeating design, not a strict one.
+    #
+    # What actually invalidates downstream results is the SOURCE of the artifact,
+    # not the bytes produced from it. The artifact's identity is pinned
+    # separately and precisely by scripts/ship-gate.py (executable and MSI
+    # SHA-256) and by .agent/evidence/artifact-e2e/STATUS.md, which binds
+    # assertions to the exact digest. Those are the right places to detect a
+    # changed artifact; the epoch tracks what would PRODUCE one.
+    "artifact-inputs": [
+        "apps/desktop/src-tauri/tauri.conf.json",
+        "apps/desktop/src-tauri/Cargo.toml",
+        "Cargo.toml",
     ],
 }
 
@@ -124,9 +153,7 @@ def digest_inputs() -> tuple[dict[str, dict[str, object]], str]:
             for path in sorted(Path(".").glob(pattern)):
                 if not path.is_file():
                     continue
-                # The artifact class legitimately lives under target/, which is
-                # excluded for every other class.
-                if name != "artifact" and (set(path.parts) & EXCLUDED_PARTS):
+                if set(path.parts) & EXCLUDED_PARTS:
                     continue
                 h = hashlib.sha256()
                 with path.open("rb") as fh:
