@@ -86,6 +86,36 @@ fn evaluate_export(
     commands::evaluate_export(&scope, &content, &sensitivity)
 }
 
+/// Lint a claim set (REQ-PAT-001).
+#[tauri::command]
+fn lint_claims(claims: String) -> commands::CommandResult<commands::LintOutcome> {
+    commands::lint_claims(&claims)
+}
+
+/// Build a filing-package manifest (REQ-PAT-002).
+#[tauri::command]
+fn build_filing_package(
+    claims: String,
+    specification: String,
+) -> commands::CommandResult<commands::FilingPackageView> {
+    commands::build_filing_package(&claims, &specification)
+}
+
+/// Import a USPTO acknowledgement receipt (REQ-PAT-005).
+#[tauri::command]
+fn import_receipt(receipt_text: String) -> commands::CommandResult<commands::ReceiptView> {
+    commands::import_receipt(&receipt_text)
+}
+
+/// Report filing-handoff readiness (REQ-PAT-005, human submission only).
+#[tauri::command]
+fn check_filing_handoff(
+    forms: Vec<String>,
+    fee_paid: bool,
+) -> commands::CommandResult<commands::HandoffReadiness> {
+    commands::check_filing_handoff(&forms, fee_paid)
+}
+
 pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -93,7 +123,11 @@ pub fn run() {
             record_conception,
             get_namespace_status,
             apply_research_action,
-            evaluate_export
+            evaluate_export,
+            lint_claims,
+            build_filing_package,
+            import_receipt,
+            check_filing_handoff
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

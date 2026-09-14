@@ -60,6 +60,27 @@ interface ResearchTaskView {
   citation_count: number;
 }
 
+interface LintOutcome {
+  passed: boolean;
+  findings: string[];
+}
+
+interface FilingPackageView {
+  format: string;
+  manifest: string;
+}
+
+interface ReceiptView {
+  application_number: string;
+  confirmation_number: string;
+}
+
+interface HandoffReadiness {
+  ready_for_human_submission: boolean;
+  blockers: string[];
+  note: string;
+}
+
 /** True when running inside the Tauri shell where IPC is available. */
 export function hasIpc(): boolean {
   return (
@@ -84,6 +105,20 @@ export default function App() {
   const [exportSensitivity, setExportSensitivity] = useState("Restricted");
   const [exportResult, setExportResult] =
     useState<CommandResult<ExportDecision> | null>(null);
+  const [claimsDraft, setClaimsDraft] = useState(
+    "1. A device comprising a valve",
+  );
+  const [lintResult, setLintResult] =
+    useState<CommandResult<LintOutcome> | null>(null);
+  const [packageResult, setPackageResult] =
+    useState<CommandResult<FilingPackageView> | null>(null);
+  const [receiptText, setReceiptText] = useState(
+    "AppNumber: 17/123,456\nConfNumber: 4321",
+  );
+  const [receiptResult, setReceiptResult] =
+    useState<CommandResult<ReceiptView> | null>(null);
+  const [handoffResult, setHandoffResult] =
+    useState<CommandResult<HandoffReadiness> | null>(null);
 
   useEffect(() => {
     if (!hasIpc()) {
@@ -134,6 +169,72 @@ export default function App() {
   }, [draft, authorIsHuman]);
 
   const implemented = namespaces.filter((n) => n.implemented);
+
+  const onLintClaims = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot lint: desktop backend unavailable.");
+      return;
+    }
+    try {
+      setLintResult(
+        await invoke<CommandResult<LintOutcome>>("lint_claims", {
+          claims: claimsDraft,
+        }),
+      );
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, [claimsDraft]);
+
+  const onBuildPackage = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot build package: desktop backend unavailable.");
+      return;
+    }
+    try {
+      setPackageResult(
+        await invoke<CommandResult<FilingPackageView>>("build_filing_package", {
+          claims: claimsDraft,
+          specification: draft || "Draft specification",
+        }),
+      );
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, [claimsDraft, draft]);
+
+  const onImportReceipt = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot import receipt: desktop backend unavailable.");
+      return;
+    }
+    try {
+      setReceiptResult(
+        await invoke<CommandResult<ReceiptView>>("import_receipt", {
+          receiptText,
+        }),
+      );
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, [receiptText]);
+
+  const onCheckHandoff = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot check handoff: desktop backend unavailable.");
+      return;
+    }
+    try {
+      setHandoffResult(
+        await invoke<CommandResult<HandoffReadiness>>("check_filing_handoff", {
+          forms: ["Ads", "Sba"],
+          feePaid: false,
+        }),
+      );
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, []);
 
   const onResearchAction = useCallback(
     async (action: "start" | "kill" | "complete") => {
@@ -294,6 +395,73 @@ export default function App() {
             {exportResult.value.sensitivity}): {exportResult.value.reason}
           </p>
         )}
+      </section>
+
+      <section aria-labelledby="patent-heading">
+        <h2 id="patent-heading">Patent Architect</h2>
+        <label htmlFor="claims-input">Claims</label>
+        <textarea
+          id="claims-input"
+          value={claimsDraft}
+          onChange={(e) => setClaimsDraft(e.target.value)}
+          rows={4}
+          style={{ display: "block", width: "100%", maxWidth: "40rem" }}
+        />
+        <button type="button" onClick={() => void onLintClaims()}>
+          Lint claims
+        </button>
+        <button type="button" onClick={() => void onBuildPackage()}>
+          Build filing package
+        </button>
+        {lintResult?.value && (
+          <p>
+            Lint: {lintResult.value.passed ? "passed" : "failed"}
+            {lintResult.value.findings.length > 0 &&
+              ` — ${lintResult.value.findings.join("; ")}`}
+          </p>
+        )}
+        {packageResult?.value && (
+          <p>
+            Package format: {packageResult.value.format} (
+            {packageResult.value.manifest})
+          </p>
+        )}
+      </section>
+
+      <section aria-labelledby="filing-heading">
+        <h2 id="filing-heading">Filing</h2>
+        <label htmlFor="receipt-input">Acknowledgement receipt</label>
+        <textarea
+          id="receipt-input"
+          value={receiptText}
+          onChange={(e) => setReceiptText(e.target.value)}
+          rows={3}
+          style={{ display: "block", width: "100%", maxWidth: "40rem" }}
+        />
+        <button type="button" onClick={() => void onImportReceipt()}>
+          Import receipt
+        </button>
+        {receiptResult?.value && (
+          <p>
+            Application {receiptResult.value.application_number}, confirmation{" "}
+            {receiptResult.value.confirmation_number}
+          </p>
+        )}
+        {receiptResult && !receiptResult.ok && (
+          <p role="alert">{receiptResult.error?.message}</p>
+        )}
+        <button type="button" onClick={() => void onCheckHandoff()}>
+          Check handoff readiness
+        </button>
+        {handoffResult?.value && (
+          <p>
+            Ready for human submission:{" "}
+            {String(handoffResult.value.ready_for_human_submission)}
+            {handoffResult.value.blockers.length > 0 &&
+              ` — blockers: ${handoffResult.value.blockers.join("; ")}`}
+          </p>
+        )}
+        <p>Human submission only: LINCHPIN does not sign, pay or submit.</p>
       </section>
 
       {namespaces.length > 0 && (

@@ -473,6 +473,165 @@ pub struct ExportDecision {
     pub reason: String,
 }
 
+/// Lint a claim set against the patent linter.
+///
+/// `REQ-PAT-001`: every claim must satisfy the structural rules in
+/// `PATENT_DOMAIN_MODEL.md`. The verdict comes from the real
+/// `patent::PatentLinter`, so the rule set is not duplicated here.
+pub fn lint_claims(claims: &str) -> CommandResult<LintOutcome> {
+    let correlation = CorrelationId::new();
+
+    if claims.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("claims cannot be empty"),
+        );
+    }
+
+    match patent::PatentLinter::lint_claims(claims) {
+        Ok(()) => CommandResult::success(
+            correlation,
+            LintOutcome {
+                passed: true,
+                findings: Vec::new(),
+            },
+        ),
+        Err(reason) => CommandResult::success(
+            correlation,
+            LintOutcome {
+                passed: false,
+                findings: vec![reason.to_string()],
+            },
+        ),
+    }
+}
+
+/// Result of linting a claim set.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LintOutcome {
+    pub passed: bool,
+    pub findings: Vec<String>,
+}
+
+/// Build a filing-package manifest (REQ-PAT-002).
+///
+/// `PackageBuilder` emits a MANIFEST with a real content fingerprint rather
+/// than claiming to render a DOCX/PDF it cannot produce. The `format` field is
+/// returned verbatim so the UI cannot present a manifest as a document.
+pub fn build_filing_package(claims: &str, specification: &str) -> CommandResult<FilingPackageView> {
+    let correlation = CorrelationId::new();
+
+    if claims.trim().is_empty() || specification.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("claims and specification are both required"),
+        );
+    }
+
+    match patent::PackageBuilder::build_docx(claims, specification) {
+        Ok(package) => CommandResult::success(
+            correlation,
+            FilingPackageView {
+                format: package.format,
+                manifest: package.content,
+            },
+        ),
+        Err(e) => CommandResult::failure(correlation, CommandError::validation(e)),
+    }
+}
+
+/// A filing-package manifest as returned to the UI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FilingPackageView {
+    pub format: String,
+    pub manifest: String,
+}
+
+/// Import a USPTO acknowledgement receipt (REQ-PAT-005).
+///
+/// The parsed application and confirmation numbers come from the real
+/// `patent::ReceiptImport`, which fails closed on malformed input. A filing
+/// receipt is record evidence, so a plausible-looking but wrong application
+/// number would be a record-integrity failure rather than a cosmetic bug.
+pub fn import_receipt(receipt_text: &str) -> CommandResult<ReceiptView> {
+    let correlation = CorrelationId::new();
+
+    if receipt_text.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("receipt text cannot be empty"),
+        );
+    }
+
+    match patent::ReceiptImport::import(receipt_text) {
+        Ok(receipt) => CommandResult::success(
+            correlation,
+            ReceiptView {
+                application_number: receipt.application_number,
+                confirmation_number: receipt.confirmation_number,
+            },
+        ),
+        Err(e) => CommandResult::failure(correlation, CommandError::validation(e)),
+    }
+}
+
+/// Parsed acknowledgement receipt.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReceiptView {
+    pub application_number: String,
+    pub confirmation_number: String,
+}
+
+/// Report whether the USPTO handoff manifest is complete (REQ-PAT-005).
+///
+/// LINCHPIN never automates signature, payment or submission; this only reports
+/// whether the prerequisites a human needs are present.
+pub fn check_filing_handoff(forms: &[String], fee_paid: bool) -> CommandResult<HandoffReadiness> {
+    let correlation = CorrelationId::new();
+
+    let mut manifest = patent::UsptoManifest::new();
+    for form in forms {
+        match form.as_str() {
+            "Ads" => manifest.add_form(patent::UsptoFormType::Ads),
+            "Sba" => manifest.add_form(patent::UsptoFormType::Sba),
+            "Oath" => manifest.add_form(patent::UsptoFormType::Oath),
+            other => {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::validation(format!("unknown form type {other:?}")),
+                );
+            }
+        }
+    }
+    if fee_paid {
+        manifest.set_fee_paid();
+    }
+
+    let ready = manifest.validate_handoff().is_ok();
+    let blockers: Vec<String> = match manifest.validate_handoff() {
+        Ok(()) => Vec::new(),
+        Err(e) => vec![e.to_string()],
+    };
+
+    CommandResult::success(
+        correlation,
+        HandoffReadiness {
+            ready_for_human_submission: ready,
+            blockers,
+            // Stated explicitly so no caller infers automation.
+            note: "Human submission only: LINCHPIN does not sign, pay or submit.".to_string(),
+        },
+    )
+}
+
+/// Readiness of a filing handoff.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HandoffReadiness {
+    pub ready_for_human_submission: bool,
+    pub blockers: Vec<String>,
+    pub note: String,
+}
+
 /// Report the SPEC-003 namespace coverage honestly.
 pub fn namespace_status() -> Vec<NamespaceStatus> {
     let entry = |ns: &str, implemented: bool, detail: &str| NamespaceStatus {
@@ -485,17 +644,17 @@ pub fn namespace_status() -> Vec<NamespaceStatus> {
         entry("workspace", true, "get_system_health, get_namespace_status"),
         entry("research", true, "apply_research_action"),
         entry("evidence", true, "evaluate_export (Disclosure Firewall)"),
+        entry("patent", true, "lint_claims, build_filing_package"),
+        entry(
+            "filing",
+            true,
+            "import_receipt, check_filing_handoff (human submission only)",
+        ),
         entry(
             "opportunity",
             false,
             "domain OpportunityCandidate exists; no IPC command wired yet",
         ),
-        entry(
-            "patent",
-            false,
-            "patent crate exists; no IPC command wired yet",
-        ),
-        entry("filing", false, "not implemented"),
         entry(
             "docket",
             false,
@@ -740,8 +899,102 @@ mod tests {
             .collect();
         assert_eq!(
             implemented,
-            vec!["conception", "workspace", "research", "evidence"],
-            "implementation claims do not match the four wired namespaces"
+            vec![
+                "conception",
+                "workspace",
+                "research",
+                "evidence",
+                "patent",
+                "filing"
+            ],
+            "implementation claims do not match the wired namespaces"
+        );
+    }
+
+    // --- patent namespace --------------------------------------------------
+
+    #[test]
+    fn test_lint_claims_uses_the_real_linter() {
+        let good = lint_claims("1. A device comprising a valve");
+        assert!(good.ok);
+        assert!(good.value.unwrap().passed);
+
+        let bad = lint_claims("A device comprising a valve");
+        assert!(
+            bad.ok,
+            "the command succeeds; the lint verdict is the payload"
+        );
+        let outcome = bad.value.unwrap();
+        assert!(!outcome.passed, "claim lacking '1. ' prefix was accepted");
+        assert!(!outcome.findings.is_empty());
+
+        assert!(!lint_claims("   ").ok, "empty claims must be rejected");
+    }
+
+    #[test]
+    fn test_build_filing_package_does_not_claim_a_document_format() {
+        let result = build_filing_package("1. A method", "The specification");
+        assert!(result.ok);
+        let view = result.value.unwrap();
+        assert_ne!(view.format, "DOCX");
+        assert_ne!(view.format, "PDF");
+        assert_eq!(view.format, "MANIFEST");
+        assert!(view.manifest.starts_with("MANIFEST sha256="));
+
+        assert!(!build_filing_package("", "spec").ok);
+        assert!(!build_filing_package("claims", "  ").ok);
+    }
+
+    // --- filing namespace --------------------------------------------------
+
+    /// REQ-PAT-005: the receipt import must parse real values, and the AG-004
+    /// regression (hardcoded application number) must stay fixed.
+    #[test]
+    fn test_import_receipt_parses_real_values() {
+        let text =
+            "United States Patent and Trademark Office\nAppNumber: 17/123,456\nConfNumber: 4321\n";
+        let result = import_receipt(text);
+        assert!(result.ok);
+        let view = result.value.unwrap();
+        assert_eq!(view.application_number, "17/123,456");
+        assert_eq!(view.confirmation_number, "4321");
+        assert_ne!(
+            view.application_number, "12/345,678",
+            "AG-004 regression: hardcoded application number returned"
+        );
+    }
+
+    #[test]
+    fn test_import_receipt_fails_closed_on_bad_input() {
+        assert!(!import_receipt("   ").ok);
+        assert!(!import_receipt("no fields here").ok);
+        assert!(!import_receipt("AppNumber: 17/123,456").ok, "missing conf");
+        assert!(!import_receipt("ConfNumber: 4321").ok, "missing app");
+        assert!(!import_receipt("AppNumber: ABC\nConfNumber: 4321").ok);
+    }
+
+    /// The handoff check must report prerequisites and must never imply that
+    /// LINCHPIN will submit on the user's behalf.
+    #[test]
+    fn test_filing_handoff_reports_blockers_and_never_automates() {
+        let ready = check_filing_handoff(&["Ads".into(), "Sba".into()], true);
+        let r = ready.value.unwrap();
+        assert!(r.ready_for_human_submission);
+        assert!(r.blockers.is_empty());
+        assert!(
+            r.note.contains("Human submission only"),
+            "handoff must state that submission is manual, got {:?}",
+            r.note
+        );
+
+        let not_ready = check_filing_handoff(&["Ads".into()], false);
+        let nr = not_ready.value.unwrap();
+        assert!(!nr.ready_for_human_submission);
+        assert!(!nr.blockers.is_empty(), "blockers must be reported");
+
+        assert!(
+            !check_filing_handoff(&["Bogus".into()], true).ok,
+            "unknown form type must be rejected"
         );
     }
 

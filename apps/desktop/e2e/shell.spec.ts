@@ -185,8 +185,47 @@ test.describe("LINCHPIN desktop shell", () => {
 
     if ((await page.getByText("Capability Coverage").count()) > 0) {
       // If it did render, it must match the honest count reported by the
-      // backend (4 of 14 at this revision), never a full-coverage claim.
-      await expect(page.getByText("4 of 14")).toBeVisible();
+      // backend (6 of 14 at this revision), never a full-coverage claim.
+      await expect(page.getByText("6 of 14")).toBeVisible();
     }
+  });
+
+  test("exposes the Patent Architect claim linter", async ({ page }) => {
+    await page.goto("/");
+
+    // REQ-PAT-001: claims must be lintable from the UI.
+    await expect(
+      page.getByRole("heading", { name: "Patent Architect" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Claims")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Lint claims" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Build filing package" }),
+    ).toBeVisible();
+  });
+
+  test("exposes filing receipt import and states submission is manual", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // REQ-PAT-005: receipt import exists, and the UI must never imply that
+    // LINCHPIN signs, pays or submits on the user's behalf.
+    await expect(page.getByRole("heading", { name: "Filing" })).toBeVisible();
+    await expect(page.getByLabel("Acknowledgement receipt")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Import receipt" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Check handoff readiness" }),
+    ).toBeVisible();
+
+    await expect(
+      page.getByText(
+        "Human submission only: LINCHPIN does not sign, pay or submit.",
+      ),
+    ).toBeVisible();
   });
 });
