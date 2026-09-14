@@ -15,7 +15,7 @@ REQ-DOM-006,0,0,0,0,NO_BOUND_TEST,,
 REQ-DOM-007,3,3,3,0,PASS,commands::tests::test_docket_requires_filing_before_commercialization;commands::tests::test_opportunity_validates_scores_and_uncertainty;docket_tests::test_docket_state_machine,apps/desktop/src-tauri/src/commands.rs;crates/domain/src/lib.rs
 REQ-DOM-008,5,4,4,0,PASS,commands::tests::test_export_firewall_blocks_restricted_content;commands::tests::test_export_gateway_hardens_paths_and_blocks_restricted;commands::tests::test_research_validates_its_inputs;firewall_tests::test_disclosure_firewall,apps/desktop/src-tauri/src/commands.rs;crates/evidence/src/lib.rs
 REQ-DOM-009,0,0,0,0,NO_BOUND_TEST,,
-REQ-DOM-010,0,0,0,0,NO_BOUND_TEST,,
+REQ-DOM-010,3,3,3,0,PASS,capsule_tests::test_export_guard_accepts_a_fully_redacted_capsule;capsule_tests::test_export_guard_rejects_surviving_registered_secret;capsule_tests::test_punctuation_wrapped_tokens_are_scrubbed_before_export,crates/crash_reporter/src/lib.rs
 REQ-FOUND-001,0,0,0,0,NO_BOUND_TEST,,
 REQ-FOUND-002,0,0,0,0,NO_BOUND_TEST,,
 REQ-LIC-001,0,0,0,0,NO_BOUND_TEST,,

@@ -3,10 +3,10 @@
     "candidate_commit": "1bca002",
     "executable": "target\\release\\linchpin-desktop.exe",
     "executable_bytes": "12035072",
-    "executable_sha256": "b3cefe63a3a2d1f7d26a7752abcae9e54a2e67f9721405fdf54a765a4b539af9",
+    "executable_sha256": "ff5f88a84ae17c34bd251e66db875ef9e925519dd9740ef9d257eb0719e6a507",
     "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
     "msi_bytes": "5554176",
-    "msi_sha256": "ae762e10b52c130c07820ca7af4142d826f1b1cb1f5a2fbe1e32de491822288f"
+    "msi_sha256": "f0102a354cf851658ef9ea4e4dabcb0bf7fdd3db671b98e346ba596a9ec695f1"
   },
   "blocking_clauses": [
     "DOD-001=PARTIAL",

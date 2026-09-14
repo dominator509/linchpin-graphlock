@@ -4,16 +4,20 @@ Scan command: `python3 scripts/anti-gaming-scan.py .`
 Scan date: 2026-09-10
 Candidate: `e4b1273` (base `962e365`)
 
-**STATUS: AG-001 through AG-012 have all been REPAIRED and verified.**
+**STATUS: AG-001 through AG-014 have all been REPAIRED and verified.**
 Each carries a mutation/negative proof showing the guarding test genuinely
 fails when the real behavior is removed (DOD-018). Zero unexplained executable
 production hits remain (classification table near the end of this file).
 
-Twelve defects were found, not three. **AG-004 onward were all located by
+Fourteen defects were found, not three. **AG-004 onward were all located by
 writing probe tests against existing APIs rather than by reading code** — the
-AG-004, AG-008 and AG-011 probes each failed on their first run, which is what
-exposed the defect. That method is worth reusing: executable probes surface
+AG-004, AG-008, AG-011 and AG-014 probes each failed on their first run, which is
+what exposed the defect. That method is worth reusing: executable probes surface
 fabrication faster than review does.
+
+AG-013 and AG-014 were found while auditing DOD-023 and DOD-001 respectively,
+after the initial anti-gaming sweep had already reported the tree clean. The
+lesson is that a clean scan bounds only the patterns it knows how to look for.
 
 Severity ordering:
 
@@ -524,3 +528,59 @@ This remains a documentation defect in the exact sense DOD-023 describes: the
 commands are *published* but do not all succeed when run as written. The
 documents now disclose this via the measured "Known command status" table; the
 underlying ADR-002 decision is external.
+
+## AG-014 — repair capsule leaked punctuation-wrapped credentials and its export guard claimed a check it never ran
+
+Found while auditing REQ-DOM-010 ("Repair Capsule always redacts before
+export") for DOD-001, by writing probe tests against the real crate rather than
+reading the code — the method that also exposed AG-004 through AG-012.
+
+Two defects in `crates/crash_reporter/src/lib.rs`:
+
+**1. Redaction missed credentials wrapped in punctuation.** `redact_token_like`
+iterated `split_inclusive(char::is_whitespace)` and tested the whole
+whitespace-delimited word, so a credential was only caught when whitespace
+separated it from everything else. Measured against the real function:
+
+```text
+{"api_key":"sk-live-ABC123xyz"}  ->  unchanged   (leaked)
+(sk-live-ABC123xyz)              ->  unchanged   (leaked)
+key=sk-live-ABC123xyz;           ->  unchanged   (leaked)
+ghp_ABC123xyz                    ->  [REDACTED]  (caught)
+```
+
+Compact JSON and `key=…;` are ordinary shapes for a credential in real log
+output, so this was a live confidentiality gap against SECURITY.md's
+device-only default for invention content. Fixed by scanning maximal runs of
+token characters, which treats punctuation as a separator.
+
+**2. The export guard asserted a check it never performed.** The doc comment on
+`is_safe_for_export()` read "True only when the capsule holds no raw detail
+**and the redaction pass did not leave a registered secret behind**", but the
+body was `self.incident.redacted && self.incident.detail.is_empty()` — two
+boolean flags, neither of which inspects the exported text. The guard would
+therefore have reported safe for a capsule whose redacted detail still held a
+registered literal. Fixed by verifying `redacted_detail` against the capsule's
+registered secrets, so the claim in the comment is one the code actually makes
+true.
+
+This is the same class as AG-007a (a runtime self-report that was a hard-coded
+"OK"): the failure mode is not a wrong value but a *guard whose stated check is
+not implemented*, which is strictly worse than a missing guard because it reads
+as verified.
+
+**Mutation proofs (DOD-018), both run and both required to fail:**
+
+| Restored pre-fix behavior | Test that must fail | Result |
+| --- | --- | --- |
+| whitespace-only tokenizer | `test_punctuation_wrapped_tokens_are_scrubbed_before_export` | FAILED as required |
+| flag-only export guard | `test_export_guard_rejects_surviving_registered_secret` | FAILED as required |
+
+Restoring both returned the suite to 10/10 passing. Three acceptance tests now
+carry `/// covers: REQ-DOM-010`.
+
+**Process note.** Restoring a mutated file with `Copy-Item` preserves the
+original mtime, so cargo skipped the rebuild and reported a *false* failure from
+the stale mutated binary. Any scripted mutation/restore loop must refresh the
+mtime or force a rebuild; the proof script here sleeps past the timestamp
+resolution before each run.

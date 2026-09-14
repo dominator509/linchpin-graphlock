@@ -1,16 +1,15 @@
 {
   "changed_classes": [
-    "rust-source",
-    "gate-script"
+    "rust-source"
   ],
-  "epoch_digest": "bac7d2f08afadc7f78da14bfdc6909ff4c96827b4646200f2f2cf6d447a45ec0",
+  "epoch_digest": "a8f7a236143e374eff9c41e56105e9339afc10046132fceb749124cc055f7e28",
   "failures": 0,
   "results": [
     {
       "command": "sh scripts/build.sh",
-      "duration_s": 95.86,
+      "duration_s": 78.53,
       "exit_code": 0,
-      "output_sha256": "9f691df0f958133c1533bb3d3544d4b2e31214e11c99fe2e64b05f9eaad31d60",
+      "output_sha256": "c39bedaa27901cead99c5fe2872031cef9f3f1daeab13ddd04dd5c10190ce533",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -21,35 +20,35 @@
     },
     {
       "command": "sh scripts/smoke-test.sh",
-      "duration_s": 11.09,
+      "duration_s": 11.26,
       "exit_code": 0,
-      "output_sha256": "6a45b20a505e59d1208581be86e6f0e1b611b39b87119371908478590bade43c",
+      "output_sha256": "2133ba1d3a0938b85f89d84d8bdda7eb43db0498fde5fd7506a45860b3dc5071",
       "output_tail": [
         "smoke: verifying removal",
         "smoke: clean removal confirmed",
-        "smoke: ok (artifact f0102a354cf851658ef9ea4e4dabcb0bf7fdd3db671b98e346ba596a9ec695f1 verified through install/launch/uninstall)"
+        "smoke: ok (artifact 3cf380a024ac460918d911f1233a91d6ce08ebf6d961f1e0873691243ff95aab verified through install/launch/uninstall)"
       ],
       "stage": "V-006 smoke",
       "status": "PASS"
     },
     {
       "command": "sh scripts/typecheck.sh",
-      "duration_s": 6.75,
+      "duration_s": 5.08,
       "exit_code": 0,
-      "output_sha256": "8762c3bc233ef9cc50f1938cca354601b2c4ce543dec12995a65e4657fa20d46",
+      "output_sha256": "5ded24b04bdbd4d9d6f06bd408611ef5bec53d8e2dafed847a8a3876a523bbea",
       "output_tail": [
-        "    Checking application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)",
+        "    Checking crash_reporter v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\crash_reporter)",
         "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.50s"
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.14s"
       ],
       "stage": "V-007 sanity",
       "status": "PASS"
     },
     {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 31.3,
+      "duration_s": 16.75,
       "exit_code": 0,
-      "output_sha256": "fc22fb37200fb41db551306e9693436f3582420f32c400991486d5ec94f57dbc",
+      "output_sha256": "a3523884c334f9e8657fc7e2c87adf9db57e522d895d4fe0db2b1dfc28440f9d",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -60,12 +59,12 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 1.8,
+      "duration_s": 1.81,
       "exit_code": 0,
-      "output_sha256": "99c5871b86fb93c1c67db6f91873ff210ea7e2ededc373a396b789d9a93db2b1",
+      "output_sha256": "c2ce1be140372b10a82555a091b573f9aafed026b954fc763c15e2e73c490f34",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.56s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-40d0be70daa3bb16.exe)"
       ],
       "stage": "V-009 integration/concurrency",
@@ -73,28 +72,15 @@
     },
     {
       "command": "sh scripts/lint.sh",
-      "duration_s": 4.68,
+      "duration_s": 4.78,
       "exit_code": 0,
-      "output_sha256": "56640bbebe2f64f58465ae1de9a27c543429f233dfc4a2017ee6b3d6cdf6013c",
+      "output_sha256": "a89e85baaf09193f76631a86da00007a0bb6fa041cc8c38413fcee97587b10c5",
       "output_tail": [
         "packages/contracts lint: Done",
         "apps/desktop lint: Done",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.82s"
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.99s"
       ],
       "stage": "V-012 regression/mutation",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/harness-validate.sh",
-      "duration_s": 49.3,
-      "exit_code": 0,
-      "output_sha256": "a0ab8f39f5cc9dccf3dba6698ff5469efb77895ffefd0742afd27e5c45657a45",
-      "output_tail": [
-        "reachability check: ok (147 public fns, 18 entry points, 0 unreachable)",
-        "trailing-and check: ok (no trailing &&-test lanes)",
-        "harness-validate: ok"
-      ],
-      "stage": "V-000 harness validation",
       "status": "PASS"
     }
   ],
@@ -104,7 +90,6 @@
     "V-007 sanity",
     "V-008 full functionality",
     "V-009 integration/concurrency",
-    "V-012 regression/mutation",
-    "V-000 harness validation"
+    "V-012 regression/mutation"
   ]
 }

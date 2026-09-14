@@ -160,25 +160,57 @@ impl RedactionPolicy {
     }
 }
 
-/// Scrub token-shaped substrings (`sk-...`, `Bearer ...`, 32+ char hex runs).
+/// Characters that may appear inside a token-shaped secret.
+fn is_token_char(c: char) -> bool {
+    c.is_ascii_alphanumeric() || c == '-' || c == '_'
+}
+
+/// Token shapes that must never leave the device boundary.
+fn looks_like_secret(core: &str) -> bool {
+    core.starts_with("sk-")
+        || core.starts_with("ghp_")
+        || core.starts_with("gho_")
+        || (core.len() >= 32 && core.chars().all(|c| c.is_ascii_hexdigit()))
+}
+
+fn push_scrubbed(out: &mut String, run: &str) {
+    if run.is_empty() {
+        return;
+    }
+    if looks_like_secret(run) {
+        out.push_str("[REDACTED]");
+    } else {
+        out.push_str(run);
+    }
+}
+
+/// Scrub token-shaped substrings (`sk-...`, `ghp_...`, `gho_...`, 32+ char hex).
+///
+/// Scans maximal runs of token characters rather than whitespace-delimited
+/// words. Measured defect in the previous version: it tested the whole
+/// whitespace token, so a credential *directly wrapped in punctuation* was not
+/// scrubbed and left the device boundary in cleartext. Only a bare
+/// whitespace-delimited token was caught. Treating punctuation as a separator
+/// closes those shapes while leaving ordinary text untouched:
+///
+/// ```text
+/// {"api_key":"sk-live-ABC123xyz"}  ->  {"api_key":"[REDACTED]"}
+/// (sk-live-ABC123xyz)              ->  ([REDACTED])
+/// key=sk-live-ABC123xyz;           ->  key=[REDACTED];
+/// ```
 fn redact_token_like(input: &str) -> String {
     let mut out = String::with_capacity(input.len());
-    for token in input.split_inclusive(char::is_whitespace) {
-        let (word, tail) = match token.find(char::is_whitespace) {
-            Some(i) => (&token[..i], &token[i..]),
-            None => (token, ""),
-        };
-        let scrubbed = word.starts_with("sk-")
-            || word.starts_with("ghp_")
-            || word.starts_with("gho_")
-            || (word.len() >= 32 && word.chars().all(|c| c.is_ascii_hexdigit()));
-        if scrubbed {
-            out.push_str("[REDACTED]");
+    let mut run = String::new();
+    for ch in input.chars() {
+        if is_token_char(ch) {
+            run.push(ch);
         } else {
-            out.push_str(word);
+            push_scrubbed(&mut out, &run);
+            run.clear();
+            out.push(ch);
         }
-        out.push_str(tail);
     }
+    push_scrubbed(&mut out, &run);
     out
 }
 
@@ -187,6 +219,8 @@ pub struct RepairCapsule {
     agent_brief: String,
     /// The only path by which incident detail may leave this type.
     redacted_detail: String,
+    /// Registered secrets that must not survive into exported detail.
+    forbidden: Vec<String>,
 }
 
 impl RepairCapsule {
@@ -212,6 +246,7 @@ impl RepairCapsule {
             incident,
             agent_brief: brief.to_string(),
             redacted_detail,
+            forbidden: policy.secrets.clone(),
         })
     }
 
@@ -230,8 +265,18 @@ impl RepairCapsule {
 
     /// Export guard. True only when the capsule holds no raw detail and the
     /// redaction pass did not leave a registered secret behind.
+    ///
+    /// The previous version asserted only `redacted && detail.is_empty()`, so it
+    /// could report safe while a registered secret was still present in the
+    /// exported detail -- a guard claiming a check it never performed. The
+    /// third condition verifies the claim instead of restating the flag.
     pub fn is_safe_for_export(&self) -> bool {
-        self.incident.redacted && self.incident.detail.is_empty()
+        self.incident.redacted
+            && self.incident.detail.is_empty()
+            && !self
+                .forbidden
+                .iter()
+                .any(|s| !s.is_empty() && self.redacted_detail.contains(s.as_str()))
     }
 }
 
@@ -320,5 +365,87 @@ mod capsule_tests {
         assert!(policy.is_empty());
         // An empty registration must not turn every position into a match.
         assert_eq!(policy.apply("harmless text"), "harmless text");
+    }
+
+    /// covers: REQ-DOM-010
+    /// "Repair Capsule always redacts before export." Measured defect in the
+    /// pre-fix implementation: it tested the whole whitespace-delimited token,
+    /// so a credential directly wrapped in punctuation survived redaction and
+    /// was still reported safe for export.
+    #[test]
+    fn test_punctuation_wrapped_tokens_are_scrubbed_before_export() {
+        let policy = RedactionPolicy::new();
+        let shapes = [
+            r#"{"api_key":"sk-live-ABC123xyz"}"#,
+            "(sk-live-ABC123xyz)",
+            "key=sk-live-ABC123xyz;",
+            "'ghp_ABC123xyz'",
+            "[gho_ABC123xyz]",
+        ];
+        for raw in shapes {
+            let out = policy.apply(raw);
+            assert!(
+                !out.contains("sk-live-ABC123xyz")
+                    && !out.contains("ghp_ABC123xyz")
+                    && !out.contains("gho_ABC123xyz"),
+                "token survived redaction in shape {raw:?}: {out}"
+            );
+            assert!(
+                out.contains("[REDACTED]"),
+                "no placeholder emitted for {raw:?}: {out}"
+            );
+        }
+    }
+
+    /// covers: REQ-DOM-010
+    /// The export guard must verify the redaction result rather than restate a
+    /// flag. Built directly, because the public constructor cannot produce a
+    /// capsule whose registered secret survived its own policy -- this asserts
+    /// the guard itself, which is what the doc comment promises.
+    #[test]
+    fn test_export_guard_rejects_surviving_registered_secret() {
+        let secret = "PROVISIONAL-CLAIM-1: a self-sealing graphene valve";
+
+        let mut incident = WindowsMinidumpHandler::capture_crash_with_detail("C:\\c.dmp", "");
+        incident.detail = String::new();
+        incident.redacted = true;
+
+        let capsule = RepairCapsule {
+            incident,
+            agent_brief: "save failed".to_string(),
+            // The redaction pass left the registered literal behind.
+            redacted_detail: format!("panic while saving draft: {secret}"),
+            forbidden: vec![secret.to_string()],
+        };
+
+        assert!(
+            capsule.incident().redacted && capsule.incident().detail.is_empty(),
+            "test premise: the flag-based conditions alone would report safe"
+        );
+        assert!(
+            !capsule.is_safe_for_export(),
+            "guard reported safe while a registered secret survived redaction"
+        );
+    }
+
+    /// covers: REQ-DOM-010
+    /// The positive control for the guard above: when the policy does cover the
+    /// literal, the placeholder replaces it and the guard reports safe.
+    #[test]
+    fn test_export_guard_accepts_a_fully_redacted_capsule() {
+        let secret = "PROVISIONAL-CLAIM-1: a self-sealing graphene valve";
+        let incident = WindowsMinidumpHandler::capture_crash_with_detail(
+            "C:\\crash.dmp",
+            &format!("panic while saving draft: {secret}"),
+        );
+        let policy = RedactionPolicy::new().with_secret(secret);
+
+        let capsule = RepairCapsule::new(incident, "save failed", &policy).unwrap();
+
+        assert!(!capsule.redacted_detail().contains(secret));
+        assert!(
+            capsule.is_safe_for_export(),
+            "a fully redacted capsule must be exportable"
+        );
     }
 }

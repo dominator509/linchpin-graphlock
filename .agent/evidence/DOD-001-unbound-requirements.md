@@ -45,7 +45,7 @@ listed as findings below.
 | REQ-DOM-005 | **ABSENT** | Promises the claim graph "enforces dependency/category/limitation identity". `crates/domain/src/lib.rs` `ClaimGraph::map_threat(reference_id, limitation_id, description)` (line 263) pushes the threat with **no validation** that either `EntityId` refers to an existing limitation or reference, and returns `ThreatMap`, not `Result`. The struct exists; the enforcement does not. |
 | REQ-DOM-006 | **ABSENT** | No support-matrix type or function exists. |
 | REQ-DOM-009 | **ABSENT** | No docket ruleset source/version type or function exists. |
-| REQ-DOM-010 | **PRESENT** | `RepairCapsule` and redaction exist in `crates/crash_reporter/src/lib.rs`, with a `RedactionReport`. Implementation is present; it has no acceptance test. |
+| REQ-DOM-010 | **FIXED and TESTED** | `RepairCapsule` and `RedactionPolicy` exist in `crates/crash_reporter/src/lib.rs`. Audit found the pass did **not** fully redact and the guard claimed a check it never performed — both fixed this round; see `AG-014` below. Three `/// covers: REQ-DOM-010` tests now pass. |
 | REQ-PAT-003 | **ABSENT** | Promises each research claim carries exactly one of 7 classes (`OBSERVATION`, `HYPOTHESIS`, `INFERENCE`, `LEGAL_RULE_SUMMARY`, `MARKET_SIGNAL`, `PATENT_THREAT`, `COMMERCIAL_TARGET_ASSERTION`). There is no `ClaimClass` enum and no occurrence of any class name as an identifier anywhere in the Rust or TypeScript sources. |
 
 ## Correction to the DOD-001 disposition's "UI/A11Y" grouping
@@ -96,3 +96,22 @@ remain unassessed. Closing DOD-001 requires implementation work for the absent
 behaviour (starting with REQ-DOM-005 enforcement and REQ-DOM-010's redaction
 guarantee, both of which are bounded and testable) plus a test for each
 present-but-untested behaviour — not merely writing more tests.
+
+## Progress this round
+
+**REQ-DOM-005 — implemented.** `ClaimGraph` promised to "enforce
+dependency/category/limitation identity" and did not. `map_threat` and
+`add_design_around` now validate identity and return
+`Result<_, ClaimGraphError>`; a threat naming an unknown limitation or reference
+is rejected instead of stored. Three tests, mutation-proven (removing the checks
+fails two of them).
+
+**REQ-DOM-010 — audited, two real defects fixed, three tests added.** Reported
+in full as `AG-014` in `ANTI_GAMING_FINDINGS.md`. Summary: the redaction pass
+missed credentials that were directly wrapped in punctuation (compact JSON,
+parentheses, `key=…;`), and `is_safe_for_export()` asserted only two boolean
+flags while its doc comment claimed it also verified that no registered secret
+survived — a guard claiming a check it never ran. Both fixed and mutation-proven.
+
+Bound requirements therefore move 35 → 37, collected tests 129 → 135, and
+`NO_BOUND_TEST` 24 → 22.
