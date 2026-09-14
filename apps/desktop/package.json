@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "test:unit": "vitest run --passWithNoTests=false",
+    "test:e2e": "playwright test",
     "lint": "eslint .",
     "format:check": "prettier --check .",
     "typecheck": "tsc"
@@ -19,6 +20,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "@tauri-apps/cli": "^2.6.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
