@@ -53,6 +53,18 @@
       "status": "PARTIAL",
       "evidence_path": "crates/storage/tests/integration_real_dependencies.rs",
       "reason": "EXECUTED in part. A query against a schema that does not exist fails closed with 'no such table' rather than silently returning empty results (DOD-014 negative-case behaviour at the database boundary). NOT PASS: broader negative-path coverage across auth, policy and provider boundaries is absent."
+    },
+    {
+      "test_id": "SUP-001",
+      "status": "PARTIAL",
+      "evidence_path": "apps/desktop/src-tauri/src/commands.rs",
+      "reason": "EXECUTED, with a release-blocking finding repaired. The repository advertised a full domain layer while ten crates were declared as desktop dependencies and used by nothing (measured: domain/storage/evidence/patent/research/commercialization/mcp_hub/crash_reporter/provider_transport all had zero usages), and the app exposed exactly one Tauri command while the React shell called nothing. That is the disconnected-UI/inert-adapter condition SUP-001 lists as release-blocking. Repaired: a typed IPC layer now implements SPEC-003 (correlation IDs, typed envelope, workspace scoping, SPEC-006 error classes) and the UI invokes it; command names verified present in the built artifact. NOT PASS: only 2 of the 14 SPEC-003 namespaces are implemented (conception, workspace) and the vault write path is not wired, so record_conception honestly reports persisted=false."
+    },
+    {
+      "test_id": "E2E-004",
+      "status": "PARTIAL",
+      "evidence_path": "apps/desktop/src-tauri/src/commands.rs",
+      "reason": "EXECUTED in part. The IPC contract is typed and tested: CommandResult envelope serializes with a unique correlation id per call; CommandError serializes with the SPEC-006 class tag; WorkspaceScope rejects an empty workspace_id; record_conception rejects empty content. NOT PASS: no API contract suite exercises the commands over the real Tauri IPC boundary, and 12 of 14 namespaces have no command at all."
     }
   ]
 }
