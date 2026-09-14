@@ -263,9 +263,8 @@ mod tests {
 
     #[test]
     fn test_local_adapter_rejects_non_loopback_endpoint() {
-        let err =
-            LocalModelAdapter::new("https://api.example.com", "llama3", LocalFlavor::Ollama)
-                .unwrap_err();
+        let err = LocalModelAdapter::new("https://api.example.com", "llama3", LocalFlavor::Ollama)
+            .unwrap_err();
         assert!(
             matches!(err, TransportError::InvalidRequest(ref m) if m.contains("loopback")),
             "non-loopback endpoint must be refused, got {err:?}"
@@ -274,8 +273,8 @@ mod tests {
 
     #[test]
     fn test_local_adapter_accepts_loopback_and_builds_urls() {
-        let a =
-            LocalModelAdapter::new("http://127.0.0.1:11434", "llama3", LocalFlavor::Ollama).unwrap();
+        let a = LocalModelAdapter::new("http://127.0.0.1:11434", "llama3", LocalFlavor::Ollama)
+            .unwrap();
         assert_eq!(a.identity(), "local-ollama");
         assert!(a.is_live());
         assert_eq!(a.request_url(), "http://127.0.0.1:11434/api/generate");
@@ -288,8 +287,7 @@ mod tests {
 
     #[test]
     fn test_extract_text_fails_closed_on_missing_field() {
-        let a =
-            LocalModelAdapter::new("http://127.0.0.1:11434", "m", LocalFlavor::Ollama).unwrap();
+        let a = LocalModelAdapter::new("http://127.0.0.1:11434", "m", LocalFlavor::Ollama).unwrap();
         let err = a
             .extract_text(&serde_json::json!({"wrong": "x"}))
             .unwrap_err();

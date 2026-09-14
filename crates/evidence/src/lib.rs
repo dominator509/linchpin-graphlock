@@ -170,7 +170,7 @@ mod hardening_tests {
             let parts = (rng.next() % 5) as usize + 1;
             let mut candidate = String::new();
             for i in 0..parts {
-                if i > 0 && rng.next() % 3 == 0 {
+                if i > 0 && rng.next().is_multiple_of(3) {
                     candidate.push('/');
                 }
                 candidate.push_str(rng.pick(ALPHABET));

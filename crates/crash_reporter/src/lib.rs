@@ -301,7 +301,8 @@ mod capsule_tests {
     #[test]
     fn test_token_shaped_secrets_are_scrubbed_without_registration() {
         let policy = RedactionPolicy::new();
-        let out = policy.apply("auth failed for sk-live-0123456789abcdef and deadbeefdeadbeefdeadbeefdeadbeef");
+        let out = policy
+            .apply("auth failed for sk-live-0123456789abcdef and deadbeefdeadbeefdeadbeefdeadbeef");
         assert!(!out.contains("sk-live-0123456789abcdef"));
         assert!(!out.contains("deadbeefdeadbeefdeadbeefdeadbeef"));
         assert_eq!(out.matches("[REDACTED]").count(), 2);

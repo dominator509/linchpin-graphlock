@@ -1,0 +1,20 @@
+# Prettier ignore list.
+#
+# Build outputs and generated files are not authored source and must not be
+# format-gated: reformatting them fights the tool that generates them.
+dist/
+build/
+node_modules/
+target/
+
+# tauri-build emits these JSON schemas on every build; Prettier reformatting
+# them would be reverted by the next `tauri build`.
+apps/desktop/src-tauri/gen/
+
+# Binary assets.
+*.png
+*.ico
+*.icns
+*.exe
+*.msi
+*.dmp

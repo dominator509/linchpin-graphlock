@@ -1,0 +1,22 @@
+# Prettier ignore list for the desktop app.
+#
+# A root-level .prettierignore does not apply here: when each workspace package
+# runs `prettier --check .`, Prettier resolves the ignore file relative to that
+# package's own directory. Without this file the generated Tauri schemas are
+# format-gated, and `--write` would reformat 1,851 lines that tauri-build
+# regenerates on the next build.
+
+dist/
+build/
+node_modules/
+
+# Emitted by tauri-build on every build; not authored source.
+src-tauri/gen/
+
+# Binary assets.
+*.png
+*.ico
+*.icns
+*.exe
+*.msi
+*.dmp

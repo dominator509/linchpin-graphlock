@@ -1,0 +1,35 @@
+fix(gates): make format-check and lint pass; exclude generated artifacts
+
+lint.sh (cargo clippy -D warnings) failed on a clippy::manual_is_multiple_of
+error introduced by my own property test in crates/evidence. Fixed with
+`rng.next().is_multiple_of(3)`. `cargo fmt --all` applied.
+  BEFORE: error: could not compile `evidence` (lib test), exit 101
+  AFTER:  Finished dev profile, exit 0
+
+format-check.sh failed for three independent reasons, all now fixed:
+
+1. CRLF contamination. core.autocrlf=true on this Windows checkout rewrote LF
+   to CRLF, so Prettier --check failed on files whose committed content is
+   already correctly formatted -- `git diff --ignore-cr-at-eol` was empty and
+   the bytes were identical modulo line endings. Added .gitattributes pinning
+   `* text=auto eol=lf` (plus binary markers for png/ico/icns/exe/msi/dmp) so
+   the gate is deterministic on every platform instead of depending on local
+   git config.
+
+2. Build outputs were being format-gated. Added root and per-package
+   .prettierignore. This matters because a root-only ignore does NOT apply:
+   when each workspace package runs `prettier --check .`, Prettier resolves
+   the ignore file relative to that package's own directory. Without the
+   package-level file, --write reformatted 1,851 lines of
+   apps/desktop/src-tauri/gen/schemas/*.json that tauri-build regenerates on
+   the next build. Those generated schemas are now excluded and were restored
+   rather than reformatted.
+
+3. The authored desktop/contracts/ui sources had never been Prettier-formatted
+   (8 files). Ran prettier --write on real source only.
+
+  BEFORE: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL, exit 1
+  AFTER:  "All matched files use Prettier code style!", exit 0
+
+Verified unchanged: cargo test --workspace --locked = 25 suites, 49 passed,
+0 failed, 0 ignored; typecheck.sh exit 0.
