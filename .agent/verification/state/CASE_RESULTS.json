@@ -1,0 +1,14 @@
+{
+  "_comment": "Real executed case results bound to candidate c3e071f. Only IDs whose acceptance oracle genuinely ran and passed may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
+  "candidate_commit": "c3e071f",
+  "candidate_epoch": "EP-009-attempt-002",
+  "environment": {
+    "host": "Windows 10 Home 10.0.19045 x64",
+    "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "1.98.0 (797e8a9bc 2026-08-05)",
+    "node": "v24.14.1",
+    "pnpm": "10.30.3",
+    "target_triple": "x86_64-pc-windows-msvc"
+  },
+  "results": []
+}
