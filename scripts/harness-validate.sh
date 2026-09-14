@@ -20,4 +20,6 @@ python3 scripts/build-applicability.py --check
 python3 scripts/generate-sbom.py --check
 python3 scripts/change-invalidation.py --check
 python3 scripts/bind-requirements.py --check
+python3 scripts/secret-scan.py --check
+python3 scripts/collect-skip-report.py --check
 echo "harness-validate: ok"

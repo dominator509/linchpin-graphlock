@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "3532660",
+  "candidate_commit": "338727a",
   "classes": {
     "artifact": {
       "count": 3,
@@ -28,7 +28,7 @@
       ]
     },
     "gate-script": {
-      "count": 44,
+      "count": 46,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
@@ -36,10 +36,11 @@
         "scripts\\bind-requirements.py": "aefe9afc545f0db1d0f61767c9125d90788771c67094e98cb8c5b95dc253402d",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "6285076849d8d847a17be1fd80bf5bd4b67246b1fbbfff1327ddd32648cc72db",
-        "scripts\\build-dod-status.py": "97eb202d5638908c578793d092701cbc57e56aaded4b24897555fbafb4d261a3",
+        "scripts\\build-dod-status.py": "d3fe82e5ac519f55297db10dcb4d4b6951cc5035de48e4962e0b475c91d48209",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "1fb0fcfa770bf67efa1db47b63b7922e57cf014b86f95e7ac3bf5f1e11113e15",
+        "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
         "scripts\\dependency-audit.sh": "b1a896cc77726d1894b704f37a36714d65182905771ec0a576688d115c434f5e",
         "scripts\\dod-gate.sh": "26d4e578e6c62da5c946fc433be1d3d5226fd520fe062cfbf01f71aef12fd6bb",
         "scripts\\format-check.sh": "d01f04988dbdf9a0ef7039e7ae628a94bad8c55fe304f8d341c6803175d6d2bd",
@@ -50,7 +51,7 @@
         "scripts\\harness-init.sh": "9e5861aecd7507382f83a2559d85f38aa5a9c0bf3ae7c5e25319c1812cda96fd",
         "scripts\\harness-next.sh": "e448ad424fd26160328f81c237ec5d4289b562acb590b47cb07878390d344096",
         "scripts\\harness-run-stage.sh": "c17cbbb510a23399dadbc9461346f72d22f848aac165fe9f2970bf8003f6f5ae",
-        "scripts\\harness-validate.sh": "84b080161f0388c1aa192947fd5c99b6b889e026bcbd9848ebb158bfac5dbb27",
+        "scripts\\harness-validate.sh": "b3c5cd26795ef6318cfae3e06be18274da7d1a05493566e72bc2ceac0f7224ba",
         "scripts\\install.sh": "bacd8c9db15ef395239a6e706187ee7f8126568ba943c3dd29ec0994400973f7",
         "scripts\\ledger.sh": "81b5ebc8c4ea7b64fe446a869b0080dceea7ae756eb72de59d26f63604eeb755",
         "scripts\\lint.sh": "e7207554e234483238ed9d211df7c0c4b11550b055f75d44ef652f25254c086e",
@@ -60,7 +61,8 @@
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reality-gate.sh": "918672a312f0cc08055d18656135e336045f0fd8bbfaf75763f401d2c0afb973",
         "scripts\\run-integration-real.sh": "a1f218daae2ab710aa9fc1ffd4df4b399bfa55c3212a8e9a909548d4a030d685",
-        "scripts\\security-check.sh": "272ffd3f9804d6edc0217c0c0c51959f0efbb6d8785bc0ad0a7bb284e04d0e40",
+        "scripts\\secret-scan.py": "28b7a041cde51745b2045e82398beabfe9587ae0f4ddb4bcceba751965d4c651",
+        "scripts\\security-check.sh": "e27eb5010d866c51b27d353192b3add0b1bc8642a8e3af7b54716a9b619ad618",
         "scripts\\ship-gate.py": "c7650a1f78b9b256dfe7ca7e968cfedc129b50aaa374494a790f9961e465f5cc",
         "scripts\\smoke-installed-artifact.sh": "71de10b34c0a69e915773b1bcc92a8a08d4757b9c7a4e5dd963a343a4f4448ac",
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
@@ -192,6 +194,6 @@
       ]
     }
   },
-  "epoch_digest": "f1aec858f6dc818f48b89303b8e63463007f7209140e2a8f9add439a1e07f4c9",
-  "total_inputs": 104
+  "epoch_digest": "93075f9e16ae893e876ece6733328d84db88abb24fdc3410570b45d602fdb1af",
+  "total_inputs": 106
 }

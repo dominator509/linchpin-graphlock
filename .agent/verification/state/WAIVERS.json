@@ -1,0 +1,8 @@
+{
+  "_comment": "Waiver register for DOD-006. A waiver is required only when a required test is skipped, disabled, ignored, pending, quarantined or xfailed. The register is currently EMPTY because scripts/collect-skip-report.py finds zero skip markers in first-party source and the runner reports zero ignored tests. An empty register is not a missing one: adding a fabricated waiver to look thorough would be the exact over-claiming DOD-026 forbids. Required fields per entry: id, owner, expires (YYYY-MM-DD), rationale, compensating_evidence.",
+  "candidate_commit": "338727a",
+  "measured_at": "2026-09-10",
+  "ignored_tests": 0,
+  "skip_markers_found": 0,
+  "waivers": []
+}
