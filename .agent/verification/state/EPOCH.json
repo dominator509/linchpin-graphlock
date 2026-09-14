@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "d987bf0",
+  "candidate_commit": "1dace70",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -37,14 +37,14 @@
         "scripts\\bind-requirements.py": "aefe9afc545f0db1d0f61767c9125d90788771c67094e98cb8c5b95dc253402d",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "b2a4a924641168715c2c38fa47e638a85b8a3ad688a877a288535f97221b69ca",
-        "scripts\\build-dod-status.py": "d09dceeca9943094b906188be430297eb2ab9abda4d64531a3ce907c8776d51a",
+        "scripts\\build-dod-status.py": "141f32e1be10e589b86c5c8a20b05e17c88dbd7c53e98df6f3196d7c91666a3b",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "d73a6d9a2f432bef3c75dde37c5939b735e005fc747a1e1f75dff5c116b25db6",
         "scripts\\clean-build.sh": "4507f635f02652766b18f987a00fbdc79377340cd23d1b2e1ebe93f48a4bb963",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
         "scripts\\dependency-audit.sh": "508cc370daf842ab1ea1535a658196adf677566088ca9928d3ca7d498fc9d1eb",
-        "scripts\\doc-exec.py": "4a156b634e128eb9eeb425f114b91b65143356b085272200cde365c128b50201",
+        "scripts\\doc-exec.py": "16eb356bf32cd2c02f4afbe272aa1080644b573b1761a5a098cc58390e1c52fa",
         "scripts\\dod-gate.sh": "26d4e578e6c62da5c946fc433be1d3d5226fd520fe062cfbf01f71aef12fd6bb",
         "scripts\\fix-trailing-and-lanes.py": "1975f3d7bfd6693657d2250076f0e71c4786e56f446389afaf77169ff3191ab9",
         "scripts\\format-check.sh": "2d565f3798f61577218798bec689d59bab3e48daaa372c6645985c86fb0ca545",
@@ -205,6 +205,6 @@
       ]
     }
   },
-  "epoch_digest": "f4a42e9262e3c8af38f917c2db04420864aefd617b728e0cf962c753151af981",
+  "epoch_digest": "d7e72ad1801c0596055b10bb0cd2278106b332837969f24409fa60aa42249944",
   "total_inputs": 112
 }

@@ -461,3 +461,66 @@ six are comments. Zero unexplained *executable* production hits remain.
 3. Re-run this scan and confirm zero *unclassified* production hits
    (DOD-019 REQUIRED EVIDENCE: lexical scan, reachability trace, allowlist
    decisions, findings).
+
+## AG-013 — published documentation executed as-is exposed 6 failing commands
+
+Found by `scripts/doc-exec.py`, which extracts every command the operator-facing
+documents publish and runs it (DOD-023 / SUP-009). Final measured state after
+fixing the verifier: 22 executed, **6 failed**, 1 skipped, 0 missing paths.
+
+| Command | Exit | Disposition |
+| --- | --- | --- |
+| `sh scripts/security-check.sh` | 1 | Known: `cargo-deny licenses` fails on the 5 MPL-2.0 crates pending ADR-002. |
+| `sh scripts/dependency-audit.sh` | 4 | **New.** `cargo-deny` exit 4 on the same licences check; the ADR-002 blocker cascades to this second gate. |
+| `sh scripts/verify.sh` | 1 | **New consequence.** `verify.sh` aggregates the lanes, so one lane failure fails the published aggregate command. |
+| `sh scripts/live-fire.sh` | 2 | Known: real-runner script absent until EP-007. |
+| `sh scripts/production-readiness-check.sh` | 1 | Correct: verdict is NO_GO. |
+| `pnpm audit` | 1 | **New.** 2 moderate advisories, below the enforced `--audit-level high`. |
+
+Also observed, and recorded rather than waived: `pnpm audit` reports **2
+moderate advisories** — GHSA-82fw-gwwq-j7x9, path traversal / arbitrary file
+read via `@vitest/mocker` redirect mock, in `vitest` and `@vitest/mocker`
+(fixed in >= 4.1.11; the repository pins 3.2.7). `security-check.sh` runs
+`pnpm audit --audit-level high`, so these do not fail the lane. That is a real
+threshold decision, not an absence of findings: the affected package is
+dev-only (no shipped artifact embeds `vitest`), which is why `high` is the
+enforced level. No waiver row currently exists for this advisory, so it is
+listed as an accepted, documented risk rather than a silent pass.
+
+### Four robustness defects in the verifier itself
+
+Writing this evidence exposed defects in the gate, each fixed and mutation-proven:
+
+1. **Self-invocation.** Documenting the gate by its own command
+   (`python3 scripts/doc-exec.py`) made it execute itself, recursing until the
+   per-command timeout fired (observed: a 900s TIMEOUT row). A documentation
+   gate must never re-invoke itself; a self-reference exclusion now covers it.
+2. **Crash on a missing runner.** `subprocess.run` raised an uncaught
+   `FileNotFoundError`, aborting the whole gate instead of reporting one
+   unrunnable command. Now classified `FAIL` / `NOT_FOUND`.
+3. **False "not installed".** `pnpm` was reported `NOT_FOUND` although present,
+   because `CreateProcess` ignores `PATHEXT` and `pnpm` ships as a `.cmd` shim.
+   Runners are now resolved through `shutil.which`; `pnpm audit` executes and
+   reports its real result. This defect *understated* verification.
+4. **Orphaned GUI process.** A timed-out desktop lane left
+   `linchpin-desktop.exe` running and holding the artifact. Commands are now
+   bounded per command, with best-effort straggler reaping guarded so a missing
+   `taskkill` cannot itself crash the gate (that secondary crash was observed
+   and fixed).
+
+### Environmental hazard: fixed port with no cross-project isolation
+
+The E2E lane binds port `4173` with `--strictPort` and
+`reuseExistingServer: false`. During this audit an unrelated project's
+`vite preview` held that port, so lane 1 failed with a 404 heading assertion.
+Re-run alone, lane 1 passed **14/14** and `test-e2e.sh` exited 0 with both
+lanes green. The failure was contention from concurrent verification runs, not
+a product defect. The configuration is correct in the safe direction: it fails
+loudly rather than silently reusing a foreign server, which would let a test
+pass against the *wrong* application. Constraint recorded in `COMMANDS.md`:
+run the E2E and documentation lanes serially, never concurrently.
+
+This remains a documentation defect in the exact sense DOD-023 describes: the
+commands are *published* but do not all succeed when run as written. The
+documents now disclose this via the measured "Known command status" table; the
+underlying ADR-002 decision is external.

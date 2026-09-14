@@ -26,6 +26,37 @@ Run commands from repository root. Export: `CI=true GIT_TERMINAL_PROMPT=0 GIT_PA
 | ledger tail | `sh scripts/ledger.sh tail 30` |
 | materialize security sources | `sh scripts/materialize-atomic-sources.sh` |
 
+## Known command status
+
+Verified by `scripts/doc-exec.py`, which extracts and executes every command
+published here and in the operator documents.
+
+These commands are published but do **not** currently exit 0 when run as
+written.
+
+| Command | Exit | Cause | Unblock |
+| --- | --- | --- | --- |
+| `sh scripts/security-check.sh` | 1 | `cargo-deny licenses` rejects 5 MPL-2.0 crates | ADR-002 decision |
+| `sh scripts/dependency-audit.sh` | 4 | same `licenses FAILED` check | ADR-002 decision |
+| `sh scripts/verify.sh` | 1 | aggregates the lanes above | ADR-002 decision |
+| `sh scripts/live-fire.sh` | 2 | real-runner script absent until EP-007 | EP-007 |
+| `sh scripts/production-readiness-check.sh` | 1 | verdict is NO_GO (correct behavior, not a defect) | release readiness |
+| `pnpm audit` | 1 | 2 moderate advisories (see below) | dependency upgrade decision |
+
+`pnpm audit` reports 2 moderate advisories (GHSA-82fw-gwwq-j7x9 in `vitest` and
+`@vitest/mocker`, fixed in >= 4.1.11; this repository pins 3.2.7). The enforced
+level in `scripts/security-check.sh` is `--audit-level high`, so these do not
+fail the lane. The affected package is dev-only and is not embedded in any
+shipped artifact. No waiver row exists for this advisory, so it is listed here
+as an accepted, documented risk rather than a silent pass.
+
+The E2E lane binds a fixed port (`4173`) with `--strictPort` and
+`reuseExistingServer: false`, so a server squatting that port fails the lane
+loudly rather than being silently reused. Observed during this audit: an
+unrelated project's `vite preview` held 4173, the lane failed on a 404, and it
+passed 14/14 once the port was free. Run the E2E lane on its own; do not run two
+documentation or E2E invocations concurrently.
+
 ## Local start
 After EP-005 creates the application: `pnpm --filter @linchpin/desktop tauri dev > .agent/state/dev-server.log 2>&1 & echo $! > .agent/state/dev-server.pid`; readiness is a bounded 60-second probe defined in EP-005; stop with `kill "$(cat .agent/state/dev-server.pid)"`.
 

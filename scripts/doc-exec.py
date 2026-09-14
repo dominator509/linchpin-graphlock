@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -61,6 +62,9 @@ EXCLUDED_PATTERNS = [
     (r"\bgit\s+push\b", "mutates a remote; forbidden by AGENTS.md section 11"),
     (r"\bkill\b", "process management"),
     (r"\bfor\s+f\s+in\b", "loop over adapter parity; awk-based, not a product command"),
+    # Self-reference guard. Measured: documenting this gate by its own command
+    # made it execute itself, recursing until the per-command timeout fired.
+    (r"\bdoc-exec\.py\b", "self-reference: a documentation gate must not re-invoke itself"),
 ]
 
 
@@ -89,11 +93,62 @@ def extract(doc: Path) -> tuple[list[str], list[str]]:
     return uniq_c, uniq_p
 
 
+def _resolve_argv(cmd: str) -> list[str] | None:
+    """Resolve the runner through PATH, returning None when it is not installed.
+
+    subprocess with shell=False uses CreateProcess on Windows, which does not
+    apply PATHEXT: `pnpm` is installed as pnpm.cmd, so passing the bare name
+    raised FileNotFoundError and the command was misreported as missing even
+    though it is present. Resolving through shutil.which (which honours
+    PATHEXT) fixes the false negative; .cmd/.bat shims are invoked via cmd /c.
+    """
+    parts = cmd.split()
+    if not parts:
+        return None
+    exe = shutil.which(parts[0])
+    if exe is None:
+        return None
+    if exe.lower().endswith((".cmd", ".bat")):
+        return ["cmd", "/c", exe, *parts[1:]]
+    return [exe, *parts[1:]]
+
+
 def excluded(cmd: str) -> str | None:
     for pattern, reason in EXCLUDED_PATTERNS:
         if re.search(pattern, cmd):
             return reason
     return None
+
+
+# Per-command wall-clock bound. The desktop lanes legitimately take minutes;
+# 900s is generous but bounded so one wedged process cannot stall the gate.
+PER_COMMAND_TIMEOUT = 900
+
+
+def _kill_stragglers() -> None:
+    """Reap GUI/test children that outlive a timed-out command.
+
+    subprocess timeout kills only the direct child. The desktop smoke and E2E
+    lanes spawn linchpin-desktop, which keeps the artifact locked and would
+    corrupt later lanes in the same run.
+
+    Best-effort only: this runs on an already-failing path, so it must never
+    raise. Measured: `taskkill` is not on PATH in this environment, and an
+    unguarded call turned a per-command timeout into a hard gate crash.
+    """
+    for name in ("linchpin-desktop", "linchpin-desktop-e2e"):
+        exe = shutil.which("taskkill")
+        if exe is None:
+            return
+        try:
+            subprocess.run(
+                [exe, "/F", "/IM", f"{name}.exe"],
+                capture_output=True,
+                shell=False,
+                timeout=30,
+            )
+        except (OSError, subprocess.SubprocessError):
+            pass
 
 
 def main() -> int:
@@ -125,15 +180,74 @@ def main() -> int:
                 )
                 continue
 
-            proc = subprocess.run(
-                cmd.split(),
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                shell=False,
-                timeout=900,
-            )
+            # Per-command timeout. Several published commands (smoke-test,
+            # test-e2e) launch the desktop binary; without a bound a single
+            # wedged GUI process stalls the whole documentation gate, and the
+            # child outlives the timeout holding the artifact. Measured: a
+            # 900s timeout left linchpin-desktop running after doc-exec gave up.
+            argv = _resolve_argv(cmd)
+            if argv is None:
+                results.append(
+                    {
+                        "doc": doc_name,
+                        "command": cmd,
+                        "status": "FAIL",
+                        "exit_code": "NOT_FOUND",
+                        "actual": f"runner not on PATH: {cmd.split()[0]!r}",
+                    }
+                )
+                continue
+            try:
+                proc = subprocess.run(
+                    argv,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    shell=False,
+                    timeout=PER_COMMAND_TIMEOUT,
+                )
+            except subprocess.TimeoutExpired as exc:
+                _kill_stragglers()
+                results.append(
+                    {
+                        "doc": doc_name,
+                        "command": cmd,
+                        "status": "FAIL",
+                        "exit_code": "TIMEOUT",
+                        "actual": (
+                            f"exceeded {PER_COMMAND_TIMEOUT}s per-command bound; "
+                            f"partial output: {((exc.stdout or b'').decode('utf-8','replace') if isinstance(exc.stdout, bytes) else (exc.stdout or ''))[-200:]}"
+                        ),
+                    }
+                )
+                continue
+            except FileNotFoundError as exc:
+                # A published command whose executable is not installed must be
+                # reported, not raised: the clause asks whether the documented
+                # commands RUN as written, so a missing interpreter is a finding
+                # about the documentation/environment, not a verifier crash.
+                results.append(
+                    {
+                        "doc": doc_name,
+                        "command": cmd,
+                        "status": "FAIL",
+                        "exit_code": "NOT_FOUND",
+                        "actual": f"executable not found: {exc}",
+                    }
+                )
+                continue
+            except OSError as exc:
+                results.append(
+                    {
+                        "doc": doc_name,
+                        "command": cmd,
+                        "status": "FAIL",
+                        "exit_code": "OS_ERROR",
+                        "actual": f"could not execute: {exc}",
+                    }
+                )
+                continue
             results.append(
                 {
                     "doc": doc_name,
