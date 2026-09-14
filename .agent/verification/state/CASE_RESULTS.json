@@ -64,7 +64,19 @@
       "test_id": "E2E-004",
       "status": "PARTIAL",
       "evidence_path": "apps/desktop/src-tauri/src/commands.rs",
-      "reason": "EXECUTED in part. The IPC contract is typed and tested: CommandResult envelope serializes with a unique correlation id per call; CommandError serializes with the SPEC-006 class tag; WorkspaceScope rejects an empty workspace_id; record_conception rejects empty content. NOT PASS: no API contract suite exercises the commands over the real Tauri IPC boundary, and 12 of 14 namespaces have no command at all."
+      "reason": "EXECUTED in part. The IPC contract is typed and tested: CommandResult envelope serializes with a unique correlation id per call; CommandError serializes with the SPEC-006 class tag; WorkspaceScope rejects an empty workspace_id; record_conception, apply_research_action and evaluate_export all validate their inputs. Commands are registered and verified present in the built artifact. NOT PASS: no suite exercises the commands over the real Tauri IPC boundary, and 10 of 14 namespaces have no command at all."
+    },
+    {
+      "test_id": "E2E-003",
+      "status": "PARTIAL",
+      "evidence_path": "apps/desktop/e2e/shell.spec.ts",
+      "reason": "EXECUTED in part. Real-browser E2E (11 tests in Edge) covers the reachable UI surface: product heading with zero uncaught page errors, confidentiality boundary stated, no prohibited definitive legal claims, title and html lang, single main landmark, Conception Lab input with a distinct human/AI origin selector, research kill-search controls, Disclosure Firewall sensitivity control, keyboard focusability, and an assertion that the UI never displays fabricated full coverage. NOT PASS: no golden-path workflow is driven end to end and the Tauri IPC bridge is absent in the browser, so backend behaviour is covered by Rust tests rather than through the UI."
+    },
+    {
+      "test_id": "SUP-015",
+      "status": "EXTERNAL_REQUIRED",
+      "evidence_path": ".agent/verification/state/ACCOUNTING_STATUS.md",
+      "reason": "Manual accessibility and assistive-technology validation requires named human validators. Automated checks (html lang, labelled controls, keyboard focusability, single landmark, WCAG-2.2-AA target declared in SPEC-004) are necessary but cannot satisfy this gate. DOD-039 forbids an AI from impersonating sign-off. PF-017 unmet."
     }
   ]
 }
