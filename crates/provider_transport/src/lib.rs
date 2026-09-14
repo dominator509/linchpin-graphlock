@@ -261,6 +261,7 @@ impl ProviderTransport for UnimplementedTransport {
 mod tests {
     use super::*;
 
+    /// covers: REQ-LLM-001, REQ-SEC-001
     #[test]
     fn test_local_adapter_rejects_non_loopback_endpoint() {
         let err = LocalModelAdapter::new("https://api.example.com", "llama3", LocalFlavor::Ollama)
@@ -299,6 +300,7 @@ mod tests {
         assert_eq!(ok, "real text");
     }
 
+    /// covers: REQ-LLM-001
     /// DOD-014 negative case: an unreachable endpoint must produce a real
     /// `Unreachable` error, not fabricated output. Port 1 is reserved and
     /// nothing listens there, so the connection fails fast.
@@ -318,6 +320,7 @@ mod tests {
         );
     }
 
+    /// covers: REQ-LLM-003
     #[tokio::test]
     async fn test_empty_prompt_is_rejected_before_any_io() {
         let adapter =
@@ -332,6 +335,7 @@ mod tests {
         assert!(matches!(err, TransportError::InvalidRequest(_)));
     }
 
+    /// covers: REQ-LLM-004
     /// The unimplemented lane must never return success.
     #[tokio::test]
     async fn test_unimplemented_transport_never_succeeds() {

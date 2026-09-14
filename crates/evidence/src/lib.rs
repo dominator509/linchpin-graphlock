@@ -40,6 +40,7 @@ impl DisclosureFirewall {
 mod firewall_tests {
     use super::*;
 
+    /// covers: REQ-DOM-008
     #[test]
     fn test_disclosure_firewall() {
         let firewall = DisclosureFirewall::new();
@@ -127,6 +128,7 @@ impl InputHardener {
 mod hardening_tests {
     use super::*;
 
+    /// covers: REQ-SEC-002
     #[test]
     fn test_input_hardening() {
         assert!(InputHardener::sanitize_path("valid/path.txt").is_ok());
@@ -153,6 +155,7 @@ mod hardening_tests {
         }
     }
 
+    /// covers: REQ-SEC-002
     /// Property test over generated inputs: `sanitize_path` must never panic,
     /// and must reject every path that resolves to an escape or an absolute
     /// root. This replaces the previous `test_fuzz_target_simulation`, which
@@ -208,6 +211,7 @@ mod hardening_tests {
         );
     }
 
+    /// covers: REQ-SEC-002
     /// Archive entries must be held to the same rule as plain paths; a zip-slip
     /// entry must not be accepted.
     #[test]
@@ -300,6 +304,7 @@ fn redact_token_like(input: &str) -> String {
 mod redaction_tests {
     use super::*;
 
+    /// covers: REQ-OPS-011
     #[test]
     fn test_secret_redaction_canary() {
         let mut redactor = LogRedactor::new();
@@ -327,6 +332,7 @@ mod redaction_tests {
         assert!(!clean.contains("ghp_ABCDEFGHIJKLMNOP"), "leaked: {clean}");
     }
 
+    /// covers: REQ-OPS-011
     /// An empty registration must not turn every position into a match.
     #[test]
     fn test_redactor_ignores_empty_secret() {
@@ -335,6 +341,7 @@ mod redaction_tests {
         assert_eq!(redactor.redact("harmless text"), "harmless text");
     }
 
+    /// covers: REQ-OPS-011
     /// Redaction must be idempotent and must not mangle ordinary text.
     #[test]
     fn test_redactor_preserves_ordinary_text() {
@@ -409,6 +416,7 @@ mod threat_control_tests {
         assert!(!control.is_allowlisted("malicious_hash_xyz999"));
     }
 
+    /// covers: REQ-SEC-010
     /// AG-012 regression: an empty signer id must never match, and an empty
     /// registration must never be stored (it would match arbitrary input).
     #[test]
@@ -435,6 +443,7 @@ mod threat_control_tests {
         assert_eq!(control.allowed_count(), 1);
     }
 
+    /// covers: REQ-SEC-010
     /// Documents the limitation explicitly: this is not crypto. A caller can
     /// observe that no cryptographic material is held.
     #[test]

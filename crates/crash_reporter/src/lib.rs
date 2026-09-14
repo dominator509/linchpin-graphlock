@@ -48,6 +48,7 @@ impl LocalTelemetryPipeline {
 mod telemetry_tests {
     use super::*;
 
+    /// covers: REQ-OPS-010
     #[test]
     fn test_telemetry_correlation() {
         let pipeline = LocalTelemetryPipeline::new();
@@ -238,6 +239,7 @@ impl RepairCapsule {
 mod capsule_tests {
     use super::*;
 
+    /// covers: REQ-REPAIR-002
     #[test]
     fn test_sanitized_repair_capsule() {
         let incident = WindowsMinidumpHandler::capture_crash("C:\\crash.dmp");
@@ -252,6 +254,7 @@ mod capsule_tests {
         assert!(RepairCapsule::new(inc2, "", &policy).is_err());
     }
 
+    /// covers: REQ-REPAIR-001
     /// The regression that matters: invention content in the incident detail
     /// must NOT survive into an exportable capsule.
     #[test]
@@ -277,6 +280,7 @@ mod capsule_tests {
         );
     }
 
+    /// covers: REQ-REPAIR-001
     /// Negative proof (DOD-018): the pre-fix implementation set a flag without
     /// transforming content. This asserts the content-level invariant that the
     /// old code violated, so restoring the old behavior fails this test.
@@ -298,6 +302,7 @@ mod capsule_tests {
         );
     }
 
+    /// covers: REQ-REPAIR-001
     #[test]
     fn test_token_shaped_secrets_are_scrubbed_without_registration() {
         let policy = RedactionPolicy::new();
@@ -308,6 +313,7 @@ mod capsule_tests {
         assert_eq!(out.matches("[REDACTED]").count(), 2);
     }
 
+    /// covers: REQ-REPAIR-001
     #[test]
     fn test_empty_secret_is_not_registered() {
         let policy = RedactionPolicy::new().with_secret("");

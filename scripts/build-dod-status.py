@@ -31,8 +31,8 @@ OUT = Path(".agent/verification/state/DOD_STATUS.jsonl")
 # Per-clause disposition grounded in measured state at candidate 4f54de5.
 # evidence path + reason must be real; no clause is PASS without executed proof.
 DISPOSITIONS: dict[str, tuple[str, str, str]] = {
-    "DOD-001": ("PARTIAL", ".agent/evidence/ADR-003-requirement-declarations.md",
-                "Addressability gap CLOSED under ADR-003: SPEC-002..SPEC-010 now declare requirement IDs against existing prose, so NO_SPEC_DEFINITION fell from 20 to 0 of 22. Not PASS: a declaration is not an acceptance test. Every requirement still maps to zero executed PASS (5 have NO_MAPPED_TEST, 6 NOT_STARTED, 11 PARTIAL). Requirement-to-executed-evidence mapping remains largely absent."),
+    "DOD-001": ("PARTIAL", ".agent/verification/REQUIREMENT_TRACEABILITY.csv",
+                "Requirement-to-EXECUTED-test mapping now real. The matrix previously mapped requirements to counts of registry IDs, which are overwhelmingly NOT_RUN_BLOCKED_MATERIAL, so it proved nothing. scripts/bind-requirements.py now enumerates the 128 tests the runner actually collects, extracts an explicit `/// covers: REQ-...` marker from each test's own source, and reports requirement -> executed tests -> real result. 97 bindings, all collected, all passing; 35 of 59 requirements carry executed PASS evidence. MUTATION-PROVEN: making AI suggestions indistinguishable from human conception drops REQ-DOM-002 from PASS to FAIL and the overall PASS count from 35 to 4. Not PASS: 24 requirements still have no bound test (UI/A11Y, licensing, release/provenance, some domain rules)."),
     "DOD-002": ("PARTIAL", ".agent/evidence/sbom/THIRD_PARTY_NOTICES.md",
                 "Builds from a clean checkout with the locked toolchain (rustc/cargo 1.98.0, --locked, exit 0). Lockfile digests are now recorded: Cargo.lock sha256 8e33ffe6185bd236..., pnpm-lock.yaml sha256 45b0fad113529e45..., plus the artifact digest. Not PASS: no clean-environment image or VM manifest exists, so build reproducibility across environments is unverified."),
     "DOD-003": ("PARTIAL", ".agent/evidence/sbom/linchpin.cdx.json",

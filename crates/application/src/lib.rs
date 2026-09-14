@@ -79,6 +79,7 @@ pub fn check_system_health_with(probes: &[HealthProbe]) -> SystemHealth {
 mod tests {
     use super::*;
 
+    /// covers: REQ-OPS-010
     /// DOD-037 / SUP-011: health must reflect reality. A missing storage path
     /// must produce a non-OK status, not a constant "OK".
     #[test]
@@ -94,6 +95,7 @@ mod tests {
         assert!(!health.storage_ok);
     }
 
+    /// covers: REQ-OPS-010
     /// A writable directory must be reported healthy, and the probe must not
     /// leave its scratch file behind.
     #[test]
@@ -123,6 +125,7 @@ mod tests {
         assert!(probe.detail.contains("not a directory"), "{}", probe.detail);
     }
 
+    /// covers: REQ-OPS-010
     /// No probes at all must not report healthy.
     #[test]
     fn test_health_with_no_probes_is_not_ok() {
@@ -134,6 +137,7 @@ mod tests {
         assert!(!health.storage_ok);
     }
 
+    /// covers: REQ-OPS-010
     /// End-to-end against the REAL runtime storage path the packaged app uses.
     ///
     /// This is the probe `get_system_health` actually runs. On a host where the
@@ -206,6 +210,7 @@ impl GitIntegrationSandbox {
 mod sandbox_tests {
     use super::*;
 
+    /// covers: REQ-SEC-010
     #[test]
     fn test_git_sandbox_proof() {
         let mut sandbox = GitIntegrationSandbox::new();
@@ -319,6 +324,7 @@ impl OperationsSoakTest {
 mod soak_tests {
     use super::*;
 
+    /// covers: REQ-OPS-003
     /// AG-007b regression: the harness must measure real memory, and a
     /// measurably growing process must not be reported as leak-free.
     #[test]
@@ -356,6 +362,7 @@ mod soak_tests {
         drop(balloon);
     }
 
+    /// covers: REQ-OPS-003
     /// A fresh soak reports zero iterations and no fabricated leak.
     #[test]
     fn test_soak_does_not_fabricate_a_leak() {

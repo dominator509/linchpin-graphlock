@@ -19,4 +19,5 @@ python3 scripts/ship-gate.py --check
 python3 scripts/build-applicability.py --check
 python3 scripts/generate-sbom.py --check
 python3 scripts/change-invalidation.py --check
+python3 scripts/bind-requirements.py --check
 echo "harness-validate: ok"

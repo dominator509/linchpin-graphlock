@@ -94,6 +94,7 @@ mod builder_tests {
         assert_eq!(pdf.format, "MANIFEST");
     }
 
+    /// covers: REQ-PAT-002
     /// AG-005 regression: the builder must not label a plain string as a
     /// rendered DOCX/PDF. It emits a MANIFEST and never claims a document
     /// format it cannot produce (REQ-PAT-002 is INCOMPLETE on real rendering).
@@ -110,6 +111,7 @@ mod builder_tests {
         );
     }
 
+    /// covers: REQ-PAT-002
     /// The manifest digest must be a genuine function of the inputs: changing
     /// either input must change the digest.
     #[test]
@@ -126,6 +128,7 @@ mod builder_tests {
         assert_eq!(base.content, repeat.content, "digest is not deterministic");
     }
 
+    /// covers: REQ-PAT-001
     #[test]
     fn test_claim_linter() {
         assert!(PatentLinter::lint_claims("1. A device comprising").is_ok());
@@ -241,6 +244,7 @@ impl ReceiptImport {
 mod manifest_tests {
     use super::*;
 
+    /// covers: REQ-PAT-005
     #[test]
     fn test_uspto_manifest_handoff() {
         let mut manifest = UsptoManifest::new();
@@ -277,6 +281,7 @@ mod manifest_tests {
         );
     }
 
+    /// covers: REQ-PAT-005
     /// REQ-PAT-005: a filing receipt is record evidence, so malformed or
     /// partial input must fail closed rather than yield a plausible-looking
     /// application number.
@@ -296,6 +301,7 @@ mod manifest_tests {
         assert!(ReceiptImport::import("AppNumber: 12/345,678\nConfNumber: 98 76").is_err());
     }
 
+    /// covers: REQ-PAT-005
     #[test]
     fn test_receipt_import_accepts_realistic_receipt() {
         let content = "\
@@ -350,6 +356,7 @@ impl OfficeAction {
 mod action_tests {
     use super::*;
 
+    /// covers: REQ-PAT-004
     #[test]
     fn test_office_action_workspace() {
         let mut action = OfficeAction::new(ActionType::NonFinalRejection);

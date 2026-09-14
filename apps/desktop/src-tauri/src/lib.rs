@@ -250,6 +250,7 @@ pub fn run() {
 mod tests {
     use super::*;
 
+    /// covers: REQ-OPS-010
     /// The default storage root does not exist on a fresh machine, so health
     /// must report DEGRADED rather than a constant OK.
     #[test]
@@ -263,6 +264,7 @@ mod tests {
         assert!(!health.storage_ok);
     }
 
+    /// covers: REQ-OPS-010
     /// A real, writable directory must report OK.
     #[test]
     fn test_health_reports_ok_for_writable_root() {
@@ -272,6 +274,7 @@ mod tests {
         assert!(health.storage_ok);
     }
 
+    /// covers: REQ-OPS-010
     /// The reported version must come from the crate manifest, not a literal.
     #[test]
     fn test_health_version_matches_crate_version() {

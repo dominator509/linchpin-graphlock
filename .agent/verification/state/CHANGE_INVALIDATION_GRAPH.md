@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `180e06df373f26871fb2cd8e076481e558d2c77fe419dbdea6eae3ee89556010`
-- Candidate commit at generation: `7b75b65`
-- Total tracked inputs: 102
-- Previous epoch digest: `42e04ffeeb95abe41de0be1ee8e9eada8f3f968116fff77fdd32bd69ed065d54`
-- **Changed input classes since that epoch: artifact**
+- Current epoch digest: `f1aec858f6dc818f48b89303b8e63463007f7209140e2a8f9add439a1e07f4c9`
+- Candidate commit at generation: `3532660`
+- Total tracked inputs: 104
+- Previous epoch digest: `4b73125abdbeb91573ce50a5404a8cc101320596786d19af906f0765d24e35f9`
+- **Changed input classes since that epoch: rust-source, gate-script**
 
 ## Input classes and what a change invalidates
 
@@ -37,16 +37,16 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 42 file(s)
+### `gate-script` — 44 file(s)
 
 - invalidates: all stages that invoke the changed gate
 
+  - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
+  - `scripts\bind-requirements.py` `aefe9afc545f0db1…`
   - `scripts\build-accounting.py` `7eee6a642222843a…`
-  - `scripts\build-applicability.py` `6285076849d8d847…`
-  - `scripts\build-dod-status.py` `2254508440662390…`
-  - … and 37 more
+  - … and 39 more
 
 ### `js-manifest` — 7 file(s)
 
@@ -104,11 +104,11 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-009 integration/concurrency
 - invalidates: V-012 regression/mutation
 
-  - `apps\desktop\src-tauri\src\commands.rs` `9eaa42e5369c29b2…`
-  - `apps\desktop\src-tauri\src\lib.rs` `b4b05e50b426cf86…`
+  - `apps\desktop\src-tauri\src\commands.rs` `987fb103f7a69f08…`
+  - `apps\desktop\src-tauri\src\lib.rs` `a461b454630d47de…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
-  - `crates\application\src\lib.rs` `bc2ea5da83149389…`
-  - `crates\commercialization\src\lib.rs` `a8f62448b5c02a8b…`
+  - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
+  - `crates\commercialization\src\lib.rs` `59bbcf33978af42a…`
   - … and 11 more
 
 ### `test-oracle` — 3 file(s)

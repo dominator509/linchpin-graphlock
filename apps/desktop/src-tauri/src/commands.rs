@@ -1306,6 +1306,7 @@ pub fn namespace_status() -> Vec<NamespaceStatus> {
 mod tests {
     use super::*;
 
+    /// covers: REQ-DOM-001
     #[test]
     fn test_record_conception_labels_human_origin() {
         let scope = WorkspaceScope {
@@ -1321,6 +1322,7 @@ mod tests {
         assert_eq!(outcome.event.content_bytes, "a self-sealing valve".len());
     }
 
+    /// covers: REQ-DOM-002
     /// REQ-DOM-002: AI suggestions must be labelled distinctly, never as human
     /// conception.
     #[test]
@@ -1392,6 +1394,7 @@ mod tests {
         (dir, db)
     }
 
+    /// covers: REQ-DATA-001, REQ-DATA-002
     /// The durable path must genuinely commit: the event is written through
     /// `storage::Vault` and read back with a real SHA-256 content address
     /// (REQ-DATA-001, REQ-DATA-002).
@@ -1434,6 +1437,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// covers: REQ-DOM-002
     /// An AI suggestion must persist with its distinct origin label, so the
     /// conception record cannot be retroactively blurred (REQ-DOM-002).
     #[test]
@@ -1476,6 +1480,7 @@ mod tests {
         assert!(!a.as_str().is_empty());
     }
 
+    /// covers: REQ-LLM-002
     /// SPEC-003 lists 14 namespaces; the report must cover all of them and must
     /// not claim implementation that does not exist.
     #[test]
@@ -1519,6 +1524,7 @@ mod tests {
 
     // --- opportunity namespace ---------------------------------------------
 
+    /// covers: REQ-DOM-003
     #[test]
     fn test_opportunity_requires_evidence_to_be_a_finding() {
         let scope = WorkspaceScope {
@@ -1558,6 +1564,7 @@ mod tests {
 
     // --- docket namespace --------------------------------------------------
 
+    /// covers: REQ-DOM-007
     /// REQ-DOM-007: filing requires receipt evidence, and commercialization
     /// cannot precede filing. Both guards live in the domain crate.
     #[test]
@@ -1587,6 +1594,7 @@ mod tests {
 
     // --- prosecution namespace ---------------------------------------------
 
+    /// covers: REQ-PAT-004
     #[test]
     fn test_office_action_refuses_allowance_response() {
         let nonfinal =
@@ -1608,6 +1616,7 @@ mod tests {
 
     // --- commercialization namespace ---------------------------------------
 
+    /// covers: REQ-COM-001, REQ-COM-004
     /// REQ-COM-004: the package must be redacted before export. The command
     /// asserts the pre-redaction export is REFUSED, so a regression that
     /// allowed it would fail here.
@@ -1633,6 +1642,7 @@ mod tests {
 
     // --- provider namespace ------------------------------------------------
 
+    /// covers: REQ-LLM-004
     /// PF-011 is unmet, so no lane may report itself configured, and the
     /// command must not perform inference or return generated text.
     #[test]
@@ -1653,6 +1663,7 @@ mod tests {
 
     // --- provider inference (DOD-019: the production path) ------------------
 
+    /// covers: REQ-LLM-001
     /// DOD-019 / AG-001: with no model served, the real transport must fail and
     /// the command must return NO text. Returning anything here would be the
     /// fabricated-completion defect.
@@ -1680,6 +1691,7 @@ mod tests {
         assert_eq!(outcome.error_class.as_deref(), Some("UNREACHABLE"));
     }
 
+    /// covers: REQ-LLM-001, REQ-SEC-001
     /// The endpoint must be loopback-only, so invention content cannot be sent
     /// off-device (SECURITY.md).
     #[tokio::test]
@@ -1705,6 +1717,7 @@ mod tests {
 
     // --- mcp namespace -----------------------------------------------------
 
+    /// covers: REQ-MCP-001, REQ-SEC-003
     /// SPEC-005: capability grants are explicit; an ungranted capability is
     /// refused, and models cannot self-approve.
     #[test]
@@ -1723,6 +1736,7 @@ mod tests {
 
     // --- incident namespace ------------------------------------------------
 
+    /// covers: REQ-REPAIR-001
     /// AG-002 regression guard: a secret present in incident detail must not
     /// survive into an exportable capsule.
     #[test]
@@ -1748,6 +1762,7 @@ mod tests {
 
     // --- export namespace --------------------------------------------------
 
+    /// covers: REQ-DOM-008
     /// The export gateway must refuse an escaping path (AG-003) as well as
     /// Restricted content.
     #[test]
@@ -1770,6 +1785,7 @@ mod tests {
 
     // --- patent namespace --------------------------------------------------
 
+    /// covers: REQ-PAT-001
     #[test]
     fn test_lint_claims_uses_the_real_linter() {
         let good = lint_claims("1. A device comprising a valve");
@@ -1788,6 +1804,7 @@ mod tests {
         assert!(!lint_claims("   ").ok, "empty claims must be rejected");
     }
 
+    /// covers: REQ-PAT-002
     #[test]
     fn test_build_filing_package_does_not_claim_a_document_format() {
         let result = build_filing_package("1. A method", "The specification");
@@ -1804,6 +1821,7 @@ mod tests {
 
     // --- filing namespace --------------------------------------------------
 
+    /// covers: REQ-PAT-005
     /// REQ-PAT-005: the receipt import must parse real values, and the AG-004
     /// regression (hardcoded application number) must stay fixed.
     #[test]
@@ -1821,6 +1839,7 @@ mod tests {
         );
     }
 
+    /// covers: REQ-PAT-005
     #[test]
     fn test_import_receipt_fails_closed_on_bad_input() {
         assert!(!import_receipt("   ").ok);
@@ -1830,6 +1849,7 @@ mod tests {
         assert!(!import_receipt("AppNumber: ABC\nConfNumber: 4321").ok);
     }
 
+    /// covers: REQ-PAT-005, REQ-REL-003
     /// The handoff check must report prerequisites and must never imply that
     /// LINCHPIN will submit on the user's behalf.
     #[test]
@@ -1857,6 +1877,7 @@ mod tests {
 
     // --- research namespace ------------------------------------------------
 
+    /// covers: REQ-RES-001
     /// The lifecycle is driven by the real `research` state machine, so an
     /// illegal transition must be refused (REQ-RES-002).
     #[test]
@@ -1870,6 +1891,7 @@ mod tests {
         assert_eq!(r.value.unwrap().status, "Killed");
     }
 
+    /// covers: REQ-RES-001
     /// A task cannot be killed before it starts; the guard lives in the domain
     /// crate, so the command must surface it as a POLICY failure.
     #[test]
@@ -1886,6 +1908,7 @@ mod tests {
         assert!(!r2.ok, "a completed task must not restart");
     }
 
+    /// covers: REQ-RES-001
     #[test]
     fn test_research_citation_accumulates_and_is_refused_when_finished() {
         let r = apply_research_action(
@@ -1932,6 +1955,7 @@ mod tests {
 
     // --- evidence / Disclosure Firewall ------------------------------------
 
+    /// covers: REQ-DOM-008
     /// REQ-DOM-008 / REQ-COM-004: Restricted content must never be approvable
     /// for public export, and the decision must come from the real firewall.
     #[test]
@@ -1969,6 +1993,7 @@ mod tests {
         assert!(!evaluate_export(&scope, "x", "Secret").ok);
     }
 
+    /// covers: REQ-OPS-001
     #[test]
     fn test_error_serializes_with_spec_006_class() {
         let err = CommandError::validation("bad input");
@@ -1977,6 +2002,7 @@ mod tests {
         assert_eq!(err.safe_message(), "bad input");
     }
 
+    /// covers: REQ-LLM-003
     #[test]
     fn test_command_result_serializes_envelope() {
         let result = record_conception(

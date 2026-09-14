@@ -88,6 +88,7 @@ impl McpServer {
 mod mcp_tests {
     use super::*;
 
+    /// covers: REQ-MCP-001
     #[test]
     fn test_mcp_grants_and_boundaries() {
         let mut server = McpServer::new();
@@ -108,6 +109,7 @@ mod mcp_tests {
         );
     }
 
+    /// covers: REQ-LLM-001
     /// AG-008 regression: the filter must catch the case and whitespace
     /// variants that the old single uppercase literal missed. This test FAILED
     /// before the fix, with "injection variant was accepted:
@@ -131,6 +133,7 @@ mod mcp_tests {
         }
     }
 
+    /// covers: REQ-LLM-001
     /// The filter must not reject ordinary text, including text that mentions
     /// instructions benignly. A security filter that blocks everything is a
     /// denial of service, not a control.
@@ -152,6 +155,7 @@ mod mcp_tests {
         }
     }
 
+    /// covers: REQ-MCP-001
     /// Granting the same capability twice must not duplicate it.
     #[test]
     fn test_grant_capability_is_idempotent() {
@@ -168,6 +172,7 @@ mod mcp_tests {
         assert_eq!(grant.capabilities.len(), 1, "capability was duplicated");
     }
 
+    /// covers: REQ-MCP-001, REQ-SEC-003
     /// An unknown client must never be granted anything.
     #[test]
     fn test_unknown_client_has_no_capabilities() {

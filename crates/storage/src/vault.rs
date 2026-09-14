@@ -501,6 +501,7 @@ mod tests {
         (dir, vault)
     }
 
+    /// covers: REQ-RES-002
     #[test]
     fn test_migrations_are_recorded_and_idempotent() {
         let (dir, vault) = temp_vault("mig");
@@ -521,6 +522,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// covers: REQ-DATA-001, REQ-DOM-001
     #[test]
     fn test_conception_event_survives_reopen() {
         let (dir, vault) = temp_vault("persist");
@@ -545,6 +547,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// covers: REQ-DATA-001, REQ-SEC-001
     /// REQ-DATA-001: workspace_id is required on every workspace-owned row, so
     /// an unknown workspace must be refused rather than silently created.
     #[test]
@@ -563,6 +566,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// covers: REQ-DATA-001, REQ-SEC-001
     #[test]
     fn test_events_are_workspace_scoped() {
         let (dir, vault) = temp_vault("scope");
@@ -585,6 +589,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// covers: REQ-DATA-002
     /// REQ-DATA-002: blobs are content-addressed, so identical bytes collapse to
     /// one row and different bytes get different addresses.
     #[test]
@@ -606,6 +611,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// covers: REQ-DATA-002
     /// REQ-DATA-002: the audit log is an append-only hash chain, and the
     /// verifier must detect tampering.
     #[test]
@@ -652,6 +658,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// covers: REQ-DATA-002
     #[test]
     fn test_sha256_known_vector() {
         // NIST/FIPS test vector: SHA-256("abc").

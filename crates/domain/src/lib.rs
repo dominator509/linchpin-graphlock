@@ -57,6 +57,7 @@ impl DomainEntity {
 mod tests {
     use super::*;
 
+    /// covers: REQ-DOM-001
     #[test]
     fn test_domain_entity_lifecycle() {
         let mut entity = DomainEntity::new();
@@ -109,6 +110,7 @@ impl ContentBlock {
 mod origin_tests {
     use super::*;
 
+    /// covers: REQ-DOM-001, REQ-DOM-002
     #[test]
     fn test_human_vs_ai_origin() {
         let human_id = Uuid::new_v4();
@@ -169,6 +171,7 @@ impl OpportunityCandidate {
 mod opportunity_tests {
     use super::*;
 
+    /// covers: REQ-DOM-003
     #[test]
     fn test_opportunity_candidate() {
         let scores = ScoreVector {
@@ -291,6 +294,7 @@ impl ClaimGraph {
 mod claim_tests {
     use super::*;
 
+    /// covers: REQ-DOM-004
     #[test]
     fn test_claim_graph_and_design_around() {
         let mut graph = ClaimGraph::new();
@@ -364,6 +368,7 @@ impl DocketRecord {
 mod docket_tests {
     use super::*;
 
+    /// covers: REQ-DOM-007
     #[test]
     fn test_docket_state_machine() {
         let mut docket = DocketRecord::new("Novel Algorithm".to_string());

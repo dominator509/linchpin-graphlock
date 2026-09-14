@@ -97,6 +97,7 @@ impl KeyringStore for MemoryKeyring {
 mod tests {
     use super::*;
 
+    /// covers: REQ-PLAT-001
     #[test]
     fn test_app_paths() {
         let paths = get_app_paths();
@@ -115,6 +116,7 @@ mod tests {
         assert_eq!(keyring.get_secret("nonexistent").unwrap(), None);
     }
 
+    /// covers: REQ-PLAT-003
     /// AG-007b: the soak harness needs a real measurement, so prove this one
     /// actually reads the process working set rather than returning a constant.
     #[cfg(windows)]

@@ -70,6 +70,7 @@ impl DataRoom {
 mod commercialization_tests {
     use super::*;
 
+    /// covers: REQ-COM-001, REQ-COM-004
     #[test]
     fn test_data_room_workflow() {
         let mut room = DataRoom::new();
@@ -205,6 +206,7 @@ mod live_fire_tests {
         assert!(orchestrator.domain_regression_passed);
     }
 
+    /// covers: REQ-SHIP-001
     /// AG-006a regression: the counter must not reach 12 without 12 real runs.
     #[test]
     fn test_completed_runs_cannot_be_fabricated() {
@@ -222,6 +224,7 @@ mod live_fire_tests {
         assert_eq!(orchestrator.missing_outcomes().len(), 11);
     }
 
+    /// covers: REQ-SHIP-001
     /// Failing runs must not count toward completion.
     #[test]
     fn test_failing_runs_do_not_count_as_completed() {
@@ -234,6 +237,7 @@ mod live_fire_tests {
         assert!(!orchestrator.domain_regression_passed);
     }
 
+    /// covers: REQ-SHIP-001
     /// Duplicate passes for the same outcome count once.
     #[test]
     fn test_duplicate_runs_count_once() {
