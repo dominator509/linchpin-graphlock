@@ -1,12 +1,12 @@
 {
-  "candidate_commit": "4bce97c",
+  "candidate_commit": "2a95872",
   "classes": {
     "artifact": {
       "count": 3,
       "files": {
         "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi": "64095bd533482658052a1ddf5138cb51c33036ce7fdfe30fb0d52edf26b474cd",
         "target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe": "6033fc60269766594e028072ff0ccde806799a11f581e1151a53fede3a504262",
-        "target\\release\\linchpin-desktop.exe": "159e4ec82b75e989b01540b47b788fbd0af376fc2ebc0f3ab55e402c1b16428c"
+        "target\\release\\linchpin-desktop.exe": "2b0e4dbf55934178963dfad9217bf25d7be3f5e25d7b56b0c0b52b6442cc1072"
       },
       "rules": [
         "V-020 exact artifact",
@@ -28,10 +28,12 @@
       ]
     },
     "gate-script": {
-      "count": 48,
+      "count": 50,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
+        "scripts\\artifact-e2e-probe.py": "c5efface3e6ff428da8d141d4d3b5b2fc0daf5b0742d340d77c086902f7b6a75",
+        "scripts\\artifact-e2e.sh": "ae37a9b0821333d0cbf89a7999bb858b09ce17f82a0d9fded64d628ccc70d82b",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\bind-requirements.py": "aefe9afc545f0db1d0f61767c9125d90788771c67094e98cb8c5b95dc253402d",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
@@ -196,6 +198,6 @@
       ]
     }
   },
-  "epoch_digest": "75a981a292d807bab56ff8c24e5b4a5d14eeca8080b1a4452a5a16baaae85916",
-  "total_inputs": 108
+  "epoch_digest": "e4879ffa0c1ecf0ab73ef7b819df56d996ac0c487108c24cd1181039ac05b654",
+  "total_inputs": 110
 }

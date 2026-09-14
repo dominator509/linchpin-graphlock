@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `75a981a292d807bab56ff8c24e5b4a5d14eeca8080b1a4452a5a16baaae85916`
-- Candidate commit at generation: `4bce97c`
-- Total tracked inputs: 108
-- Previous epoch digest: `f2b3206f0780c76fbc80e6947c64826a6a636b06dde9ef78b7ee31f3575ccac9`
-- **Changed input classes since that epoch: rust-source, gate-script, test-oracle**
+- Current epoch digest: `e4879ffa0c1ecf0ab73ef7b819df56d996ac0c487108c24cd1181039ac05b654`
+- Candidate commit at generation: `2a95872`
+- Total tracked inputs: 110
+- Previous epoch digest: `75a981a292d807bab56ff8c24e5b4a5d14eeca8080b1a4452a5a16baaae85916`
+- **Changed input classes since that epoch: gate-script, artifact**
 
 ## Input classes and what a change invalidates
 
@@ -24,7 +24,7 @@ definition and its PASS status is revoked until rerun.
 
   - `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `64095bd533482658…`
   - `target\release\bundle\nsis\LINCHPIN_0.1.0_x64-setup.exe` `6033fc6026976659…`
-  - `target\release\linchpin-desktop.exe` `159e4ec82b75e989…`
+  - `target\release\linchpin-desktop.exe` `2b0e4dbf55934178…`
 
 ### `config` — 5 file(s)
 
@@ -37,16 +37,16 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 48 file(s)
+### `gate-script` — 50 file(s)
 
 - invalidates: all stages that invoke the changed gate
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
+  - `scripts\artifact-e2e-probe.py` `c5efface3e6ff428…`
+  - `scripts\artifact-e2e.sh` `ae37a9b0821333d0…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
-  - `scripts\bind-requirements.py` `aefe9afc545f0db1…`
-  - `scripts\build-accounting.py` `7eee6a642222843a…`
-  - … and 43 more
+  - … and 45 more
 
 ### `js-manifest` — 7 file(s)
 
