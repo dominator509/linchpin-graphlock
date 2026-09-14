@@ -20,8 +20,14 @@
     {
       "test_id": "SUP-003",
       "status": "PARTIAL",
-      "evidence_path": ".agent/evidence/EP-009/M1/STATUS.md",
-      "reason": "EXECUTED for the built formats. MSI and NSIS both produced (exit 0), digests pinned, product identity independently read back via the Windows Installer COM API (ProductName=LINCHPIN, ProductVersion=0.1.0, valid GUIDs), magic bytes confirmed (MSI D0CF11E0 OLE, exes MZ/PE). NOT PASS: artifacts are unsigned (PF-015, no signing identity), there is no SBOM/notices/provenance artifact, no prohibited-content scan has been run over installer contents, and no install/uninstall exercise has been performed."
+      "evidence_path": ".agent/evidence/EP-009/M3/STATUS.md",
+      "reason": "EXECUTED. MSI silently installed (msiexec exit 0), files present in C:\\Program Files\\LINCHPIN, Add/Remove Programs entry correct (LINCHPIN 0.1.0, publisher linchpin), installed binary launched to a responsive window 'LINCHPIN Patent Intelligence OS', then silently uninstalled with clean removal (install dir gone, registry entry gone). Artifact sha256 2521FE6151671424E77A1D6F9988BBCD5A73DE97E0DD01727C3D08D09835B7A3. NOT PASS: artifacts unsigned (PF-015), no SBOM/notices/provenance shipped, no clean-room target (PF-016), no golden-path UI interaction, Windows 11 untested."
+    },
+    {
+      "test_id": "E2E-011",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/EP-009/M3/STATUS.md",
+      "reason": "EXECUTED in part. The exact installer artifact was installed, launched and uninstalled with independently verified pre/post state. NOT PASS: this is not a virgin clean room. The host carries the full Rust/Node/WebView2 toolchain, so hidden prerequisite dependencies cannot be excluded. DOD-034 requires a zero-state machine or VM, which does not exist (PF-016 unmet)."
     }
   ]
 }
