@@ -263,6 +263,13 @@ impl LogRedactor {
     }
 
     /// Number of registered secrets.
+    ///
+    /// Reachability analysis (DOD-019) flagged this as the one public function
+    /// in the workspace not named from any reachable or test file. Rather than
+    /// delete it, it now backs [`Self::redact_with_report`], which the incident
+    /// path uses: a redactor must be able to state *how many* placeholders it
+    /// inserted, because an operator auditing a capsule needs to know redaction
+    /// actually fired rather than silently no-op'ing.
     pub fn secret_count(&self) -> usize {
         self.secrets.len()
     }
@@ -273,6 +280,41 @@ impl LogRedactor {
             redacted = redacted.replace(secret.as_str(), "[REDACTED]");
         }
         redact_token_like(&redacted)
+    }
+
+    /// Redact and report how many substitutions were made.
+    ///
+    /// `REQ-REPAIR-001` requires that capsule export "logs redaction
+    /// counts/hashes". Returning the count lets a caller record that redaction
+    /// genuinely ran, instead of trusting that it did.
+    pub fn redact_with_report(&self, log_message: &str) -> RedactionReport {
+        let after = self.redact(log_message);
+        RedactionReport {
+            registered_secrets: self.secret_count(),
+            placeholders_inserted: after.matches("[REDACTED]").count(),
+            removed_bytes: log_message.len().saturating_sub(after.len()),
+            redacted: after,
+        }
+    }
+}
+
+/// Outcome of a redaction pass.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RedactionReport {
+    /// Registered literals available to the redactor.
+    pub registered_secrets: usize,
+    /// `[REDACTED]` markers present in the output.
+    pub placeholders_inserted: usize,
+    /// Bytes removed from the original message.
+    pub removed_bytes: usize,
+    /// The redacted message.
+    pub redacted: String,
+}
+
+impl RedactionReport {
+    /// True when the message changed, i.e. redaction actually did something.
+    pub fn changed(&self) -> bool {
+        self.removed_bytes > 0 || self.placeholders_inserted > 0
     }
 }
 
@@ -351,6 +393,33 @@ mod redaction_tests {
         let clean = redactor.redact("user hunter2 logged in from 10.0.0.1");
         assert_eq!(clean, "user [REDACTED] logged in from 10.0.0.1");
         assert_eq!(redactor.redact(&clean), clean, "not idempotent");
+    }
+
+    /// /// covers: REQ-REPAIR-002
+    ///
+    /// An operator auditing a capsule must be able to tell that redaction
+    /// actually fired. A report whose counts are zero on a message that DID
+    /// contain a secret would be a silent no-op.
+    #[test]
+    fn test_redaction_report_evidences_the_pass() {
+        let mut redactor = LogRedactor::new();
+        redactor.register_secret("sk-live-0123456789abcdef".to_string());
+        assert_eq!(redactor.secret_count(), 1);
+
+        let report =
+            redactor.redact_with_report("auth failed for sk-live-0123456789abcdef at endpoint X");
+        assert_eq!(report.registered_secrets, 1);
+        assert!(report.changed(), "report claims nothing changed");
+        assert!(report.placeholders_inserted >= 1);
+        assert!(report.removed_bytes > 0);
+        assert!(!report.redacted.contains("sk-live-0123456789abcdef"));
+
+        // A message with no secret must report no change rather than a
+        // fabricated one.
+        let clean = redactor.redact_with_report("ordinary log line");
+        assert!(!clean.changed());
+        assert_eq!(clean.placeholders_inserted, 0);
+        assert_eq!(clean.removed_bytes, 0);
     }
 }
 
