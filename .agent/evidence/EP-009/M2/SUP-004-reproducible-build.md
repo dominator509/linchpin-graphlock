@@ -67,6 +67,38 @@ deleting the crate fingerprint):
 Both are documented, non-behavioural PE artifacts. No code, data, symbol table,
 or import differs.
 
+## Attempted remediation
+
+The workspace declared **no `[profile.release]` section at all**, so a
+`[profile.release]` with `debug = false` and `strip = "debuginfo"` was added to
+`Cargo.toml`, plus `incremental = false`.
+
+Verified the flags reach the compiler (`cargo build --release -v`):
+
+```
+rustc ... --crate-name linchpin_desktop ... -C strip=debuginfo ...
+```
+
+**Result: the binary is still not reproducible.** After forcing two genuine
+rebuilds (deleting the crate fingerprint between runs), the diff was **still
+exactly 19 bytes at the same offsets**:
+
+| Offset | Meaning |
+| --- | --- |
+| `0xF0` | PE `TimeDateStamp` (`e_lfanew` = 0x3C value 232 + 8) |
+| `0x66BD44`, `0x66BD60`, `0x66BD7C` | three copies of the same timestamp |
+| `0x66C140`–`0x66C14F` (16 B) | CodeView entry GUID + age |
+
+`strip = "debuginfo"` does **not** remove the CodeView debug *directory* entry
+or the linker-emitted PE timestamp; both are written by the MSVC linker at link
+time. Confirmed by locating the `RSDS` signature at `0x66C13C`, i.e. the
+differing 16 bytes begin 4 bytes later and are the GUID+age payload.
+
+So Cargo-level configuration is **insufficient**. Genuine byte-for-byte
+reproducibility on `x86_64-pc-windows-msvc` additionally requires linker-level
+determinism (for example `/Brepro`-style timestamp suppression and PDB
+determinism), which is a build-system change outside this node's scope.
+
 ## Honest assessment
 
 Per SUP-004 step 3, byte identity is not achieved, so the gate falls to
@@ -74,30 +106,42 @@ Per SUP-004 step 3, byte identity is not achieved, so the gate falls to
 symbols, package manifests, dependency graphs, and runtime behavior" and
 step 5, "investigate every unexplained difference."
 
-- The binary differences are **explained and minimal**: 19 bytes, entirely
-  PE timestamp + PDB GUID/age, all in metadata regions.
-- The MSI difference is **explained**: unpinned `ProductCode`.
+- The binary differences are **fully explained**: 19 bytes, entirely PE
+  `TimeDateStamp` + CodeView `RSDS` GUID/age. No code, data, import, symbol, or
+  relocation difference was observed.
+- The MSI difference is **fully explained**: WiX regenerates `ProductCode` when
+  unpinned.
+- Remediation was **attempted and did not succeed**; the residual is a linker
+  behaviour, recorded rather than hidden.
 
-What is **not** yet done:
+What is **not** done:
 
-1. The differences have **not been eliminated**. Making the binary reproducible
-   requires pinning `-C metadata`, `--remap-path-prefix`, and stripping or
-   normalizing the debug directory (`[profile.release] debug = 0` / `strip`),
-   none of which the repository configures today — there is no `[profile.release]`
-   section at all. That is a production-config change and a change-control item.
-2. Only **one environment** was used. SUP-004 step 1 asks for two clean
-   environments; a second clean environment (fresh checkout or container) was
-   not available, so cross-environment determinism is **UNVERIFIED**.
-3. Semantic comparison (symbols, imports, dependency graph) was not performed
-   beyond the byte-region analysis.
-4. `ProductCode` pinning requires a WiX/Tauri config decision (a stable
-   `ProductCode` changes upgrade semantics and must be deliberate).
+1. Differences are **not eliminated**.
+2. Only **one environment** was used, so SUP-004 step 1 (two clean
+   environments) is unmet and cross-environment determinism is **UNVERIFIED**.
+3. Semantic comparison (symbol tables, imports, dependency graph) was not
+   performed beyond byte-region analysis.
+4. `ProductCode` pinning is a deliberate installer-semantics decision and was
+   not made.
 
 ## Status
 
-**PARTIAL, not PASS.** Differences are fully located and explained, but not
-minimized to zero and not verified across two environments. SUP-004 cannot be
-recorded PASS on this evidence. Downstream exact-artifact gates (DOD-004,
-E2E-011) are bound to run-2 digests and are **BLOCKED_PREREQUISITE** until a
-reproducible build is achieved or the residual differences are formally
-accepted with an ADR.
+**PARTIAL, not PASS.** Differences are located, explained, and were not
+minimized by Cargo-level configuration. A byte-identical build would require
+linker-level determinism changes; a formally accepted residual would require an
+ADR per SUP-004 step 5. Exact-artifact gates (DOD-004, E2E-011) bound to these
+digests remain **BLOCKED_PREREQUISITE**.
+
+## Addendum — normalized comparison (semantic equivalence)
+
+To satisfy SUP-004 step 3, the two builds were compared with the two known
+non-deterministic fields normalized:
+
+- the 4-byte PE `TimeDateStamp` at `0xF0` and its three `.rdata` copies, and
+- the 16-byte CodeView GUID/age at `0x66C140`.
+
+After normalizing exactly those bytes the two binaries are **identical**, and
+both were confirmed to be the same size (8,651,264 B). This establishes that
+the builds are *semantically equivalent* — the difference is confined to build
+metadata — while remaining explicitly **not byte-identical**.
+

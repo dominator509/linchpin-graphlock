@@ -1,0 +1,28 @@
+SUP-004 normalized semantic comparison -- raw evidence
+Candidate: working tree after Cargo.toml [profile.release] addition
+Toolchain: rustc 1.98.0 / cargo 1.98.0, x86_64-pc-windows-msvc
+
+Builds compared (both forced full rebuilds, fingerprint deleted between runs):
+  G1 sha256 034E72C7EF6E10F5774CEA8D9CB5A1DEE27925E675F4609B48F5A182C5E845EF size 8651264
+  G2 sha256 F0488843703A42EDC2F2B5DDA3A48708074B0F4F1D9221BD6CB9B5FB107EFFD1 size 8651264
+
+Raw byte diff: 19 bytes differing, at offsets:
+  0xF0        PE TimeDateStamp
+  0x66BD44    .rdata timestamp copy
+  0x66BD60    .rdata timestamp copy
+  0x66BD7C    .rdata timestamp copy
+  0x66C140-0x66C14F  CodeView RSDS GUID + age (RSDS signature located at 0x66C13C)
+
+Normalization applied: zeroed the 5 documented metadata ranges
+  (240,4) (6733124,4) (6733152,4) (6733180,4) (6734140,20)
+
+Post-normalization differing bytes: 0
+RESULT: IDENTICAL -- all differences confined to documented build metadata
+
+Rustc flags confirmed applied (cargo build --release -v):
+  -C strip=debuginfo   (present on all linchpin_desktop* rustc invocations)
+strip=debuginfo does NOT remove the CodeView debug directory entry or the
+linker-emitted PE timestamp; both are written by the MSVC linker.
+
+CONCLUSION: builds are semantically equivalent and metadata-nondeterministic.
+NOT byte-identical. SUP-004 = PARTIAL.

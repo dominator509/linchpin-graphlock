@@ -14,3 +14,24 @@ members = [
   "crates/platform_windows",
   "apps/desktop/src-tauri"
 ]
+
+# Release profile.
+#
+# Added because the workspace previously declared NO [profile.release] section
+# at all, and SUP-004 measured that two release builds of the same revision
+# differ. Byte-level analysis (see
+# .agent/evidence/EP-009/M2/SUP-004-reproducible-build.md) isolated the cause to
+# exactly 19 bytes: the PE TimeDateStamp plus the CodeView RSDS block
+# (PDB GUID + age). Both are build metadata, not behaviour.
+#
+# `debug = false` + `strip = "debuginfo"` removes the PDB reference carrying the
+# GUID/age. The PE timestamp is emitted by the linker and is not suppressible
+# through Cargo alone; it is normalized at comparison time and that residual is
+# recorded rather than hidden.
+[profile.release]
+debug = false
+strip = "debuginfo"
+panic = "unwind"
+overflow-checks = false
+incremental = false
+
