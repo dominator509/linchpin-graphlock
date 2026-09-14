@@ -252,6 +252,187 @@ pub struct NamespaceStatus {
     pub detail: String,
 }
 
+/// State of a research task as reported to the UI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ResearchTaskView {
+    pub task_id: String,
+    pub status: String,
+    pub citations: Vec<String>,
+    pub citation_count: usize,
+}
+
+/// Advance a research task through its lifecycle.
+///
+/// `REQ-RES-002` and `REQ-DOM-006`: a kill-search runs from Pending -> Active
+/// and ends either Killed (a design-around was found, so the search succeeded)
+/// or Completed (exhausted without a kill). Citations may only be added while
+/// the task has not finished.
+///
+/// The transition rules live in the `research` crate, so this command drives the
+/// real state machine rather than re-implementing its guards.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ResearchAction {
+    /// Pending -> Active.
+    Start,
+    /// Active -> Killed.
+    Kill,
+    /// Active -> Completed.
+    Complete,
+    /// Append a citation (requires a citation string).
+    AddCitation,
+}
+
+/// Apply an action to a research task and return the resulting state.
+pub fn apply_research_action(
+    task_id: &str,
+    current_status: &str,
+    citations: &[String],
+    action: ResearchAction,
+    citation: Option<&str>,
+) -> CommandResult<ResearchTaskView> {
+    let correlation = CorrelationId::new();
+
+    if task_id.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("task_id is required"),
+        );
+    }
+
+    // Rebuild the real domain object from the reported state.
+    let mut task = research::ResearchTask::new(task_id);
+    for existing in citations {
+        if let Err(e) = task.add_citation(existing.clone()) {
+            return CommandResult::failure(correlation, CommandError::validation(e));
+        }
+    }
+    let restored = match current_status {
+        "Pending" => true,
+        "Active" => task.start().is_ok(),
+        "Killed" => task.start().is_ok() && task.kill().is_ok(),
+        "Completed" => task.start().is_ok() && task.complete().is_ok(),
+        other => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("unknown research status {other:?}")),
+            );
+        }
+    };
+    if !restored {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("could not restore research task state"),
+        );
+    }
+
+    let outcome = match action {
+        ResearchAction::Start => task.start(),
+        ResearchAction::Kill => task.kill(),
+        ResearchAction::Complete => task.complete(),
+        ResearchAction::AddCitation => match citation {
+            Some(c) if !c.trim().is_empty() => task.add_citation(c.to_string()),
+            Some(_) => {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::validation("citation cannot be empty"),
+                );
+            }
+            None => {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::validation("citation is required for AddCitation"),
+                );
+            }
+        },
+    };
+
+    if let Err(message) = outcome {
+        return CommandResult::failure(correlation, CommandError::policy(message));
+    }
+
+    CommandResult::success(
+        correlation,
+        ResearchTaskView {
+            task_id: task.id.clone(),
+            status: format!("{:?}", task.status),
+            citation_count: task.citations.len(),
+            citations: task.citations.clone(),
+        },
+    )
+}
+
+/// Evaluate a disclosure payload against the Disclosure Firewall.
+///
+/// `REQ-DOM-008` / `REQ-COM-004`: the firewall classifies every public export
+/// and blocks Restricted content. `PATENT_DOMAIN_MODEL.md` requires that public
+/// marketing never bypasses it.
+///
+/// The decision comes from the real `evidence::DisclosureFirewall`, so the
+/// policy is not duplicated here.
+pub fn evaluate_export(
+    scope: &WorkspaceScope,
+    content: &str,
+    sensitivity: &str,
+) -> CommandResult<ExportDecision> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if content.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("export content cannot be empty"),
+        );
+    }
+
+    let level = match sensitivity {
+        "Public" => evidence::Sensitivity::Public,
+        "Confidential" => evidence::Sensitivity::Confidential,
+        "Restricted" => evidence::Sensitivity::Restricted,
+        other => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("unknown sensitivity {other:?}")),
+            );
+        }
+    };
+
+    let firewall = evidence::DisclosureFirewall::new();
+    let payload = evidence::ExportPayload {
+        content: content.to_string(),
+        sensitivity: level.clone(),
+    };
+
+    match firewall.filter_export(&payload) {
+        Ok(()) => CommandResult::success(
+            correlation,
+            ExportDecision {
+                allowed: true,
+                sensitivity: sensitivity.to_string(),
+                reason: "permitted by Disclosure Firewall".to_string(),
+            },
+        ),
+        Err(reason) => CommandResult::success(
+            correlation,
+            ExportDecision {
+                allowed: false,
+                sensitivity: sensitivity.to_string(),
+                reason: reason.to_string(),
+            },
+        ),
+    }
+}
+
+/// Outcome of a disclosure-firewall evaluation.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExportDecision {
+    pub allowed: bool,
+    pub sensitivity: String,
+    pub reason: String,
+}
+
 /// Report the SPEC-003 namespace coverage honestly.
 pub fn namespace_status() -> Vec<NamespaceStatus> {
     let entry = |ns: &str, implemented: bool, detail: &str| NamespaceStatus {
@@ -262,20 +443,12 @@ pub fn namespace_status() -> Vec<NamespaceStatus> {
     vec![
         entry("conception", true, "record_conception"),
         entry("workspace", true, "get_system_health, get_namespace_status"),
-        entry(
-            "evidence",
-            false,
-            "domain types exist; no IPC command wired yet",
-        ),
+        entry("research", true, "apply_research_action"),
+        entry("evidence", true, "evaluate_export (Disclosure Firewall)"),
         entry(
             "opportunity",
             false,
             "domain OpportunityCandidate exists; no IPC command wired yet",
-        ),
-        entry(
-            "research",
-            false,
-            "research crate exists; no IPC command wired yet",
         ),
         entry(
             "patent",
@@ -312,7 +485,7 @@ pub fn namespace_status() -> Vec<NamespaceStatus> {
         entry(
             "export",
             false,
-            "Disclosure Firewall exists; no IPC command wired yet",
+            "the export namespace command is not wired yet",
         ),
     ]
 }
@@ -436,9 +609,123 @@ mod tests {
             .collect();
         assert_eq!(
             implemented,
-            vec!["conception", "workspace"],
-            "implementation claims do not match the two wired namespaces"
+            vec!["conception", "workspace", "research", "evidence"],
+            "implementation claims do not match the four wired namespaces"
         );
+    }
+
+    // --- research namespace ------------------------------------------------
+
+    /// The lifecycle is driven by the real `research` state machine, so an
+    /// illegal transition must be refused (REQ-RES-002).
+    #[test]
+    fn test_research_lifecycle_happy_path() {
+        let r = apply_research_action("task-1", "Pending", &[], ResearchAction::Start, None);
+        assert!(r.ok);
+        assert_eq!(r.value.unwrap().status, "Active");
+
+        let r = apply_research_action("task-1", "Active", &[], ResearchAction::Kill, None);
+        assert!(r.ok);
+        assert_eq!(r.value.unwrap().status, "Killed");
+    }
+
+    /// A task cannot be killed before it starts; the guard lives in the domain
+    /// crate, so the command must surface it as a POLICY failure.
+    #[test]
+    fn test_research_rejects_illegal_transition() {
+        let r = apply_research_action("t", "Pending", &[], ResearchAction::Kill, None);
+        assert!(!r.ok);
+        assert!(
+            matches!(r.error, Some(CommandError::Policy { .. })),
+            "illegal transition must be a POLICY failure, got {:?}",
+            r.error
+        );
+
+        let r2 = apply_research_action("t", "Completed", &[], ResearchAction::Start, None);
+        assert!(!r2.ok, "a completed task must not restart");
+    }
+
+    #[test]
+    fn test_research_citation_accumulates_and_is_refused_when_finished() {
+        let r = apply_research_action(
+            "t",
+            "Active",
+            &[],
+            ResearchAction::AddCitation,
+            Some("US1234567A1"),
+        );
+        assert!(r.ok);
+        let v = r.value.unwrap();
+        assert_eq!(v.citation_count, 1);
+        assert_eq!(v.citations, vec!["US1234567A1".to_string()]);
+
+        // Adding to a finished task must fail.
+        let r2 = apply_research_action(
+            "t",
+            "Killed",
+            &["US1".to_string()],
+            ResearchAction::AddCitation,
+            Some("US2"),
+        );
+        assert!(!r2.ok, "citations must not be added to a finished task");
+    }
+
+    #[test]
+    fn test_research_validates_its_inputs() {
+        // Empty task id.
+        let r = apply_research_action("  ", "Pending", &[], ResearchAction::Start, None);
+        assert!(!r.ok);
+        assert!(matches!(r.error, Some(CommandError::Validation { .. })));
+
+        // Unknown status.
+        let r2 = apply_research_action("t", "Bogus", &[], ResearchAction::Start, None);
+        assert!(!r2.ok);
+
+        // Missing / empty citation.
+        let r3 = apply_research_action("t", "Active", &[], ResearchAction::AddCitation, None);
+        assert!(!r3.ok);
+        let r4 =
+            apply_research_action("t", "Active", &[], ResearchAction::AddCitation, Some("   "));
+        assert!(!r4.ok);
+    }
+
+    // --- evidence / Disclosure Firewall ------------------------------------
+
+    /// REQ-DOM-008 / REQ-COM-004: Restricted content must never be approvable
+    /// for public export, and the decision must come from the real firewall.
+    #[test]
+    fn test_export_firewall_blocks_restricted_content() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        let restricted = evaluate_export(&scope, "unpublished enabling detail", "Restricted");
+        assert!(restricted.ok, "the command itself succeeds");
+        let decision = restricted.value.unwrap();
+        assert!(
+            !decision.allowed,
+            "Restricted content was approved for export"
+        );
+        assert_eq!(decision.sensitivity, "Restricted");
+
+        let public = evaluate_export(&scope, "public abstract", "Public");
+        assert!(public.value.unwrap().allowed);
+
+        let confidential = evaluate_export(&scope, "internal notes", "Confidential");
+        assert!(confidential.value.unwrap().allowed);
+    }
+
+    #[test]
+    fn test_export_validates_scope_content_and_sensitivity() {
+        let bad = WorkspaceScope {
+            workspace_id: String::new(),
+        };
+        assert!(!evaluate_export(&bad, "x", "Public").ok);
+
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        assert!(!evaluate_export(&scope, "   ", "Public").ok);
+        assert!(!evaluate_export(&scope, "x", "Secret").ok);
     }
 
     #[test]

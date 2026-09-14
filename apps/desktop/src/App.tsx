@@ -47,6 +47,19 @@ interface CommandResult<T> {
   error?: { class: string; message: string };
 }
 
+interface ExportDecision {
+  allowed: boolean;
+  sensitivity: string;
+  reason: string;
+}
+
+interface ResearchTaskView {
+  task_id: string;
+  status: string;
+  citations: string[];
+  citation_count: number;
+}
+
 /** True when running inside the Tauri shell where IPC is available. */
 export function hasIpc(): boolean {
   return (
@@ -64,6 +77,13 @@ export default function App() {
   const [authorIsHuman, setAuthorIsHuman] = useState(true);
   const [lastRecord, setLastRecord] =
     useState<CommandResult<RecordConceptionOutcome> | null>(null);
+  const [researchTaskId, setResearchTaskId] = useState("kill-search-1");
+  const [researchStatus, setResearchStatus] = useState("Pending");
+  const [researchCitations, setResearchCitations] = useState<string[]>([]);
+  const [researchError, setResearchError] = useState<string | null>(null);
+  const [exportSensitivity, setExportSensitivity] = useState("Restricted");
+  const [exportResult, setExportResult] =
+    useState<CommandResult<ExportDecision> | null>(null);
 
   useEffect(() => {
     if (!hasIpc()) {
@@ -114,6 +134,59 @@ export default function App() {
   }, [draft, authorIsHuman]);
 
   const implemented = namespaces.filter((n) => n.implemented);
+
+  const onResearchAction = useCallback(
+    async (action: "start" | "kill" | "complete") => {
+      if (!hasIpc()) {
+        setResearchError("Cannot act: desktop backend unavailable.");
+        return;
+      }
+      try {
+        const result = await invoke<CommandResult<ResearchTaskView>>(
+          "apply_research_action",
+          {
+            taskId: researchTaskId,
+            currentStatus: researchStatus,
+            citations: researchCitations,
+            action,
+            citation: null,
+          },
+        );
+        if (result.ok && result.value) {
+          setResearchStatus(result.value.status);
+          setResearchCitations(result.value.citations);
+          setResearchError(null);
+        } else {
+          setResearchError(
+            `${result.error?.class ?? "ERROR"}: ${result.error?.message ?? "unknown"}`,
+          );
+        }
+      } catch (err) {
+        setResearchError(String(err));
+      }
+    },
+    [researchTaskId, researchStatus, researchCitations],
+  );
+
+  const onEvaluateExport = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot evaluate export: desktop backend unavailable.");
+      return;
+    }
+    try {
+      const result = await invoke<CommandResult<ExportDecision>>(
+        "evaluate_export",
+        {
+          workspaceId: "local-workspace",
+          content: draft || "sample export content",
+          sensitivity: exportSensitivity,
+        },
+      );
+      setExportResult(result);
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, [draft, exportSensitivity]);
 
   return (
     <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
@@ -175,6 +248,51 @@ export default function App() {
             )}
             <p>Correlation: {lastRecord.correlation_id}</p>
           </div>
+        )}
+      </section>
+
+      <section aria-labelledby="research-heading">
+        <h2 id="research-heading">Research Kill-Search</h2>
+        <label htmlFor="research-task">Task ID</label>
+        <input
+          id="research-task"
+          value={researchTaskId}
+          onChange={(e) => setResearchTaskId(e.target.value)}
+        />
+        <p>Status: {researchStatus}</p>
+        <p>Citations: {researchCitations.length}</p>
+        {researchError && <p role="alert">{researchError}</p>}
+        <button type="button" onClick={() => void onResearchAction("start")}>
+          Start search
+        </button>
+        <button type="button" onClick={() => void onResearchAction("kill")}>
+          Record kill
+        </button>
+        <button type="button" onClick={() => void onResearchAction("complete")}>
+          Complete search
+        </button>
+      </section>
+
+      <section aria-labelledby="firewall-heading">
+        <h2 id="firewall-heading">Disclosure Firewall</h2>
+        <label htmlFor="sensitivity-select">Export sensitivity</label>
+        <select
+          id="sensitivity-select"
+          value={exportSensitivity}
+          onChange={(e) => setExportSensitivity(e.target.value)}
+        >
+          <option value="Public">Public</option>
+          <option value="Confidential">Confidential</option>
+          <option value="Restricted">Restricted</option>
+        </select>
+        <button type="button" onClick={() => void onEvaluateExport()}>
+          Evaluate export
+        </button>
+        {exportResult && exportResult.value && (
+          <p>
+            {exportResult.value.allowed ? "Allowed" : "Blocked"} (
+            {exportResult.value.sensitivity}): {exportResult.value.reason}
+          </p>
         )}
       </section>
 

@@ -134,4 +134,59 @@ test.describe("LINCHPIN desktop shell", () => {
     );
     expect(focused).toBe("textarea");
   });
+
+  test("exposes the research kill-search controls", async ({ page }) => {
+    await page.goto("/");
+
+    // REQ-RES-002: the kill-search lifecycle must be operable from the UI.
+    await expect(
+      page.getByRole("heading", { name: "Research Kill-Search" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Task ID")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Start search" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Record kill" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Complete search" }),
+    ).toBeVisible();
+  });
+
+  test("exposes the Disclosure Firewall sensitivity control", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // REQ-DOM-008 / REQ-COM-004: public export must be gated by the firewall,
+    // and the UI must let the operator set the sensitivity.
+    await expect(
+      page.getByRole("heading", { name: "Disclosure Firewall" }),
+    ).toBeVisible();
+
+    const sensitivity = page.getByLabel("Export sensitivity");
+    await expect(sensitivity).toBeVisible();
+    await expect(sensitivity.locator("option")).toHaveCount(3);
+    await expect(
+      page.getByRole("button", { name: "Evaluate export" }),
+    ).toBeVisible();
+  });
+
+  test("reports capability coverage without over-claiming", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // Outside Tauri the namespace list cannot load, so the coverage section
+    // must be absent rather than showing a fabricated "14 of 14".
+    const body = await page.locator("body").innerText();
+    expect(body).not.toContain("14 of 14");
+
+    if ((await page.getByText("Capability Coverage").count()) > 0) {
+      // If it did render, it must match the honest count reported by the
+      // backend (4 of 14 at this revision), never a full-coverage claim.
+      await expect(page.getByText("4 of 14")).toBeVisible();
+    }
+  });
 });

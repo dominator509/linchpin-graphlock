@@ -45,12 +45,43 @@ fn get_namespace_status() -> Vec<commands::NamespaceStatus> {
     commands::namespace_status()
 }
 
+/// Advance a research task (REQ-RES-002).
+#[tauri::command]
+fn apply_research_action(
+    task_id: String,
+    current_status: String,
+    citations: Vec<String>,
+    action: commands::ResearchAction,
+    citation: Option<String>,
+) -> commands::CommandResult<commands::ResearchTaskView> {
+    commands::apply_research_action(
+        &task_id,
+        &current_status,
+        &citations,
+        action,
+        citation.as_deref(),
+    )
+}
+
+/// Evaluate content against the Disclosure Firewall (REQ-DOM-008).
+#[tauri::command]
+fn evaluate_export(
+    workspace_id: String,
+    content: String,
+    sensitivity: String,
+) -> commands::CommandResult<commands::ExportDecision> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::evaluate_export(&scope, &content, &sensitivity)
+}
+
 pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             get_system_health,
             record_conception,
-            get_namespace_status
+            get_namespace_status,
+            apply_research_action,
+            evaluate_export
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
