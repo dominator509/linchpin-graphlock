@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -107,6 +108,127 @@ def split_license(expr: str | None) -> tuple[list[str], bool]:
     return ids, is_choice
 
 
+def npm_components() -> tuple[list[dict], int, int, list[str]]:
+    """Inventory the JavaScript dependency tree from the pnpm store.
+
+    DOD-003 requires the production artifact's SBOM. LINCHPIN ships a Tauri
+    desktop app whose frontend is bundled JavaScript, so a Rust-only SBOM is
+    incomplete -- the clause was previously recorded PARTIAL for exactly that.
+
+    `pnpm list` reports only DIRECT dependencies per project (measured: 15
+    components while node_modules/.pnpm holds 211 packages), so the inventory is
+    taken from the pnpm virtual store instead. Each store directory is named
+    `<name>@<version>` and contains the package's own package.json, which is the
+    authoritative source for its license.
+
+    Scoped packages encode the scope as `+` (e.g. `@types+node@24.0.0`), which is
+    decoded back to `/`.
+    """
+    store = Path("node_modules/.pnpm")
+    if not store.is_dir():
+        raise SystemExit(
+            "node_modules/.pnpm is absent; run 'pnpm install --frozen-lockfile' first"
+        )
+
+    components: list[dict] = []
+    first_party = 0
+    third_party = 0
+    unknown_license: list[str] = []
+    seen: set[tuple[str, str]] = set()
+
+    for entry in sorted(store.iterdir()):
+        if not entry.is_dir() or entry.name.startswith("."):
+            continue
+        pkg_json = entry / "node_modules"
+        if not pkg_json.is_dir():
+            continue
+        # A store entry may hold several packages (peer-dependency variants);
+        # walk one level to find the actual package directories.
+        for candidate in sorted(pkg_json.iterdir()):
+            if candidate.name.startswith("@"):
+                scoped = sorted(candidate.iterdir()) if candidate.is_dir() else []
+            else:
+                scoped = [candidate]
+            for pkg_dir in scoped:
+                meta_path = pkg_dir / "package.json"
+                if not meta_path.is_file():
+                    continue
+                try:
+                    meta = json.loads(meta_path.read_text("utf-8"))
+                except (json.JSONDecodeError, OSError):
+                    continue
+                name = meta.get("name")
+                version = meta.get("version")
+                if not name or not version:
+                    continue
+                key = (name, version)
+                if key in seen:
+                    continue
+                seen.add(key)
+
+                license_id = meta.get("license")
+                third_party += 1
+                if not license_id:
+                    unknown_license.append(f"{name}@{version}")
+
+                component = {
+                    "type": "library",
+                    "name": name,
+                    "version": version,
+                    "bom-ref": f"npm:{name}@{version}",
+                    "scope": "required",
+                    "properties": [
+                        {"name": "linchpin:ecosystem", "value": "npm"},
+                        {
+                            "name": "linchpin:first_party",
+                            "value": "false",
+                        },
+                    ],
+                }
+                if license_id:
+                    component["licenses"] = [{"license": {"id": license_id}}]
+                else:
+                    component["licenses"] = [{"license": {"name": "NOASSERTION"}}]
+                components.append(component)
+
+    # Workspace (first-party) packages come from the repository, not the store.
+    for manifest in sorted(Path(".").glob("apps/*/package.json")) + sorted(
+        Path(".").glob("packages/*/package.json")
+    ):
+        try:
+            meta = json.loads(manifest.read_text("utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        name = meta.get("name")
+        version = meta.get("version")
+        if not name or not version or (name, version) in seen:
+            continue
+        seen.add((name, version))
+        first_party += 1
+        components.append(
+            {
+                "type": "library",
+                "name": name,
+                "version": version,
+                "bom-ref": f"npm:{name}@{version}",
+                "scope": "required",
+                "properties": [
+                    {"name": "linchpin:ecosystem", "value": "npm"},
+                    {"name": "linchpin:first_party", "value": "true"},
+                ],
+                "licenses": [
+                    {
+                        "license": {
+                            "id": meta.get("license", "NOASSERTION")
+                        }
+                    }
+                ],
+            }
+        )
+
+    return components, first_party, third_party, unknown_license
+
+
 def main() -> int:
     check_only = "--check" in sys.argv
     meta = cargo_metadata()
@@ -186,6 +308,17 @@ def main() -> int:
         "sha256": sha256_file(Path("pnpm-lock.yaml")),
     }
 
+    # --- merge the JavaScript tree (DOD-003: one SBOM per artifact) --------
+    npm_comps, npm_first, npm_third, npm_unknown = npm_components()
+    npm_ids = {c["bom-ref"] for c in npm_comps}
+    cargo_ids = {c["bom-ref"] for c in components}
+    overlap = npm_ids & cargo_ids
+    if overlap:
+        # The two ecosystems are namespaced differently (cargo uses the registry
+        # id, npm uses npm:name@version), so a collision means a real bug.
+        raise SystemExit(f"component bom-ref collision between ecosystems: {overlap}")
+    components.extend(npm_comps)
+
     bom = {
         "bomFormat": "CycloneDX",
         "specVersion": "1.5",
@@ -201,6 +334,15 @@ def main() -> int:
                 {"name": "linchpin:artifact", "value": json.dumps(artifact)},
                 {"name": "linchpin:cargo_lock", "value": json.dumps(cargo_lock)},
                 {"name": "linchpin:pnpm_lock", "value": json.dumps(pnpm_lock)},
+                {
+                    "name": "linchpin:ecosystems",
+                    "value": json.dumps(
+                        {
+                            "cargo": {"components": len(cargo_ids)},
+                            "npm": {"components": len(npm_ids)},
+                        }
+                    ),
+                },
             ],
         },
         "components": components,
@@ -227,14 +369,16 @@ def main() -> int:
     lines = [
         "# Third-Party Notices",
         "",
-        "Generated by `scripts/generate-sbom.py` from `cargo metadata --locked`.",
-        "Do not hand-edit; regenerate after any dependency change.",
+        "Generated by `scripts/generate-sbom.py`. Do not hand-edit; regenerate",
+        "after any dependency change.",
         "",
         "## Inventory",
         "",
-        f"- First-party workspace packages: {first_party}",
-        f"- Third-party components: {third_party}",
-        f"- Total components: {len(components)}",
+        f"- Rust (cargo) first-party packages: {first_party}",
+        f"- Rust (cargo) third-party components: {third_party}",
+        f"- JavaScript (npm) first-party packages: {npm_first}",
+        f"- JavaScript (npm) third-party components: {npm_third}",
+        f"- Total components across both ecosystems: {len(components)}",
         "",
         "## Artifact identity",
         "",
@@ -242,7 +386,7 @@ def main() -> int:
         f"- `{cargo_lock['path']}` sha256 `{cargo_lock['sha256']}`",
         f"- `{pnpm_lock['path']}` sha256 `{pnpm_lock['sha256']}`",
         "",
-        "## License inventory",
+        "## License inventory (Rust)",
         "",
     ]
     for lic, count in sorted(license_counts.items(), key=lambda kv: (-kv[1], kv[0])):
@@ -283,23 +427,69 @@ def main() -> int:
 
     lines += [
         "",
+        "## License inventory (JavaScript)",
+        "",
+    ]
+    npm_license_counts: dict[str, int] = defaultdict(int)
+    npm_review: list[tuple[str, str]] = []
+    for c in npm_comps:
+        lic = c.get("licenses", [{}])[0].get("license", {})
+        lic_id = lic.get("id") or lic.get("name") or "NOASSERTION"
+
+        # Apply the same choice-expression rule as the Rust side: an expression
+        # offering an allowlisted alternative is not a copyleft dependency,
+        # because the consumer may take the allowlisted option. Flagging
+        # "Apache-2.0 OR MIT" as needing review is a false positive.
+        ids, is_choice = split_license(lic_id)
+        if is_choice and (set(ids) & ALLOWED):
+            npm_license_counts[f"{lic_id} (allowlisted alternative)"] += 1
+            continue
+
+        npm_license_counts[lic_id] += 1
+        if lic_id not in ALLOWED and lic_id != "NOASSERTION":
+            npm_review.append((f"{c['name']}@{c['version']}", lic_id))
+    for lic, count in sorted(
+        npm_license_counts.items(), key=lambda kv: (-kv[1], kv[0])
+    ):
+        marker = ""
+        if lic not in ALLOWED and lic != "NOASSERTION":
+            marker = " — **not on the LICENSE_ALLOWLIST.md default allowlist**"
+        lines.append(f"- `{lic}`: {count} component(s){marker}")
+    if not npm_license_counts:
+        lines.append("- none")
+
+    lines += ["", "## JavaScript components requiring license review", ""]
+    if npm_review:
+        for name, lic in npm_review:
+            lines.append(f"- `{name}` — {lic}")
+    else:
+        lines.append("- none")
+
+    lines += [
+        "",
         "## Scope note",
         "",
-        "This inventory covers the Rust dependency graph resolved from the locked",
-        "Cargo.lock. The JavaScript dependency tree is pinned by pnpm-lock.yaml and",
-        "is inventoried by the JavaScript license scan; Python has no dependency set",
-        "because no Python package is shipped. A single merged SBOM covering all",
-        "three ecosystems is a release requirement that remains open.",
+        "This is a MERGED cross-ecosystem inventory covering both the Rust graph",
+        "(from `cargo metadata --locked`) and the JavaScript graph (from the pnpm",
+        "virtual store at `node_modules/.pnpm`, since `pnpm list` reports only",
+        "direct dependencies). Python has no dependency set because no Python",
+        "package is shipped, so no Python lane exists to merge.",
+        "",
+        "Both ecosystems are inventoried from their own manifests, which are the",
+        "authoritative source for license declarations. A component whose manifest",
+        "declares no license is reported as `NOASSERTION` rather than guessed.",
         "",
     ]
     NOTICES.write_text("\n".join(lines), "utf-8")
 
     print(f"wrote {CDX} ({len(components)} components)")
     print(f"wrote {NOTICES}")
-    print(f"  first-party={first_party} third-party={third_party}")
-    print(f"  components requiring review: {len(review_needed)}")
+    print(f"  cargo: first-party={first_party} third-party={third_party}")
+    print(f"  npm:   first-party={npm_first} third-party={npm_third}")
+    print(f"  components requiring review (Rust): {len(review_needed)}")
+    print(f"  components requiring review (npm):  {len(npm_review)}")
     print(f"  components with a non-allowlisted license: {len(other_licenses)}")
-    print(f"  components with no declared license: {len(unknown_license)}")
+    print(f"  components with no declared license: {len(unknown_license) + len(npm_unknown)}")
     return 0
 
 

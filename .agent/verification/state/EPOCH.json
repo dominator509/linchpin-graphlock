@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "d767ec9",
+  "candidate_commit": "c0c9a18",
   "classes": {
     "artifact": {
       "count": 3,
@@ -37,7 +37,7 @@
         "scripts\\bind-requirements.py": "aefe9afc545f0db1d0f61767c9125d90788771c67094e98cb8c5b95dc253402d",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "6285076849d8d847a17be1fd80bf5bd4b67246b1fbbfff1327ddd32648cc72db",
-        "scripts\\build-dod-status.py": "83d17f311f6d0eae2d063226c1a8fc6912e461696ed89718ac6d1e574389ac3e",
+        "scripts\\build-dod-status.py": "a1211550858952e1f8f3191a88be6ea2dbc64553f7694ce2599630187df567ae",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "1fb0fcfa770bf67efa1db47b63b7922e57cf014b86f95e7ac3bf5f1e11113e15",
@@ -47,7 +47,7 @@
         "scripts\\dod-gate.sh": "26d4e578e6c62da5c946fc433be1d3d5226fd520fe062cfbf01f71aef12fd6bb",
         "scripts\\format-check.sh": "d01f04988dbdf9a0ef7039e7ae628a94bad8c55fe304f8d341c6803175d6d2bd",
         "scripts\\generate-icons.py": "cd5649efa6ea2a9ee8d35c95e097c17e1bfff88edf526f2bd7a75c9a0e16a1fe",
-        "scripts\\generate-sbom.py": "f91fdb62bf30575d85269f8c2eb1b0e5895cfc3c2b92314f29045968c3417069",
+        "scripts\\generate-sbom.py": "96285928a2d5b54165431727d005d0ed73dead5d909654c45a1c09644ffcfdaf",
         "scripts\\graph-next.sh": "3f73444ecc2008a54a7487e6db42f34191f658b5a44bfb5c4739f50ba59c514a",
         "scripts\\harness-accounting.sh": "4e354312bb083d102f8705fa1978b7e5eeffdd0353ea5cc84f9b651c597283b9",
         "scripts\\harness-init.sh": "9e5861aecd7507382f83a2559d85f38aa5a9c0bf3ae7c5e25319c1812cda96fd",
@@ -197,6 +197,6 @@
       ]
     }
   },
-  "epoch_digest": "1cd1acf40947adcb4a095a3ad7702aaa7deaac171ba067ef54333c911ff94d4d",
+  "epoch_digest": "a02c5af9229ed10869c147d0578fdf1f5d04b8d05404ebb95dbf4223169d3f15",
   "total_inputs": 109
 }
