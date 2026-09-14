@@ -1,6 +1,6 @@
 {
-  "_comment": "Real executed case results bound to candidate c3e071f. Only IDs whose acceptance oracle genuinely ran and passed may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
-  "candidate_commit": "c3e071f",
+  "_comment": "Real executed case results. Only IDs whose acceptance oracle genuinely ran may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
+  "candidate_commit": "22f3918",
   "candidate_epoch": "EP-009-attempt-002",
   "environment": {
     "host": "Windows 10 Home 10.0.19045 x64",
@@ -10,5 +10,18 @@
     "pnpm": "10.30.3",
     "target_triple": "x86_64-pc-windows-msvc"
   },
-  "results": []
+  "results": [
+    {
+      "test_id": "SUP-004",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/EP-009/M2/SUP-004-reproducible-build.md",
+      "reason": "EXECUTED. Two release builds of the same revision produced non-identical artifacts (MSI D28C0B94->33D28A7E, NSIS 6D9B45A4->DC271F29, exe 6E09A3DD->6F223D7D). Root cause fully measured: (1) WiX regenerates MSI ProductCode per build (UpgradeCode stable); (2) binary differs by exactly 19 bytes, all PE TimeDateStamp + CodeView RSDS GUID/age metadata. Differences are explained but NOT eliminated (no [profile.release] config exists) and NOT verified across two clean environments as SUP-004 step 1 requires. Not PASS."
+    },
+    {
+      "test_id": "SUP-003",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/EP-009/M1/STATUS.md",
+      "reason": "EXECUTED for the built formats. MSI and NSIS both produced (exit 0), digests pinned, product identity independently read back via the Windows Installer COM API (ProductName=LINCHPIN, ProductVersion=0.1.0, valid GUIDs), magic bytes confirmed (MSI D0CF11E0 OLE, exes MZ/PE). NOT PASS: artifacts are unsigned (PF-015, no signing identity), there is no SBOM/notices/provenance artifact, no prohibited-content scan has been run over installer contents, and no install/uninstall exercise has been performed."
+    }
+  ]
 }

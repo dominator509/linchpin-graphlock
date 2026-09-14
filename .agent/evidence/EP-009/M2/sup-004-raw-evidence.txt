@@ -1,0 +1,55 @@
+SUP-004 Reproducible Build Verification -- raw command evidence
+Candidate: 22f3918  Host: Windows 10 Home 10.0.19045 x64
+Toolchain: rustc 1.98.0 (88d9e12ae 2026-08-18) / cargo 1.98.0 (797e8a9bc 2026-08-05)
+Target: x86_64-pc-windows-msvc
+
+=== RUN 1: sh scripts/build.sh ===
+exit 0
+  LINCHPIN_0.1.0_x64_en-US.msi    sha256 D28C0B9400A83E39B8EBAC1687FE9219A11845F5F9444A974DB5CE479E11784E  size 3002368
+  LINCHPIN_0.1.0_x64-setup.exe    sha256 6D9B45A40135F0173A70AFECA3BA85A84440E6F3ED240BEA0ABBE6D1F3575081  size 1964747
+  linchpin-desktop.exe            sha256 6E09A3DD7308248BA73F5CAC86AB2443D50344280AAAAF41678CB605EAE2D2A1  size 8689664
+
+=== RUN 2 (after rm -rf target/release/bundle): sh scripts/build.sh ===
+exit 0
+  LINCHPIN_0.1.0_x64_en-US.msi    sha256 33D28A7E9D23CEC2ED8E217A956655F2...  size 3018752
+  LINCHPIN_0.1.0_x64-setup.exe    sha256 DC271F2913CDBFD1DE2D1DE817B3408E...  size 1980959
+  linchpin-desktop.exe            sha256 6F223D7DF6296483211014F732DA7D98AE542289178249E4BBE81F3D58ACA1D6  size 8735744
+
+BYTE-IDENTICAL: NO for all three artifacts.
+
+=== MSI property read-back (Windows Installer COM API) ===
+run1: ProductName=LINCHPIN ProductVersion=0.1.0
+      UpgradeCode={F521FA25-961F-5B0D-BF96-2961D39CC086}
+      ProductCode={A65DA36B-1000-4B8F-A75A-E0AF8D757B57}
+run2: ProductName=LINCHPIN ProductVersion=0.1.0
+      UpgradeCode={F521FA25-961F-5B0D-BF96-2961D39CC086}
+      ProductCode={84F7C145-34E5-4B14-8F58-E2B66E6819A6}
+=> UpgradeCode stable; ProductCode REGENERATED per build (WiX default).
+
+=== MSI File table payload ===
+run1: files=1 totalPayloadBytes=8689664
+run2: files=1 totalPayloadBytes=8735744
+=> delta 46080 bytes is the BINARY, not container metadata.
+
+=== Binary-only isolation (forced rebuilds, fingerprint deleted) ===
+build D: sha256 6DEA56C139BDCACC1AAA06A4C58E3A22E5B9079107A361B04B0E794B1103C89A size 8651264
+build F: sha256 10D29A742002E3498FE05DCACA5747882D122818EA3E452BE3879BA3D621B023 size 8651264
+SAME SIZE, DIFFERENT DIGEST.
+
+Byte-level diff D vs F: 19 differing bytes total.
+  offset 240    (0xF0)      PE TimeDateStamp        d=0x78 f=0xCB
+  offset 6733124 (0x66BD44)  .rdata timestamp copy   d=0x78 f=0xCB
+  offset 6733152 (0x66BD60)  .rdata timestamp copy   d=0x78 f=0xCB
+  offset 6733180 (0x66BD7C)  .rdata timestamp copy   d=0x78 f=0xCB
+  offset 6734144-6734159 (0x66C140-0x66C14F, 16B)    RSDS debug GUID+age
+
+e_lfanew = 0x3C value; PE TimeDateStamp at e_lfanew+8 = 0xF0. Confirmed.
+Region at 0x66C140 is the CodeView RSDS signature block (PDB GUID + age).
+
+CONCLUSION: all binary differences are PE build-timestamp and PDB GUID/age
+metadata. No code, data, import, or symbol difference was observed.
+ELIMINATION: not performed (no [profile.release] config exists in the repo).
+CROSS-ENVIRONMENT: not performed (single host only).
+
+STATUS: PARTIAL -- explained but not minimized to zero, and not verified
+across two clean environments.
