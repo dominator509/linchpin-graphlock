@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `d5269b631cdfd477c52375d53a0daf1ba4450da2badf0e59eca0133cecf07df6`
-- Candidate commit at generation: `75fc35c`
-- Total tracked inputs: 112
-- Previous epoch digest: `a8f7a236143e374eff9c41e56105e9339afc10046132fceb749124cc055f7e28`
-- **Changed input classes since that epoch: rust-manifest, gate-script**
+- Current epoch digest: `737e0a4272b0d7c0a6bf913a112c77f76c29b08aec8a5e5541e7652988a0352b`
+- Candidate commit at generation: `ce5f20e`
+- Total tracked inputs: 115
+- Previous epoch digest: `aa83ec38413ee459568142aa022a257923aef4c8d7c3309ebe59c57dbcd7a16d`
+- **Changed input classes since that epoch: gate-script**
 
 ## Input classes and what a change invalidates
 
@@ -37,7 +37,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 52 file(s)
+### `gate-script` — 55 file(s)
 
 - invalidates: V-000 harness validation
 - invalidates: V-005 clean build
@@ -49,7 +49,7 @@ definition and its PASS status is revoked until rerun.
   - `scripts\artifact-e2e.sh` `66789e3a58097851…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
   - `scripts\bind-requirements.py` `b5b3f5d11af024a5…`
-  - … and 47 more
+  - … and 50 more
 
 ### `js-manifest` — 7 file(s)
 
@@ -106,8 +106,9 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-008 full functionality
 - invalidates: V-009 integration/concurrency
 - invalidates: V-012 regression/mutation
+- invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `987fb103f7a69f08…`
+  - `apps\desktop\src-tauri\src\commands.rs` `5a7a8ee6442b55fb…`
   - `apps\desktop\src-tauri\src\lib.rs` `a461b454630d47de…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
@@ -154,6 +155,7 @@ PASS recorded against the prior epoch may be reinstated:
 - (`rust-source` changed) → rerun V-008 full functionality
 - (`rust-source` changed) → rerun V-009 integration/concurrency
 - (`rust-source` changed) → rerun V-012 regression/mutation
+- (`rust-source` changed) → rerun V-013 dynamic security/domain packs
 - (`test-oracle` changed) → rerun V-008 full functionality
 - (`test-oracle` changed) → rerun V-012 regression/mutation
 - (`test-oracle` changed) → rerun DOD-007 collection guard

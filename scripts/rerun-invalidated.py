@@ -82,6 +82,13 @@ STAGE_RUNNERS: dict[str, list[list[str]]] = {
     "V-020 exact artifact": [
         ["sh", "scripts/artifact-e2e.sh"],
     ],
+    # V-013 owns the dynamic-security / domain-pack lane, which is where the
+    # mandatory offline provider proof belongs (PF-011, DOD-010). Exits 2 with a
+    # named prerequisite when no loopback provider is served, so it reports an
+    # absent dependency rather than passing silently (DOD-006).
+    "V-013 dynamic security/domain packs": [
+        ["sh", "scripts/live-fire-local-provider.sh"],
+    ],
     "V-021 final accounting": [
         ["sh", "scripts/harness-accounting.sh"],
         ["python3", "scripts/ship-gate.py", "--check"],

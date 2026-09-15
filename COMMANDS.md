@@ -36,12 +36,22 @@ written.
 
 | Command | Exit | Cause | Unblock |
 | --- | --- | --- | --- |
-| `sh scripts/security-check.sh` | 1 | `cargo-deny licenses` rejects 5 MPL-2.0 crates | ADR-002 decision |
-| `sh scripts/dependency-audit.sh` | 4 | same `licenses FAILED` check | ADR-002 decision |
-| `sh scripts/verify.sh` | 1 | aggregates the lanes above | ADR-002 decision |
-| `sh scripts/live-fire.sh` | 2 | real-runner script absent until EP-007 | EP-007 |
 | `sh scripts/production-readiness-check.sh` | 1 | verdict is NO_GO (correct behavior, not a defect) | release readiness |
 | `pnpm audit` | 1 | 2 moderate advisories (see below) | dependency upgrade decision |
+
+**Resolved since the previous revision of this table** (all now exit 0):
+`sh scripts/security-check.sh`, `sh scripts/dependency-audit.sh` and
+`sh scripts/verify.sh` were failing on the MPL-2.0 licences check — closed by
+ADR-002. `sh scripts/live-fire.sh` was exiting 2 because
+`scripts/run-live-fire-real.sh` did not exist; that real production-path runner
+now exists and the gate passes.
+
+**Ordering caveat for `sh scripts/verify.sh`.** It ends with the change-
+invalidation and rerun-obligation checks, so it legitimately FAILS if it is run
+after something that changed a tracked input in the same sequence — including
+`sh scripts/build.sh`, which `doc-exec.py` executes earlier in its list. That is
+DOD-040 working, not a defect. Run `scripts/change-invalidation.py` and
+`scripts/rerun-invalidated.py` to settle first, then `verify.sh` passes.
 
 `pnpm audit` reports 2 moderate advisories (GHSA-82fw-gwwq-j7x9 in `vitest` and
 `@vitest/mocker`, fixed in >= 4.1.11; this repository pins 3.2.7). The enforced
@@ -56,6 +66,17 @@ loudly rather than being silently reused. Observed during this audit: an
 unrelated project's `vite preview` held 4173, the lane failed on a 404, and it
 passed 14/14 once the port was free. Run the E2E lane on its own; do not run two
 documentation or E2E invocations concurrently.
+
+## Live-fire (AGENTS.md section 9)
+
+`sh scripts/live-fire.sh` now runs the real production-path proof suite
+(`scripts/run-live-fire-real.sh`), which composes three independently runnable
+gates: the packaged-desktop boundary over CDP with a real vault write and a
+pinned artifact digest; the real local-provider boundary with both negative
+cases; and installer state preservation across update/uninstall/rollback. It
+**requires** a served loopback provider (PF-011) and exits 2 naming that
+prerequisite when absent — a live-fire gate that quietly skipped its live
+dependency would be the fabrication AG-006 recorded.
 
 ## Local start
 After EP-005 creates the application: `pnpm --filter @linchpin/desktop tauri dev > .agent/state/dev-server.log 2>&1 & echo $! > .agent/state/dev-server.pid`; readiness is a bounded 60-second probe defined in EP-005; stop with `kill "$(cat .agent/state/dev-server.pid)"`.

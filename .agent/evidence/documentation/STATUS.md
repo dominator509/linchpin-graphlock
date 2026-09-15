@@ -13,7 +13,7 @@ checked for existence.
 ## Summary
 
 - Documents scanned: 7 of 7
-- Commands executed: 22 (PASS 16, FAIL 6)
+- Commands executed: 22 (PASS 19, FAIL 3)
 - Commands skipped: 1
 - Referenced paths missing: 0
 
@@ -22,25 +22,25 @@ checked for existence.
 | Document | Command | Result | Exit | Actual (tail) |
 | --- | --- | --- | --- | --- |
 | `README.md` | `sh scripts/preflight.sh` | PASS | 0 | `preflight: ok` |
-| `COMMANDS.md` | `sh scripts/install.sh` | PASS | 0 | `should be allowed     │ │   to run scripts.                                                            │ │              ` |
+| `COMMANDS.md` | `sh scripts/install.sh` | PASS | 0 | `es should be allowed     │ │   to run scripts.                                                            │ │           ` |
 | `COMMANDS.md` | `sh scripts/preflight.sh` | PASS | 0 | `preflight: ok` |
-| `COMMANDS.md` | `sh scripts/lint.sh` | PASS | 0 | ` "type": "module" to C:\dev\linchpin-graphlock\package.json. apps/desktop lint: (Use `node --trace-warnings ...` to show` |
+| `COMMANDS.md` | `sh scripts/lint.sh` | PASS | 0 | `d "type": "module" to C:\dev\linchpin-graphlock\package.json. packages/ui lint: (Use `node --trace-warnings ...` to show` |
 | `COMMANDS.md` | `sh scripts/format-check.sh` | PASS | 0 | `mat:check: All matched files use Prettier code style! packages/ui format:check: Done packages/contracts format:check: Al` |
 | `COMMANDS.md` | `sh scripts/typecheck.sh` | PASS | 0 | `Scope: 3 of 4 workspace projects apps/desktop typecheck$ tsc packages/contracts typecheck$ tsc packages/ui typecheck$ ts` |
 | `COMMANDS.md` | `sh scripts/test-unit.sh` | PASS | 0 | `c-tests application    Doc-tests commercialization    Doc-tests crash_reporter    Doc-tests domain    Doc-tests evidence` |
-| `COMMANDS.md` | `sh scripts/test-integration.sh` | PASS | 0 | `tered out; finished in 0.42s  integration: collected 5 test(s) integration: ok (5 real-dependency tests)     Finished `t` |
+| `COMMANDS.md` | `sh scripts/test-integration.sh` | PASS | 0 | `tered out; finished in 0.30s  integration: collected 5 test(s) integration: ok (5 real-dependency tests)     Finished `t` |
 | `COMMANDS.md` | `sh scripts/test-e2e.sh` | PASS | 0 | `NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set. (Use `node --trace-warnings ...` to show where the warn` |
 | `COMMANDS.md` | `sh scripts/build.sh` | PASS | 0 | `s to produce C:\dev\linchpin-graphlock\target\release\bundle\nsis\LINCHPIN_0.1.0_x64-setup.exe     Finished 2 bundles at` |
-| `COMMANDS.md` | `sh scripts/security-check.sh` | FAIL | 1 | `e allowance  warning[license-not-encountered]: license was not encountered    ┌─ C:\dev\linchpin-graphlock\deny.toml:59:` |
-| `COMMANDS.md` | `sh scripts/dependency-audit.sh` | FAIL | 4 | `i v2.11.5 (*)       │   │   └── tauri-runtime-wry v2.11.4 (*)       │   └── tauri-winres v0.3.6 (*)       └── toml_parse` |
+| `COMMANDS.md` | `sh scripts/security-check.sh` | PASS | 0 | `\dev\linchpin-graphlock\deny.toml:57:6    │ 57 │     "ISC",    │      ━━━ unmatched license allowance  warning[license-n` |
+| `COMMANDS.md` | `sh scripts/dependency-audit.sh` | PASS | 0 | `i v2.11.5 (*)       │   │   └── tauri-runtime-wry v2.11.4 (*)       │   └── tauri-winres v0.3.6 (*)       └── toml_parse` |
 | `COMMANDS.md` | `sh scripts/smoke-test.sh` | PASS | 0 | ` title = 'LINCHPIN Patent Intelligence OS' responding = True smoke: launched and stopped cleanly smoke: uninstalling smo` |
-| `COMMANDS.md` | `sh scripts/live-fire.sh` | FAIL | 2 | `live-fire: real production-path runner absent until EP-007` |
-| `COMMANDS.md` | `sh scripts/verify.sh` | FAIL | 1 | `nse allowance      cargo-deny licenses: FAIL -- see ADR-002 security-check: FAIL -- see the lanes above     security: FA` |
+| `COMMANDS.md` | `sh scripts/live-fire.sh` | PASS | 0 | `nstall (rollback) exit 0 canary intact (1 row(s)) vault-preservation: ok (canary survived update, uninstall and rollback` |
+| `COMMANDS.md` | `sh scripts/verify.sh` | FAIL | 1 | ` C:\dev\linchpin-graphlock\deny.toml:60:6    │ 60 │     "Unicode-DFS-2016",    │      ━━━━━━━━━━━━━━━━ unmatched license` |
 | `COMMANDS.md` | `sh scripts/production-readiness-check.sh` | FAIL | 1 | `production-readiness: recomputing verdict from measured state ship-gate check: ok (verdict NO_GO, unchanged) production-` |
 | `COMMANDS.md` | `python3 scripts/validate-generated-pack.py .` | PASS | 0 | `generated pack validation: ok` |
 | `COMMANDS.md` | `python3 scripts/anti-gaming-scan.py .` | PASS | 0 | `in.cdx.json:15763	vitest TEST_ONLY_BRANCH	.agent\evidence\sbom\linchpin.cdx.json:15827	vitest TEST_ONLY_BRANCH	.agent\ev` |
-| `COMMANDS.md` | `sh scripts/graph-next.sh` | PASS | 0 | `RUN_BLOCKED dependencies prevent: EP-010` |
-| `COMMANDS.md` | `sh scripts/ledger.sh tail 30` | PASS | 0 | `VERIFIED \| EP-007-remediation-001 \| .agent/evidence/EP-007/STATUS.md \| \| 2026-09-09 \| EP-008 \| DONE_VERIFIED \| EP` |
+| `COMMANDS.md` | `sh scripts/graph-next.sh` | PASS | 0 | `NEXT EP-009 .agent\execplans\EP-009-deployment-and-release.md` |
+| `COMMANDS.md` | `sh scripts/ledger.sh tail 30` | PASS | 0 | `/evidence/EP-009/REMEDIATION.md \| \| 2026-09-14 \| EP-009 \| REMEDIATION_REOPENED \| EP-009-remediation-001 \| environm` |
 | `COMMANDS.md` | `sh scripts/materialize-atomic-sources.sh` | PASS | 0 | `materialize-atomic-sources: ok` |
 | `COMMANDS.md` | `pnpm audit` | FAIL | 1 | `           │ ├─────────────────────┼────────────────────────────────────────────────────────┤ │ More info           │ ht` |
 
@@ -54,4 +54,4 @@ checked for existence.
 
 ## Verdict
 
-FAIL — 6 command failure(s), 0 missing path(s)
+FAIL — 3 command failure(s), 0 missing path(s)

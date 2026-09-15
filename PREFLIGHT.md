@@ -14,7 +14,7 @@ Preflight must finish before implementation nodes. Missing optional credentials 
 | PF-008 | Claude Code installed/authenticated + terms decision | OPTIONAL | `claude --version`; non-secret auth status; ADR | blocks Anthropic lane only |
 | PF-009 | Grok Build installed/authenticated + ACP available | OPTIONAL | `grok --version`; ACP capability probe | blocks xAI lane only |
 | PF-010 | Gemini CLI consumer-OAuth policy gate | OPTIONAL | first-party FAQ/terms review + ADR; do not inspect token store | DISABLED_BY_PROVIDER_POLICY unless first-party policy changes |
-| PF-011 | local llama.cpp/Ollama provider | REQUIRED_BEFORE_E2E | loopback capability/version/model-hash probe | blocks mandatory offline provider proof |
+| PF-011 | local llama.cpp/Ollama provider | **SATISFIED** (2026-09-14) | loopback capability/version/model-hash probe | resolved: Ollama 0.34.0 bound to 127.0.0.1:11434 serving `smollm2:135m`; proven by `sh scripts/live-fire-local-provider.sh`, 11/11 assertions |
 | PF-012 | USPTO ODP credential if selected endpoint requires it | REQUIRED_BEFORE_INTEGRATION | official API positive/negative/readback test | blocks ODP live lane only |
 | PF-013 | EPO OPS OAuth credential if enabled | OPTIONAL | official OAuth probe + quota capture | blocks EPO live lane only |
 | PF-014 | GitHub/gh auth for optional repair PR flow | OPTIONAL | `gh auth status` without logging token | blocks PR automation only |

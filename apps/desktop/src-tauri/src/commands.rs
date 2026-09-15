@@ -945,8 +945,14 @@ pub struct CommercializationView {
 ///   * the returned `live` flag states whether a real inference boundary was
 ///     reached, so a caller cannot mistake an error path for output.
 ///
-/// PF-011 (a served local model) is unmet on this host, so in practice this
-/// returns a transport error. That is the correct result, not a defect.
+/// PF-011 is now SATISFIED on the verification host: a real loopback inference
+/// server (Ollama 0.34.0 on 127.0.0.1:11434) serves `smollm2:135m`, and
+/// `scripts/live-fire-local-provider.sh` drives this command against it through
+/// the packaged executable, asserting a live completion and the two negative
+/// paths below. The earlier note in this comment -- "PF-011 is unmet on this
+/// host, so in practice this returns a transport error" -- was accurate when
+/// written and is preserved here only as a correction: it is no longer true, and
+/// a stale claim in a doc comment is still a false claim.
 pub async fn run_local_inference(
     endpoint: &str,
     model_id: &str,

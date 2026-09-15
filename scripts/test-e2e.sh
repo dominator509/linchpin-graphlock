@@ -24,10 +24,24 @@ if [ ! -f apps/desktop/dist/index.html ]; then
   pnpm --filter @linchpin/desktop build
 fi
 
-echo "=== e2e lane 1/2: Playwright against the built bundle (system Edge) ==="
+echo "=== e2e lane 1/3: Playwright against the built bundle (system Edge) ==="
 pnpm --filter @linchpin/desktop exec playwright test
 
-echo "=== e2e lane 2/2: exact-artifact E2E (DOD-004) ==="
+echo "=== e2e lane 2/3: exact-artifact E2E (DOD-004) ==="
 sh scripts/artifact-e2e.sh
 
-echo "e2e: ok (both lanes)"
+# LANE 3 -- installer data preservation (EP-009 M4). DOD-035 requires upgrade,
+# rollback and compatibility paths be executed "with realistic persistent state",
+# and DOD-036 requires recovery claims be "executed against reconciled state".
+# This lane installs the real MSI, seeds a real vault-shaped database at the
+# product's real app-data path, then proves the data survives an update
+# (install-over-install), an uninstall and a rollback (reinstall after removal).
+# Previously NOT executed; M4's "signed" half is covered by ADR-003.
+echo "=== e2e lane 3/3: installer vault preservation (EP-009 M4) ==="
+if [ ! -d target/release/bundle/msi ]; then
+  echo "e2e: building the MSI first (bundle/msi absent)"
+  sh scripts/build.sh
+fi
+sh scripts/vault-preservation-e2e.sh
+
+echo "e2e: ok (all lanes)"

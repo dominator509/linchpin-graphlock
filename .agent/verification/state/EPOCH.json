@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "75fc35c",
+  "candidate_commit": "ce5f20e",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -28,7 +28,7 @@
       ]
     },
     "gate-script": {
-      "count": 52,
+      "count": 55,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
@@ -37,10 +37,10 @@
         "scripts\\bind-requirements.py": "b5b3f5d11af024a5bd363c74cd133a696e64172f34064aae8fbb7b34f881c41f",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "b2a4a924641168715c2c38fa47e638a85b8a3ad688a877a288535f97221b69ca",
-        "scripts\\build-dod-status.py": "f6b36e32afc59e24d5106af9cf846147bc8ace721561779072a3d3fba5598e63",
+        "scripts\\build-dod-status.py": "35235698aea6207b32b142463a5529076bcfed2076a9127edc50343a92b34745",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
-        "scripts\\change-invalidation.py": "d73a6d9a2f432bef3c75dde37c5939b735e005fc747a1e1f75dff5c116b25db6",
+        "scripts\\change-invalidation.py": "df545559d66689b19dd83b8f72716eee2337f2d8a69b16aa9b5a967dc06a2dba",
         "scripts\\clean-build.sh": "4507f635f02652766b18f987a00fbdc79377340cd23d1b2e1ebe93f48a4bb963",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
         "scripts\\dependency-audit.sh": "508cc370daf842ab1ea1535a658196adf677566088ca9928d3ca7d498fc9d1eb",
@@ -59,14 +59,16 @@
         "scripts\\install.sh": "239ce88259366eb9c7fd08be66e72f8e8ad15b0b5fab2406580f3a381a0bbe4a",
         "scripts\\ledger.sh": "81b5ebc8c4ea7b64fe446a869b0080dceea7ae756eb72de59d26f63604eeb755",
         "scripts\\lint.sh": "9ee4326885c8b33befaa74195a8a4d8e83cbcc43a60cdefc62cd86f20a4e222d",
+        "scripts\\live-fire-local-provider.sh": "107e4afabee66253a81b2978b8bae3c6d5fd1c51e9d4ff97e46620d07e45e1f2",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
         "scripts\\reality-gate.sh": "d6d8fd785d9eadf8d74d15b86d18bb08fdb4e0ff9f05d2e26f2f0ecb263f9092",
-        "scripts\\rerun-invalidated.py": "7cbff8e4a03746ae1afc3dec534ff0b587e2bd64c75f2a70445a06af6863d111",
+        "scripts\\rerun-invalidated.py": "492702fb696dc093faa0286a727bcdb10dabb4303974a5e988ec29f6048fc7cb",
         "scripts\\run-integration-real.sh": "a1f218daae2ab710aa9fc1ffd4df4b399bfa55c3212a8e9a909548d4a030d685",
+        "scripts\\run-live-fire-real.sh": "b3641eed140c03789261aac8c5b371fe3c35616f9a03844b5c85a721c9f69e31",
         "scripts\\secret-scan.py": "28b7a041cde51745b2045e82398beabfe9587ae0f4ddb4bcceba751965d4c651",
         "scripts\\security-check.sh": "e27eb5010d866c51b27d353192b3add0b1bc8642a8e3af7b54716a9b619ad618",
         "scripts\\ship-gate.py": "c7650a1f78b9b256dfe7ca7e968cfedc129b50aaa374494a790f9961e465f5cc",
@@ -74,13 +76,14 @@
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
         "scripts\\test-collection-guard.py": "83a92ac7dbcbcbff78c04fa60c23776ceb7234ad7b59e03c9bb6fcfe315767ab",
         "scripts\\test-collection-guard.sh": "82c46b21641211877d13314c012fc40f3a8bc7f06930a513b9a7b32a83200958",
-        "scripts\\test-e2e.sh": "1079092f3a695bea66a0efcef186b3e4ea0979a71468e02551ac4261945cc5aa",
+        "scripts\\test-e2e.sh": "68992d27236a6fdd2dcc107d3e5b23abaef3637d129eed19eb8c3c926a662eba",
         "scripts\\test-integration.sh": "2acaa6c1f4f01d9b4c6f498bbf2a08cfd4b4797674624c5dc2277b71629fcbad",
         "scripts\\test-unit.sh": "0feb713f778b4416900735069b515d236c3dbc485271590123d6157b54d8bce4",
         "scripts\\typecheck.sh": "4ce965051793b2fec197d8b8fd86fa7e8027c30cd2c52102767f6ac1d088b904",
         "scripts\\update-test-manifest.py": "98025fb12b2a4b4650ce0f6388a47f849fdfc7231198fe807d1e8bf7157b3ec3",
         "scripts\\validate-generated-pack.py": "50dc425bbcc17145e559a7fc1eccc9957b0ecbcbb6b6539a2ac5cde1cb8adf47",
         "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
+        "scripts\\vault-preservation-e2e.sh": "99077fbdbbebea0d09390a2c6d0bdb67a63698e796a6f3ac884b3b12cc0fca7a",
         "scripts\\verify.sh": "39ce4683db85da230dc16f3603042a633ceab98686097c4da9fd0c5c700cce25"
       },
       "rules": [
@@ -165,7 +168,7 @@
     "rust-source": {
       "count": 16,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "987fb103f7a69f0862bcaae1f77154c1febff61c9dc622e56cfa87709473ca77",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "5a7a8ee6442b55fbba9aca4be4b5966961fb0567420be3be861c13b6a870a28e",
         "apps\\desktop\\src-tauri\\src\\lib.rs": "a461b454630d47de384e56f949395fb8e9465b1fc62f0e012615bce72c0ab8d0",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
@@ -188,7 +191,8 @@
         "V-007 sanity",
         "V-008 full functionality",
         "V-009 integration/concurrency",
-        "V-012 regression/mutation"
+        "V-012 regression/mutation",
+        "V-013 dynamic security/domain packs"
       ]
     },
     "test-oracle": {
@@ -205,6 +209,6 @@
       ]
     }
   },
-  "epoch_digest": "d5269b631cdfd477c52375d53a0daf1ba4450da2badf0e59eca0133cecf07df6",
-  "total_inputs": 112
+  "epoch_digest": "737e0a4272b0d7c0a6bf913a112c77f76c29b08aec8a5e5541e7652988a0352b",
+  "total_inputs": 115
 }

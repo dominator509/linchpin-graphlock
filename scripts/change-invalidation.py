@@ -46,6 +46,13 @@ INVALIDATION_RULES: dict[str, list[str]] = {
         "V-008 full functionality",
         "V-009 integration/concurrency",
         "V-012 regression/mutation",
+        # The provider lane is Rust source: a change to provider_transport or to
+        # the run_local_inference command invalidates the live provider proof.
+        # This stage REQUIRES the PF-011 prerequisite and exits 2 naming it when
+        # absent, rather than passing silently (DOD-006). Recorded consequence:
+        # a host with no loopback provider cannot complete this rerun, which is
+        # the correct behaviour for a declared prerequisite.
+        "V-013 dynamic security/domain packs",
     ],
     "rust-manifest": [
         "V-004 supply chain",
