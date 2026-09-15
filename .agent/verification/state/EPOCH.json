@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "de78a4e",
+  "candidate_commit": "25c5216",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -169,13 +169,13 @@
     "rust-source": {
       "count": 16,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "7367be2cc0f96f52c4fd5430552cb0f7242028097501808e00ac18fc1fc92807",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "ba8e97b8d3ba20fcac595bdd00311bd53236626e76212d999bb5b5b624a24130",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "9496a7dc7eeef3068c746d49d8cdd30369851ac0850d001103c26e63f08486b5",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "b96ea4c90d8eef022ca69c9a33c41e2b82be7c506f9a2c37ec48cbda4543dd08",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
         "crates\\commercialization\\src\\lib.rs": "59bbcf33978af42a76239d11583acb9fb8e132d382bd6b72edb2a7fc4411858f",
         "crates\\crash_reporter\\src\\lib.rs": "7d582c24175d920b18f02241e91f7a95e5d3d067b3e5db93bb2b66aefb0864a6",
-        "crates\\domain\\src\\lib.rs": "4d492108c95c17c408119574d08455c0ef4eadc44fbb2044a16ee93b670c6ca6",
+        "crates\\domain\\src\\lib.rs": "06b0c7d5cb87861839108ed3ec75267f31f67ac7d47c877a1b4529f35666c020",
         "crates\\evidence\\src\\lib.rs": "831478be7892eb838c88886cd10dd40ffad85ad2a1a62b04dc2bbd841f02fc2e",
         "crates\\mcp_hub\\src\\lib.rs": "bac47aab7e67b1e81cb3852515b18ca6006f548d69313d5036ee9646ec2222aa",
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
@@ -210,7 +210,7 @@
       ]
     }
   },
-  "epoch_digest": "377948e0ea38fd8d2cf94c106588a30858ad7d217287cadd509acaca7578fed6",
+  "epoch_digest": "a32d1a729e64cc2b3f5af7cb0e2ba5e81f600197b39ff538b7fd77d6b6b562d6",
   "prior_candidate_commit": "de78a4e",
   "prior_epoch_digest": "377948e0ea38fd8d2cf94c106588a30858ad7d217287cadd509acaca7578fed6",
   "total_inputs": 116

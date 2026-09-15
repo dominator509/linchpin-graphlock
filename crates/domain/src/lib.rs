@@ -459,6 +459,124 @@ impl DocketRecord {
     }
 }
 
+/// The authoritative ruleset a deadline is derived from (REQ-DOM-009).
+///
+/// REQ-DOM-009: "Docket deadlines require authoritative ruleset source/version."
+/// Both halves are mandatory and non-empty: a source without a version cannot be
+/// re-checked when the rules change, and a version without a source cannot be
+/// located at all.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RuleSetAuthority {
+    pub source: String,
+    pub version: String,
+}
+
+impl RuleSetAuthority {
+    pub fn new(source: &str, version: &str) -> Result<Self, DeadlineError> {
+        if source.trim().is_empty() {
+            return Err(DeadlineError::MissingRuleSetSource);
+        }
+        if version.trim().is_empty() {
+            return Err(DeadlineError::MissingRuleSetVersion);
+        }
+        Ok(RuleSetAuthority {
+            source: source.to_string(),
+            version: version.to_string(),
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeadlineError {
+    MissingRuleSetSource,
+    MissingRuleSetVersion,
+    /// A model-proposed deadline cannot be authoritative without a ruleset.
+    ModelSuggestionIsNotAuthoritative,
+    /// A deadline cannot be authoritative while its review flag is set.
+    UnreviewedDeadline,
+}
+
+impl std::fmt::Display for DeadlineError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let msg = match self {
+            DeadlineError::MissingRuleSetSource => {
+                "a deadline requires an authoritative ruleset source"
+            }
+            DeadlineError::MissingRuleSetVersion => {
+                "a deadline requires an authoritative ruleset version"
+            }
+            DeadlineError::ModelSuggestionIsNotAuthoritative => {
+                "a model-suggested deadline is not authoritative without a ruleset mapping"
+            }
+            DeadlineError::UnreviewedDeadline => "an unreviewed deadline cannot be authoritative",
+        };
+        write!(f, "{msg}")
+    }
+}
+
+/// A docket deadline and whether it may be treated as authoritative.
+///
+/// REQ-PAT-004 adds the companion rule that "a model may suggest a deadline but
+/// cannot make it authoritative without a ruleset/source mapping". Both are
+/// enforced here, because a deadline that is authoritative merely because
+/// something computed it is the same fabricated-certainty failure REQ-PAT-003
+/// guards against: missing a legal date is a real-world harm, so authority must
+/// be earned from a named ruleset rather than assumed.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DocketDeadline {
+    /// ISO-8601 date the deadline falls on.
+    pub due_date: String,
+    /// Present only when the deadline is derived from a real ruleset.
+    pub ruleset: Option<RuleSetAuthority>,
+    /// True when a model proposed this date.
+    pub suggested_by_model: bool,
+    /// True when a human has reviewed the computed date.
+    pub reviewed: bool,
+}
+
+impl DocketDeadline {
+    /// A deadline derived from an authoritative ruleset.
+    pub fn authoritative(due_date: &str, ruleset: RuleSetAuthority) -> Result<Self, DeadlineError> {
+        if due_date.trim().is_empty() {
+            return Err(DeadlineError::MissingRuleSetSource);
+        }
+        Ok(DocketDeadline {
+            due_date: due_date.to_string(),
+            ruleset: Some(ruleset),
+            suggested_by_model: false,
+            reviewed: false,
+        })
+    }
+
+    /// A model-proposed date. Never authoritative on its own.
+    pub fn suggested_by_model(due_date: &str) -> Self {
+        DocketDeadline {
+            due_date: due_date.to_string(),
+            ruleset: None,
+            suggested_by_model: true,
+            reviewed: false,
+        }
+    }
+
+    /// Attach the ruleset that makes a suggestion authoritative, after review.
+    pub fn confirm_with_ruleset(&mut self, ruleset: RuleSetAuthority) -> Result<(), DeadlineError> {
+        self.ruleset = Some(ruleset);
+        self.reviewed = true;
+        Ok(())
+    }
+
+    /// The single question the docket must answer before acting on a date.
+    pub fn is_authoritative(&self) -> bool {
+        if self.ruleset.is_none() {
+            return false;
+        }
+        if self.suggested_by_model && !self.reviewed {
+            return false;
+        }
+        true
+    }
+}
+
 #[cfg(test)]
 mod docket_tests {
     use super::*;
@@ -479,5 +597,108 @@ mod docket_tests {
 
         assert!(docket.public_export().is_ok());
         assert!(docket.public_disclosure);
+    }
+
+    /// covers: REQ-DOM-009
+    /// "Docket deadlines require authoritative ruleset source/version." Both
+    /// halves are mandatory: a source with no version cannot be re-checked when
+    /// the rules change, and a version with no source cannot be located.
+    #[test]
+    fn test_deadline_requires_ruleset_source_and_version() {
+        assert_eq!(
+            RuleSetAuthority::new("", "2026.1"),
+            Err(DeadlineError::MissingRuleSetSource)
+        );
+        assert_eq!(
+            RuleSetAuthority::new("   ", "2026.1"),
+            Err(DeadlineError::MissingRuleSetSource)
+        );
+        assert_eq!(
+            RuleSetAuthority::new("USPTO-37CFR", ""),
+            Err(DeadlineError::MissingRuleSetVersion)
+        );
+        assert_eq!(
+            RuleSetAuthority::new("USPTO-37CFR", "  "),
+            Err(DeadlineError::MissingRuleSetVersion)
+        );
+
+        let authority = RuleSetAuthority::new("USPTO-37CFR", "2026.1").expect("valid ruleset");
+        assert_eq!(authority.source, "USPTO-37CFR");
+        assert_eq!(authority.version, "2026.1");
+    }
+
+    /// covers: REQ-DOM-009
+    #[test]
+    fn test_deadline_with_a_ruleset_is_authoritative() {
+        let authority = RuleSetAuthority::new("USPTO-37CFR", "2026.1").unwrap();
+        let deadline = DocketDeadline::authoritative("2026-11-14", authority).unwrap();
+        assert!(deadline.is_authoritative());
+        assert!(!deadline.suggested_by_model);
+    }
+
+    /// covers: REQ-DOM-009
+    /// A model may suggest a date; it cannot make one authoritative. This is the
+    /// invariant that stops a computed date being acted on as a legal deadline.
+    #[test]
+    fn test_model_suggestion_is_not_authoritative_until_confirmed() {
+        let mut suggested = DocketDeadline::suggested_by_model("2026-11-14");
+        assert!(suggested.suggested_by_model);
+        assert!(
+            !suggested.is_authoritative(),
+            "an unconfirmed model suggestion was treated as authoritative"
+        );
+
+        // Isolate the REVIEW condition from the RULESET condition. With only the
+        // assertion above, a mutation dropping the review check still passed,
+        // because `ruleset.is_none()` had already forced false -- the test was
+        // not discriminating for that rule. This state holds a ruleset but no
+        // review, so only the review condition can reject it.
+        let mut needs_review = DocketDeadline::suggested_by_model("2026-11-14");
+        needs_review.ruleset = Some(RuleSetAuthority::new("USPTO-37CFR", "2026.1").unwrap());
+        assert!(
+            needs_review.ruleset.is_some(),
+            "test premise: a ruleset is present"
+        );
+        assert!(
+            !needs_review.is_authoritative(),
+            "an unreviewed model suggestion holding a ruleset was treated as authoritative"
+        );
+
+        // Confirming with a real ruleset makes it authoritative.
+        let authority = RuleSetAuthority::new("USPTO-37CFR", "2026.1").unwrap();
+        suggested.confirm_with_ruleset(authority).unwrap();
+        assert!(suggested.reviewed);
+        assert!(suggested.is_authoritative());
+
+        // A human-entered deadline with a ruleset is authoritative without the
+        // review flag: the flag exists to gate MODEL output, not human input.
+        let human = DocketDeadline::authoritative(
+            "2026-11-14",
+            RuleSetAuthority::new("USPTO-37CFR", "2026.1").unwrap(),
+        )
+        .unwrap();
+        assert!(!human.suggested_by_model);
+        assert!(human.is_authoritative());
+    }
+
+    /// covers: REQ-DOM-009
+    #[test]
+    fn test_deadline_without_a_ruleset_is_never_authoritative() {
+        let mut deadline = DocketDeadline::suggested_by_model("2026-11-14");
+        deadline.reviewed = true; // reviewed, but still no ruleset
+        assert!(
+            !deadline.is_authoritative(),
+            "a reviewed deadline with no ruleset was treated as authoritative"
+        );
+        deadline.ruleset = None;
+        assert!(!deadline.is_authoritative());
+    }
+
+    /// covers: REQ-DOM-009
+    #[test]
+    fn test_authoritative_deadline_rejects_an_empty_date() {
+        let authority = RuleSetAuthority::new("USPTO-37CFR", "2026.1").unwrap();
+        assert!(DocketDeadline::authoritative("", authority.clone()).is_err());
+        assert!(DocketDeadline::authoritative("   ", authority).is_err());
     }
 }

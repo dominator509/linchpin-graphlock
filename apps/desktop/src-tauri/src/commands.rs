@@ -906,6 +906,104 @@ pub struct DocketView {
     pub public_disclosure: bool,
 }
 
+/// A scheduled docket deadline and whether it is authoritative (REQ-DOM-009).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DeadlineView {
+    pub due_date: String,
+    /// True only when a named ruleset source AND version back this date.
+    pub authoritative: bool,
+    pub ruleset_source: Option<String>,
+    pub ruleset_version: Option<String>,
+    pub suggested_by_model: bool,
+    pub reviewed: bool,
+}
+
+/// Schedule a docket deadline, enforcing ruleset authority (REQ-DOM-009).
+///
+/// REQ-DOM-009: "Docket deadlines require authoritative ruleset source/version."
+/// REQ-PAT-004 adds that "a model may suggest a deadline but cannot make it
+/// authoritative without a ruleset/source mapping."
+///
+/// Both are enforced at this boundary, not only inside the domain crate, because
+/// a rule reachable only from tests is not a delivered behaviour. A suggested
+/// date comes back with `authoritative: false` and NO error: the suggestion is
+/// useful, it is simply not a legal deadline until a ruleset backs it. Acting on
+/// it as one is the real-world harm this clause exists to prevent.
+pub fn schedule_docket_deadline(
+    scope: &WorkspaceScope,
+    due_date: &str,
+    ruleset_source: Option<&str>,
+    ruleset_version: Option<&str>,
+    suggested_by_model: bool,
+) -> CommandResult<DeadlineView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if due_date.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("due_date is required"),
+        );
+    }
+
+    let mut deadline = if suggested_by_model {
+        domain::DocketDeadline::suggested_by_model(due_date)
+    } else {
+        let (Some(source), Some(version)) = (ruleset_source, ruleset_version) else {
+            // A date asserted without a ruleset is a POLICY matter: the caller
+            // is asking the docket to treat an unsourced date as authoritative.
+            return CommandResult::failure(
+                correlation,
+                CommandError::policy(
+                    "a docket deadline requires both a ruleset source and version \
+                     (REQ-DOM-009); use suggested_by_model to record an unbacked date",
+                ),
+            );
+        };
+        let authority = match domain::RuleSetAuthority::new(source, version) {
+            Ok(a) => a,
+            Err(e) => {
+                return CommandResult::failure(correlation, CommandError::validation(e.to_string()))
+            }
+        };
+        match domain::DocketDeadline::authoritative(due_date, authority) {
+            Ok(d) => d,
+            Err(e) => {
+                return CommandResult::failure(correlation, CommandError::validation(e.to_string()))
+            }
+        }
+    };
+
+    // A model suggestion becomes authoritative only once a ruleset backs it.
+    if suggested_by_model {
+        if let (Some(source), Some(version)) = (ruleset_source, ruleset_version) {
+            if let Ok(authority) = domain::RuleSetAuthority::new(source, version) {
+                if let Err(e) = deadline.confirm_with_ruleset(authority) {
+                    return CommandResult::failure(
+                        correlation,
+                        CommandError::validation(e.to_string()),
+                    );
+                }
+            }
+        }
+    }
+
+    let authoritative = deadline.is_authoritative();
+    CommandResult::success(
+        correlation,
+        DeadlineView {
+            due_date: deadline.due_date.clone(),
+            authoritative,
+            ruleset_source: deadline.ruleset.as_ref().map(|r| r.source.clone()),
+            ruleset_version: deadline.ruleset.as_ref().map(|r| r.version.clone()),
+            suggested_by_model: deadline.suggested_by_model,
+            reviewed: deadline.reviewed,
+        },
+    )
+}
+
 /// Draft a response workspace for an office action.
 ///
 /// Prosecution flow. A Notice of Allowance has no rejection to respond to, and
@@ -1999,6 +2097,88 @@ mod tests {
 
         // Empty text asserts nothing.
         assert!(!classify_research_claim("OBSERVATION", "  ", Some("s"), None, None).ok);
+    }
+
+    /// covers: REQ-DOM-009
+    /// The ruleset-authority rule must hold at the production boundary.
+    #[test]
+    fn test_schedule_docket_deadline_requires_ruleset_authority() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+
+        // A ruleset-backed date is authoritative.
+        let backed = schedule_docket_deadline(
+            &scope,
+            "2026-11-14",
+            Some("USPTO-37CFR"),
+            Some("2026.1"),
+            false,
+        );
+        assert!(
+            backed.ok,
+            "ruleset-backed deadline rejected: {:?}",
+            backed.error
+        );
+        let view = backed.value.unwrap();
+        assert!(view.authoritative);
+        assert_eq!(view.ruleset_source.as_deref(), Some("USPTO-37CFR"));
+        assert_eq!(view.ruleset_version.as_deref(), Some("2026.1"));
+
+        // Asserting a date with NO ruleset is a policy failure, not a silent
+        // authoritative deadline.
+        let bare = schedule_docket_deadline(&scope, "2026-11-14", None, None, false);
+        assert!(
+            !bare.ok,
+            "a ruleset-less deadline was accepted as authoritative"
+        );
+
+        // Half a ruleset is a validation failure.
+        let half_source =
+            schedule_docket_deadline(&scope, "2026-11-14", Some("USPTO-37CFR"), None, false);
+        assert!(!half_source.ok);
+        let half_version =
+            schedule_docket_deadline(&scope, "2026-11-14", None, Some("2026.1"), false);
+        assert!(!half_version.ok);
+        // Blank is not a value either.
+        let blank =
+            schedule_docket_deadline(&scope, "2026-11-14", Some("   "), Some("2026.1"), false);
+        assert!(!blank.ok, "a blank ruleset source was accepted");
+
+        // A model suggestion is returned but is NOT authoritative, and is not an
+        // error: the date is useful, it is just not a legal deadline yet.
+        let suggested = schedule_docket_deadline(&scope, "2026-11-14", None, None, true);
+        assert!(
+            suggested.ok,
+            "a suggestion should be accepted as a suggestion"
+        );
+        let sview = suggested.value.unwrap();
+        assert!(sview.suggested_by_model);
+        assert!(
+            !sview.authoritative,
+            "an unbacked model suggestion was reported as authoritative"
+        );
+        assert!(sview.ruleset_source.is_none());
+
+        // A suggestion CONFIRMED with a ruleset becomes authoritative.
+        let confirmed = schedule_docket_deadline(
+            &scope,
+            "2026-11-14",
+            Some("USPTO-37CFR"),
+            Some("2026.1"),
+            true,
+        );
+        assert!(confirmed.ok);
+        let cview = confirmed.value.unwrap();
+        assert!(cview.authoritative);
+        assert!(cview.reviewed);
+
+        // Empty dates and empty workspaces are rejected.
+        assert!(!schedule_docket_deadline(&scope, "  ", Some("s"), Some("1"), false).ok);
+        let no_scope = WorkspaceScope {
+            workspace_id: "  ".to_string(),
+        };
+        assert!(!schedule_docket_deadline(&no_scope, "2026-11-14", Some("s"), Some("1"), false).ok);
     }
 
     /// covers: REQ-PAT-002

@@ -1,28 +1,15 @@
 {
   "changed_classes": [
-    "gate-script"
+    "rust-source"
   ],
-  "epoch_digest": "377948e0ea38fd8d2cf94c106588a30858ad7d217287cadd509acaca7578fed6",
+  "epoch_digest": "a32d1a729e64cc2b3f5af7cb0e2ba5e81f600197b39ff538b7fd77d6b6b562d6",
   "failures": 0,
   "results": [
     {
-      "command": "sh scripts/harness-validate.sh",
-      "duration_s": 35.88,
-      "exit_code": 0,
-      "output_sha256": "7bc47518592f7a6f712fae9f3d77b0ea5485e92c13730f5a1b470d83104cd6ad",
-      "output_tail": [
-        "reachability check: ok (154 public fns, 19 entry points, 0 unreachable)",
-        "trailing-and check: ok (no trailing &&-test lanes)",
-        "harness-validate: ok"
-      ],
-      "stage": "V-000 harness validation",
-      "status": "PASS"
-    },
-    {
       "command": "sh scripts/build.sh",
-      "duration_s": 81.42,
+      "duration_s": 108.24,
       "exit_code": 0,
-      "output_sha256": "a18bb72f2d8eeff87dc58824aba36636459b47bcbbd2e66b0d21a9c0ce867f65",
+      "output_sha256": "c854979dc123b72b311eb93d04d75ebe963a4e33840397a55619b19eede9a575",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -32,10 +19,36 @@
       "status": "PASS"
     },
     {
-      "command": "sh scripts/test-unit.sh",
-      "duration_s": 17.31,
+      "command": "sh scripts/smoke-test.sh",
+      "duration_s": 15.46,
       "exit_code": 0,
-      "output_sha256": "df4bf7b95838ae83f2abbbb9d3bb08336496fba715aa92319a3406a4e419fb2b",
+      "output_sha256": "b3d21f687474f76633569e5b08b7823574239719c89e23f83985ab0cc0b333bb",
+      "output_tail": [
+        "smoke: verifying removal",
+        "smoke: clean removal confirmed",
+        "smoke: ok (artifact 7bbf3375498238ad160aec511172ab7ff91fb8464d6fc81f946c39faca31de41 verified through install/launch/uninstall)"
+      ],
+      "stage": "V-006 smoke",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/typecheck.sh",
+      "duration_s": 6.97,
+      "exit_code": 0,
+      "output_sha256": "920abb4bc6fbbf8da16bf44695c457c842d7790398f81a86da12a6a6a31e9ff7",
+      "output_tail": [
+        "    Checking application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)",
+        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.97s"
+      ],
+      "stage": "V-007 sanity",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/test-unit.sh",
+      "duration_s": 29.42,
+      "exit_code": 0,
+      "output_sha256": "15fa57e453ba1b2510afb105a7ec692e1dc82c8863cec5c69091502eea8fd87c",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -46,22 +59,51 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 2.31,
+      "duration_s": 1.88,
       "exit_code": 0,
-      "output_sha256": "7346fbff47e18bae34b22c435881864b91ba28e6390d32abffc77dd54ae229bd",
+      "output_sha256": "2d4087124c1719c1a11b8dbd78281e465894b58f12910449161b1eb8a3c1445e",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.71s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-40d0be70daa3bb16.exe)"
       ],
       "stage": "V-009 integration/concurrency",
       "status": "PASS"
+    },
+    {
+      "command": "sh scripts/lint.sh",
+      "duration_s": 6.84,
+      "exit_code": 0,
+      "output_sha256": "388b3f01e285e0007ad1620ac8161c8978bd944ea3e63e4ac99fa2611b5ceca4",
+      "output_tail": [
+        "    Checking application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)",
+        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.66s"
+      ],
+      "stage": "V-012 regression/mutation",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/live-fire-local-provider.sh",
+      "duration_s": 245.99,
+      "exit_code": 0,
+      "output_sha256": "10fd0d5faae69e2dea3f950f40084c156f8a2c857b404851e174b61e49b76171",
+      "output_tail": [
+        "local-provider: restored the production artifact",
+        "local-provider: rebuilding the production artifact from the committed config",
+        "local-provider: production artifact correctly opens no debug port"
+      ],
+      "stage": "V-013 dynamic security/domain packs",
+      "status": "PASS"
     }
   ],
   "stages": [
-    "V-000 harness validation",
     "V-005 clean build",
+    "V-006 smoke",
+    "V-007 sanity",
     "V-008 full functionality",
-    "V-009 integration/concurrency"
+    "V-009 integration/concurrency",
+    "V-012 regression/mutation",
+    "V-013 dynamic security/domain packs"
   ]
 }

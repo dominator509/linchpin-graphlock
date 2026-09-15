@@ -115,6 +115,26 @@ fn classify_research_claim(
     )
 }
 
+/// Schedule a docket deadline and report whether it is authoritative
+/// (REQ-DOM-009).
+#[tauri::command]
+fn schedule_docket_deadline(
+    workspace_id: String,
+    due_date: String,
+    ruleset_source: Option<String>,
+    ruleset_version: Option<String>,
+    suggested_by_model: bool,
+) -> commands::CommandResult<commands::DeadlineView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::schedule_docket_deadline(
+        &scope,
+        &due_date,
+        ruleset_source.as_deref(),
+        ruleset_version.as_deref(),
+        suggested_by_model,
+    )
+}
+
 /// Build a filing-package manifest (REQ-PAT-002).
 #[tauri::command]
 fn build_filing_package(
@@ -253,6 +273,7 @@ pub fn run() {
             evaluate_export,
             lint_claims,
             classify_research_claim,
+            schedule_docket_deadline,
             build_filing_package,
             import_receipt,
             check_filing_handoff,
