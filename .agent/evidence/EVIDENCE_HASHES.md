@@ -54,9 +54,9 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | FAIL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
 | DOD-038 | FAIL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `0f601bc6ef9ccdb2` | 4202 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `c522b60d7c109af6` | 187 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `abddfe3185eca5a2` | 144894 |
-| DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `e165a9074eb3e0c9` | 1365 |
+| DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `3704782107e29c7b` | 1365 |
 
 ## Registry ledger rows with a cited evidence document
 
