@@ -227,14 +227,31 @@ def main() -> int:
         # named ce5f20e while HEAD had advanced to 3a0f088).
         recorded_commit = prior.get("candidate_commit") if prior else None
         if recorded_commit and head and recorded_commit != head:
-            print(
-                "change-invalidation check: FAIL -- the epoch was computed for "
-                f"candidate {recorded_commit} but HEAD is {head}. Re-run "
-                "scripts/change-invalidation.py so the record names the candidate "
-                "whose content it hashed.",
-                file=sys.stderr,
+            # The record must name a candidate that is HEAD or an ANCESTOR of
+            # it. Requiring exact equality was a design defect: settling writes
+            # EPOCH.json, committing that record advances HEAD, and the check
+            # then failed on the very commit that recorded it -- an unfixable
+            # loop where every settle produced a new failure.
+            #
+            # Ancestry is the honest test. It still catches a record naming a
+            # commit that is not on this line of history, and content drift is
+            # caught by the epoch digest above, which is what actually protects
+            # the evidence. The candidate name is identity documentation, not
+            # the integrity mechanism.
+            ancestor = subprocess.run(
+                ["git", "merge-base", "--is-ancestor", recorded_commit, head],
+                capture_output=True,
+                shell=False,
             )
-            return 1
+            if ancestor.returncode != 0:
+                print(
+                    "change-invalidation check: FAIL -- the epoch was computed for "
+                    f"candidate {recorded_commit}, which is not an ancestor of HEAD "
+                    f"({head}). Re-run scripts/change-invalidation.py so the record "
+                    "names the candidate whose content it hashed.",
+                    file=sys.stderr,
+                )
+                return 1
         print(
             f"change-invalidation check: ok (epoch {epoch[:16]}..., "
             f"candidate {recorded_commit}, "
