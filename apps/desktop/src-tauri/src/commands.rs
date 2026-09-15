@@ -1116,6 +1116,88 @@ pub fn check_support_matrix(
     )
 }
 
+/// A valuation output as returned to the UI (REQ-COM-003).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ValuationView {
+    pub low: f64,
+    pub high: f64,
+    /// True only when high > low: a point estimate is not a range.
+    pub is_range: bool,
+    pub scenario_label: String,
+    /// Sensitivity table, most influential assumption first.
+    pub sensitivity: Vec<(String, f64)>,
+    pub dominant_assumption: Option<String>,
+}
+
+/// Produce a valuation RANGE tied to explicit assumptions (REQ-COM-003).
+///
+/// REQ-COM-003: "Valuation outputs are ranges tied to explicit assumptions and
+/// labelled planning scenarios, not certified appraisals. Sensitivity tables
+/// show which assumptions dominate."
+///
+/// Enforced at this boundary rather than only in the crate, because a rule
+/// reachable only from tests is not a delivered behaviour. A label asserting
+/// appraisal authority is a POLICY failure -- the caller is asking the product
+/// to present an estimate as an appraisal -- while a range with no assumption
+/// behind it is a validation failure, since an unsourced number is exactly what
+/// the requirement prohibits.
+pub fn evaluate_valuation(
+    scope: &WorkspaceScope,
+    scenario_label: &str,
+    low: f64,
+    high: f64,
+    assumptions: &[(String, f64, f64)],
+) -> CommandResult<ValuationView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if scenario_label.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("a valuation requires a scenario label"),
+        );
+    }
+    if !low.is_finite() || !high.is_finite() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("valuation bounds must be finite numbers"),
+        );
+    }
+
+    let mut parsed = Vec::with_capacity(assumptions.len());
+    for (name, alow, ahigh) in assumptions {
+        match commercialization::Assumption::new(name, *alow, *ahigh) {
+            Ok(a) => parsed.push(a),
+            Err(e) => {
+                return CommandResult::failure(correlation, CommandError::validation(e.to_string()))
+            }
+        }
+    }
+
+    match commercialization::ValuationRange::planning_scenario(scenario_label, low, high, parsed) {
+        Ok(range) => {
+            let dominant = range.dominant_assumption().map(|a| a.name.clone());
+            CommandResult::success(
+                correlation,
+                ValuationView {
+                    low: range.low,
+                    high: range.high,
+                    is_range: range.is_a_range(),
+                    scenario_label: range.scenario_label.clone(),
+                    sensitivity: range.sensitivity(),
+                    dominant_assumption: dominant,
+                },
+            )
+        }
+        Err(e @ commercialization::ValuationError::NotAPlanningScenario(_)) => {
+            CommandResult::failure(correlation, CommandError::policy(e.to_string()))
+        }
+        Err(e) => CommandResult::failure(correlation, CommandError::validation(e.to_string())),
+    }
+}
+
 /// A scheduled docket deadline and whether it is authoritative (REQ-DOM-009).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DeadlineView {
@@ -2555,6 +2637,78 @@ mod tests {
         };
         assert!(!set_research_coverage(&no_scope, "task-1", 1, 1).ok);
         assert!(!complete_research_partial(&no_scope, "task-1", 1, "c").ok);
+    }
+
+    /// covers: REQ-COM-003
+    /// The range/assumption/planning-label rule must hold at the boundary.
+    #[test]
+    fn test_evaluate_valuation_enforces_range_assumptions_and_label() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        let assumptions = vec![
+            ("market size".to_string(), 100.0, 400.0),
+            ("royalty rate".to_string(), 0.02, 0.05),
+        ];
+
+        // A well-formed planning scenario comes back as a range with a ranked
+        // sensitivity table and the dominant assumption named.
+        let ok = evaluate_valuation(
+            &scope,
+            "Conservative planning scenario",
+            1_000_000.0,
+            2_500_000.0,
+            &assumptions,
+        );
+        assert!(ok.ok, "valuation rejected: {:?}", ok.error);
+        let view = ok.value.unwrap();
+        assert!(view.is_range);
+        assert_eq!(view.low, 1_000_000.0);
+        assert_eq!(view.high, 2_500_000.0);
+        assert_eq!(view.dominant_assumption.as_deref(), Some("market size"));
+        assert_eq!(view.sensitivity[0].0, "market size");
+        assert_eq!(view.sensitivity.len(), 2);
+
+        // No assumptions: an unsourced number is refused.
+        assert!(
+            !evaluate_valuation(&scope, "Planning scenario", 1.0, 2.0, &[]).ok,
+            "a valuation with no explicit assumption was accepted"
+        );
+
+        // A label asserting appraisal authority is a POLICY failure, not a
+        // validation one: the request itself is what policy forbids.
+        let appraisal = evaluate_valuation(&scope, "Certified valuation", 1.0, 2.0, &assumptions);
+        assert!(!appraisal.ok, "an appraisal label was accepted");
+        assert!(
+            matches!(appraisal.error, Some(CommandError::Policy { .. })),
+            "appraisal language must be a POLICY failure, got {:?}",
+            appraisal.error
+        );
+
+        // An inverted range is a validation failure.
+        assert!(!evaluate_valuation(&scope, "Planning scenario", 9.0, 1.0, &assumptions).ok);
+
+        // Non-finite bounds are rejected rather than propagating NaN.
+        assert!(!evaluate_valuation(&scope, "Planning scenario", f64::NAN, 1.0, &assumptions).ok);
+        assert!(
+            !evaluate_valuation(
+                &scope,
+                "Planning scenario",
+                0.0,
+                f64::INFINITY,
+                &assumptions
+            )
+            .ok
+        );
+
+        // Blank labels, unnamed assumptions and empty workspaces are rejected.
+        assert!(!evaluate_valuation(&scope, "   ", 1.0, 2.0, &assumptions).ok);
+        let unnamed = vec![("   ".to_string(), 1.0, 2.0)];
+        assert!(!evaluate_valuation(&scope, "Planning scenario", 1.0, 2.0, &unnamed).ok);
+        let no_scope = WorkspaceScope {
+            workspace_id: String::new(),
+        };
+        assert!(!evaluate_valuation(&no_scope, "Planning scenario", 1.0, 2.0, &assumptions).ok);
     }
 
     /// covers: REQ-PAT-002

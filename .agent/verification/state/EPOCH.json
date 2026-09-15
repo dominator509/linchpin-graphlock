@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "f63a1c9",
+  "candidate_commit": "40754ac",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -169,11 +169,11 @@
     "rust-source": {
       "count": 17,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "90409428bffae531049bd649b13095f6be54f9bd83f62cbccd85dfbeaf03b884",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "829298a5f2b87f9453c4ce7c43f606563bd999203df5560d0fc05788a123fc0a",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "1809a6797ef3ed50c81ebc12c654950f4dcdf566b1636e686274d069a90142e7",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "d2a41b3babe0d992a58c5596947c4f1db54c5b7742b24bb7656bb8596516e1e4",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
-        "crates\\commercialization\\src\\lib.rs": "59bbcf33978af42a76239d11583acb9fb8e132d382bd6b72edb2a7fc4411858f",
+        "crates\\commercialization\\src\\lib.rs": "b3cda133f33472b00164b106d3629eceeb701a00d2e14d894e537813646d125a",
         "crates\\crash_reporter\\src\\lib.rs": "7d582c24175d920b18f02241e91f7a95e5d3d067b3e5db93bb2b66aefb0864a6",
         "crates\\domain\\src\\lib.rs": "b35b395f6901cf87c3cb6e474852062b5349ae6dd67d82ae76fb2f54f26081c1",
         "crates\\evidence\\src\\lib.rs": "831478be7892eb838c88886cd10dd40ffad85ad2a1a62b04dc2bbd841f02fc2e",
@@ -211,8 +211,8 @@
       ]
     }
   },
-  "epoch_digest": "783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e",
-  "prior_candidate_commit": "f63a1c9",
-  "prior_epoch_digest": "85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a",
+  "epoch_digest": "0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59",
+  "prior_candidate_commit": "40754ac",
+  "prior_epoch_digest": "783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e",
   "total_inputs": 117
 }

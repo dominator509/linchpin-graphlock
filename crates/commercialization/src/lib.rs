@@ -4,6 +4,163 @@ pub struct TargetCompany {
     pub valuation_match: f32,
 }
 
+/// One explicit assumption behind a valuation range (REQ-COM-003).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Assumption {
+    pub name: String,
+    pub low: f64,
+    pub high: f64,
+}
+
+impl Assumption {
+    pub fn new(name: &str, low: f64, high: f64) -> Result<Self, ValuationError> {
+        if name.trim().is_empty() {
+            return Err(ValuationError::BlankAssumptionName);
+        }
+        if low > high {
+            return Err(ValuationError::InvertedAssumption(name.to_string()));
+        }
+        Ok(Assumption {
+            name: name.to_string(),
+            low,
+            high,
+        })
+    }
+
+    /// How much this assumption moves the outcome. This is what makes the
+    /// sensitivity table meaningful rather than decorative.
+    pub fn spread(&self) -> f64 {
+        (self.high - self.low).abs()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ValuationError {
+    /// "ranges tied to explicit assumptions" -- a range with no assumption
+    /// behind it is an unsourced number.
+    NoAssumptions,
+    /// The range itself is inverted.
+    InvertedRange,
+    BlankAssumptionName,
+    InvertedAssumption(String),
+    /// "not certified appraisals" -- language that asserts appraisal authority.
+    NotAPlanningScenario(String),
+}
+
+impl std::fmt::Display for ValuationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ValuationError::NoAssumptions => write!(
+                f,
+                "a valuation range requires at least one explicit assumption"
+            ),
+            ValuationError::InvertedRange => write!(f, "a valuation range cannot be inverted"),
+            ValuationError::BlankAssumptionName => write!(f, "an assumption must be named"),
+            ValuationError::InvertedAssumption(n) => {
+                write!(f, "assumption {n:?} has a low bound above its high bound")
+            }
+            ValuationError::NotAPlanningScenario(label) => write!(
+                f,
+                "valuation label {label:?} asserts appraisal authority; \
+                 outputs must be labelled planning scenarios"
+            ),
+        }
+    }
+}
+
+/// Phrases that assert appraisal or certification authority.
+const APPRAISAL_LANGUAGE: [&str; 6] = [
+    "certified",
+    "certificate of value",
+    "appraisal",
+    "appraised",
+    "audited valuation",
+    "guaranteed",
+];
+
+/// A valuation output: a range, its explicit assumptions, and a scenario label
+/// (REQ-COM-003).
+///
+/// REQ-COM-003: "Valuation outputs are ranges tied to explicit assumptions and
+/// labelled planning scenarios, not certified appraisals. Sensitivity tables
+/// show which assumptions dominate." All three clauses are enforced here:
+///
+///  * the value is a RANGE, and it cannot be inverted;
+///  * it must carry at least one explicit assumption, so a bare number cannot be
+///    produced;
+///  * its label must not assert appraisal or certification authority -- the same
+///    fabricated-certainty failure REQ-UI-003 guards in product copy, applied to
+///    the number itself;
+///  * `sensitivity()` ranks assumptions by how much they move the outcome, so
+///    "which assumptions dominate" is answered rather than asserted.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ValuationRange {
+    pub low: f64,
+    pub high: f64,
+    pub assumptions: Vec<Assumption>,
+    pub scenario_label: String,
+}
+
+impl ValuationRange {
+    pub fn planning_scenario(
+        scenario_label: &str,
+        low: f64,
+        high: f64,
+        assumptions: Vec<Assumption>,
+    ) -> Result<Self, ValuationError> {
+        let lowered = scenario_label.to_lowercase();
+        if let Some(bad) = APPRAISAL_LANGUAGE
+            .iter()
+            .find(|phrase| lowered.contains(*phrase))
+        {
+            return Err(ValuationError::NotAPlanningScenario(bad.to_string()));
+        }
+        if assumptions.is_empty() {
+            return Err(ValuationError::NoAssumptions);
+        }
+        if low > high {
+            return Err(ValuationError::InvertedRange);
+        }
+        Ok(ValuationRange {
+            low,
+            high,
+            assumptions,
+            scenario_label: scenario_label.to_string(),
+        })
+    }
+
+    /// True when the output is a range rather than a point estimate.
+    pub fn is_a_range(&self) -> bool {
+        self.high > self.low
+    }
+
+    /// Sensitivity table: assumptions ranked by how much they move the outcome,
+    /// most influential first. Ties keep insertion order so the table is stable.
+    pub fn sensitivity(&self) -> Vec<(String, f64)> {
+        let mut ranked: Vec<(usize, String, f64)> = self
+            .assumptions
+            .iter()
+            .enumerate()
+            .map(|(i, a)| (i, a.name.clone(), a.spread()))
+            .collect();
+        ranked.sort_by(|a, b| {
+            b.2.partial_cmp(&a.2)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then(a.0.cmp(&b.0))
+        });
+        ranked.into_iter().map(|(_, n, s)| (n, s)).collect()
+    }
+
+    /// The single assumption that dominates the outcome, if any.
+    pub fn dominant_assumption(&self) -> Option<&Assumption> {
+        self.assumptions.iter().max_by(|a, b| {
+            a.spread()
+                .partial_cmp(&b.spread())
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })
+    }
+}
+
 pub struct DataRoom {
     pub targets: Vec<TargetCompany>,
     pub assets_redacted: bool,
@@ -247,5 +404,137 @@ mod live_fire_tests {
         }
         assert_eq!(orchestrator.completed_runs(), 1);
         assert_eq!(orchestrator.missing_outcomes().len(), 11);
+    }
+}
+
+#[cfg(test)]
+mod valuation_tests {
+    use super::*;
+
+    fn assumptions() -> Vec<Assumption> {
+        vec![
+            Assumption::new("market size", 100.0, 400.0).unwrap(),
+            Assumption::new("royalty rate", 0.02, 0.05).unwrap(),
+            Assumption::new("remaining life", 8.0, 12.0).unwrap(),
+        ]
+    }
+
+    /// covers: REQ-COM-003
+    /// "Valuation outputs are ranges tied to explicit assumptions."
+    #[test]
+    fn test_valuation_is_a_range_tied_to_explicit_assumptions() {
+        let v = ValuationRange::planning_scenario(
+            "Conservative planning scenario",
+            1_000_000.0,
+            2_500_000.0,
+            assumptions(),
+        )
+        .expect("a well-formed planning scenario");
+        assert!(v.is_a_range(), "the output must be a range, not a point");
+        assert_eq!(v.assumptions.len(), 3);
+        assert_eq!(v.low, 1_000_000.0);
+        assert_eq!(v.high, 2_500_000.0);
+    }
+
+    /// covers: REQ-COM-003
+    /// A range with no assumption behind it is an unsourced number, and an
+    /// inverted range is not a range at all.
+    #[test]
+    fn test_valuation_requires_assumptions_and_a_sane_range() {
+        assert_eq!(
+            ValuationRange::planning_scenario("Planning scenario", 1.0, 2.0, Vec::new()),
+            Err(ValuationError::NoAssumptions),
+            "a valuation with no explicit assumption must be refused"
+        );
+        assert_eq!(
+            ValuationRange::planning_scenario("Planning scenario", 5.0, 1.0, assumptions()),
+            Err(ValuationError::InvertedRange)
+        );
+        // A single point is permitted but is NOT a range, so callers can tell.
+        let point = ValuationRange::planning_scenario("Planning scenario", 3.0, 3.0, assumptions())
+            .unwrap();
+        assert!(!point.is_a_range());
+    }
+
+    /// covers: REQ-COM-003
+    /// "not certified appraisals" -- a label asserting appraisal authority is
+    /// refused rather than stored.
+    #[test]
+    fn test_valuation_label_must_not_assert_appraisal_authority() {
+        for bad in [
+            "Certified valuation",
+            "Independent appraisal",
+            "Audited valuation result",
+            "Guaranteed return scenario",
+            "APPRAISED value",
+        ] {
+            assert_eq!(
+                ValuationRange::planning_scenario(bad, 1.0, 2.0, assumptions()),
+                Err(ValuationError::NotAPlanningScenario(
+                    APPRAISAL_LANGUAGE
+                        .iter()
+                        .find(|p| bad.to_lowercase().contains(*p))
+                        .unwrap()
+                        .to_string()
+                )),
+                "label {bad:?} should have been refused"
+            );
+        }
+        // An honest planning label is accepted.
+        assert!(
+            ValuationRange::planning_scenario(
+                "Illustrative planning scenario only",
+                1.0,
+                2.0,
+                assumptions()
+            )
+            .is_ok()
+        );
+    }
+
+    /// covers: REQ-COM-003
+    /// "Sensitivity tables show which assumptions dominate."
+    #[test]
+    fn test_sensitivity_ranks_the_dominant_assumption_first() {
+        let v = ValuationRange::planning_scenario("Planning scenario", 1.0, 2.0, assumptions())
+            .unwrap();
+
+        let table = v.sensitivity();
+        assert_eq!(table.len(), 3);
+        // market size spans 300, remaining life 4, royalty rate 0.03.
+        assert_eq!(table[0].0, "market size");
+        assert_eq!(table[0].1, 300.0);
+        assert_eq!(table[1].0, "remaining life");
+        assert_eq!(table[2].0, "royalty rate");
+
+        let dominant = v.dominant_assumption().expect("a dominant assumption");
+        assert_eq!(dominant.name, "market size");
+
+        // Ties are stable: insertion order wins.
+        let tied = ValuationRange::planning_scenario(
+            "Planning scenario",
+            0.0,
+            1.0,
+            vec![
+                Assumption::new("first", 0.0, 1.0).unwrap(),
+                Assumption::new("second", 0.0, 1.0).unwrap(),
+            ],
+        )
+        .unwrap();
+        assert_eq!(tied.sensitivity()[0].0, "first");
+    }
+
+    /// covers: REQ-COM-003
+    #[test]
+    fn test_assumption_bounds_are_validated() {
+        assert_eq!(
+            Assumption::new("  ", 0.0, 1.0),
+            Err(ValuationError::BlankAssumptionName)
+        );
+        assert_eq!(
+            Assumption::new("inverted", 5.0, 1.0),
+            Err(ValuationError::InvertedAssumption("inverted".to_string()))
+        );
+        assert_eq!(Assumption::new("ok", 1.0, 5.0).unwrap().spread(), 4.0);
     }
 }

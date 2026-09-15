@@ -171,6 +171,19 @@ fn check_support_matrix(
     commands::check_support_matrix(&scope, &exportable, &anchors)
 }
 
+/// Produce a valuation range tied to explicit assumptions (REQ-COM-003).
+#[tauri::command]
+fn evaluate_valuation(
+    workspace_id: String,
+    scenario_label: String,
+    low: f64,
+    high: f64,
+    assumptions: Vec<(String, f64, f64)>,
+) -> commands::CommandResult<commands::ValuationView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::evaluate_valuation(&scope, &scenario_label, low, high, &assumptions)
+}
+
 /// Declare a research task's scope and covered count (REQ-OPS-002).
 #[tauri::command]
 fn set_research_coverage(
@@ -336,6 +349,7 @@ pub fn run() {
             classify_research_claim,
             schedule_docket_deadline,
             check_support_matrix,
+            evaluate_valuation,
             set_research_coverage,
             complete_research_partial,
             build_filing_package,

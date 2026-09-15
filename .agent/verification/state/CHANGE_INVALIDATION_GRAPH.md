@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e`
-- Candidate commit at generation: `f63a1c9`
+- Current epoch digest: `0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59`
+- Candidate commit at generation: `40754ac`
 - Total tracked inputs: 117
-- Previous epoch digest: `85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a`
-- **Changed input classes since that epoch: gate-script**
+- Previous epoch digest: `783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e`
+- **Changed input classes since that epoch: rust-source**
 
 ## Input classes and what a change invalidates
 
@@ -108,11 +108,11 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-012 regression/mutation
 - invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `90409428bffae531…`
-  - `apps\desktop\src-tauri\src\lib.rs` `829298a5f2b87f94…`
+  - `apps\desktop\src-tauri\src\commands.rs` `1809a6797ef3ed50…`
+  - `apps\desktop\src-tauri\src\lib.rs` `d2a41b3babe0d992…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
-  - `crates\commercialization\src\lib.rs` `59bbcf33978af42a…`
+  - `crates\commercialization\src\lib.rs` `b3cda133f33472b0…`
   - … and 12 more
 
 ### `test-oracle` — 3 file(s)

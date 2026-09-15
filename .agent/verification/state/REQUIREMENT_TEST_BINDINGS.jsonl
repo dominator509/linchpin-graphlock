@@ -1,6 +1,13 @@
 {"collected": false, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-001", "result": "NOT_RUN", "test_id": "default"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-001", "result": "PASS", "test_id": "commercialization_tests::test_data_room_workflow"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-COM-001", "result": "PASS", "test_id": "commands::tests::test_commercialization_package_is_redacted"}
+{"collected": false, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "NOT_RUN", "test_id": "valuation_tests::assumptions"}
+{"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "valuation_tests::test_valuation_is_a_range_tied_to_explicit_assumptions"}
+{"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "valuation_tests::test_valuation_requires_assumptions_and_a_sane_range"}
+{"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "valuation_tests::test_valuation_label_must_not_assert_appraisal_authority"}
+{"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "valuation_tests::test_sensitivity_ranks_the_dominant_assumption_first"}
+{"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "valuation_tests::test_assumption_bounds_are_validated"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "commands::tests::test_evaluate_valuation_enforces_range_assumptions_and_label"}
 {"collected": false, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-004", "result": "NOT_RUN", "test_id": "default"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-004", "result": "PASS", "test_id": "commercialization_tests::test_data_room_workflow"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-COM-004", "result": "PASS", "test_id": "commands::tests::test_commercialization_package_is_redacted"}
