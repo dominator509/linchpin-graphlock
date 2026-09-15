@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "40754ac",
+  "candidate_commit": "2de60ad",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -213,6 +213,6 @@
   },
   "epoch_digest": "0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59",
   "prior_candidate_commit": "40754ac",
-  "prior_epoch_digest": "783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e",
+  "prior_epoch_digest": "0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59",
   "total_inputs": 117
 }
