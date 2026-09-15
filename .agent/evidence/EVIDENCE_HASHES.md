@@ -24,7 +24,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-007 | PASS | `.agent/verification/state/TEST_COLLECTION_MANIFEST.json` | `81fcb86f30351611` | 927 |
 | DOD-008 | PARTIAL | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `e8282c11d6fd8e1e` | 163134 |
 | DOD-009 | PARTIAL | `crates/storage/tests/integration_real_dependencies.rs` | `f1a3c433b86e22cd` | 7993 |
-| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `4926afd04de1dcb6` | 2229 |
+| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `9786b3e22f577129` | 2229 |
 | DOD-011 | PARTIAL | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` | 3804 |
 | DOD-012 | PARTIAL | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` | 3804 |
 | DOD-013 | FAIL | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
@@ -33,7 +33,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-016 | PARTIAL | `crates/storage/src/vault.rs` | `7a93a336d709e6de` | 24577 |
 | DOD-017 | PARTIAL | `crates/storage/tests/integration_real_dependencies.rs` | `f1a3c433b86e22cd` | 7993 |
 | DOD-018 | PASS | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
-| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `4926afd04de1dcb6` | 2229 |
+| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `9786b3e22f577129` | 2229 |
 | DOD-020 | PARTIAL | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
 | DOD-021 | PASS | `.agent/verification/reports/TEST_COLLECTION_SKIP_REPORT.md` | `1a39d097092d002e` | 553 |
 | DOD-022 | FAIL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
@@ -54,9 +54,9 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | FAIL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
 | DOD-038 | FAIL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `bf43be948f44963b` | 4075 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `0f601bc6ef9ccdb2` | 4202 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `abddfe3185eca5a2` | 144894 |
-| DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `324ee0696bd7345e` | 1365 |
+| DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `e165a9074eb3e0c9` | 1365 |
 
 ## Registry ledger rows with a cited evidence document
 

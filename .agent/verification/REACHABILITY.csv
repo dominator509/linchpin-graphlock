@@ -44,6 +44,7 @@ complete,research,crates/research/src/lib.rs,REACHABLE,"named from apps\desktop\
 complete_partial,research,crates/research/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\research\src\lib.rs"
 complete_research_partial,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 completed_runs,commercialization,crates/commercialization/src/lib.rs,REACHABLE,named from crates\commercialization\src\lib.rs
+config_status,desktop,apps/desktop/src-tauri/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs
 confirm_with_ruleset,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 content_hash,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\storage\src\vault.rs"
 count_evidence,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests: crates\storage\src\lib.rs
@@ -69,8 +70,10 @@ fetch_official_record,storage,crates/storage/src/lib.rs,REACHABLE,named from cra
 figure,domain,crates/domain/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\domain\src\lib.rs"
 file_application,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 filter_export,evidence,crates/evidence/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
-fmt,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\domain\src\lib.rs, crates\provider_transport\src\lib.rs"
+fmt,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\domain\src\lib.rs, crates\platform_windows\src\lib.rs"
 from,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\application\src\lib.rs"
+from_env,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\lib.rs, crates\platform_windows\src\lib.rs"
+from_lookup,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from crates\platform_windows\src\lib.rs
 generate,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\provider_transport\src\lib.rs"
 get_app_paths,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs
 get_blob,storage,crates/storage/src/vault.rs,TEST_ONLY,named only from tests: crates\storage\src\vault.rs
@@ -119,6 +122,7 @@ observation,research,crates/research/src/lib.rs,REACHABLE,"named from apps\deskt
 open,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\storage\src\vault.rs"
 open_pr,application,crates/application/src/lib.rs,TEST_ONLY,named only from tests: crates\application\src\lib.rs
 passing_count,research,crates/research/src/lib.rs,TEST_ONLY,named only from tests: crates\research\src\lib.rs
+paths,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\platform_windows\src\lib.rs, crates\provider_transport\src\lib.rs"
 policy,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\crash_reporter\src\lib.rs, crates\evidence\src\lib.rs"
 probe_storage,application,crates/application/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs
 provider_status,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
@@ -126,7 +130,7 @@ public_export,domain,crates/domain/src/lib.rs,TEST_ONLY,named only from tests: c
 push_scrubbed,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from crates\crash_reporter\src\lib.rs
 put_blob,storage,crates/storage/src/vault.rs,TEST_ONLY,named only from tests: crates\storage\src\vault.rs
 put_conception_event,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
-reason,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\domain\src\lib.rs, crates\provider_transport\src\lib.rs"
+reason,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\domain\src\lib.rs"
 record_conception,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 record_coverage,research,crates/research/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 record_run,commercialization,crates/commercialization/src/lib.rs,TEST_ONLY,named only from tests: crates\commercialization\src\lib.rs

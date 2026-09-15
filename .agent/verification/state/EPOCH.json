@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "ddb85d5",
+  "candidate_commit": "26317da",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -170,7 +170,7 @@
       "count": 16,
       "files": {
         "apps\\desktop\\src-tauri\\src\\commands.rs": "90409428bffae531049bd649b13095f6be54f9bd83f62cbccd85dfbeaf03b884",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "aa95549cd6cf8740808b28648b5525f94c49b624cfc996e8e11a878bc1c47c13",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "829298a5f2b87f9453c4ce7c43f606563bd999203df5560d0fc05788a123fc0a",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
         "crates\\commercialization\\src\\lib.rs": "59bbcf33978af42a76239d11583acb9fb8e132d382bd6b72edb2a7fc4411858f",
@@ -179,7 +179,7 @@
         "crates\\evidence\\src\\lib.rs": "831478be7892eb838c88886cd10dd40ffad85ad2a1a62b04dc2bbd841f02fc2e",
         "crates\\mcp_hub\\src\\lib.rs": "bac47aab7e67b1e81cb3852515b18ca6006f548d69313d5036ee9646ec2222aa",
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
-        "crates\\platform_windows\\src\\lib.rs": "8be19d1ce80e0b309565f4015a0a1a1f3728954316de1b83e505300a1fa94108",
+        "crates\\platform_windows\\src\\lib.rs": "20bbb410079f4faf5644c6f63ae900b0b4a1e5dddd4aeaaa5acc92c1088042c9",
         "crates\\provider_transport\\src\\lib.rs": "a62348a0bfcf96e67c141cc8f3c593d45a80e6ca1939873c1df6c7a1b9c59813",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
@@ -210,8 +210,8 @@
       ]
     }
   },
-  "epoch_digest": "73173c88ad47262bda9cb9a538e96bb06233ec676a193246aee8b554cb1a9841",
-  "prior_candidate_commit": "ddb85d5",
-  "prior_epoch_digest": "a32d1a729e64cc2b3f5af7cb0e2ba5e81f600197b39ff538b7fd77d6b6b562d6",
+  "epoch_digest": "cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a",
+  "prior_candidate_commit": "26317da",
+  "prior_epoch_digest": "73173c88ad47262bda9cb9a538e96bb06233ec676a193246aee8b554cb1a9841",
   "total_inputs": 116
 }

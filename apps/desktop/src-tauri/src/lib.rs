@@ -10,6 +10,18 @@ fn storage_root() -> PathBuf {
     platform_windows::get_app_paths().app_data_dir
 }
 
+/// The typed configuration, or the reason it could not be parsed.
+///
+/// REQ-FOUND-002 centralises environment parsing. This surfaces a parse failure
+/// to the health probe instead of swallowing it, so a misconfigured host reports
+/// DEGRADED rather than appearing healthy at a fallback path.
+fn config_status() -> (Option<platform_windows::AppConfig>, Option<String>) {
+    match platform_windows::AppConfig::from_env() {
+        Ok(config) => (Some(config), None),
+        Err(e) => (None, Some(e.to_string())),
+    }
+}
+
 /// Report runtime health from real probes.
 ///
 /// GraphLock context (anti-gaming finding AG-007a): this command previously
@@ -25,7 +37,19 @@ fn storage_root() -> PathBuf {
 fn get_system_health() -> Result<application::SystemHealth, String> {
     let root = storage_root();
     let probe = application::probe_storage(&root);
-    Ok(application::check_system_health_with(&[probe]))
+    // A configuration that cannot be parsed is a real health signal, not a
+    // detail to hide: REQ-FOUND-002 requires the environment to be parsed into
+    // typed form, so failing to do that is reported alongside the storage probe.
+    let (_, config_error) = config_status();
+    let mut probes = vec![probe];
+    if let Some(detail) = config_error {
+        probes.push(application::HealthProbe {
+            name: "configuration".to_string(),
+            ok: false,
+            detail,
+        });
+    }
+    Ok(application::check_system_health_with(&probes))
 }
 
 /// Record a human conception event (REQ-DOM-001, REQ-DOM-002).

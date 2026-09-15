@@ -17,7 +17,7 @@ REQ-DOM-008,5,4,4,0,PASS,commands::tests::test_export_firewall_blocks_restricted
 REQ-DOM-009,6,6,6,0,PASS,commands::tests::test_schedule_docket_deadline_requires_ruleset_authority;docket_tests::test_authoritative_deadline_rejects_an_empty_date;docket_tests::test_deadline_requires_ruleset_source_and_version;docket_tests::test_deadline_with_a_ruleset_is_authoritative;docket_tests::test_deadline_without_a_ruleset_is_never_authoritative;docket_tests::test_model_suggestion_is_not_authoritative_until_confirmed,apps/desktop/src-tauri/src/commands.rs;crates/domain/src/lib.rs
 REQ-DOM-010,3,3,3,0,PASS,capsule_tests::test_export_guard_accepts_a_fully_redacted_capsule;capsule_tests::test_export_guard_rejects_surviving_registered_secret;capsule_tests::test_punctuation_wrapped_tokens_are_scrubbed_before_export,crates/crash_reporter/src/lib.rs
 REQ-FOUND-001,0,0,0,0,NO_BOUND_TEST,,
-REQ-FOUND-002,0,0,0,0,NO_BOUND_TEST,,
+REQ-FOUND-002,4,4,4,0,PASS,tests::test_config_parses_environment_once_into_typed_values;tests::test_missing_required_value_is_an_error_not_a_fallback;tests::test_release_runtime_is_parsed;tests::test_unknown_keys_warn_in_development_and_fail_in_release,crates/platform_windows/src/lib.rs
 REQ-LIC-001,0,0,0,0,NO_BOUND_TEST,,
 REQ-LIC-002,0,0,0,0,NO_BOUND_TEST,,
 REQ-LIC-003,0,0,0,0,NO_BOUND_TEST,,

@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `73173c88ad47262bda9cb9a538e96bb06233ec676a193246aee8b554cb1a9841`
-- Candidate commit at generation: `ddb85d5`
+- Current epoch digest: `cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a`
+- Candidate commit at generation: `26317da`
 - Total tracked inputs: 116
-- Previous epoch digest: `a32d1a729e64cc2b3f5af7cb0e2ba5e81f600197b39ff538b7fd77d6b6b562d6`
+- Previous epoch digest: `73173c88ad47262bda9cb9a538e96bb06233ec676a193246aee8b554cb1a9841`
 - **Changed input classes since that epoch: rust-source**
 
 ## Input classes and what a change invalidates
@@ -109,7 +109,7 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-013 dynamic security/domain packs
 
   - `apps\desktop\src-tauri\src\commands.rs` `90409428bffae531…`
-  - `apps\desktop\src-tauri\src\lib.rs` `aa95549cd6cf8740…`
+  - `apps\desktop\src-tauri\src\lib.rs` `829298a5f2b87f94…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
   - `crates\commercialization\src\lib.rs` `59bbcf33978af42a…`
