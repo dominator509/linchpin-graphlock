@@ -185,3 +185,7 @@
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-SHIP-001", "result": "PASS", "test_id": "live_fire_tests::test_completed_runs_cannot_be_fabricated"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-SHIP-001", "result": "PASS", "test_id": "live_fire_tests::test_failing_runs_do_not_count_as_completed"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-SHIP-001", "result": "PASS", "test_id": "live_fire_tests::test_duplicate_runs_count_once"}
+{"collected": true, "file": "apps/desktop/e2e/shell.spec.ts", "requirement_id": "REQ-UI-001", "result": "PASS", "test_id": "e2e::exposes primary navigation for all thirteen surfaces"}
+{"collected": true, "file": "apps/desktop/e2e/shell.spec.ts", "requirement_id": "REQ-UI-002", "result": "PASS", "test_id": "e2e::shows the four persistent top-level status badges"}
+{"collected": true, "file": "apps/desktop/e2e/shell.spec.ts", "requirement_id": "REQ-UI-003", "result": "PASS", "test_id": "e2e::uses screening vocabulary and never definitive legal conclusions"}
+{"collected": true, "file": "apps/desktop/e2e/shell.spec.ts", "requirement_id": "REQ-UI-004", "result": "PASS", "test_id": "e2e::high-impact actions require a consequence-specific confirmation"}

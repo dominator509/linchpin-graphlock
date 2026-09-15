@@ -81,6 +81,12 @@ fn get_namespace_status() -> Vec<commands::NamespaceStatus> {
     commands::namespace_status()
 }
 
+/// Report the resolved typed configuration (REQ-FOUND-002).
+#[tauri::command]
+fn get_configuration() -> commands::CommandResult<commands::ConfigurationView> {
+    commands::get_configuration()
+}
+
 /// Advance a research task (REQ-RES-002).
 #[tauri::command]
 fn apply_research_action(
@@ -343,6 +349,7 @@ pub fn run() {
             get_system_health,
             record_conception,
             get_namespace_status,
+            get_configuration,
             apply_research_action,
             evaluate_export,
             lint_claims,

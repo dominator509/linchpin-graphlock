@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59`
-- Candidate commit at generation: `2de60ad`
+- Current epoch digest: `8eb2e2afc647fc01bc1eb36bafa6b3f629b15fd8d5a9fee70c22a60225081248`
+- Candidate commit at generation: `ce21cbf`
 - Total tracked inputs: 117
-- Previous epoch digest: `0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59`
+- Previous epoch digest: `8eb2e2afc647fc01bc1eb36bafa6b3f629b15fd8d5a9fee70c22a60225081248`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -33,7 +33,7 @@ definition and its PASS status is revoked until rerun.
 
   - `.gitattributes` `3de8a5dfac003c5f…`
   - `.prettierignore` `f6bc22748f98df53…`
-  - `apps\desktop\playwright.config.ts` `44233624cd581b09…`
+  - `apps\desktop\playwright.config.ts` `0245031fa9af124d…`
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
@@ -48,7 +48,7 @@ definition and its PASS status is revoked until rerun.
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
   - `scripts\artifact-e2e.sh` `ae13bb46a1b8bd9f…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
-  - `scripts\bind-requirements.py` `9cc8788618425ea7…`
+  - `scripts\bind-requirements.py` `3fcbf287580ccf09…`
   - … and 51 more
 
 ### `js-manifest` — 7 file(s)
@@ -69,8 +69,8 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-008 full functionality
 - invalidates: V-015 usability/accessibility
 
-  - `apps\desktop\e2e\shell.spec.ts` `bc69a5b585c10400…`
-  - `apps\desktop\src\App.tsx` `bf4715bfaae5bef7…`
+  - `apps\desktop\e2e\shell.spec.ts` `060fed4727356374…`
+  - `apps\desktop\src\App.tsx` `d5e3c1ee496fe44c…`
   - `apps\desktop\src\main.tsx` `bfcf131d8fb04a4d…`
   - `apps\desktop\tests\has-ipc.test.ts` `8f2e208b7f1499e6…`
   - `packages\contracts\src\index.ts` `72fd005dc2fdd303…`
@@ -108,8 +108,8 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-012 regression/mutation
 - invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `1809a6797ef3ed50…`
-  - `apps\desktop\src-tauri\src\lib.rs` `d2a41b3babe0d992…`
+  - `apps\desktop\src-tauri\src\commands.rs` `d6dde38e7b20e2bf…`
+  - `apps\desktop\src-tauri\src\lib.rs` `3caaedc99872a98f…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
   - `crates\commercialization\src\lib.rs` `b3cda133f33472b0…`

@@ -24,7 +24,20 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: [["list"]],
+  // `list` keeps the console output readable; `json` writes the machine-readable
+  // report that scripts/bind-requirements.py reads to decide whether an
+  // E2E-bound requirement was actually COLLECTED and whether it PASSED. Without
+  // it, requirements bound to Playwright tests are reported BOUND_NOT_COLLECTED
+  // or PARTIAL even though the tests ran and passed -- a false negative in the
+  // traceability accounting.
+  //
+  // Written under .agent/state/ rather than into this workspace: it is GraphLock
+  // run evidence, and generating it inside apps/desktop made
+  // scripts/format-check.sh fail on a generated file instead of on authored code.
+  reporter: [
+    ["list"],
+    ["json", { outputFile: "../../.agent/state/e2e-report.json" }],
+  ],
   timeout: 30_000,
   expect: { timeout: 5_000 },
   use: {

@@ -1116,6 +1116,44 @@ pub fn check_support_matrix(
     )
 }
 
+/// Resolved runtime configuration as reported to the UI (REQ-FOUND-002).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ConfigurationView {
+    pub app_data_dir: String,
+    pub vault_dir: String,
+    pub runtime: String,
+    /// Unknown configuration keys that were ignored in development. Reported
+    /// rather than dropped, so a typo stays visible.
+    pub warnings: Vec<String>,
+}
+
+/// Report the typed configuration the process actually resolved
+/// (REQ-FOUND-002).
+///
+/// The environment is parsed once into `platform_windows::AppConfig`; this
+/// surfaces the RESULT so an operator can see which paths and runtime are in
+/// effect instead of inferring them. A configuration that cannot be parsed is a
+/// POLICY failure: the process would be running on a fallback, and that is not a
+/// state to present as normal.
+pub fn get_configuration() -> CommandResult<ConfigurationView> {
+    let correlation = CorrelationId::new();
+    match platform_windows::AppConfig::from_env() {
+        Ok(config) => {
+            let paths = config.paths();
+            CommandResult::success(
+                correlation,
+                ConfigurationView {
+                    app_data_dir: paths.app_data_dir.display().to_string(),
+                    vault_dir: paths.vault_dir.display().to_string(),
+                    runtime: format!("{:?}", config.runtime),
+                    warnings: config.warnings,
+                },
+            )
+        }
+        Err(e) => CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    }
+}
+
 /// A valuation output as returned to the UI (REQ-COM-003).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ValuationView {

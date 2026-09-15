@@ -74,12 +74,13 @@ file_application,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\deskt
 filter_export,evidence,crates/evidence/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 fmt,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\commercialization\src\lib.rs, crates\domain\src\lib.rs"
 from,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\application\src\lib.rs"
-from_env,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\lib.rs, crates\platform_windows\src\lib.rs"
+from_env,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\platform_windows\src\lib.rs"
 from_lookup,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from crates\platform_windows\src\lib.rs
 generate,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\provider_transport\src\lib.rs"
 get_app_paths,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs
 get_blob,storage,crates/storage/src/vault.rs,TEST_ONLY,named only from tests: crates\storage\src\vault.rs
 get_conception_event,storage,crates/storage/src/vault.rs,TEST_ONLY,"named only from tests: apps\desktop\src-tauri\src\commands.rs, crates\storage\src\vault.rs"
+get_configuration,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 get_namespace_status,desktop,apps/desktop/src-tauri/src/lib.rs,ENTRY_POINT,registered in generate_handler![...]
 get_record,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests: crates\storage\src\lib.rs
 get_secret,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from crates\platform_windows\src\lib.rs

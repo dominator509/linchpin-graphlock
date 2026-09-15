@@ -54,7 +54,7 @@ REQ-SEC-002,5,4,4,0,PASS,hardening_tests::test_archive_entry_rejects_zip_slip;ha
 REQ-SEC-003,3,3,3,0,PASS,commands::tests::test_local_inference_rejects_empty_prompt;commands::tests::test_mcp_capability_grant_is_explicit;mcp_tests::test_unknown_client_has_no_capabilities,apps/desktop/src-tauri/src/commands.rs;crates/mcp_hub/src/lib.rs
 REQ-SEC-010,6,5,5,0,PASS,sandbox_tests::test_git_sandbox_proof;threat_control_tests::test_allowlist_holds_no_cryptographic_material;threat_control_tests::test_allowlist_registration_is_idempotent;threat_control_tests::test_allowlist_rejects_empty_values;threat_control_tests::test_update_signature_verification,crates/application/src/lib.rs;crates/evidence/src/lib.rs
 REQ-SHIP-001,4,4,4,0,PASS,live_fire_tests::test_completed_runs_cannot_be_fabricated;live_fire_tests::test_duplicate_runs_count_once;live_fire_tests::test_failing_runs_do_not_count_as_completed;live_fire_tests::test_uo_live_fire_and_regression,crates/commercialization/src/lib.rs
-REQ-UI-001,0,0,0,0,NO_BOUND_TEST,,
-REQ-UI-002,0,0,0,0,NO_BOUND_TEST,,
-REQ-UI-003,0,0,0,0,NO_BOUND_TEST,,
-REQ-UI-004,0,0,0,0,NO_BOUND_TEST,,
+REQ-UI-001,1,1,1,0,PASS,e2e::exposes primary navigation for all thirteen surfaces,apps/desktop/e2e/shell.spec.ts
+REQ-UI-002,1,1,1,0,PASS,e2e::shows the four persistent top-level status badges,apps/desktop/e2e/shell.spec.ts
+REQ-UI-003,1,1,1,0,PASS,e2e::uses screening vocabulary and never definitive legal conclusions,apps/desktop/e2e/shell.spec.ts
+REQ-UI-004,1,1,1,0,PASS,e2e::high-impact actions require a consequence-specific confirmation,apps/desktop/e2e/shell.spec.ts

@@ -105,6 +105,31 @@ def find_e2e_specs() -> list[Path]:
     return sorted(root.rglob("*.spec.ts"))
 
 
+def attached_comment_block(text: str, start: int) -> str:
+    """The run of comment lines immediately above position `start`.
+
+    Only lines contiguous with the declaration count: the block ends at the
+    first non-comment line. This is what makes attribution unambiguous. An
+    earlier version searched from the preceding blank line to the NEXT test's
+    declaration, so a test carrying no marker of its own inherited the marker
+    written above the following test -- measured, REQ-UI-001 was credited to the
+    receipt-import test as well as to the navigation test.
+    """
+    block: list[str] = []
+    for line in reversed(text[:start].splitlines()):
+        stripped = line.strip()
+        if (
+            stripped.startswith("//")
+            or stripped.startswith("/*")
+            or stripped.startswith("*")
+            or stripped.endswith("*/")
+        ):
+            block.append(line)
+            continue
+        break
+    return "\n".join(reversed(block))
+
+
 def bind_e2e_requirements() -> dict[str, list[dict[str, str]]]:
     """Map Playwright test titles -> requirement IDs declared inside that test.
 
@@ -128,8 +153,10 @@ def bind_e2e_requirements() -> dict[str, list[dict[str, str]]]:
         for idx, match in enumerate(starts):
             title = match.group(1)
             start = match.start()
-            end = starts[idx + 1].start() if idx + 1 < len(starts) else len(text)
-            body = text[start:end]
+
+            # Attribute the comment block ATTACHED to this declaration, so a
+            # `covers:` marker belongs to the test it sits above and to no other.
+            body = attached_comment_block(text, start)
 
             marker = re.search(
                 r"(?://|/\*|\*)\s*(?:covers|verifies|reqs?)\s*:\s*([^\n*]*)",
@@ -153,6 +180,13 @@ def collect_e2e_test_ids() -> set[str]:
     file is not execution, so without a report the set is empty and any bound
     E2E requirement is reported BOUND_NOT_COLLECTED rather than PASS -- the
     honest outcome when the browser lane has not run for this candidate.
+
+    The walker follows Playwright's real report shape: `suites[]` nest other
+    suites AND hold `specs[]`, and each spec carries the test title and `ok`.
+    An earlier version iterated suites looking for `tests` directly on them and
+    therefore never reached a single spec -- it returned an empty set, which
+    went unnoticed because no report existed to read. Fixed once the JSON
+    reporter was added and the empty result became visible.
     """
     report = Path("apps/desktop/e2e-report.json")
     if not report.exists():
@@ -165,20 +199,16 @@ def collect_e2e_test_ids() -> set[str]:
         return set()
     ids: set[str] = set()
 
-    def walk(specs: list) -> None:
-        for spec in specs:
-            for suite in spec.get("suites", []) or []:
-                walk([suite])
-            title = spec.get("title")
-            if title and spec.get("ok") is not None:
-                ids.add(f"e2e::{title}")
-            for t in spec.get("tests", []) or []:
-                t_title = t.get("title")
-                if t_title:
-                    ids.add(f"e2e::{t_title}")
+    def walk_suites(suites: list) -> None:
+        for suite in suites or []:
+            for spec in suite.get("specs", []) or []:
+                title = spec.get("title")
+                if title:
+                    ids.add(f"e2e::{title}")
+            # Nested describes.
+            walk_suites(suite.get("suites", []) or [])
 
-    for suite in data.get("suites", []) or []:
-        walk([suite])
+    walk_suites(data.get("suites", []) or [])
     return ids
 
 
@@ -263,7 +293,7 @@ def bind_requirements() -> dict[str, list[dict[str, str]]]:
 
 
 def parse_results() -> dict[str, str]:
-    """test_id -> PASS/FAIL from a real run."""
+    """test_id -> PASS/FAIL from a real run, across both runners."""
     proc = subprocess.run(
         ["cargo", "test", "--workspace", "--locked"],
         capture_output=True,
@@ -282,6 +312,31 @@ def parse_results() -> dict[str, str]:
                 "FAILED": "FAIL",
                 "ignored": "IGNORED",
             }[m.group(2)]
+
+    # E2E outcomes. Without these, an E2E-bound requirement has a collected test
+    # and no RESULT, which the caller reports as PARTIAL -- indistinguishable
+    # from a test that ran and did not pass. Measured: all four REQ-UI rows sat
+    # at PARTIAL with exec=1 pass=0 while their Playwright tests were green.
+    report = Path("apps/desktop/e2e-report.json")
+    if not report.exists():
+        report = Path(".agent/state/e2e-report.json")
+    if report.exists():
+        try:
+            data = json.loads(report.read_text("utf-8", errors="replace"))
+        except (json.JSONDecodeError, OSError):
+            data = {}
+
+        def walk_suites(suites: list) -> None:
+            for suite in suites or []:
+                for spec in suite.get("specs", []) or []:
+                    title = spec.get("title")
+                    if title:
+                        results[f"e2e::{title}"] = (
+                            "PASS" if spec.get("ok") else "FAIL"
+                        )
+                walk_suites(suite.get("suites", []) or [])
+
+        walk_suites(data.get("suites", []) or [])
     return results
 
 

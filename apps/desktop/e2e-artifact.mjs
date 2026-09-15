@@ -221,6 +221,38 @@ try {
       String(conception.value?.event?.origin),
     );
   }
+
+  // REQ-UI-004 audit half: a confirmed high-impact action must be recorded with
+  // its correlation ID. This needs REAL IPC -- the browser suite can prove the
+  // confirmation step but not that an action actually ran and was audited.
+  const auditBefore = await page
+    .locator("#audit li")
+    .count()
+    .catch(() => 0);
+  await page.getByRole("button", { name: "Export evidence bundle" }).click();
+  const confirmPanel = page.getByRole("group", {
+    name: "Confirm Export evidence bundle",
+  });
+  const confirmVisible = await confirmPanel.isVisible().catch(() => false);
+  record(
+    "high-impact action shows a confirmation panel before acting",
+    confirmVisible,
+    String(confirmVisible),
+  );
+  if (confirmVisible) {
+    await confirmPanel.getByRole("button", { name: "Export evidence" }).click();
+    await page.waitForTimeout(1500);
+    const auditAfter = await page.locator("#audit li").count();
+    const auditText = await page
+      .locator("#audit")
+      .innerText()
+      .catch(() => "");
+    record(
+      "confirmed action is recorded in the audit trail (REQ-UI-004)",
+      auditAfter > auditBefore && /correlation/.test(auditText),
+      `entries ${auditBefore} -> ${auditAfter}; ${auditText.replace(/\s+/g, " ").slice(0, 120)}`,
+    );
+  }
 } catch (err) {
   record("harness", false, String(err));
 } finally {

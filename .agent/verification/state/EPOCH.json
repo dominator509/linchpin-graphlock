@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "2de60ad",
+  "candidate_commit": "ce21cbf",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -18,7 +18,7 @@
       "files": {
         ".gitattributes": "3de8a5dfac003c5fcb8cf674d6b0eb545c663d97c36a4da2dee7f7725517cd56",
         ".prettierignore": "f6bc22748f98df5307f79b0f7f03d11b0410a31089c04b2ec01400af9c39ac03",
-        "apps\\desktop\\playwright.config.ts": "44233624cd581b09f8db578c11d7b7ad2ec66d2f4e43f0e263849fb0623c1c1c",
+        "apps\\desktop\\playwright.config.ts": "0245031fa9af124de8d79650a457867cf4e92d5b6f366085cb990b90f42fca7f",
         "apps\\desktop\\src-tauri\\tauri.conf.json": "950dc4ba958823127e61c28f97f0693013fef91537ee9a0c1f4409a006909622",
         "apps\\desktop\\vitest.config.ts": "d0adc5ef1e028cc988da921a9224b3bb82652f005a09450ff39718b385eb06ac"
       },
@@ -34,7 +34,7 @@
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
         "scripts\\artifact-e2e.sh": "ae13bb46a1b8bd9fe6f9af86b07479e83c446ae22ba6d007b8d96c0897e17cc9",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
-        "scripts\\bind-requirements.py": "9cc8788618425ea7ff066a1be91ff1cafd04f4d539da82be05ef929b915b3b30",
+        "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
         "scripts\\build-dod-status.py": "e24977d47a97d69ca745cb2d1cbb90cdd8360f4a68275be437cc5aa563340616",
@@ -113,8 +113,8 @@
     "js-source": {
       "count": 9,
       "files": {
-        "apps\\desktop\\e2e\\shell.spec.ts": "bc69a5b585c1040007318cfba5ca2739d18cedfae9c19a81287055b163f079d3",
-        "apps\\desktop\\src\\App.tsx": "bf4715bfaae5bef7ae2fb7178fc2735cd9d325cbdb65c98f5f9e332db9f3a19f",
+        "apps\\desktop\\e2e\\shell.spec.ts": "060fed4727356374841f8db39695faca5f98e3e348fb11928c4ceb2a96ee5217",
+        "apps\\desktop\\src\\App.tsx": "d5e3c1ee496fe44c30c411d127ff4d9369e873c247bcdb542220112d230c7d83",
         "apps\\desktop\\src\\main.tsx": "bfcf131d8fb04a4dadcdd633c0bdbefea3f3a7af5bb35d34dc55588991887654",
         "apps\\desktop\\tests\\has-ipc.test.ts": "8f2e208b7f1499e680843f672d5ebe4c6be7dd528740e5ff1f1bf7e8d09ba10c",
         "packages\\contracts\\src\\index.ts": "72fd005dc2fdd303863557b1adf8b594509112d5ea55642b960093676ef8bd06",
@@ -169,8 +169,8 @@
     "rust-source": {
       "count": 17,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "1809a6797ef3ed50c81ebc12c654950f4dcdf566b1636e686274d069a90142e7",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "d2a41b3babe0d992a58c5596947c4f1db54c5b7742b24bb7656bb8596516e1e4",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "d6dde38e7b20e2bfe89b83a827aa5207c3ac9114667397d54e9dff81cfe69180",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "3caaedc99872a98f1c3c2b7a511487f686f89764877e3e5adf98d7e1986237af",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
         "crates\\commercialization\\src\\lib.rs": "b3cda133f33472b00164b106d3629eceeb701a00d2e14d894e537813646d125a",
@@ -211,8 +211,8 @@
       ]
     }
   },
-  "epoch_digest": "0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59",
-  "prior_candidate_commit": "40754ac",
-  "prior_epoch_digest": "0d67ebb101dffa6045e78c4bef786780dfec0055525b22a90465bd97dec6bd59",
+  "epoch_digest": "8eb2e2afc647fc01bc1eb36bafa6b3f629b15fd8d5a9fee70c22a60225081248",
+  "prior_candidate_commit": "ce21cbf",
+  "prior_epoch_digest": "8eb2e2afc647fc01bc1eb36bafa6b3f629b15fd8d5a9fee70c22a60225081248",
   "total_inputs": 117
 }

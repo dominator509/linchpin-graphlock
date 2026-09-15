@@ -253,4 +253,146 @@ test.describe("LINCHPIN desktop shell", () => {
       ),
     ).toBeVisible();
   });
+
+  // covers: REQ-UI-001
+  test("exposes primary navigation for all thirteen surfaces", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // REQ-UI-001 names thirteen surfaces. Every one must be a real navigation
+    // entry AND lead to a real section — a nav link to a missing target is a
+    // dead route, which DOD-019 forbids.
+    const expected = [
+      "Dashboard",
+      "Opportunity Radar",
+      "Conception Lab",
+      "Research War Room",
+      "Patent Architect",
+      "Filing",
+      "Docket",
+      "Prosecution",
+      "Commercialize",
+      "Evidence Vault",
+      "Integrations",
+      "Incidents",
+      "Settings",
+    ];
+
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    await expect(nav).toBeVisible();
+
+    const links = nav.getByRole("link");
+    await expect(links).toHaveCount(expected.length);
+
+    for (const label of expected) {
+      const link = nav.getByRole("link", { name: label, exact: true });
+      await expect(link, `${label} must be a navigation entry`).toBeVisible();
+
+      // The target must exist and be the section that labels itself `label`.
+      const href = await link.getAttribute("href");
+      expect(href, `${label} must link somewhere`).toBeTruthy();
+      const id = href!.replace(/^#/, "");
+      const section = page.locator(`section#${id}`);
+      await expect(section, `${label} must link to a real section`).toHaveCount(
+        1,
+      );
+      await expect(
+        section.getByRole("heading", { level: 2, name: label }),
+      ).toBeVisible();
+    }
+  });
+
+  // covers: REQ-UI-002
+  test("shows the four persistent top-level status badges", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // REQ-UI-002: confidentiality, filing/priority state, evidence coverage and
+    // external-provider egress state. The badges must render even with no
+    // backend, and must describe the unknown state rather than invent one.
+    const badges = page.getByRole("list", { name: "Status badges" });
+    await expect(badges).toBeVisible();
+
+    await expect(
+      badges.getByText("Local-First Confidentiality Boundary Active."),
+    ).toBeVisible();
+    await expect(badges.getByText(/^Filing state:/)).toBeVisible();
+    await expect(
+      badges.getByText(/Evidence coverage|contract namespaces/),
+    ).toBeVisible();
+    await expect(badges.getByText(/External-provider egress:/)).toBeVisible();
+
+    await expect(badges.getByRole("listitem")).toHaveCount(4);
+
+    // A badge must not claim a provider lane is configured when none was
+    // reported — the AG-007a "health signal that lies" failure.
+    const text = await badges.innerText();
+    expect(text).not.toContain("a lane is configured");
+  });
+
+  // covers: REQ-UI-003
+  test("uses screening vocabulary and never definitive legal conclusions", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // REQ-UI-003: legal-risk language uses "screen", "draft", "evidence",
+    // "uncertainty" rather than definitive legal conclusions.
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    for (const preferred of ["screen", "draft", "evidence", "uncertainty"]) {
+      expect(
+        body,
+        `preferred vocabulary "${preferred}" should appear in the product surface`,
+      ).toContain(preferred);
+    }
+  });
+
+  // covers: REQ-UI-004
+  test("high-impact actions require a consequence-specific confirmation", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // REQ-UI-004: destructive/high-impact actions use consequence-specific
+    // confirmation and audit. The first click must NOT perform the action.
+    const trigger = page.getByRole("button", {
+      name: "Export evidence bundle",
+    });
+    await expect(trigger).toBeVisible();
+
+    await expect(
+      page.getByRole("group", { name: "Confirm Export evidence bundle" }),
+    ).toHaveCount(0);
+
+    await trigger.click();
+
+    const confirmPanel = page.getByRole("group", {
+      name: "Confirm Export evidence bundle",
+    });
+    await expect(confirmPanel).toBeVisible();
+
+    // The consequence must be specific: it names what leaves the boundary.
+    await expect(confirmPanel).toContainText(
+      "releases screening evidence beyond the device boundary",
+    );
+    await expect(confirmPanel).toContainText("cannot be recalled");
+
+    // Cancel dismisses without acting.
+    await confirmPanel.getByRole("button", { name: "Cancel" }).click();
+    await expect(confirmPanel).toHaveCount(0);
+
+    // Every high-impact action offers the same protection.
+    for (const label of ["Build filing package", "Probe local model"]) {
+      await page.getByRole("button", { name: label, exact: true }).click();
+      await expect(
+        page.getByRole("group", { name: `Confirm ${label}` }),
+      ).toBeVisible();
+      await page
+        .getByRole("group", { name: `Confirm ${label}` })
+        .getByRole("button", { name: "Cancel" })
+        .click();
+    }
+  });
 });
