@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "d8927fb",
+  "candidate_commit": "de78a4e",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -35,9 +35,9 @@
         "scripts\\artifact-e2e.sh": "66789e3a58097851dc57d7a8d6d06fbc7b3d6e23c3fe66c69144132a8c8be9f3",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\bind-requirements.py": "b5b3f5d11af024a5bd363c74cd133a696e64172f34064aae8fbb7b34f881c41f",
-        "scripts\\build-accounting.py": "b78a76cb023247fbb17340edb081c17ba405e443bed9c0212281b89767958f9b",
+        "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "7a1859364d51ac8c793ce8d2118b56e256ecf48b5de5256c79c2b95ee1173ba3",
+        "scripts\\build-dod-status.py": "e24977d47a97d69ca745cb2d1cbb90cdd8360f4a68275be437cc5aa563340616",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "4a3a415e5911befcdc401208536e230281314563602d8a46c88d2dcdf703fc05",
@@ -48,7 +48,7 @@
         "scripts\\dod-gate.sh": "26d4e578e6c62da5c946fc433be1d3d5226fd520fe062cfbf01f71aef12fd6bb",
         "scripts\\fix-trailing-and-lanes.py": "1975f3d7bfd6693657d2250076f0e71c4786e56f446389afaf77169ff3191ab9",
         "scripts\\format-check.sh": "2d565f3798f61577218798bec689d59bab3e48daaa372c6645985c86fb0ca545",
-        "scripts\\generate-evidence-index.py": "5e54c65a55f48fe6539704a0c1ab441c89313a5dfb3684bc02eb44e058442960",
+        "scripts\\generate-evidence-index.py": "a630cc0ddc88fbbc3d09dea9f5e6f6afb4ae3f189e9f887692656becdf2e5510",
         "scripts\\generate-icons.py": "cd5649efa6ea2a9ee8d35c95e097c17e1bfff88edf526f2bd7a75c9a0e16a1fe",
         "scripts\\generate-sbom.py": "8ee9a1c44f0acc404b2e71b5e52e52821dd6d0f9e8574cb2de20ff09222de18e",
         "scripts\\graph-next.sh": "3f73444ecc2008a54a7487e6db42f34191f658b5a44bfb5c4739f50ba59c514a",
@@ -56,7 +56,7 @@
         "scripts\\harness-init.sh": "9e5861aecd7507382f83a2559d85f38aa5a9c0bf3ae7c5e25319c1812cda96fd",
         "scripts\\harness-next.sh": "e448ad424fd26160328f81c237ec5d4289b562acb590b47cb07878390d344096",
         "scripts\\harness-run-stage.sh": "c17cbbb510a23399dadbc9461346f72d22f848aac165fe9f2970bf8003f6f5ae",
-        "scripts\\harness-validate.sh": "a2171fe5a9d066e7f4c947b7e24c5512dc64a524efb8acec6c7e7afb947b2f74",
+        "scripts\\harness-validate.sh": "44c33c0859e590ceecdd300bb49d9fbc81c64ffbcb2aa9c93c9338f08b228fd1",
         "scripts\\install.sh": "239ce88259366eb9c7fd08be66e72f8e8ad15b0b5fab2406580f3a381a0bbe4a",
         "scripts\\ledger.sh": "81b5ebc8c4ea7b64fe446a869b0080dceea7ae756eb72de59d26f63604eeb755",
         "scripts\\lint.sh": "9ee4326885c8b33befaa74195a8a4d8e83cbcc43a60cdefc62cd86f20a4e222d",
@@ -67,7 +67,7 @@
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
         "scripts\\reality-gate.sh": "d6d8fd785d9eadf8d74d15b86d18bb08fdb4e0ff9f05d2e26f2f0ecb263f9092",
-        "scripts\\rerun-invalidated.py": "4a0c5297a2072d6d06c7b2e2d368877b5d2495b1f632afc6a0d6fd2f25e8d519",
+        "scripts\\rerun-invalidated.py": "c5e6355ac11d77280b4f831823a1819328fcce210fdb5a353b4813ce0c9d08ec",
         "scripts\\run-integration-real.sh": "a1f218daae2ab710aa9fc1ffd4df4b399bfa55c3212a8e9a909548d4a030d685",
         "scripts\\run-live-fire-real.sh": "b3641eed140c03789261aac8c5b371fe3c35616f9a03844b5c85a721c9f69e31",
         "scripts\\secret-scan.py": "28b7a041cde51745b2045e82398beabfe9587ae0f4ddb4bcceba751965d4c651",
@@ -85,7 +85,7 @@
         "scripts\\validate-generated-pack.py": "50dc425bbcc17145e559a7fc1eccc9957b0ecbcbb6b6539a2ac5cde1cb8adf47",
         "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
         "scripts\\vault-preservation-e2e.sh": "99077fbdbbebea0d09390a2c6d0bdb67a63698e796a6f3ac884b3b12cc0fca7a",
-        "scripts\\verify.sh": "39ce4683db85da230dc16f3603042a633ceab98686097c4da9fd0c5c700cce25"
+        "scripts\\verify.sh": "219bbf937f182b6d679b9b8d58b5fdfad7883625952b2c7cd5c9282a9281ea3e"
       },
       "rules": [
         "V-000 harness validation",
@@ -169,8 +169,8 @@
     "rust-source": {
       "count": 16,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "5a7a8ee6442b55fbba9aca4be4b5966961fb0567420be3be861c13b6a870a28e",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "a461b454630d47de384e56f949395fb8e9465b1fc62f0e012615bce72c0ab8d0",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "7367be2cc0f96f52c4fd5430552cb0f7242028097501808e00ac18fc1fc92807",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "ba8e97b8d3ba20fcac595bdd00311bd53236626e76212d999bb5b5b624a24130",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
         "crates\\commercialization\\src\\lib.rs": "59bbcf33978af42a76239d11583acb9fb8e132d382bd6b72edb2a7fc4411858f",
@@ -181,7 +181,7 @@
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
         "crates\\platform_windows\\src\\lib.rs": "8be19d1ce80e0b309565f4015a0a1a1f3728954316de1b83e505300a1fa94108",
         "crates\\provider_transport\\src\\lib.rs": "92d48bbf0490b490bcba36de078e027e2ff34cc45eb9122f3a15e6a7de61ba3a",
-        "crates\\research\\src\\lib.rs": "c1e1f7baa1604787e44673624d00a705ffe6fdfbb68dccfb8f237a6609b619e5",
+        "crates\\research\\src\\lib.rs": "68809369a124876743c08fdfa3d759cb36d2e83ce7c26cf6db0204da3be47bb3",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
         "crates\\storage\\src\\vault.rs": "7a93a336d709e6dea982296c038742d4785e3fedc095b947cd9f4b250091feab",
         "crates\\storage\\tests\\integration_real_dependencies.rs": "f1a3c433b86e22cdddfaaa95d1658e76b1c2a81414a06bd33299da73f7d51539"
@@ -210,8 +210,8 @@
       ]
     }
   },
-  "epoch_digest": "fe4afacbbb183350b950428f618c63630c6adf8f536de365222159b6b8445506",
-  "prior_candidate_commit": "d8927fb",
-  "prior_epoch_digest": "40261f1507e7d92564993a3faea02dd5b2e291e7aedfa1b3e267d69ee1e8cbcd",
+  "epoch_digest": "377948e0ea38fd8d2cf94c106588a30858ad7d217287cadd509acaca7578fed6",
+  "prior_candidate_commit": "de78a4e",
+  "prior_epoch_digest": "377948e0ea38fd8d2cf94c106588a30858ad7d217287cadd509acaca7578fed6",
   "total_inputs": 116
 }

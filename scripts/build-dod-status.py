@@ -184,6 +184,19 @@ def main() -> int:
         # whose cited evidence has changed since it was recorded is STALE, and a
         # stale PASS must be re-derived rather than trusted. Reported per clause
         # so the affected claims are named rather than counted.
+        #
+        # `--structure-only` skips the currency comparison. harness-validate.sh
+        # uses it, because that script is ITSELF an invalidated stage: a gate
+        # change reruns the harness, and stages that rewrite evidence run before
+        # it, so a currency check inside it is circular in exactly the way the
+        # rerun-obligation check was before it moved to verify.sh. Currency is
+        # asserted in verify.sh, after the derived evidence has been refreshed.
+        if "--structure-only" in sys.argv:
+            print(
+                f"dod-status check: ok ({len(existing)} clauses, one disposition "
+                "each, structure only)"
+            )
+            return 0
         stale: list[str] = []
         unhashed: list[str] = []
         for row in existing:

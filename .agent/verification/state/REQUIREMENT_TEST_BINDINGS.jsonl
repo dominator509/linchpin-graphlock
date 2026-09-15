@@ -89,6 +89,13 @@
 {"collected": true, "file": "crates/patent/src/lib.rs", "requirement_id": "REQ-PAT-002", "result": "PASS", "test_id": "builder_tests::test_package_builder_does_not_claim_unimplemented_formats"}
 {"collected": true, "file": "crates/patent/src/lib.rs", "requirement_id": "REQ-PAT-002", "result": "PASS", "test_id": "builder_tests::test_manifest_digest_depends_on_both_inputs"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-PAT-002", "result": "PASS", "test_id": "commands::tests::test_build_filing_package_does_not_claim_a_document_format"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-PAT-003", "result": "PASS", "test_id": "tournament_tests::test_rerun_replaces_previous_verdicts"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-PAT-003", "result": "PASS", "test_id": "claim_tests::test_claim_classes_are_a_closed_set_of_seven"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-PAT-003", "result": "PASS", "test_id": "claim_tests::test_observation_may_be_emitted_from_a_source_record"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-PAT-003", "result": "PASS", "test_id": "claim_tests::test_non_observation_classes_require_method_and_contrary_evidence"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-PAT-003", "result": "PASS", "test_id": "claim_tests::test_non_observation_may_not_claim_a_source_record"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-PAT-003", "result": "PASS", "test_id": "claim_tests::test_empty_claim_text_is_rejected"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-PAT-003", "result": "PASS", "test_id": "commands::tests::test_classify_research_claim_enforces_class_provenance"}
 {"collected": true, "file": "crates/patent/src/lib.rs", "requirement_id": "REQ-PAT-004", "result": "PASS", "test_id": "action_tests::test_office_action_workspace"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-PAT-004", "result": "PASS", "test_id": "commands::tests::test_docket_validates_inputs"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-PAT-004", "result": "PASS", "test_id": "commands::tests::test_office_action_refuses_allowance_response"}

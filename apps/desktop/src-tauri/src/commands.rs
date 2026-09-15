@@ -513,6 +513,102 @@ pub struct LintOutcome {
     pub findings: Vec<String>,
 }
 
+/// Outcome of classifying a research claim (REQ-PAT-003).
+///
+/// `class` is returned verbatim as one of the seven canonical names so the UI
+/// cannot relabel a hypothesis as an observation, and `requires` states what the
+/// chosen class obliges the author to supply.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ClaimClassOutcome {
+    /// One of the seven REQ-PAT-003 class names.
+    pub class: String,
+    /// True only for `OBSERVATION`, the sole class emittable from a source record.
+    pub emittable_from_source_record: bool,
+    /// Non-empty for every class other than `OBSERVATION`.
+    pub requires: Vec<String>,
+}
+
+/// Classify a research claim and enforce REQ-PAT-003's provenance rule.
+///
+/// REQ-PAT-003: "Every research claim carries exactly one class ... Only
+/// `OBSERVATION` may be emitted directly from a source record; all others store
+/// inference method and contrary evidence."
+///
+/// This command is the production path for that rule. Without it the rule was
+/// enforced only inside the research crate's own tests, which is why the
+/// reachability analysis classified it TEST_ONLY: a requirement implemented but
+/// unreachable from any user-facing path is not a delivered behaviour.
+///
+/// A claim whose class obligations are unmet is a VALIDATION failure, not a
+/// silent acceptance: storing an unlabelled inference next to observations is
+/// the fabricated-certainty failure the requirement exists to prevent.
+pub fn classify_research_claim(
+    class: &str,
+    text: &str,
+    source_record: Option<&str>,
+    inference_method: Option<&str>,
+    contrary_evidence: Option<&str>,
+) -> CommandResult<ClaimClassOutcome> {
+    let correlation = CorrelationId::new();
+
+    if text.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("claim text cannot be empty"),
+        );
+    }
+
+    let parsed = match class {
+        "OBSERVATION" => research::ClaimClass::Observation,
+        "HYPOTHESIS" => research::ClaimClass::Hypothesis,
+        "INFERENCE" => research::ClaimClass::Inference,
+        "LEGAL_RULE_SUMMARY" => research::ClaimClass::LegalRuleSummary,
+        "MARKET_SIGNAL" => research::ClaimClass::MarketSignal,
+        "PATENT_THREAT" => research::ClaimClass::PatentThreat,
+        "COMMERCIAL_TARGET_ASSERTION" => research::ClaimClass::CommercialTargetAssertion,
+        other => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!(
+                    "unknown claim class {other:?}; expected one of the seven REQ-PAT-003 classes"
+                )),
+            );
+        }
+    };
+
+    // Build the claim from exactly what the caller declared, then let the domain
+    // rule decide. Nothing is inferred or defaulted on the caller's behalf.
+    let claim = research::ResearchClaim {
+        text: text.to_string(),
+        class: parsed,
+        source_record: source_record.map(str::to_string),
+        inference_method: inference_method.map(str::to_string),
+        contrary_evidence: contrary_evidence.map(str::to_string),
+    };
+
+    match claim.validate() {
+        Ok(()) => {
+            let requires = if parsed.may_be_emitted_from_source_record() {
+                Vec::new()
+            } else {
+                vec![
+                    "inference_method".to_string(),
+                    "contrary_evidence".to_string(),
+                ]
+            };
+            CommandResult::success(
+                correlation,
+                ClaimClassOutcome {
+                    class: parsed.as_str().to_string(),
+                    emittable_from_source_record: parsed.may_be_emitted_from_source_record(),
+                    requires,
+                },
+            )
+        }
+        Err(e) => CommandResult::failure(correlation, CommandError::validation(e.to_string())),
+    }
+}
+
 /// Build a filing-package manifest (REQ-PAT-002).
 ///
 /// `PackageBuilder` emits a MANIFEST with a real content fingerprint rather
@@ -1808,6 +1904,101 @@ mod tests {
         assert!(!outcome.findings.is_empty());
 
         assert!(!lint_claims("   ").ok, "empty claims must be rejected");
+    }
+
+    /// covers: REQ-PAT-003
+    /// The rule must hold at the production boundary, not only inside the
+    /// research crate's own tests.
+    #[test]
+    fn test_classify_research_claim_enforces_class_provenance() {
+        // OBSERVATION may come straight from a source record.
+        let obs = classify_research_claim(
+            "OBSERVATION",
+            "US1234567B2 discloses a valve.",
+            Some("US1234567B2"),
+            None,
+            None,
+        );
+        assert!(obs.ok, "observation rejected: {:?}", obs.error);
+        let view = obs.value.unwrap();
+        assert_eq!(view.class, "OBSERVATION");
+        assert!(view.emittable_from_source_record);
+        assert!(view.requires.is_empty());
+
+        // A non-observation class without its obligations is rejected, and the
+        // message names the missing obligation.
+        let bare = classify_research_claim("HYPOTHESIS", "the market is moving", None, None, None);
+        assert!(!bare.ok, "hypothesis without provenance was accepted");
+        let msg = format!("{:?}", bare.error);
+        assert!(
+            msg.contains("inference method"),
+            "rejection did not name the inference method: {msg}"
+        );
+
+        // Supplying only the method is still incomplete: contrary evidence is
+        // required too.
+        let half = classify_research_claim(
+            "HYPOTHESIS",
+            "the market is moving",
+            None,
+            Some("extrapolated from three filings"),
+            None,
+        );
+        assert!(
+            !half.ok,
+            "hypothesis without contrary evidence was accepted"
+        );
+        assert!(
+            format!("{:?}", half.error).contains("contrary evidence"),
+            "rejection did not name the contrary evidence"
+        );
+
+        // Full provenance is accepted.
+        let full = classify_research_claim(
+            "HYPOTHESIS",
+            "the market is moving",
+            None,
+            Some("extrapolated from three filings"),
+            Some("one filing contradicts this"),
+        );
+        assert!(
+            full.ok,
+            "fully-provenanced claim rejected: {:?}",
+            full.error
+        );
+        let full_view = full.value.unwrap();
+        assert_eq!(full_view.class, "HYPOTHESIS");
+        assert!(!full_view.emittable_from_source_record);
+        assert_eq!(
+            full_view.requires,
+            vec![
+                "inference_method".to_string(),
+                "contrary_evidence".to_string()
+            ]
+        );
+
+        // A non-observation claim may not cite a source record directly: that is
+        // the shape that presents an inference as a fact.
+        let sneaky = classify_research_claim(
+            "INFERENCE",
+            "the claim is anticipated",
+            Some("US1234567B2"),
+            Some("comparison of limitations"),
+            Some("one limitation is absent"),
+        );
+        assert!(!sneaky.ok, "inference citing a source record was accepted");
+        assert!(
+            format!("{:?}", sneaky.error).contains("source record"),
+            "rejection did not name the source-record rule"
+        );
+
+        // An unlisted class is rejected rather than coerced into one of the seven.
+        let bogus = classify_research_claim("GUESS", "t", None, Some("m"), Some("c"));
+        assert!(!bogus.ok, "an unlisted class was accepted");
+        assert!(format!("{:?}", bogus.error).contains("unknown claim class"));
+
+        // Empty text asserts nothing.
+        assert!(!classify_research_claim("OBSERVATION", "  ", Some("s"), None, None).ok);
     }
 
     /// covers: REQ-PAT-002

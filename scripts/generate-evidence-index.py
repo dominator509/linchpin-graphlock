@@ -103,6 +103,15 @@ def main() -> int:
     ]
 
     if "--check" in sys.argv:
+        if "--structure-only" in sys.argv:
+            # harness-validate.sh path: presence and shape only. The file's
+            # CONTENT is derived from the digests, so asserting freshness there
+            # would be circular; verify.sh asserts it once the state has settled.
+            if not OUT.exists():
+                print("evidence-index check: FAIL (file missing)", file=sys.stderr)
+                return 1
+            print(f"evidence-index check: ok ({len(rows)} clauses, structure only)")
+            return 0
         if not OUT.exists():
             print("evidence-index check: FAIL (file missing)", file=sys.stderr)
             return 1

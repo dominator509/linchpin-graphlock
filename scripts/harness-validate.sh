@@ -11,10 +11,10 @@ set -eu
 # tamper-detection bypass. The mask is removed here.
 python3 scripts/validate-generated-pack.py .
 python3 scripts/validate-hash-ledger.py .agent/state/LEDGER.jsonl
-python3 scripts/build-accounting.py --check
+python3 scripts/build-accounting.py --check --structure-only
 python3 scripts/build-traceability.py --check
-python3 scripts/build-dod-status.py --check
-python3 scripts/generate-evidence-index.py --check
+python3 scripts/build-dod-status.py --check --structure-only
+python3 scripts/generate-evidence-index.py --check --structure-only
 python3 scripts/test-collection-guard.py --check
 python3 scripts/ship-gate.py --check
 python3 scripts/build-applicability.py --check

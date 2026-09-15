@@ -43,6 +43,18 @@ run "change invalidation (recompute)" python3 scripts/change-invalidation.py
 run "change invalidation (verify)" python3 scripts/change-invalidation.py --check
 run "rerun obligation" python3 scripts/rerun-invalidated.py --check
 
+# Evidence-currency checks, AFTER the epoch has settled.
+#
+# These live here rather than in harness-validate.sh because harness-validate is
+# itself an invalidated stage: a gate change reruns it, and the stages that
+# rewrite evidence run before it, so a currency check inside it can never pass
+# on a rerun. That is the same circularity that forced the rerun-obligation
+# check out of harness-validate earlier; harness-validate now runs these with
+# --structure-only and the currency assertion happens here, on the settled state.
+run "ledger evidence currency" python3 scripts/build-accounting.py --check
+run "DOD evidence currency" python3 scripts/build-dod-status.py --check
+run "evidence index currency" python3 scripts/generate-evidence-index.py --check
+
 if [ "$status" -eq 0 ]; then
   echo "verify: ok"
 else

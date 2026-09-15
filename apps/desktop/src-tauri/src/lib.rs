@@ -92,6 +92,29 @@ fn lint_claims(claims: String) -> commands::CommandResult<commands::LintOutcome>
     commands::lint_claims(&claims)
 }
 
+/// Classify a research claim and enforce its provenance obligations
+/// (REQ-PAT-003).
+///
+/// The rule was previously enforced only inside the research crate's own tests,
+/// so the reachability analysis reported it TEST_ONLY. A requirement implemented
+/// but unreachable from any user-facing path is not a delivered behaviour.
+#[tauri::command]
+fn classify_research_claim(
+    class: String,
+    text: String,
+    source_record: Option<String>,
+    inference_method: Option<String>,
+    contrary_evidence: Option<String>,
+) -> commands::CommandResult<commands::ClaimClassOutcome> {
+    commands::classify_research_claim(
+        &class,
+        &text,
+        source_record.as_deref(),
+        inference_method.as_deref(),
+        contrary_evidence.as_deref(),
+    )
+}
+
 /// Build a filing-package manifest (REQ-PAT-002).
 #[tauri::command]
 fn build_filing_package(
@@ -229,6 +252,7 @@ pub fn run() {
             apply_research_action,
             evaluate_export,
             lint_claims,
+            classify_research_claim,
             build_filing_package,
             import_receipt,
             check_filing_handoff,

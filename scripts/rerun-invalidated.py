@@ -147,6 +147,43 @@ def stages_for(classes: list[str]) -> list[str]:
     return stages
 
 
+def refresh_derived_evidence() -> None:
+    """Refresh derived evidence in dependency order.
+
+    The order is not cosmetic:
+      accounting -> records ledger-row digests, and its inputs include source
+                    files (commands.rs), so a rerun that rebuilt code makes those
+                    digests stale;
+      DOD status -> records clause digests, and depends on the ledger;
+      index      -> renders both, so it goes last.
+    Measured: refreshing only the DOD status left two ledger rows citing
+    commands.rs stale, and refreshing the index before its sources left the
+    harness-validate run red. Each step exists because its absence was observed
+    to fail.
+    """
+    for label, script in (
+        ("accounting", "scripts/build-accounting.py"),
+        ("DOD evidence digests", "scripts/build-dod-status.py"),
+        ("the evidence index", "scripts/generate-evidence-index.py"),
+    ):
+        step = subprocess.run(
+            ["python3", script],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            shell=False,
+        )
+        if step.returncode == 0:
+            print(f"rerun: refreshed {label}")
+        else:
+            print(
+                f"rerun: WARNING -- could not refresh {label}; "
+                f"{(step.stderr or '').strip()[:200]}",
+                file=sys.stderr,
+            )
+
+
 def main() -> int:
     list_only = "--list" in sys.argv
     check_only = "--check" in sys.argv
@@ -218,6 +255,13 @@ def main() -> int:
             + "\n",
             "utf-8",
         )
+        # This path REWRITES RERUN_RECORD.json, which DOD-040 cites as its
+        # evidence, so the derived digests must be refreshed here too. Measured
+        # defect: returning without refreshing left DOD-040's digest stale, and
+        # verify.sh then failed its DOD-evidence-currency lane on a run that had
+        # done nothing wrong. Same class as the artifact-ordering trap: writing
+        # a cited document obliges refreshing whatever records its digest.
+        refresh_derived_evidence()
         return 0
 
     print(f"rerun: {len(classes)} changed class(es) -> {len(stages)} stage(s)")
@@ -312,44 +356,17 @@ def main() -> int:
     # what keeps the DOD-040 evidence-currency check meaningful instead of
     # permanently red. Ordering matters: this must not run before the reruns,
     # or it would record digests for documents the reruns then replace.
-    refresh = subprocess.run(
-        ["python3", "scripts/build-dod-status.py"],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        shell=False,
-    )
-    if refresh.returncode == 0:
-        print("rerun: refreshed DOD evidence digests")
-    else:
-        print(
-            "rerun: WARNING -- could not refresh DOD evidence digests; "
-            f"{(refresh.stderr or '').strip()[:200]}",
-            file=sys.stderr,
-        )
-
-    # The human-readable index renders the digests, so refreshing the digests
-    # makes the index stale by construction. Regenerate it in the same step and
-    # in this order, or --check fails on the next harness run. This is the same
-    # ordering trap the artifact class documents: regenerating a view after its
-    # source is a fix, not a weakening.
-    index = subprocess.run(
-        ["python3", "scripts/generate-evidence-index.py"],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        shell=False,
-    )
-    if index.returncode == 0:
-        print("rerun: refreshed the evidence index")
-    else:
-        print(
-            "rerun: WARNING -- could not refresh the evidence index; "
-            f"{(index.stderr or '').strip()[:200]}",
-            file=sys.stderr,
-        )
+    # Refresh derived evidence in dependency order. This order is not cosmetic:
+    #   accounting  -> records ledger-row digests, and its inputs include source
+    #                  files (commands.rs), so a rerun that rebuilt code makes
+    #                  those digests stale;
+    #   DOD status  -> records clause digests, and depends on the ledger;
+    #   index       -> renders both, so it goes last.
+    # Measured: refreshing only the DOD status left two ledger rows citing
+    # commands.rs stale, and refreshing the index before its sources left the
+    # harness-validate run red. Each step here exists because its absence was
+    # observed to fail.
+    refresh_derived_evidence()
 
     if failures:
         print(f"rerun: FAIL -- {failures} command(s) failed", file=sys.stderr)

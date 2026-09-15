@@ -6,6 +6,156 @@ pub enum SearchStatus {
     Completed,
 }
 
+/// The single class a research claim carries (REQ-PAT-003).
+///
+/// REQ-PAT-003 requires that "every research claim carries exactly one class"
+/// from this closed set. Modelling it as an enum makes "exactly one" a
+/// property of the type rather than a convention: a claim cannot hold two
+/// classes, and no class outside this list can be constructed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ClaimClass {
+    Observation,
+    Hypothesis,
+    Inference,
+    LegalRuleSummary,
+    MarketSignal,
+    PatentThreat,
+    CommercialTargetAssertion,
+}
+
+impl ClaimClass {
+    /// Only `OBSERVATION` may be emitted directly from a source record.
+    pub fn may_be_emitted_from_source_record(self) -> bool {
+        matches!(self, ClaimClass::Observation)
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ClaimClass::Observation => "OBSERVATION",
+            ClaimClass::Hypothesis => "HYPOTHESIS",
+            ClaimClass::Inference => "INFERENCE",
+            ClaimClass::LegalRuleSummary => "LEGAL_RULE_SUMMARY",
+            ClaimClass::MarketSignal => "MARKET_SIGNAL",
+            ClaimClass::PatentThreat => "PATENT_THREAT",
+            ClaimClass::CommercialTargetAssertion => "COMMERCIAL_TARGET_ASSERTION",
+        }
+    }
+}
+
+/// A research claim and the provenance REQ-PAT-003 demands for its class.
+///
+/// The rule has two halves and both are enforced here: "Only `OBSERVATION` may
+/// be emitted directly from a source record; all others store inference method
+/// and contrary evidence." A non-observation claim that omits either the
+/// inference method or the contrary evidence is rejected rather than stored,
+/// because an unlabelled inference presented alongside observations is exactly
+/// the fabricated-certainty failure this requirement exists to prevent.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ResearchClaim {
+    pub text: String,
+    pub class: ClaimClass,
+    /// Present when the claim was read directly out of a source record.
+    pub source_record: Option<String>,
+    /// Required for every class other than `OBSERVATION`.
+    pub inference_method: Option<String>,
+    /// Required for every class other than `OBSERVATION`.
+    pub contrary_evidence: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ClaimError {
+    /// A non-observation claim was emitted straight from a source record.
+    SourceRecordNotAllowedForClass(ClaimClass),
+    /// A non-observation claim omitted its inference method.
+    MissingInferenceMethod(ClaimClass),
+    /// A non-observation claim omitted its contrary evidence.
+    MissingContraryEvidence(ClaimClass),
+    /// A claim's text is empty, so it asserts nothing.
+    EmptyText,
+}
+
+impl std::fmt::Display for ClaimError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ClaimError::SourceRecordNotAllowedForClass(c) => write!(
+                f,
+                "class {} may not be emitted directly from a source record",
+                c.as_str()
+            ),
+            ClaimError::MissingInferenceMethod(c) => {
+                write!(f, "class {} requires an inference method", c.as_str())
+            }
+            ClaimError::MissingContraryEvidence(c) => {
+                write!(f, "class {} requires contrary evidence", c.as_str())
+            }
+            ClaimError::EmptyText => write!(f, "claim text cannot be empty"),
+        }
+    }
+}
+
+impl ResearchClaim {
+    /// An observation read directly from a source record.
+    pub fn observation(text: &str, source_record: &str) -> Self {
+        ResearchClaim {
+            text: text.to_string(),
+            class: ClaimClass::Observation,
+            source_record: Some(source_record.to_string()),
+            inference_method: None,
+            contrary_evidence: None,
+        }
+    }
+
+    /// Validate the claim against REQ-PAT-003 before it is stored or exported.
+    pub fn validate(&self) -> Result<(), ClaimError> {
+        if self.text.trim().is_empty() {
+            return Err(ClaimError::EmptyText);
+        }
+        if self.class.may_be_emitted_from_source_record() {
+            return Ok(());
+        }
+        if self.source_record.is_some() {
+            return Err(ClaimError::SourceRecordNotAllowedForClass(self.class));
+        }
+        if self
+            .inference_method
+            .as_deref()
+            .map(str::trim)
+            .unwrap_or("")
+            .is_empty()
+        {
+            return Err(ClaimError::MissingInferenceMethod(self.class));
+        }
+        if self
+            .contrary_evidence
+            .as_deref()
+            .map(str::trim)
+            .unwrap_or("")
+            .is_empty()
+        {
+            return Err(ClaimError::MissingContraryEvidence(self.class));
+        }
+        Ok(())
+    }
+
+    /// Construct a non-observation claim, validating it before it exists.
+    pub fn inferred(
+        text: &str,
+        class: ClaimClass,
+        inference_method: &str,
+        contrary_evidence: &str,
+    ) -> Result<Self, ClaimError> {
+        let claim = ResearchClaim {
+            text: text.to_string(),
+            class,
+            source_record: None,
+            inference_method: Some(inference_method.to_string()),
+            contrary_evidence: Some(contrary_evidence.to_string()),
+        };
+        claim.validate()?;
+        Ok(claim)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ResearchTask {
     pub id: String,
@@ -206,5 +356,132 @@ mod tournament_tests {
         tournament.execute_independent_runs(|_| true).unwrap();
         assert_eq!(tournament.isolated_runs.len(), 1, "verdicts were appended");
         assert_eq!(tournament.passing_count(), 1);
+    }
+}
+
+#[cfg(test)]
+mod claim_tests {
+    use super::*;
+
+    /// covers: REQ-PAT-003
+    /// Every claim carries exactly one class, and the class set is closed: the
+    /// enum cannot represent a claim with two classes or an unlisted one.
+    #[test]
+    fn test_claim_classes_are_a_closed_set_of_seven() {
+        let all = [
+            ClaimClass::Observation,
+            ClaimClass::Hypothesis,
+            ClaimClass::Inference,
+            ClaimClass::LegalRuleSummary,
+            ClaimClass::MarketSignal,
+            ClaimClass::PatentThreat,
+            ClaimClass::CommercialTargetAssertion,
+        ];
+        let names: Vec<&str> = all.iter().map(|c| c.as_str()).collect();
+        assert_eq!(names.len(), 7);
+        assert_eq!(
+            names,
+            vec![
+                "OBSERVATION",
+                "HYPOTHESIS",
+                "INFERENCE",
+                "LEGAL_RULE_SUMMARY",
+                "MARKET_SIGNAL",
+                "PATENT_THREAT",
+                "COMMERCIAL_TARGET_ASSERTION",
+            ]
+        );
+        // Only OBSERVATION may come straight from a source record.
+        let from_source: Vec<&str> = all
+            .iter()
+            .filter(|c| c.may_be_emitted_from_source_record())
+            .map(|c| c.as_str())
+            .collect();
+        assert_eq!(from_source, vec!["OBSERVATION"]);
+    }
+
+    /// covers: REQ-PAT-003
+    #[test]
+    fn test_observation_may_be_emitted_from_a_source_record() {
+        let claim = ResearchClaim::observation("US1234567B2 claims a valve.", "US1234567B2");
+        assert_eq!(claim.class, ClaimClass::Observation);
+        assert!(claim.validate().is_ok());
+    }
+
+    /// covers: REQ-PAT-003
+    /// The other six classes must store inference method AND contrary evidence.
+    #[test]
+    fn test_non_observation_classes_require_method_and_contrary_evidence() {
+        let classes = [
+            ClaimClass::Hypothesis,
+            ClaimClass::Inference,
+            ClaimClass::LegalRuleSummary,
+            ClaimClass::MarketSignal,
+            ClaimClass::PatentThreat,
+            ClaimClass::CommercialTargetAssertion,
+        ];
+        for class in classes {
+            // Both present: accepted.
+            let ok = ResearchClaim::inferred(
+                "the market is moving this way",
+                class,
+                "extrapolated from three filings",
+                "one filing contradicts this",
+            );
+            assert!(ok.is_ok(), "{class:?} with full provenance was rejected");
+
+            // Missing contrary evidence: rejected, naming the class.
+            let mut missing_contrary = ok.unwrap();
+            missing_contrary.contrary_evidence = None;
+            assert_eq!(
+                missing_contrary.validate(),
+                Err(ClaimError::MissingContraryEvidence(class))
+            );
+            // Blank strings are not provenance either.
+            missing_contrary.contrary_evidence = Some("   ".to_string());
+            assert_eq!(
+                missing_contrary.validate(),
+                Err(ClaimError::MissingContraryEvidence(class))
+            );
+
+            // Missing inference method: rejected, naming the class.
+            let mut missing_method = ResearchClaim::inferred(
+                "the market is moving this way",
+                class,
+                "extrapolated from three filings",
+                "one filing contradicts this",
+            )
+            .unwrap();
+            missing_method.inference_method = None;
+            assert_eq!(
+                missing_method.validate(),
+                Err(ClaimError::MissingInferenceMethod(class))
+            );
+        }
+    }
+
+    /// covers: REQ-PAT-003
+    /// A non-observation class must not be emitted directly from a source
+    /// record: that is the shape that would present an inference as a fact.
+    #[test]
+    fn test_non_observation_may_not_claim_a_source_record() {
+        for class in [ClaimClass::Hypothesis, ClaimClass::Inference] {
+            let mut claim =
+                ResearchClaim::inferred("t", class, "method", "contrary").expect("valid claim");
+            claim.source_record = Some("US1234567B2".to_string());
+            assert_eq!(
+                claim.validate(),
+                Err(ClaimError::SourceRecordNotAllowedForClass(class))
+            );
+        }
+    }
+
+    /// covers: REQ-PAT-003
+    #[test]
+    fn test_empty_claim_text_is_rejected() {
+        let mut claim = ResearchClaim::observation("", "src");
+        assert_eq!(claim.validate(), Err(ClaimError::EmptyText));
+        claim.text = "   ".to_string();
+        assert_eq!(claim.validate(), Err(ClaimError::EmptyText));
     }
 }
