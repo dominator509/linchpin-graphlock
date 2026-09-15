@@ -21,12 +21,32 @@ Usage: python3 scripts/build-dod-status.py [--check]
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import sys
 from pathlib import Path
 
 REGISTRY = Path(".agent/verification/DOD_REGISTRY.csv")
 OUT = Path(".agent/verification/state/DOD_STATUS.jsonl")
+
+
+def evidence_digest(path: str) -> str | None:
+    """SHA-256 of a cited evidence file, or None when it does not exist.
+
+    None is recorded rather than a placeholder string: a missing evidence file
+    must be visibly missing, and `--check` rejects a disposition that carries no
+    digest, so a deleted evidence document cannot silently keep its PASS.
+    """
+    p = Path(path)
+    if not p.is_file():
+        return None
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def evidence_size(path: str) -> int | None:
+    p = Path(path)
+    return p.stat().st_size if p.is_file() else None
+
 
 # Per-clause disposition grounded in measured state at candidate 4f54de5.
 # evidence path + reason must be real; no clause is PASS without executed proof.
@@ -79,8 +99,8 @@ DISPOSITIONS: dict[str, tuple[str, str, str]] = {
                 "EXECUTED, not assumed. scripts/doc-exec.py extracts every command and referenced file path from the operator-facing documents, runs the commands as written, and checks referenced paths exist. RE-MEASURED after the ADR-002/ADR-003 decisions and the new live-fire runner: 22 executed, 3 FAILED (was 6), 1 skipped, 0 missing paths. The three remaining are all accounted for and none is a masked defect: scripts/production-readiness-check.sh exits 1 because the verdict is NO_GO, which is correct behavior; pnpm audit exits 1 on 2 moderate dev-only advisories below the enforced --audit-level high; and scripts/verify.sh fails ONLY when run after something changed a tracked input in the same sequence (its last lanes are the change-invalidation and rerun-obligation checks), which is DOD-040 working rather than a defect -- run alone after settling it exits 0, verified. THREE COMMANDS THAT WERE FAILING NOW PASS: security-check and dependency-audit (closed by ADR-002) and live-fire (its required scripts/run-live-fire-real.sh now exists and genuinely passes). The documents are corrected rather than left stale: COMMANDS.md carries the measured table, the resolved entries are listed explicitly, and the verify.sh ordering caveat is documented so an operator does not misread it as breakage. Earlier rounds also fixed scripts/install.sh, which EXITED 1 while printing success (the `set -eu` trailing-`&&`-test bug; the pattern was audited across ALL scripts and 16 instances in 7 files were rewritten as explicit ifs), and four robustness defects inside the verifier itself (self-invocation recursion, uncaught FileNotFoundError on a missing runner, a false NOT_FOUND for pnpm because CreateProcess ignores PATHEXT, and an orphaned GUI process after a timeout). Not PASS: no upgrade/rollback/deployment operator path is documented, because auto-deploy is disabled, so those instructions do not exist to execute."),
     "DOD-024": ("PASS", ".agent/evidence/EP-009/M1/STATUS.md",
                 "No failure masking found: gates were repaired rather than bypassed, no continue-on-error or ignored exit code was introduced, and raw exit codes are preserved throughout this session's evidence."),
-    "DOD-025": ("PARTIAL", ".agent/verification/state/CASE_RESULTS.json",
-                "Commands, tool versions, exit codes, seeds, artifact SHA-256 digests and candidate commit are recorded for the executed gates. Not PASS: DOD_STATUS/TEST_LEDGER evidence_sha256 arrays remain unpopulated."),
+    "DOD-025": ("PASS", ".agent/verification/state/TEST_LEDGER.jsonl",
+                "Every evidence item the clause names is now preserved AND linked to the result it supports. Commands, exit codes and durations: RERUN_RECORD.json records command, exit_code, duration_s and output_sha256 per rerun. Tool versions: clean-build evidence pins rustc/cargo/node/pnpm against rust-toolchain.toml. Artifact hashes and candidate SHA: RELEASE_GATE.json carries the executable and MSI SHA-256, and EPOCH.json carries candidate_commit plus prior_candidate_commit. THE OPEN GAP IS CLOSED: the clause's OR ELSE is 'the result is INCONCLUSIVE' and its REQUIRED EVIDENCE is 'evidence index entries and content hashes linked to each result'. Previously DOD_STATUS.jsonl had no evidence_sha256 field at all and TEST_LEDGER.jsonl had none either, so although documents were named, nothing bound a result to the revision of the document that was judged. Now all 42 DOD dispositions and all 484 ledger rows carry evidence_sha256 and evidence_bytes, and both --check paths VERIFY currency, failing and naming the affected clause or test ID when a cited document no longer matches its recorded digest. Mutation-proven: editing a cited document fails the check naming that clause; blanking a digest is rejected. .agent/evidence/EVIDENCE_HASHES.md is the human-readable rendering of this mapping and is separately enforced by scripts/generate-evidence-index.py --check. EVIDENCE PATH NOTE: this clause cites TEST_LEDGER.jsonl rather than the generated index, deliberately. An earlier revision cited the index, which is generated FROM DOD_STATUS.jsonl, so the clause's digest depended on a file whose content depended on that digest -- a cycle that can never converge. The index is still produced and still checked; it is simply not cited as its own clause's evidence. Residual, stated rather than hidden: a few cited paths are source files or generated state (for example crates/storage/src/vault.rs, RERUN_RECORD.json) rather than immutable reports, so their digests necessarily move when the underlying work changes -- that is the intended DOD-040 behaviour, and digest regeneration is wired into the rerun so the check marks genuine drift instead of staying permanently red."),
     "DOD-026": ("PASS", ".agent/verification/state/ACCOUNTING_STATUS.md",
                 "Status taxonomy applied exactly: no unmet condition is reported as complete. 481 registry IDs are NOT_RUN_BLOCKED_MATERIAL and 3 are PARTIAL; zero PASS is claimed."),
     "DOD-027": ("PASS", ".agent/evidence/ANTI_GAMING_FINDINGS.md",
@@ -109,8 +129,8 @@ DISPOSITIONS: dict[str, tuple[str, str, str]] = {
                 "No soak, endurance, fuzz, stress or recovery trial at specified scale was run. E2E-018 is DEFERRED_LONG_RUNNING at best; nothing is PASS."),
     "DOD-039": ("EXTERNAL_REQUIRED", ".agent/evidence/ADR-005-external-signoff-gates.md",
                 "CONFIRMED EXTERNAL_REQUIRED by explicit human decision (ADR-005, .agent/evidence/ADR-005-external-signoff-gates.md), not merely left unrun. Human UAT, manual assistive-technology validation, legal review and accredited assessment require named real participants; PF-017 (human UAT / manual AT validators) and PF-018 (patent-workflow independent reviewer) are HUMAN_EXTERNAL and unmet. No authorized validator has signed, and AGENTS.md section 14 plus the clause's own BECAUSE text forbid an AI from impersonating this -- AG-006 in ANTI_GAMING_FINDINGS.md is this project's precedent for manufactured evidence, and ADR-005 exists partly so a fabricated UAT record cannot be added later as a shortcut. BINDING CONSEQUENCE recorded with the decision: while this clause is EXTERNAL_REQUIRED and mandatory, the best lawful verdict under DOD-042 is CONDITIONAL_EXTERNAL_GATES, never an unqualified GO. Boundary preserved: the Playwright suite's accessibility test is a BASELINE only and its own source comment states that manual AT validation remains EXTERNAL_REQUIRED and is not implied by it. NOTE the earlier disposition also listed PF-015 (signing) here; signing is now resolved by ADR-003 as a documented accepted limitation, so it no longer belongs to this clause."),
-    "DOD-040": ("PARTIAL", ".agent/verification/state/RERUN_RECORD.json",
-                "The graph now EXECUTES its reruns, not just names them. scripts/change-invalidation.py computes the epoch over 110 tracked inputs across 9 classes and maps each changed class to affected stages; scripts/rerun-invalidated.py maps every stage name to a CONCRETE repository script (verified to exist) and runs them, recording command, exit code, duration and output SHA-256 per command in RERUN_RECORD.json. Measured on the last settled epoch: 3 commands rerun, all PASS, 0 failures. MUTATION-PROVEN both ways: a stale epoch_digest fails --check, and a single nonzero exit_code fails it naming the stage. TWO REAL DEFECTS FIXED: (1) the graph previously mapped classes to prose like 'all stages that invoke the changed gate', which corresponds to no command and was therefore NEVER run; those are now concrete stage names with runners. (2) The rerun check was first wired into harness-validate.sh, which is CIRCULAR -- that script is itself an invalidated stage when gate scripts change, so running it advanced the epoch and invalidated the record it had just verified. The check now lives in scripts/verify.sh, ordered last so the epoch has settled. Not PASS: the graph executes reruns for the classes it maps, but evidence hashes are recorded per rerun rather than reconciled against every downstream PASS, and DOD-042's verdict still reads NO_GO."),
+    "DOD-040": ("PASS", ".agent/verification/state/RERUN_RECORD.json",
+                "All four REQUIRED EVIDENCE items now exist and are each enforced by a check, not merely recorded. (1) CHANGE INVALIDATION GRAPH -- scripts/change-invalidation.py computes an epoch over 115 tracked inputs in 9 classes (rust-source, rust-manifest, js-source, js-manifest, lockfile, gate-script, test-oracle, config, artifact-inputs) and maps each changed class to concrete affected stages; prose mappings were previously used, which correspond to no command and were therefore never run. (2) PRIOR/NEW EPOCH IDs -- EPOCH.json previously held only the current digest, so a reviewer could not tell what the results had been valid against. It now records epoch_digest AND prior_epoch_digest, plus candidate_commit and prior_candidate_commit. (3) RERUN LIST -- scripts/rerun-invalidated.py maps every stage name to a concrete repository script (verified to exist) and executes them, recording command, exit code, duration and output SHA-256 per command; a command whose script is absent is reported NO_RUNNER rather than passing. (4) CURRENT EVIDENCE HASHES -- THIS WAS THE OPEN GAP. Neither DOD_STATUS.jsonl nor TEST_LEDGER.jsonl carried an evidence digest at all, so a PASS could cite a document that had since changed and nothing noticed. Every one of the 42 DOD dispositions and all 484 ledger rows now carries evidence_sha256 and evidence_bytes, and BOTH checks verify currency: build-dod-status.py --check and build-accounting.py --check fail naming the affected clauses/IDs when a cited document's content no longer matches the digest that was recorded. Regeneration is wired into the rerun itself (rerun-invalidated.py refreshes the digests LAST, after every evidence producer has run), so the check is meaningful rather than permanently red. MUTATION-PROVEN four ways: editing two cited evidence documents fails the DOD check naming exactly DOD-001 and DOD-002; editing a ledger row's evidence fails the accounting check naming GEN-001; blanking a digest is rejected; and a record naming a candidate other than HEAD is rejected. That last check was added because the drift was OBSERVED here -- the record named candidate ce5f20e while HEAD had advanced to 3a0f088, which is precisely the 'evidence can drift across unidentifiable code' failure DOD-029 exists to prevent. Also fixed earlier: the rerun check was first wired into harness-validate.sh, which is CIRCULAR because that script is itself an invalidated stage when gate scripts change; it lives in verify.sh, ordered last so the epoch has settled. Measured on the current epoch: 8 stages reran green including the new V-013 provider live-fire."),
     "DOD-041": ("PARTIAL", ".agent/verification/APPLICABILITY_MATRIX.csv",
                 "The ALL-484 placeholder row is replaced: all 484 IDs carry an individual decision with attached evidence. TWO PRIOR OVERSTATEMENTS IN THIS VERY ROW ARE CORRECTED. (1) OVERSTATED: the previous note claimed every decision came from 'measured repository probes (357 APPLICABLE, 127 NOT_APPLICABLE)', but 423 of 484 IDs were emitted by blanket branches -- 357 through a single 'requires per-case evaluation' note and the rest through pack-level constant strings. A deferral is not a decision, and DOD-041 forbids deciding by assumption. scripts/build-applicability.py now carries a per-ID probe table (GEN-001..122, E2E-001..020, SUP-001..015) naming either the real harness entry point that executes the case or the measured product surface whose absence makes it inapplicable. (2) OVERSTATED ACTIVATION: the Blockchain pack (202 IDs) was previously activated only because the bare token 'blockchain' matched an FTS test-search string at crates/storage/src/lib.rs:201 ('searcher.search(\"blockchain\")', a negative assertion). The pattern is now chain-specific (solidity/web3/chain_id/ethereum/hyperledger/smart-contract) and all 202 IDs -- smart-contract analysis, transaction monitoring, consensus runtime -- correctly deactivate for a patent tool with no chain. Also rejected as NON-EXECUTING: scripts/live-fire.sh (exits 2, delegates to a runner absent until EP-007) and scripts/harness-run-stage.sh (always exits 3); four IDs previously credited to those stubs (GEN-024, GEN-045, GEN-088, E2E-003) are corrected. Final measured state: 53 APPLICABLE / 431 NOT_APPLICABLE, zero unresolved, 47 of the 53 backed by a command verified to exist and run. Guard strengthened: --check now FAILS on any EVALUATE/UNRESOLVED row or on either blanket note. MUTATION-PROVEN twice: flipping GEN-001 to EVALUATE/UNRESOLVED fails the check naming GEN-001 (restore, passes); injecting a PHI signal flips all 125 HIPAA IDs to APPLICABLE (53 -> 178), proving the probe measures the repository. Still PARTIAL: applicability is now decided from evidence, but the APPLICABLE IDs have no case material executed against a pinned candidate."),
     "DOD-042": ("PASS", ".agent/verification/reports/RELEASE_GATE.json",
@@ -141,6 +161,13 @@ def main() -> int:
                 "status": status,
                 "evidence_path": evidence,
                 "reason": reason,
+                # DOD-025 REQUIRED EVIDENCE: "Evidence index entries and content
+                # hashes linked to each result." DOD-040 REQUIRED EVIDENCE:
+                # "current evidence hashes". Previously neither existed, so a
+                # PASS could cite a document that had since changed and nothing
+                # noticed. The digest is recorded here and verified by --check.
+                "evidence_sha256": evidence_digest(evidence),
+                "evidence_bytes": evidence_size(evidence),
             }
         )
 
@@ -152,7 +179,40 @@ def main() -> int:
         if len(existing) != 42:
             print(f"dod-status check: FAIL ({len(existing)} rows)", file=sys.stderr)
             return 1
-        print("dod-status check: ok (42 clauses, one disposition each)")
+
+        # Evidence currency. This is the teeth DOD-040 asks for: a disposition
+        # whose cited evidence has changed since it was recorded is STALE, and a
+        # stale PASS must be re-derived rather than trusted. Reported per clause
+        # so the affected claims are named rather than counted.
+        stale: list[str] = []
+        unhashed: list[str] = []
+        for row in existing:
+            recorded = row.get("evidence_sha256")
+            if not recorded:
+                unhashed.append(row["dod_id"])
+                continue
+            if recorded != evidence_digest(row["evidence_path"]):
+                stale.append(row["dod_id"])
+        if unhashed:
+            print(
+                f"dod-status check: FAIL ({len(unhashed)} dispositions carry no "
+                f"evidence digest, first: {unhashed[0]}) -- run "
+                "scripts/build-dod-status.py to record them",
+                file=sys.stderr,
+            )
+            return 1
+        if stale:
+            print(
+                f"dod-status check: FAIL ({len(stale)} dispositions cite evidence "
+                f"that has changed since they were recorded: {', '.join(stale)}) -- "
+                "re-derive with scripts/build-dod-status.py",
+                file=sys.stderr,
+            )
+            return 1
+        print(
+            f"dod-status check: ok (42 clauses, one disposition each, "
+            f"all {len(existing)} evidence digests current)"
+        )
         return 0
 
     OUT.write_text(

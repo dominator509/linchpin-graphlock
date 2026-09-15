@@ -25,6 +25,7 @@ Usage: python3 scripts/build-accounting.py [--check]
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -33,6 +34,24 @@ REGISTRY = Path(".agent/verification/MASTER_TEST_REGISTRY.csv")
 CASE_RESULTS = Path(".agent/verification/state/CASE_RESULTS.json")
 REPORT = Path(".agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv")
 LEDGER = Path(".agent/verification/state/TEST_LEDGER.jsonl")
+
+
+def evidence_digest(path: str) -> str | None:
+    """SHA-256 of the evidence document a ledger row cites, None if absent."""
+    if not path:
+        return None
+    p = Path(path)
+    if not p.is_file():
+        return None
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def evidence_size(path: str) -> int | None:
+    if not path:
+        return None
+    p = Path(path)
+    return p.stat().st_size if p.is_file() else None
+
 
 # DOD-032 taxonomy. Nothing outside this set may appear in final_status.
 VALID_STATUSES = {
@@ -140,6 +159,12 @@ def main() -> int:
                 "applicability": row["applicability"],
                 "final_status": status,
                 "evidence_path": evidence,
+                # DOD-025 REQUIRED EVIDENCE: "Evidence index entries and content
+                # hashes linked to each result." This previously carried no
+                # digest at all, so a ledger row named an evidence document but
+                # nothing proved which revision of it was judged.
+                "evidence_sha256": evidence_digest(evidence),
+                "evidence_bytes": evidence_size(evidence),
             }
         )
 
@@ -160,7 +185,54 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 1
-        print("accounting check: ok (484 IDs, one status each)")
+
+        # Evidence currency for the ledger (DOD-025 / DOD-040). A row that cites
+        # an evidence document must carry a digest of the revision that was
+        # judged, and that digest must still match the file on disk. Reported per
+        # ID rather than counted, so the affected results are named.
+        if not LEDGER.exists():
+            print("accounting check: FAIL (ledger missing)", file=sys.stderr)
+            return 1
+        ledger = [
+            json.loads(l) for l in LEDGER.read_text("utf-8").splitlines() if l.strip()
+        ]
+        if len(ledger) != 484:
+            print(
+                f"accounting check: FAIL (ledger has {len(ledger)} rows)",
+                file=sys.stderr,
+            )
+            return 1
+        unhashed = [
+            r["test_id"]
+            for r in ledger
+            if r.get("evidence_path") and not r.get("evidence_sha256")
+        ]
+        stale = [
+            r["test_id"]
+            for r in ledger
+            if r.get("evidence_sha256")
+            and r["evidence_sha256"] != evidence_digest(r.get("evidence_path") or "")
+        ]
+        if unhashed:
+            print(
+                f"accounting check: FAIL ({len(unhashed)} ledger rows cite evidence "
+                f"with no digest, first: {unhashed[0]})",
+                file=sys.stderr,
+            )
+            return 1
+        if stale:
+            print(
+                f"accounting check: FAIL ({len(stale)} ledger rows cite evidence "
+                f"that has changed since they were recorded: {', '.join(stale[:5])}"
+                f"{'...' if len(stale) > 5 else ''})",
+                file=sys.stderr,
+            )
+            return 1
+        digested = len([r for r in ledger if r.get("evidence_sha256")])
+        print(
+            f"accounting check: ok (484 IDs, one status each; "
+            f"{digested} evidence digests current)"
+        )
         return 0
 
     REPORT.parent.mkdir(parents=True, exist_ok=True)

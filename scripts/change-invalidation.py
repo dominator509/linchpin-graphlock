@@ -218,8 +218,26 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 1
+
+        # Candidate identity. The epoch digest covers tracked file CONTENT, so
+        # committing those files does not move it: without this check the record
+        # could keep naming candidate X while the tree had since become commit Y.
+        # That is exactly the "evidence can drift across unidentifiable code"
+        # failure DOD-029 exists to prevent, and it was observed here (the record
+        # named ce5f20e while HEAD had advanced to 3a0f088).
+        recorded_commit = prior.get("candidate_commit") if prior else None
+        if recorded_commit and head and recorded_commit != head:
+            print(
+                "change-invalidation check: FAIL -- the epoch was computed for "
+                f"candidate {recorded_commit} but HEAD is {head}. Re-run "
+                "scripts/change-invalidation.py so the record names the candidate "
+                "whose content it hashed.",
+                file=sys.stderr,
+            )
+            return 1
         print(
             f"change-invalidation check: ok (epoch {epoch[:16]}..., "
+            f"candidate {recorded_commit}, "
             f"{sum(c['count'] for c in classes.values())} inputs)"
         )
         return 0
@@ -295,6 +313,12 @@ def main() -> int:
         json.dumps(
             {
                 "epoch_digest": epoch,
+                # DOD-040 REQUIRED EVIDENCE names "prior/new epoch IDs". The
+                # digest alone does not tell a reviewer what the results were
+                # previously valid against, so both are recorded. First run has
+                # no prior, which is recorded as null rather than invented.
+                "prior_epoch_digest": prior.get("epoch_digest") if prior else None,
+                "prior_candidate_commit": prior.get("candidate_commit") if prior else None,
                 "candidate_commit": head,
                 "total_inputs": total,
                 "classes": {

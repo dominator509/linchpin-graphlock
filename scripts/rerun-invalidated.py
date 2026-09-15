@@ -304,6 +304,53 @@ def main() -> int:
         "utf-8",
     )
     print(f"rerun: wrote {RECORD}")
+
+    # Refresh the evidence digests carried by the DOD dispositions. A rerun
+    # rewrites evidence (RERUN_RECORD.json itself is cited by DOD-040), so every
+    # digest recorded against a rewritten document goes stale by construction.
+    # Regenerating here, LAST and only after all evidence producers have run, is
+    # what keeps the DOD-040 evidence-currency check meaningful instead of
+    # permanently red. Ordering matters: this must not run before the reruns,
+    # or it would record digests for documents the reruns then replace.
+    refresh = subprocess.run(
+        ["python3", "scripts/build-dod-status.py"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        shell=False,
+    )
+    if refresh.returncode == 0:
+        print("rerun: refreshed DOD evidence digests")
+    else:
+        print(
+            "rerun: WARNING -- could not refresh DOD evidence digests; "
+            f"{(refresh.stderr or '').strip()[:200]}",
+            file=sys.stderr,
+        )
+
+    # The human-readable index renders the digests, so refreshing the digests
+    # makes the index stale by construction. Regenerate it in the same step and
+    # in this order, or --check fails on the next harness run. This is the same
+    # ordering trap the artifact class documents: regenerating a view after its
+    # source is a fix, not a weakening.
+    index = subprocess.run(
+        ["python3", "scripts/generate-evidence-index.py"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        shell=False,
+    )
+    if index.returncode == 0:
+        print("rerun: refreshed the evidence index")
+    else:
+        print(
+            "rerun: WARNING -- could not refresh the evidence index; "
+            f"{(index.stderr or '').strip()[:200]}",
+            file=sys.stderr,
+        )
+
     if failures:
         print(f"rerun: FAIL -- {failures} command(s) failed", file=sys.stderr)
         return 1

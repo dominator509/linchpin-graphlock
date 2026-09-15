@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `737e0a4272b0d7c0a6bf913a112c77f76c29b08aec8a5e5541e7652988a0352b`
-- Candidate commit at generation: `ce5f20e`
-- Total tracked inputs: 115
-- Previous epoch digest: `aa83ec38413ee459568142aa022a257923aef4c8d7c3309ebe59c57dbcd7a16d`
+- Current epoch digest: `40261f1507e7d92564993a3faea02dd5b2e291e7aedfa1b3e267d69ee1e8cbcd`
+- Candidate commit at generation: `3a0f088`
+- Total tracked inputs: 116
+- Previous epoch digest: `ba8eb1f2e7c5f51e7b1a8efd53624e69614c4adf689d8cd5ad53c0deaa52298b`
 - **Changed input classes since that epoch: gate-script**
 
 ## Input classes and what a change invalidates
@@ -37,7 +37,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 55 file(s)
+### `gate-script` — 56 file(s)
 
 - invalidates: V-000 harness validation
 - invalidates: V-005 clean build
@@ -49,7 +49,7 @@ definition and its PASS status is revoked until rerun.
   - `scripts\artifact-e2e.sh` `66789e3a58097851…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
   - `scripts\bind-requirements.py` `b5b3f5d11af024a5…`
-  - … and 50 more
+  - … and 51 more
 
 ### `js-manifest` — 7 file(s)
 
