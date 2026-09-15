@@ -2,14 +2,14 @@
   "changed_classes": [
     "gate-script"
   ],
-  "epoch_digest": "40261f1507e7d92564993a3faea02dd5b2e291e7aedfa1b3e267d69ee1e8cbcd",
+  "epoch_digest": "fe4afacbbb183350b950428f618c63630c6adf8f536de365222159b6b8445506",
   "failures": 0,
   "results": [
     {
       "command": "sh scripts/harness-validate.sh",
-      "duration_s": 52.83,
+      "duration_s": 36.16,
       "exit_code": 0,
-      "output_sha256": "b3df0c06cf7a9a0e1e1f02778174835a77cab057525baa67c46bbaccbfb8c30a",
+      "output_sha256": "2790236cffcc6c44873c6aaec7d3ed09ee53c07483814b040833c46790c8d0c1",
       "output_tail": [
         "reachability check: ok (150 public fns, 18 entry points, 0 unreachable)",
         "trailing-and check: ok (no trailing &&-test lanes)",
@@ -20,9 +20,9 @@
     },
     {
       "command": "sh scripts/build.sh",
-      "duration_s": 115.92,
+      "duration_s": 87.16,
       "exit_code": 0,
-      "output_sha256": "4a690c3af0c1f3415f4db71390ab9491a8e02d6e8fa00f200384ed5f22ecfe04",
+      "output_sha256": "184b61ed93a53d379afd677f623a3bb5ddd490daa8a25ee2ec87c319a74c609a",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -33,9 +33,9 @@
     },
     {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 20.37,
+      "duration_s": 17.44,
       "exit_code": 0,
-      "output_sha256": "b917f076f6b31a9053049e6cccbe6fb2ec7b28bf43d1788aaf825c8fe55e41f1",
+      "output_sha256": "d6d36dc852426239085d87c3f4cc1fbe64f5755a58e6b26632fab9df5969f67d",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -46,12 +46,12 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 2.08,
+      "duration_s": 2.02,
       "exit_code": 0,
-      "output_sha256": "b572caf551573047ed0b61d8fd7b6383eecec48fbe6d658ab00eebd77e49f8a5",
+      "output_sha256": "1e42665921c7b4b6a50f344a0dcc14ca1138698c5512bf6b36b13d3aa3488f63",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.69s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.67s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-40d0be70daa3bb16.exe)"
       ],
       "stage": "V-009 integration/concurrency",

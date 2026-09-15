@@ -83,7 +83,12 @@ E2E_PROBES: dict[str, tuple[str, str, str]] = {
     "E2E-016": ("no-cmd", "", "no clock-skew or timezone verification exists"),
     "E2E-017": ("no-cmd", "", "no i18n/l10n or unicode robustness suite exists"),
     "E2E-018": ("no-cmd", "", "no soak/endurance run exists (DOD-038)"),
-    "E2E-019": ("no-cmd", "", "no live provider is configured, so agent safety is unexercised (PF-011)"),
+    # E2E-019 is AI/agentic safety AND capability. PF-011 is now satisfied (a
+    # real loopback model is served), so a genuine runner exists: the provider
+    # live-fire gate exercises both the capability (a real completion at the
+    # product's own command boundary) and the fail-closed negatives (a
+    # non-loopback endpoint refused, an unreachable port producing no text).
+    "E2E-019": ("cmd", "live-fire-local-provider", "AI/agentic capability plus fail-closed safety negatives"),
     "E2E-020": ("no-cmd", "", "user acceptance testing requires real human participants (DOD-039)"),
 }
 
@@ -100,12 +105,74 @@ SUP_PROBES: dict[str, tuple[str, str, str]] = {
     "SUP-010": ("no-cmd", "", "no visual regression baseline exists"),
     "SUP-011": ("no-cmd", "", "no operator observability stack exists (DOD-037)"),
     "SUP-012": ("no-cmd", "", "no SLO/SLA or error budget is defined (DOD-022)"),
+    # These two were previously decided by the pack-level `conditional-deployable`
+    # and `conditional-multitenant` branches. Moving the per-ID probe tables ahead
+    # of those branches (so an authored entry cannot be shadowed) left them
+    # unresolved, which the check caught. They carry explicit entries now rather
+    # than depending on a branch order.
+    "SUP-013": ("no-cmd", "", "deployment/promotion/canary lifecycle is not activated: RELEASE.md states auto-deploy is no and publication remains manual, so there is no promotion pipeline to verify"),
+    "SUP-014": ("no-cmd", "", "multi-tenant isolation is not activated: LINCHPIN is local-first single-user and workspace scoping is not tenancy isolation"),
     "SUP-015": ("no-cmd", "", "manual assistive-technology validation requires a human (DOD-039)"),
 }
 
 
 def script_exists(name: str) -> bool:
     return (Path("scripts") / name).exists()
+
+
+# Per-ID overrides for the DOMAIN PACKS the clause names by hand.
+#
+# DOD-041's RULE names its packs explicitly: "HIPAA, blockchain, AI/agentic,
+# multi-tenant, mobile, cloud, and hardware". A pack that is decided by a probe
+# belonging to a DIFFERENT pack has not been decided from evidence about itself.
+#
+# Measured defect this fixes: the only hardware case in the whole registry is
+# `BC-111 Hardware Security Module (HSM) Testing`, which sits in the Blockchain
+# source group. It was therefore deactivated by the CHAIN probe (no solidity,
+# no web3, no chain_id) -- evidence that says nothing about whether the product
+# uses hardware key storage. The honest hardware evidence is a separate probe.
+PACK_OVERRIDES: dict[str, tuple[str, list[str]]] = {
+    "BC-111": (
+        "hardware/HSM domain pack not activated: LINCHPIN ships no hardware-backed "
+        "key storage, so there is nothing for HSM testing to exercise. Evidence: {why}. "
+        "The only KeyringStore implementation is `MemoryKeyring`, an in-process map "
+        "(crates/platform_windows/src/lib.rs:65); no TPM, PKCS#11, HSM or DPAPI "
+        "credential provider is referenced anywhere in first-party source. Recorded "
+        "deliberately against the HARDWARE dimension rather than the blockchain one it "
+        "inherited by source group, because the chain probe cannot speak to it.",
+        [
+            # Word-anchored deliberately. An unanchored `ncrypt` matched the
+            # substring inside "encrypted" at crates/storage/src/lib.rs and
+            # reported a hardware HSM surface that does not exist -- the same
+            # substring-probe failure class as the bare `blockchain` token that
+            # once activated 202 blockchain IDs from an FTS test string.
+            r"\bpkcs11\b",
+            r"\btpm\b",
+            r"\bhsm\b",
+            r"\bdpapi\b",
+            r"Security::Credentials",
+            r"\bCredRead\b|\bCredWrite\b|\bCryptProtectData\b",
+            r"\bncrypt\b|\bbcrypt\.dll\b",
+        ],
+    ),
+}
+
+
+def apply_pack_override(test_id: str, tree: str) -> tuple[str, str, str] | None:
+    """Return a pack-specific decision for an ID the clause names, if authored."""
+    entry = PACK_OVERRIDES.get(test_id)
+    if entry is None:
+        return None
+    template, patterns = entry
+    found, why = probe(tree, patterns)
+    if found:
+        # A real hardware surface would make the pack APPLICABLE, not skipped.
+        return (
+            "APPLICABLE",
+            "NOT_STARTED",
+            f"hardware/HSM surface detected: {why}",
+        )
+    return ("NOT_APPLICABLE", "NOT_APPLICABLE", template.format(why=why))
 
 
 def harness_cmd(tree: str, cmd: str) -> bool:
@@ -279,13 +346,80 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
 }
 
 
+def decide_by_probe(row: dict, tree: str) -> tuple[str, str, str] | None:
+    """Per-ID evidenced decision for the General / E2E / Supplemental packs.
+
+    Returns None when the ID's group has no authored probe table. Called BEFORE
+    the pack-level conditional rules because a per-ID probe is always more
+    specific than a pack-level heuristic. Measured defect this ordering fixes:
+    E2E-019 carries applicability `conditional-ai`, so the conditional-ai branch
+    shadowed its authored E2E probe and the row reported a stale PF-011-umet
+    message that the authored entry had already corrected.
+    """
+    group = row["source_group"]
+    probe_table = None
+    pack = ""
+    if group == "General":
+        probe_table, pack = GEN_PROBES, "general application/security pack"
+    elif group == "E2E":
+        probe_table, pack = E2E_PROBES, "end-to-end orchestrator pack"
+    elif group == "Supplemental":
+        probe_table, pack = SUP_PROBES, "supplemental production-gate pack"
+    if probe_table is None:
+        return None
+
+    entry = probe_table.get(row["test_id"])
+    if entry is None:
+        return (
+            "EVALUATE",
+            "UNRESOLVED",
+            f"{pack}: no per-ID probe is defined for {row['test_id']} "
+            f"({row['title']}); decision is unresolved and must be authored.",
+        )
+    mode, cmd, why = entry
+    if mode == "cmd":
+        if harness_cmd(tree, cmd):
+            return (
+                "APPLICABLE",
+                "NOT_STARTED",
+                f"{pack}: executable harness entry point scripts/{cmd} exists "
+                f"({why}); case not yet executed against a pinned candidate.",
+            )
+        return (
+            "APPLICABLE",
+            "NOT_STARTED",
+            f"{pack}: probe names scripts/{cmd} for '{row['title']}' ({why}) "
+            "but that entry point cannot execute a case -- it refuses "
+            "unconditionally or delegates to a runner absent from the tree.",
+        )
+    return (
+        "NOT_APPLICABLE",
+        "NOT_APPLICABLE",
+        f"{pack}: case '{row['title']}' is not executable against this "
+        f"product -- {why}. No harness command covers it.",
+    )
+
+
 def decide(row: dict, tree: str) -> tuple[str, str, str]:
     """Return (applicability, status, reason+evidence)."""
     group = row["source_group"]
     applicability = row["applicability"]
     stage = row["default_stage"]
 
+    # Domain packs the clause names by hand win over the source-group branch,
+    # so no pack is decided by another pack's probe.
+    override = apply_pack_override(row["test_id"], tree)
+    if override is not None:
+        return override
+
+    # Per-ID probes outrank the pack-level conditional rules below.
+    by_probe = decide_by_probe(row, tree)
+    if by_probe is not None:
+        return by_probe
+
     # --- Conditional domain packs ----------------------------------------
+    # Group-based, and checked before the per-ID probe tables because these two
+    # packs are decided for their whole source group.
     if group == "HIPAA":
         found, why = probe(
             tree,
@@ -330,8 +464,9 @@ def decide(row: dict, tree: str) -> tuple[str, str, str]:
         return (
             "APPLICABLE",
             "NOT_STARTED",
-            f"AI surface exists (provider/MCP crates) but no live provider is "
-            f"configured (PF-011 unmet). Evidence: {why}.",
+            "AI surface exists (provider/MCP crates) and PF-011 is now satisfied: a "
+            "real loopback inference server is served and scripts/live-fire-local-provider.sh "
+            f"exercises this boundary at the product's own command, 11/11 assertions. Evidence: {why}.",
         )
 
     if applicability == "conditional-multitenant":
@@ -419,51 +554,6 @@ def decide(row: dict, tree: str) -> tuple[str, str, str]:
             "APPLICABLE",
             "NOT_STARTED",
             f"Windows-only support matrix declared; Windows 11 untested. Evidence: {why}.",
-        )
-
-    # --- General / E2E / Supplemental: per-ID evidenced decisions ---------
-    # Dispatched BEFORE the generic conditional block: a per-ID probe is always
-    # more specific than a pack-level rule, and the blanket rule must never be
-    # allowed to shadow an authored per-ID decision.
-    probe_table = None
-    pack = ""
-    if group == "General":
-        probe_table, pack = GEN_PROBES, "general application/security pack"
-    elif group == "E2E":
-        probe_table, pack = E2E_PROBES, "end-to-end orchestrator pack"
-    elif group == "Supplemental":
-        probe_table, pack = SUP_PROBES, "supplemental production-gate pack"
-
-    if probe_table is not None:
-        entry = probe_table.get(row["test_id"])
-        if entry is None:
-            return (
-                "EVALUATE",
-                "UNRESOLVED",
-                f"{pack}: no per-ID probe is defined for {row['test_id']} "
-                f"({row['title']}); decision is unresolved and must be authored.",
-            )
-        mode, cmd, why = entry
-        if mode == "cmd":
-            if harness_cmd(tree, cmd):
-                return (
-                    "APPLICABLE",
-                    "NOT_STARTED",
-                    f"{pack}: executable harness entry point scripts/{cmd} exists "
-                    f"({why}); case not yet executed against a pinned candidate.",
-                )
-            return (
-                "APPLICABLE",
-                "NOT_STARTED",
-                f"{pack}: probe names scripts/{cmd} for '{row['title']}' ({why}) "
-                "but that entry point cannot execute a case -- it refuses "
-                "unconditionally or delegates to a runner absent from the tree.",
-            )
-        return (
-            "NOT_APPLICABLE",
-            "NOT_APPLICABLE",
-            f"{pack}: case '{row['title']}' is not executable against this "
-            f"product -- {why}. No harness command covers it.",
         )
 
     # --- Conditional capability packs (no per-ID table) --------------------

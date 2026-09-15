@@ -3,21 +3,20 @@
     "candidate_commit": "1bca002",
     "executable": "target\\release\\linchpin-desktop.exe",
     "executable_bytes": "12036096",
-    "executable_sha256": "ef67093806dc03d7d9e083313488b2244ef5df1f04bc16b3f6fb6a3fa0cd72e8",
+    "executable_sha256": "f5d093bf55cdefef32b0d88f5e21167f128a79825dbe98035b6b8436bdeb720b",
     "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
     "msi_bytes": "5558272",
-    "msi_sha256": "04f2c1de52161d3aeada8bdd2f3fe5d84249b3b6eb2848ddf5e41fb81b0caff6"
+    "msi_sha256": "85251f40f13d65d58ac87215058af86c565cb97afeda9f28c27ccdd606c23767"
   },
   "blocking_clauses": [
-    "DOD-001=PARTIAL",
-    "DOD-041=PARTIAL"
+    "DOD-001=PARTIAL"
   ],
   "candidate_commit": "1bca002",
   "dod_status_tally": {
     "EXTERNAL_REQUIRED": 2,
     "FAIL": 6,
-    "PARTIAL": 16,
-    "PASS": 18
+    "PARTIAL": 15,
+    "PASS": 19
   },
   "external_clauses": [],
   "inconclusive_reasons": [],
