@@ -135,6 +135,43 @@ fn schedule_docket_deadline(
     )
 }
 
+/// Check that every exportable limitation carries a spec/figure anchor
+/// (REQ-DOM-006).
+#[tauri::command]
+fn check_support_matrix(
+    workspace_id: String,
+    exportable: Vec<String>,
+    anchors: Vec<(String, String, String)>,
+) -> commands::CommandResult<commands::SupportMatrixView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::check_support_matrix(&scope, &exportable, &anchors)
+}
+
+/// Declare a research task's scope and covered count (REQ-OPS-002).
+#[tauri::command]
+fn set_research_coverage(
+    workspace_id: String,
+    task_id: String,
+    requested_scopes: usize,
+    covered_scopes: usize,
+) -> commands::CommandResult<commands::ResearchTaskView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::set_research_coverage(&scope, &task_id, requested_scopes, covered_scopes)
+}
+
+/// Finish a research task with incomplete coverage, persisting a checkpoint
+/// (REQ-OPS-002).
+#[tauri::command]
+fn complete_research_partial(
+    workspace_id: String,
+    task_id: String,
+    covered_scopes: usize,
+    checkpoint: String,
+) -> commands::CommandResult<commands::ResearchTaskView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::complete_research_partial(&scope, &task_id, covered_scopes, &checkpoint)
+}
+
 /// Build a filing-package manifest (REQ-PAT-002).
 #[tauri::command]
 fn build_filing_package(
@@ -274,6 +311,9 @@ pub fn run() {
             lint_claims,
             classify_research_claim,
             schedule_docket_deadline,
+            check_support_matrix,
+            set_research_coverage,
+            complete_research_partial,
             build_filing_package,
             import_receipt,
             check_filing_handoff,

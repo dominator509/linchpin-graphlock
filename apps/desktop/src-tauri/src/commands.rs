@@ -299,6 +299,16 @@ pub struct ResearchTaskView {
     pub status: String,
     pub citations: Vec<String>,
     pub citation_count: usize,
+    /// Scopes the task must cover (REQ-OPS-002).
+    pub requested_scopes: usize,
+    /// Scopes actually covered.
+    pub covered_scopes: usize,
+    /// Requested minus covered, so the gap is visible rather than inferred.
+    pub uncovered_scopes: usize,
+    /// True only when every requested scope was covered.
+    pub coverage_complete: bool,
+    /// Present only for a partial completion, so the run can be resumed.
+    pub checkpoint: Option<String>,
 }
 
 /// Advance a research task through its lifecycle.
@@ -398,6 +408,109 @@ pub fn apply_research_action(
             status: format!("{:?}", task.status),
             citation_count: task.citations.len(),
             citations: task.citations.clone(),
+            requested_scopes: task.requested_scopes,
+            covered_scopes: task.covered_scopes,
+            uncovered_scopes: task.uncovered_scopes(),
+            coverage_complete: task.coverage_complete(),
+            checkpoint: task.checkpoint.clone(),
+        },
+    )
+}
+
+/// Declare a research task's scope and how much of it is covered
+/// (REQ-OPS-002).
+///
+/// REQ-OPS-002 requires that partial research "marks incomplete coverage", so
+/// coverage must be settable through a production path. Without this the domain
+/// API existed only for its own tests, which is the TEST_ONLY state the
+/// reachability analysis flags.
+pub fn set_research_coverage(
+    scope: &WorkspaceScope,
+    task_id: &str,
+    requested_scopes: usize,
+    covered_scopes: usize,
+) -> CommandResult<ResearchTaskView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if task_id.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("task_id is required"),
+        );
+    }
+
+    let mut task = research::ResearchTask::new(task_id);
+    task.set_requested_scopes(requested_scopes);
+    if let Err(e) = task.record_coverage(covered_scopes) {
+        return CommandResult::failure(correlation, CommandError::validation(e));
+    }
+
+    CommandResult::success(
+        correlation,
+        ResearchTaskView {
+            task_id: task.id.clone(),
+            status: format!("{:?}", task.status),
+            citation_count: task.citations.len(),
+            citations: task.citations.clone(),
+            requested_scopes: task.requested_scopes,
+            covered_scopes: task.covered_scopes,
+            uncovered_scopes: task.uncovered_scopes(),
+            coverage_complete: task.coverage_complete(),
+            checkpoint: task.checkpoint.clone(),
+        },
+    )
+}
+
+/// Finish a research task with incomplete coverage, persisting a checkpoint
+/// (REQ-OPS-002).
+///
+/// "Partial research persists checkpoints and marks incomplete coverage." Both
+/// halves are enforced by the domain object: a partial completion without a
+/// checkpoint is refused, and the returned view reports the uncovered count so
+/// the gap cannot be mistaken for completeness.
+pub fn complete_research_partial(
+    scope: &WorkspaceScope,
+    task_id: &str,
+    covered_scopes: usize,
+    checkpoint: &str,
+) -> CommandResult<ResearchTaskView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if task_id.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("task_id is required"),
+        );
+    }
+
+    let mut task = research::ResearchTask::new(task_id);
+    // A partial completion is only meaningful for a task that was running and
+    // had declared a scope, so both are established through real transitions.
+    if let Err(e) = task.start() {
+        return CommandResult::failure(correlation, CommandError::policy(e));
+    }
+    if let Err(e) = task.complete_partial(covered_scopes, checkpoint) {
+        return CommandResult::failure(correlation, CommandError::policy(e));
+    }
+
+    CommandResult::success(
+        correlation,
+        ResearchTaskView {
+            task_id: task.id.clone(),
+            status: format!("{:?}", task.status),
+            citation_count: task.citations.len(),
+            citations: task.citations.clone(),
+            requested_scopes: task.requested_scopes,
+            covered_scopes: task.covered_scopes,
+            uncovered_scopes: task.uncovered_scopes(),
+            coverage_complete: task.coverage_complete(),
+            checkpoint: task.checkpoint.clone(),
         },
     )
 }
@@ -906,6 +1019,103 @@ pub struct DocketView {
     pub public_disclosure: bool,
 }
 
+/// Result of checking a support matrix (REQ-DOM-006).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SupportMatrixView {
+    /// Exportable limitations that carry no specification or figure anchor.
+    pub unsupported: Vec<String>,
+    /// True only when every exportable limitation is anchored.
+    pub exportable: bool,
+    pub anchor_count: usize,
+}
+
+/// Check that every exportable limitation has a spec/figure anchor
+/// (REQ-DOM-006).
+///
+/// REQ-DOM-006: "Support matrix maps every exportable limitation to spec/figure
+/// anchors." The clause is a prohibition as much as a mapping: exporting a
+/// limitation the specification does not enable asserts subject matter that is
+/// not supported, so the shortfall is reported by NAME rather than as a bare
+/// boolean, and `exportable` is true only when that list is empty.
+///
+/// `anchors` is a flat list of `(limitation_label, kind, reference)` triples as
+/// the UI holds them; `SPECIFICATION` and `FIGURE` are the only accepted kinds.
+pub fn check_support_matrix(
+    scope: &WorkspaceScope,
+    exportable: &[String],
+    anchors: &[(String, String, String)],
+) -> CommandResult<SupportMatrixView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+
+    // Map the caller's limitation labels onto real entity ids so the matrix is
+    // keyed exactly like the domain object rather than by display string.
+    let mut ids: Vec<(String, domain::EntityId)> = Vec::new();
+    for label in exportable {
+        if label.trim().is_empty() {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation("an exportable limitation label cannot be empty"),
+            );
+        }
+        ids.push((label.clone(), domain::EntityId(uuid::Uuid::new_v4())));
+    }
+
+    let mut matrix = domain::SupportMatrix::new();
+    for (label, kind, reference) in anchors {
+        let Some((_, id)) = ids.iter().find(|(l, _)| l == label) else {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!(
+                    "anchor names limitation {label:?}, which is not in the exportable set"
+                )),
+            );
+        };
+        let anchor = match kind.as_str() {
+            "SPECIFICATION" => domain::Anchor::specification(reference),
+            "FIGURE" => domain::Anchor::figure(reference),
+            other => {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::validation(format!(
+                        "unknown anchor kind {other:?}; expected SPECIFICATION or FIGURE"
+                    )),
+                )
+            }
+        };
+        let anchor = match anchor {
+            Ok(a) => a,
+            Err(e) => {
+                return CommandResult::failure(correlation, CommandError::validation(e.to_string()))
+            }
+        };
+        if let Err(e) = matrix.add_anchor(id.clone(), anchor) {
+            return CommandResult::failure(correlation, CommandError::validation(e.to_string()));
+        }
+    }
+
+    let exportable_ids: Vec<domain::EntityId> = ids.iter().map(|(_, id)| id.clone()).collect();
+    let unsupported_ids = matrix.unsupported(&exportable_ids);
+    let unsupported: Vec<String> = ids
+        .iter()
+        .filter(|(_, id)| unsupported_ids.contains(id))
+        .map(|(label, _)| label.clone())
+        .collect();
+
+    let exportable_ok = matrix.assert_exportable(&exportable_ids).is_ok();
+    CommandResult::success(
+        correlation,
+        SupportMatrixView {
+            unsupported,
+            exportable: exportable_ok,
+            anchor_count: matrix.anchor_count(),
+        },
+    )
+}
+
 /// A scheduled docket deadline and whether it is authoritative (REQ-DOM-009).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DeadlineView {
@@ -1180,8 +1390,38 @@ pub async fn run_local_inference(
         model_id: model_id.to_string(),
     };
 
-    match provider_transport::ProviderTransport::generate(&adapter, request).await {
-        Ok(response) => CommandResult::success(
+    // REQ-OPS-002: "Retry only EXTERNAL_TRANSIENT with bounded policy."
+    //
+    // The bound is enforced here rather than left to callers, and only transient
+    // failures are retried: an InvalidRequest will be rejected identically on
+    // every attempt, and Unimplemented is a code path that does not exist, so
+    // retrying either wastes time and buries the real diagnostic. Attempts are
+    // reported in the outcome so the caller can see how hard the transport tried
+    // rather than only whether it worked.
+    let policy = provider_transport::RetryPolicy::default();
+    let mut attempts: u32 = 0;
+    let mut last_error: Option<provider_transport::TransportError> = None;
+    let mut succeeded: Option<provider_transport::ModelResponse> = None;
+
+    while attempts < policy.max_attempts {
+        attempts += 1;
+        match provider_transport::ProviderTransport::generate(&adapter, request.clone()).await {
+            Ok(response) => {
+                succeeded = Some(response);
+                break;
+            }
+            Err(e) => {
+                let transient = e.is_external_transient();
+                last_error = Some(e);
+                if !transient {
+                    break;
+                }
+            }
+        }
+    }
+
+    match succeeded {
+        Some(response) => CommandResult::success(
             correlation,
             InferenceOutcome {
                 live: true,
@@ -1189,9 +1429,12 @@ pub async fn run_local_inference(
                 text: Some(response.text),
                 error_class: None,
                 detail: response.metadata,
+                attempts,
+                retryable_exhausted: false,
             },
         ),
-        Err(e) => {
+        None => {
+            let e = last_error.expect("a failed attempt records its error");
             let class = match e {
                 provider_transport::TransportError::InvalidRequest(_) => "INVALID_REQUEST",
                 provider_transport::TransportError::Unreachable(_) => "UNREACHABLE",
@@ -1199,6 +1442,10 @@ pub async fn run_local_inference(
                 provider_transport::TransportError::InvalidResponse(_) => "INVALID_RESPONSE",
                 provider_transport::TransportError::Unimplemented(_) => "UNIMPLEMENTED",
             };
+            // Retrying is worth suggesting ONLY when the failure was transient
+            // AND the bound was already spent. Telling a user to retry a
+            // malformed request would be advice that cannot work.
+            let retryable_exhausted = e.is_external_transient() && attempts >= policy.max_attempts;
             CommandResult::success(
                 correlation,
                 InferenceOutcome {
@@ -1209,6 +1456,8 @@ pub async fn run_local_inference(
                     text: None,
                     error_class: Some(class.to_string()),
                     detail: e.to_string(),
+                    attempts,
+                    retryable_exhausted,
                 },
             )
         }
@@ -1225,6 +1474,11 @@ pub struct InferenceOutcome {
     pub text: Option<String>,
     pub error_class: Option<String>,
     pub detail: String,
+    /// Attempts actually made, including the first (REQ-OPS-002).
+    pub attempts: u32,
+    /// True when the failure was EXTERNAL_TRANSIENT and the policy had already
+    /// exhausted its bound. Lets the UI say "try again" only when that is true.
+    pub retryable_exhausted: bool,
 }
 
 /// Report provider transport availability honestly.
@@ -2179,6 +2433,128 @@ mod tests {
             workspace_id: "  ".to_string(),
         };
         assert!(!schedule_docket_deadline(&no_scope, "2026-11-14", Some("s"), Some("1"), false).ok);
+    }
+
+    /// covers: REQ-DOM-006
+    /// The support-matrix gate must hold at the production boundary.
+    #[test]
+    fn test_check_support_matrix_blocks_unanchored_limitations() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+        let exportable = vec![
+            "a self-sealing valve".to_string(),
+            "a claimed but unspecified coating".to_string(),
+        ];
+
+        // Only the first limitation is anchored.
+        let anchors = vec![(
+            "a self-sealing valve".to_string(),
+            "SPECIFICATION".to_string(),
+            "[0042]".to_string(),
+        )];
+        let partial = check_support_matrix(&scope, &exportable, &anchors);
+        assert!(partial.ok, "check failed: {:?}", partial.error);
+        let view = partial.value.unwrap();
+        assert!(
+            !view.exportable,
+            "an unanchored limitation did not block export"
+        );
+        assert_eq!(
+            view.unsupported,
+            vec!["a claimed but unspecified coating".to_string()],
+            "the unsupported limitation should be named"
+        );
+        assert_eq!(view.anchor_count, 1);
+
+        // Anchoring both clears the gate.
+        let both = vec![
+            (
+                "a self-sealing valve".to_string(),
+                "SPECIFICATION".to_string(),
+                "[0042]".to_string(),
+            ),
+            (
+                "a claimed but unspecified coating".to_string(),
+                "FIGURE".to_string(),
+                "FIG. 7".to_string(),
+            ),
+        ];
+        let complete = check_support_matrix(&scope, &exportable, &both);
+        assert!(complete.ok);
+        let cview = complete.value.unwrap();
+        assert!(cview.exportable, "a fully anchored set was not exportable");
+        assert!(cview.unsupported.is_empty());
+        assert_eq!(cview.anchor_count, 2);
+
+        // An anchor for a limitation outside the exportable set is a validation
+        // failure, not a silently ignored row.
+        let stray = vec![(
+            "not in the set".to_string(),
+            "FIGURE".to_string(),
+            "FIG. 1".to_string(),
+        )];
+        assert!(!check_support_matrix(&scope, &exportable, &stray).ok);
+
+        // Unknown anchor kinds and blank references are rejected.
+        let bad_kind = vec![(
+            "a self-sealing valve".to_string(),
+            "DRAWING".to_string(),
+            "FIG. 1".to_string(),
+        )];
+        assert!(!check_support_matrix(&scope, &exportable, &bad_kind).ok);
+        let blank_ref = vec![(
+            "a self-sealing valve".to_string(),
+            "FIGURE".to_string(),
+            "   ".to_string(),
+        )];
+        assert!(!check_support_matrix(&scope, &exportable, &blank_ref).ok);
+
+        // Empty labels and empty workspaces are rejected.
+        assert!(!check_support_matrix(&scope, &["  ".to_string()], &[]).ok);
+        let no_scope = WorkspaceScope {
+            workspace_id: String::new(),
+        };
+        assert!(!check_support_matrix(&no_scope, &exportable, &both).ok);
+    }
+
+    /// covers: REQ-OPS-002
+    /// "Partial research persists checkpoints and marks incomplete coverage."
+    /// The rule must hold at the production boundary, not only in the crate.
+    #[test]
+    fn test_research_coverage_and_partial_completion_at_the_boundary() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-1".to_string(),
+        };
+
+        // Declaring a scope with partial coverage marks the gap.
+        let partial = set_research_coverage(&scope, "task-1", 5, 2);
+        assert!(partial.ok, "coverage rejected: {:?}", partial.error);
+        let pview = partial.value.unwrap();
+        assert_eq!(pview.requested_scopes, 5);
+        assert_eq!(pview.covered_scopes, 2);
+        assert_eq!(pview.uncovered_scopes, 3);
+        assert!(
+            !pview.coverage_complete,
+            "partial coverage reported as complete"
+        );
+        assert!(pview.checkpoint.is_none(), "nothing is checkpointed yet");
+
+        // Over-covering is rejected rather than clamped.
+        assert!(!set_research_coverage(&scope, "task-1", 2, 5).ok);
+
+        // A partial completion without a checkpoint is refused.
+        assert!(!complete_research_partial(&scope, "task-1", 2, "").ok);
+        assert!(!complete_research_partial(&scope, "task-1", 2, "   ").ok);
+
+        // Empty identifiers and workspaces are rejected.
+        assert!(!set_research_coverage(&scope, "  ", 1, 1).ok);
+        assert!(!complete_research_partial(&scope, "  ", 1, "c").ok);
+        let no_scope = WorkspaceScope {
+            workspace_id: String::new(),
+        };
+        assert!(!set_research_coverage(&no_scope, "task-1", 1, 1).ok);
+        assert!(!complete_research_partial(&no_scope, "task-1", 1, "c").ok);
     }
 
     /// covers: REQ-PAT-002

@@ -31,6 +31,11 @@
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-005", "result": "PASS", "test_id": "claim_tests::test_claim_graph_rejects_unknown_limitation_identity"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-005", "result": "PASS", "test_id": "claim_tests::test_claim_graph_rejects_unknown_reference_identity"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-005", "result": "PASS", "test_id": "claim_tests::test_design_around_requires_a_recorded_threat"}
+{"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-006", "result": "PASS", "test_id": "support_matrix_tests::test_support_matrix_maps_limitations_to_anchors"}
+{"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-006", "result": "PASS", "test_id": "support_matrix_tests::test_unanchored_limitation_blocks_export"}
+{"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-006", "result": "PASS", "test_id": "support_matrix_tests::test_export_with_no_limitations_is_trivially_supported"}
+{"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-006", "result": "PASS", "test_id": "support_matrix_tests::test_blank_anchor_reference_is_rejected"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-006", "result": "PASS", "test_id": "commands::tests::test_check_support_matrix_blocks_unanchored_limitations"}
 {"collected": false, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-007", "result": "NOT_RUN", "test_id": "claim_tests::fmt"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-007", "result": "PASS", "test_id": "docket_tests::test_docket_state_machine"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-007", "result": "PASS", "test_id": "commands::tests::test_opportunity_validates_scores_and_uncertainty"}
@@ -71,6 +76,15 @@
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-MCP-001", "result": "PASS", "test_id": "commands::tests::test_mcp_capability_grant_is_explicit"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-OPS-001", "result": "PASS", "test_id": "commands::tests::test_export_validates_scope_content_and_sensitivity"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-OPS-001", "result": "PASS", "test_id": "commands::tests::test_error_serializes_with_spec_006_class"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "research_tests::test_research_completion"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "research_tests::test_partial_research_persists_a_checkpoint_and_marks_coverage"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "research_tests::test_full_coverage_completes_without_a_checkpoint"}
+{"collected": true, "file": "crates/research/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "research_tests::test_task_with_no_declared_scope_is_trivially_complete"}
+{"collected": true, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "tests::test_only_external_transient_failures_are_retryable"}
+{"collected": true, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "tests::test_transient_failure_is_retried_up_to_the_bound"}
+{"collected": true, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "tests::test_non_transient_failure_is_not_retried"}
+{"collected": true, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "tests::test_retry_policy_rejects_an_unbounded_or_zero_bound"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "commands::tests::test_research_coverage_and_partial_completion_at_the_boundary"}
 {"collected": false, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-003", "result": "NOT_RUN", "test_id": "sandbox_tests::default"}
 {"collected": true, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-003", "result": "PASS", "test_id": "soak_tests::test_soak_measures_real_memory_growth"}
 {"collected": true, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-003", "result": "PASS", "test_id": "soak_tests::test_soak_does_not_fabricate_a_leak"}

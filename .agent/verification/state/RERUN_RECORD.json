@@ -2,14 +2,14 @@
   "changed_classes": [
     "rust-source"
   ],
-  "epoch_digest": "a32d1a729e64cc2b3f5af7cb0e2ba5e81f600197b39ff538b7fd77d6b6b562d6",
+  "epoch_digest": "73173c88ad47262bda9cb9a538e96bb06233ec676a193246aee8b554cb1a9841",
   "failures": 0,
   "results": [
     {
       "command": "sh scripts/build.sh",
-      "duration_s": 108.24,
+      "duration_s": 117.17,
       "exit_code": 0,
-      "output_sha256": "c854979dc123b72b311eb93d04d75ebe963a4e33840397a55619b19eede9a575",
+      "output_sha256": "c96b04c9d2ed92190c9a9225e0f14141df6bfb208360225e1295b148f0556e37",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -20,35 +20,35 @@
     },
     {
       "command": "sh scripts/smoke-test.sh",
-      "duration_s": 15.46,
+      "duration_s": 15.18,
       "exit_code": 0,
-      "output_sha256": "b3d21f687474f76633569e5b08b7823574239719c89e23f83985ab0cc0b333bb",
+      "output_sha256": "5f347e4d3e7fcbe14bb1c39349ae0d570ac71d93b263ac142cbbeb047d95a481",
       "output_tail": [
         "smoke: verifying removal",
         "smoke: clean removal confirmed",
-        "smoke: ok (artifact 7bbf3375498238ad160aec511172ab7ff91fb8464d6fc81f946c39faca31de41 verified through install/launch/uninstall)"
+        "smoke: ok (artifact 237e1abfd3711556b56ded8885c52c40f7dd142c23a53ad37f28adc32c559457 verified through install/launch/uninstall)"
       ],
       "stage": "V-006 smoke",
       "status": "PASS"
     },
     {
       "command": "sh scripts/typecheck.sh",
-      "duration_s": 6.97,
+      "duration_s": 12.37,
       "exit_code": 0,
-      "output_sha256": "920abb4bc6fbbf8da16bf44695c457c842d7790398f81a86da12a6a6a31e9ff7",
+      "output_sha256": "b40100fcc906c6500e36270025ba6fb3b6753d8432cfab043232705a85e1afca",
       "output_tail": [
-        "    Checking application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)",
+        "    Checking research v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\research)",
         "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.97s"
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.43s"
       ],
       "stage": "V-007 sanity",
       "status": "PASS"
     },
     {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 29.42,
+      "duration_s": 33.52,
       "exit_code": 0,
-      "output_sha256": "15fa57e453ba1b2510afb105a7ec692e1dc82c8863cec5c69091502eea8fd87c",
+      "output_sha256": "628f003e1d717a7a6539d79784b2e81a983816994ca839796bf9ba3eb81e1a79",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -59,12 +59,12 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 1.88,
+      "duration_s": 2.79,
       "exit_code": 0,
-      "output_sha256": "2d4087124c1719c1a11b8dbd78281e465894b58f12910449161b1eb8a3c1445e",
+      "output_sha256": "617b171395a5e3550eb64dc19377dc5d8d01209a887eb5e10f0314bb7a8de41d",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.07s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-40d0be70daa3bb16.exe)"
       ],
       "stage": "V-009 integration/concurrency",
@@ -72,22 +72,22 @@
     },
     {
       "command": "sh scripts/lint.sh",
-      "duration_s": 6.84,
+      "duration_s": 6.1,
       "exit_code": 0,
-      "output_sha256": "388b3f01e285e0007ad1620ac8161c8978bd944ea3e63e4ac99fa2611b5ceca4",
+      "output_sha256": "42e4c280dc40c81b11de27e3d3df2c3d6939171c54df6c7c239945a995fe3e10",
       "output_tail": [
-        "    Checking application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)",
-        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.66s"
+        "packages/contracts lint: Done",
+        "apps/desktop lint: Done",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.18s"
       ],
       "stage": "V-012 regression/mutation",
       "status": "PASS"
     },
     {
       "command": "sh scripts/live-fire-local-provider.sh",
-      "duration_s": 245.99,
+      "duration_s": 277.77,
       "exit_code": 0,
-      "output_sha256": "10fd0d5faae69e2dea3f950f40084c156f8a2c857b404851e174b61e49b76171",
+      "output_sha256": "e6c37b19d4eea38ed5f87cc82be6958a50d7ed98ab63f17bf9485183da2cfb29",
       "output_tail": [
         "local-provider: restored the production artifact",
         "local-provider: rebuilding the production artifact from the committed config",

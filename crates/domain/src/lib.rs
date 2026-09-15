@@ -459,6 +459,130 @@ impl DocketRecord {
     }
 }
 
+/// A location in the specification or drawings that supports a limitation
+/// (REQ-DOM-006).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AnchorKind {
+    Specification,
+    Figure,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Anchor {
+    pub kind: AnchorKind,
+    /// Paragraph, figure or like reference, e.g. `[0042]` or `FIG. 3`.
+    pub reference: String,
+}
+
+impl Anchor {
+    pub fn specification(reference: &str) -> Result<Self, SupportMatrixError> {
+        Self::new(AnchorKind::Specification, reference)
+    }
+
+    pub fn figure(reference: &str) -> Result<Self, SupportMatrixError> {
+        Self::new(AnchorKind::Figure, reference)
+    }
+
+    fn new(kind: AnchorKind, reference: &str) -> Result<Self, SupportMatrixError> {
+        if reference.trim().is_empty() {
+            return Err(SupportMatrixError::EmptyAnchorReference);
+        }
+        Ok(Anchor {
+            kind,
+            reference: reference.to_string(),
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SupportMatrixError {
+    EmptyAnchorReference,
+    /// One or more exportable limitations have no specification or figure
+    /// anchor. Counted rather than listed, since the caller already holds the
+    /// set it passed in.
+    UnsupportedLimitations(usize),
+}
+
+impl std::fmt::Display for SupportMatrixError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SupportMatrixError::EmptyAnchorReference => {
+                write!(f, "an anchor requires a non-empty reference")
+            }
+            SupportMatrixError::UnsupportedLimitations(n) => write!(
+                f,
+                "{n} exportable limitation(s) have no specification or figure anchor"
+            ),
+        }
+    }
+}
+
+/// Maps exportable limitations to specification/figure anchors (REQ-DOM-006).
+///
+/// REQ-DOM-006: "Support matrix maps every exportable limitation to spec/figure
+/// anchors." The clause is a prohibition as much as a mapping: a limitation with
+/// no anchor is *unsupported*, and exporting it would assert subject matter the
+/// specification does not enable. `assert_exportable` is therefore the gate, and
+/// it returns the shortfall rather than a boolean nobody checks.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SupportMatrix {
+    entries: Vec<(EntityId, Anchor)>,
+}
+
+impl SupportMatrix {
+    pub fn new() -> Self {
+        SupportMatrix {
+            entries: Vec::new(),
+        }
+    }
+
+    /// Attach an anchor to a limitation. Multiple anchors per limitation are
+    /// allowed: a limitation is commonly supported by both a paragraph and a
+    /// figure.
+    pub fn add_anchor(
+        &mut self,
+        limitation_id: EntityId,
+        anchor: Anchor,
+    ) -> Result<(), SupportMatrixError> {
+        if anchor.reference.trim().is_empty() {
+            return Err(SupportMatrixError::EmptyAnchorReference);
+        }
+        self.entries.push((limitation_id, anchor));
+        Ok(())
+    }
+
+    pub fn anchors_for(&self, limitation_id: &EntityId) -> Vec<&Anchor> {
+        self.entries
+            .iter()
+            .filter(|(id, _)| id == limitation_id)
+            .map(|(_, a)| a)
+            .collect()
+    }
+
+    /// Every exportable limitation that has no anchor at all.
+    pub fn unsupported(&self, exportable: &[EntityId]) -> Vec<EntityId> {
+        exportable
+            .iter()
+            .filter(|id| self.anchors_for(id).is_empty())
+            .cloned()
+            .collect()
+    }
+
+    /// Export gate: every exportable limitation must be anchored.
+    pub fn assert_exportable(&self, exportable: &[EntityId]) -> Result<(), SupportMatrixError> {
+        let missing = self.unsupported(exportable);
+        if missing.is_empty() {
+            Ok(())
+        } else {
+            Err(SupportMatrixError::UnsupportedLimitations(missing.len()))
+        }
+    }
+
+    pub fn anchor_count(&self) -> usize {
+        self.entries.len()
+    }
+}
+
 /// The authoritative ruleset a deadline is derived from (REQ-DOM-009).
 ///
 /// REQ-DOM-009: "Docket deadlines require authoritative ruleset source/version."
@@ -700,5 +824,104 @@ mod docket_tests {
         let authority = RuleSetAuthority::new("USPTO-37CFR", "2026.1").unwrap();
         assert!(DocketDeadline::authoritative("", authority.clone()).is_err());
         assert!(DocketDeadline::authoritative("   ", authority).is_err());
+    }
+}
+
+#[cfg(test)]
+mod support_matrix_tests {
+    use super::*;
+
+    /// covers: REQ-DOM-006
+    /// "Support matrix maps every exportable limitation to spec/figure anchors."
+    #[test]
+    fn test_support_matrix_maps_limitations_to_anchors() {
+        let mut graph = ClaimGraph::new();
+        let valve = graph.add_limitation("a self-sealing valve".to_string());
+        let sensor = graph.add_limitation("a pressure sensor".to_string());
+
+        let mut matrix = SupportMatrix::new();
+        assert_eq!(matrix.anchor_count(), 0);
+
+        matrix
+            .add_anchor(valve.clone(), Anchor::specification("[0042]").unwrap())
+            .unwrap();
+        matrix
+            .add_anchor(valve.clone(), Anchor::figure("FIG. 3").unwrap())
+            .unwrap();
+
+        let valve_anchors = matrix.anchors_for(&valve);
+        assert_eq!(valve_anchors.len(), 2, "both anchors should be retained");
+        assert_eq!(valve_anchors[0].kind, AnchorKind::Specification);
+        assert_eq!(valve_anchors[1].kind, AnchorKind::Figure);
+        assert!(matrix.anchors_for(&sensor).is_empty());
+    }
+
+    /// covers: REQ-DOM-006
+    /// The prohibition half: an unanchored exportable limitation blocks export.
+    #[test]
+    fn test_unanchored_limitation_blocks_export() {
+        let mut graph = ClaimGraph::new();
+        let supported = graph.add_limitation("a self-sealing valve".to_string());
+        let unsupported = graph.add_limitation("a claimed but unspecified coating".to_string());
+        let exportable = vec![supported.clone(), unsupported.clone()];
+
+        let mut matrix = SupportMatrix::new();
+        matrix
+            .add_anchor(supported.clone(), Anchor::specification("[0042]").unwrap())
+            .unwrap();
+
+        // The unsupported limitation is named, not merely counted.
+        let missing = matrix.unsupported(&exportable);
+        assert_eq!(missing, vec![unsupported.clone()]);
+
+        // And the gate refuses, reporting how many are unsupported.
+        assert_eq!(
+            matrix.assert_exportable(&exportable),
+            Err(SupportMatrixError::UnsupportedLimitations(1))
+        );
+
+        // Anchoring it clears the gate.
+        matrix
+            .add_anchor(unsupported, Anchor::figure("FIG. 7").unwrap())
+            .unwrap();
+        assert!(matrix.assert_exportable(&exportable).is_ok());
+        assert!(matrix.unsupported(&exportable).is_empty());
+    }
+
+    /// covers: REQ-DOM-006
+    #[test]
+    fn test_export_with_no_limitations_is_trivially_supported() {
+        let matrix = SupportMatrix::new();
+        assert!(matrix.assert_exportable(&[]).is_ok());
+    }
+
+    /// covers: REQ-DOM-006
+    /// An anchor with no reference points nowhere and must be rejected, both at
+    /// construction and on insertion.
+    #[test]
+    fn test_blank_anchor_reference_is_rejected() {
+        assert_eq!(
+            Anchor::specification(""),
+            Err(SupportMatrixError::EmptyAnchorReference)
+        );
+        assert_eq!(
+            Anchor::figure("   "),
+            Err(SupportMatrixError::EmptyAnchorReference)
+        );
+
+        let mut matrix = SupportMatrix::new();
+        let blank = Anchor {
+            kind: AnchorKind::Specification,
+            reference: "  ".to_string(),
+        };
+        assert_eq!(
+            matrix.add_anchor(EntityId(Uuid::new_v4()), blank),
+            Err(SupportMatrixError::EmptyAnchorReference)
+        );
+        assert_eq!(
+            matrix.anchor_count(),
+            0,
+            "a rejected anchor must not be stored"
+        );
     }
 }

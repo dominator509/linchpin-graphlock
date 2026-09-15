@@ -161,6 +161,13 @@ pub struct ResearchTask {
     pub id: String,
     pub status: SearchStatus,
     pub citations: Vec<String>,
+    /// Scopes this task was asked to cover (REQ-OPS-002).
+    pub requested_scopes: usize,
+    /// Scopes actually covered.
+    pub covered_scopes: usize,
+    /// Present only when the task finished with incomplete coverage, so the work
+    /// can be resumed rather than lost.
+    pub checkpoint: Option<String>,
 }
 
 impl ResearchTask {
@@ -169,6 +176,9 @@ impl ResearchTask {
             id: id.to_string(),
             status: SearchStatus::Pending,
             citations: Vec::new(),
+            requested_scopes: 0,
+            covered_scopes: 0,
+            checkpoint: None,
         }
     }
 
@@ -200,8 +210,75 @@ impl ResearchTask {
         if self.status != SearchStatus::Active {
             return Err("Must be active to complete");
         }
+        // REQ-OPS-002: "Partial research persists checkpoints and marks
+        // incomplete coverage." A task that did not cover everything it was
+        // asked to cannot be recorded as a plain completion, or the gap becomes
+        // invisible and downstream reasoning treats unchecked scope as checked.
+        if !self.coverage_complete() {
+            return Err(
+                "coverage is incomplete; record it with complete_partial so the gap is visible",
+            );
+        }
         self.status = SearchStatus::Completed;
         Ok(())
+    }
+
+    /// Declare how many scopes this task was asked to cover.
+    pub fn set_requested_scopes(&mut self, requested: usize) {
+        self.requested_scopes = requested;
+    }
+
+    /// Record progress: how many scopes have actually been covered so far.
+    ///
+    /// Needed because `complete()` requires full coverage, and without a way to
+    /// report coverage a fully-covered run could never reach `complete()` at all.
+    /// The first version of this API had exactly that gap, and the test caught it
+    /// rather than the gap reaching production.
+    pub fn record_coverage(&mut self, covered_scopes: usize) -> Result<(), &'static str> {
+        if covered_scopes > self.requested_scopes {
+            return Err("covered scopes cannot exceed requested scopes");
+        }
+        self.covered_scopes = covered_scopes;
+        Ok(())
+    }
+
+    /// Finish with incomplete coverage, persisting a checkpoint (REQ-OPS-002).
+    ///
+    /// The checkpoint is mandatory rather than optional: "partial research
+    /// persists checkpoints" is the clause's own requirement, and a partial
+    /// result with no checkpoint cannot be resumed, so the work is lost.
+    pub fn complete_partial(
+        &mut self,
+        covered_scopes: usize,
+        checkpoint: &str,
+    ) -> Result<(), &'static str> {
+        if self.status != SearchStatus::Active {
+            return Err("Must be active to complete");
+        }
+        if checkpoint.trim().is_empty() {
+            return Err("partial research must persist a checkpoint");
+        }
+        if covered_scopes > self.requested_scopes {
+            return Err("covered scopes cannot exceed requested scopes");
+        }
+        if covered_scopes == self.requested_scopes {
+            return Err("coverage is complete; use complete rather than complete_partial");
+        }
+        self.covered_scopes = covered_scopes;
+        self.checkpoint = Some(checkpoint.to_string());
+        self.status = SearchStatus::Completed;
+        Ok(())
+    }
+
+    /// True only when every requested scope was covered. A task that declared no
+    /// scope has nothing uncovered, so it is trivially complete.
+    pub fn coverage_complete(&self) -> bool {
+        self.covered_scopes >= self.requested_scopes
+    }
+
+    /// Scopes that were requested but not covered.
+    pub fn uncovered_scopes(&self) -> usize {
+        self.requested_scopes.saturating_sub(self.covered_scopes)
     }
 }
 
@@ -230,6 +307,97 @@ mod research_tests {
         let mut task = ResearchTask::new("task-2");
         task.start().unwrap();
         task.add_citation("US9999".to_string()).unwrap();
+        task.complete().unwrap();
+        assert_eq!(task.status, SearchStatus::Completed);
+    }
+
+    /// covers: REQ-OPS-002
+    /// "Partial research persists checkpoints and marks incomplete coverage."
+    #[test]
+    fn test_partial_research_persists_a_checkpoint_and_marks_coverage() {
+        let mut task = ResearchTask::new("task-partial");
+        task.start().unwrap();
+        task.set_requested_scopes(5);
+        assert!(!task.coverage_complete());
+        assert_eq!(task.uncovered_scopes(), 5);
+
+        // Finishing partially without a checkpoint must fail: an unresumable
+        // partial result loses the work the clause exists to preserve.
+        assert!(
+            task.complete_partial(2, "").is_err(),
+            "a partial completion without a checkpoint was accepted"
+        );
+        assert!(
+            task.complete_partial(2, "   ").is_err(),
+            "a blank checkpoint was accepted"
+        );
+        assert_eq!(
+            task.status,
+            SearchStatus::Active,
+            "a rejected partial completion must not change the status"
+        );
+        assert!(task.checkpoint.is_none());
+
+        // A plain complete() must not be usable to hide the gap.
+        assert!(
+            task.complete().is_err(),
+            "incomplete coverage was recorded as a full completion"
+        );
+        assert_eq!(task.status, SearchStatus::Active);
+
+        // With a checkpoint it succeeds, and the gap stays visible.
+        task.complete_partial(2, "checkpoint://run-7/scope-2")
+            .unwrap();
+        assert_eq!(task.status, SearchStatus::Completed);
+        assert_eq!(task.covered_scopes, 2);
+        assert_eq!(task.requested_scopes, 5);
+        assert_eq!(task.uncovered_scopes(), 3);
+        assert!(
+            !task.coverage_complete(),
+            "partial coverage must not report as complete"
+        );
+        assert_eq!(
+            task.checkpoint.as_deref(),
+            Some("checkpoint://run-7/scope-2"),
+            "the checkpoint must be persisted on the task"
+        );
+    }
+
+    /// covers: REQ-OPS-002
+    #[test]
+    fn test_full_coverage_completes_without_a_checkpoint() {
+        let mut task = ResearchTask::new("task-full");
+        task.start().unwrap();
+        task.set_requested_scopes(3);
+
+        // complete_partial refuses when nothing is actually uncovered.
+        assert!(task.complete_partial(3, "c").is_err());
+        // Over-covering is nonsense and is rejected, both when recording
+        // progress and when finishing.
+        assert!(task.record_coverage(4).is_err());
+        assert!(task.complete_partial(4, "c").is_err());
+
+        // Full coverage must be recordable, or a complete run could never
+        // finish: this assertion is what exposed that gap in the first place.
+        task.record_coverage(3).unwrap();
+        task.complete().unwrap();
+        assert_eq!(task.status, SearchStatus::Completed);
+        assert!(task.coverage_complete());
+        assert_eq!(task.uncovered_scopes(), 0);
+        assert!(
+            task.checkpoint.is_none(),
+            "a complete run needs no checkpoint"
+        );
+    }
+
+    /// covers: REQ-OPS-002
+    /// A task that declared no scope has nothing uncovered, so the existing
+    /// completion path keeps working for scope-less tasks.
+    #[test]
+    fn test_task_with_no_declared_scope_is_trivially_complete() {
+        let mut task = ResearchTask::new("task-noscope");
+        assert!(task.coverage_complete());
+        task.start().unwrap();
         task.complete().unwrap();
         assert_eq!(task.status, SearchStatus::Completed);
     }

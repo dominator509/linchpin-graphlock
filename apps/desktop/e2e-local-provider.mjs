@@ -229,6 +229,27 @@ try {
       dead.value.error_class.length > 0,
     `live=${dead?.value?.live} class=${dead?.value?.error_class} text=${JSON.stringify(dead?.value?.text)}`,
   );
+
+  // REQ-OPS-002: UNREACHABLE is EXTERNAL_TRANSIENT, so the bounded policy must
+  // have retried it up to the bound before reporting that a retry is worth
+  // suggesting. Asserting `attempts >= 2` proves the retry is real rather than a
+  // reported intent, and `retryable_exhausted` proves the advice is only given
+  // once the bound is spent.
+  record(
+    "transient failure retried under the bounded policy (REQ-OPS-002)",
+    dead?.value?.error_class === "UNREACHABLE" &&
+      dead?.value?.attempts >= 2 &&
+      dead?.value?.retryable_exhausted === true,
+    `class=${dead?.value?.error_class} attempts=${dead?.value?.attempts} retryable_exhausted=${dead?.value?.retryable_exhausted}`,
+  );
+
+  // A successful call must report exactly ONE attempt: the bound must not be
+  // retrying work that already succeeded.
+  record(
+    "a successful call reports exactly one attempt",
+    outcome?.live === true && outcome?.attempts === 1,
+    `live=${outcome?.live} attempts=${outcome?.attempts}`,
+  );
 } catch (e) {
   record("harness completed", false, String(e));
 } finally {

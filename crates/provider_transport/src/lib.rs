@@ -58,6 +58,34 @@ pub enum TransportError {
     Unimplemented(String),
 }
 
+impl TransportError {
+    /// Whether this failure is EXTERNAL_TRANSIENT and therefore retryable
+    /// (REQ-OPS-002).
+    ///
+    /// REQ-OPS-002: "Retry only EXTERNAL_TRANSIENT with bounded policy." The
+    /// distinction is not cosmetic. Retrying an `InvalidRequest` cannot succeed
+    /// -- the same malformed prompt will be rejected every time -- and retrying
+    /// `Unimplemented` retries a code path that does not exist. Both waste the
+    /// user's time and, worse, can bury the real diagnostic under retry noise.
+    /// Only a transport-level failure that a later attempt could plausibly
+    /// outlive is retryable:
+    ///
+    ///   * `Unreachable`                          -> transient
+    ///   * `ProviderFailure` with a 5xx status    -> transient (server-side)
+    ///   * `ProviderFailure` with a 4xx status    -> NOT retryable (our request)
+    ///   * `InvalidRequest` / `InvalidResponse`   -> NOT retryable
+    ///   * `Unimplemented`                        -> NOT retryable
+    pub fn is_external_transient(&self) -> bool {
+        match self {
+            TransportError::Unreachable(_) => true,
+            TransportError::ProviderFailure { status, .. } => *status >= 500,
+            TransportError::InvalidRequest(_)
+            | TransportError::InvalidResponse(_)
+            | TransportError::Unimplemented(_) => false,
+        }
+    }
+}
+
 impl std::fmt::Display for TransportError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -73,6 +101,65 @@ impl std::fmt::Display for TransportError {
 }
 
 impl std::error::Error for TransportError {}
+
+/// A bounded retry policy for EXTERNAL_TRANSIENT failures (REQ-OPS-002).
+///
+/// "Bounded" is the operative word: an unbounded retry loop against a provider
+/// that is down is indistinguishable from a hang, and it would also be the
+/// all-retry pattern DOD-024 forbids, because a policy that retries everything
+/// eventually reports success for a request that should have failed immediately.
+/// `max_attempts` counts the FIRST attempt, so `max_attempts = 3` means one try
+/// plus at most two retries.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RetryPolicy {
+    pub max_attempts: u32,
+}
+
+impl Default for RetryPolicy {
+    fn default() -> Self {
+        RetryPolicy { max_attempts: 3 }
+    }
+}
+
+impl RetryPolicy {
+    /// A policy that never retries.
+    pub fn none() -> Self {
+        RetryPolicy { max_attempts: 1 }
+    }
+
+    pub fn bounded(max_attempts: u32) -> Result<Self, &'static str> {
+        if max_attempts == 0 {
+            return Err("max_attempts must be at least 1 (the first attempt)");
+        }
+        Ok(RetryPolicy { max_attempts })
+    }
+
+    /// Run `attempt` under this policy, retrying ONLY external-transient
+    /// failures and stopping at the bound.
+    ///
+    /// Returns the last result and the number of attempts actually made, so a
+    /// caller can report how hard it tried rather than only whether it worked.
+    /// The attempt index is passed in so a caller can vary its behaviour per
+    /// attempt without hidden state.
+    pub fn run<T, F>(&self, mut attempt: F) -> (Result<T, TransportError>, u32)
+    where
+        F: FnMut(u32) -> Result<T, TransportError>,
+    {
+        let mut made = 0;
+        loop {
+            made += 1;
+            match attempt(made) {
+                Ok(value) => return (Ok(value), made),
+                Err(err) => {
+                    let can_retry = err.is_external_transient() && made < self.max_attempts;
+                    if !can_retry {
+                        return (Err(err), made);
+                    }
+                }
+            }
+        }
+    }
+}
 
 #[async_trait]
 pub trait ProviderTransport: Send + Sync + Debug {
@@ -351,5 +438,138 @@ mod tests {
             matches!(result, Err(TransportError::Unimplemented(_))),
             "unimplemented lane must fail closed, got {result:?}"
         );
+    }
+
+    /// covers: REQ-OPS-002
+    /// "Retry only EXTERNAL_TRANSIENT with bounded policy." Classification must
+    /// separate failures a later attempt could outlive from ones it cannot.
+    #[test]
+    fn test_only_external_transient_failures_are_retryable() {
+        // Transient: a transport-level failure or a server-side error.
+        assert!(
+            TransportError::Unreachable("connection refused".to_string()).is_external_transient()
+        );
+        assert!(
+            TransportError::ProviderFailure {
+                status: 500,
+                body: "internal error".to_string()
+            }
+            .is_external_transient()
+        );
+        assert!(
+            TransportError::ProviderFailure {
+                status: 503,
+                body: "unavailable".to_string()
+            }
+            .is_external_transient()
+        );
+
+        // NOT transient: our request is wrong, so the same request fails again.
+        assert!(
+            !TransportError::InvalidRequest("empty prompt".to_string()).is_external_transient()
+        );
+        assert!(
+            !TransportError::ProviderFailure {
+                status: 400,
+                body: "bad request".to_string()
+            }
+            .is_external_transient()
+        );
+        assert!(
+            !TransportError::ProviderFailure {
+                status: 404,
+                body: "no such model".to_string()
+            }
+            .is_external_transient()
+        );
+        // NOT transient: the payload was unusable.
+        assert!(!TransportError::InvalidResponse("not JSON".to_string()).is_external_transient());
+        // NOT transient: retrying a code path that does not exist is pointless.
+        assert!(
+            !TransportError::Unimplemented("lane not wired".to_string()).is_external_transient()
+        );
+    }
+
+    /// covers: REQ-OPS-002
+    /// A transient failure is retried up to the bound and no further.
+    #[test]
+    fn test_transient_failure_is_retried_up_to_the_bound() {
+        let policy = RetryPolicy::bounded(3).unwrap();
+        let mut calls = 0;
+        let (result, made) = policy.run(|_| {
+            calls += 1;
+            Err::<u32, _>(TransportError::Unreachable("down".to_string()))
+        });
+        assert!(result.is_err());
+        assert_eq!(made, 3, "the policy must stop at max_attempts");
+        assert_eq!(calls, 3);
+
+        // A failure that clears on the second attempt still succeeds.
+        let mut n = 0;
+        let (ok, made) = policy.run(|_| {
+            n += 1;
+            if n < 2 {
+                Err(TransportError::Unreachable("down".to_string()))
+            } else {
+                Ok("recovered")
+            }
+        });
+        assert_eq!(ok, Ok("recovered"));
+        assert_eq!(made, 2, "it must stop as soon as it succeeds");
+    }
+
+    /// covers: REQ-OPS-002
+    /// A non-transient failure is NOT retried: retrying a malformed request or
+    /// an unimplemented lane cannot succeed and hides the real diagnostic.
+    #[test]
+    fn test_non_transient_failure_is_not_retried() {
+        let policy = RetryPolicy::bounded(5).unwrap();
+
+        let mut calls = 0;
+        let (result, made) = policy.run(|_| {
+            calls += 1;
+            Err::<u32, _>(TransportError::InvalidRequest("empty prompt".to_string()))
+        });
+        assert!(result.is_err());
+        assert_eq!(made, 1, "an invalid request must not be retried");
+        assert_eq!(calls, 1);
+
+        let mut calls = 0;
+        let (_, made) = policy.run(|_| {
+            calls += 1;
+            Err::<u32, _>(TransportError::Unimplemented("not wired".to_string()))
+        });
+        assert_eq!(made, 1, "an unimplemented lane must not be retried");
+        assert_eq!(calls, 1);
+
+        // A 4xx is the provider rejecting our request, so it is not retried
+        // even though it arrives as a ProviderFailure.
+        let mut calls = 0;
+        let (_, made) = policy.run(|_| {
+            calls += 1;
+            Err::<u32, _>(TransportError::ProviderFailure {
+                status: 429,
+                body: "rate limited".to_string(),
+            })
+        });
+        assert_eq!(made, 1, "429 is a 4xx and must not be retried here");
+        assert_eq!(calls, 1);
+
+        // The no-retry policy makes exactly one attempt regardless.
+        let (_, made) = RetryPolicy::none()
+            .run(|_| Err::<u32, _>(TransportError::Unreachable("down".to_string())));
+        assert_eq!(made, 1);
+    }
+
+    /// covers: REQ-OPS-002
+    #[test]
+    fn test_retry_policy_rejects_an_unbounded_or_zero_bound() {
+        assert!(
+            RetryPolicy::bounded(0).is_err(),
+            "a zero bound would make no attempt at all"
+        );
+        assert_eq!(RetryPolicy::bounded(1).unwrap().max_attempts, 1);
+        assert_eq!(RetryPolicy::default().max_attempts, 3);
+        assert_eq!(RetryPolicy::none().max_attempts, 1);
     }
 }
