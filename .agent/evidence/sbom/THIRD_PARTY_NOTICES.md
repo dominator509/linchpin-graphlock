@@ -13,7 +13,7 @@ after any dependency change.
 
 ## Artifact identity
 
-- `target\release\linchpin-desktop.exe` sha256 `9504cd8d90328435d11f9bb9dd67d03f2dfdeb41c4aee6bd6a59077421dc4842`
+- `target\release\linchpin-desktop.exe` sha256 `8df69a3b9b09925d4d3294c2e7bf807f04563c3d5ecafbdaff3d3252e2d01c84`
 - `Cargo.lock` sha256 `e4b6581bcd9abb74c7c5f4ac9155ad95d168dead52caf7f42f138d67b8380cfb`
 - `pnpm-lock.yaml` sha256 `45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf`
 
@@ -24,17 +24,13 @@ after any dependency change.
 - `Unicode-3.0`: 18 component(s)
 - `Apache-2.0`: 6 component(s)
 - `BSD-3-Clause`: 5 component(s)
-- `MPL-2.0`: 5 component(s) — **requires the file-level review described in ADR-002**
+- `MPL-2.0`: 5 component(s) — permitted by ADR-002 (review complete, 2026-09-14)
 - `Zlib`: 2 component(s)
 - `ISC`: 1 component(s)
 
 ## Components requiring license review
 
-- `cssparser@0.36.0` — MPL-2.0
-- `cssparser-macros@0.6.1` — MPL-2.0
-- `dtoa-short@0.3.5` — MPL-2.0
-- `option-ext@0.2.0` — MPL-2.0
-- `selectors@0.36.1` — MPL-2.0
+- none
 
 ## Components with a non-allowlisted license
 
@@ -59,9 +55,9 @@ after any dependency change.
 
 ## JavaScript components requiring license review
 
-- `minimatch@10.2.6` — BlueOak-1.0.0
-- `argparse@2.0.1` — Python-2.0
-- `caniuse-lite@1.0.30001810` — CC-BY-4.0
+- `minimatch@10.2.6` — BlueOak-1.0.0 — build/test-time only; verified absent from the shipped bundle
+- `argparse@2.0.1` — Python-2.0 — build/test-time only; verified absent from the shipped bundle
+- `caniuse-lite@1.0.30001810` — CC-BY-4.0 — build/test-time only; verified absent from the shipped bundle
 
 ## Scope note
 

@@ -1,15 +1,40 @@
 {
   "changed_classes": [
-    "rust-source"
+    "rust-manifest",
+    "gate-script"
   ],
-  "epoch_digest": "a8f7a236143e374eff9c41e56105e9339afc10046132fceb749124cc055f7e28",
+  "epoch_digest": "d5269b631cdfd477c52375d53a0daf1ba4450da2badf0e59eca0133cecf07df6",
   "failures": 0,
   "results": [
     {
-      "command": "sh scripts/build.sh",
-      "duration_s": 78.53,
+      "command": "sh scripts/security-check.sh",
+      "duration_s": 24.97,
       "exit_code": 0,
-      "output_sha256": "c39bedaa27901cead99c5fe2872031cef9f3f1daeab13ddd04dd5c10190ce533",
+      "output_sha256": "d71ad949837d92a49f06bcc48568d9db8581e0403d943c15f4c2fdd40219da1e",
+      "output_tail": [
+        "   \u2502",
+        "60 \u2502     \"Unicode-DFS-2016\",",
+        "   \u2502      \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 unmatched license allowance"
+      ],
+      "stage": "V-004 supply chain",
+      "status": "PASS"
+    },
+    {
+      "command": "python3 scripts/generate-sbom.py --check",
+      "duration_s": 1.29,
+      "exit_code": 0,
+      "output_sha256": "ab1c5d4950dc209fa473305b8c8a10edb5dd4bcff46c26d56521c39d18c91ffd",
+      "output_tail": [
+        "sbom check: ok (720 components, current)"
+      ],
+      "stage": "V-004 supply chain",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/build.sh",
+      "duration_s": 111.72,
+      "exit_code": 0,
+      "output_sha256": "e2a5561469fcabfcdd956d95d63cf03ac4917756d74b4bf9054fab451ac1b527",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -19,36 +44,36 @@
       "status": "PASS"
     },
     {
-      "command": "sh scripts/smoke-test.sh",
-      "duration_s": 11.26,
+      "command": "sh scripts/artifact-e2e.sh",
+      "duration_s": 136.29,
       "exit_code": 0,
-      "output_sha256": "2133ba1d3a0938b85f89d84d8bdda7eb43db0498fde5fd7506a45860b3dc5071",
+      "output_sha256": "953e6f2213d4adb48bcfacf5dda83038eef8b7774a52c7d4edceaa5b48981808",
       "output_tail": [
-        "smoke: verifying removal",
-        "smoke: clean removal confirmed",
-        "smoke: ok (artifact 3cf380a024ac460918d911f1233a91d6ce08ebf6d961f1e0873691243ff95aab verified through install/launch/uninstall)"
+        "  PASS: artifact digest unchanged across the run -- 1f7904e1793c9112",
+        "artifact-e2e: wrote .agent/evidence/artifact-e2e/STATUS.md",
+        "artifact-e2e: ok"
       ],
-      "stage": "V-006 smoke",
+      "stage": "V-020 exact artifact",
       "status": "PASS"
     },
     {
-      "command": "sh scripts/typecheck.sh",
-      "duration_s": 5.08,
+      "command": "sh scripts/harness-validate.sh",
+      "duration_s": 64.99,
       "exit_code": 0,
-      "output_sha256": "5ded24b04bdbd4d9d6f06bd408611ef5bec53d8e2dafed847a8a3876a523bbea",
+      "output_sha256": "a0112506b97a674dbac0fd21cdce150560e51fb4506be69b22ecdd14dd03b457",
       "output_tail": [
-        "    Checking crash_reporter v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\crash_reporter)",
-        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.14s"
+        "reachability check: ok (150 public fns, 18 entry points, 0 unreachable)",
+        "trailing-and check: ok (no trailing &&-test lanes)",
+        "harness-validate: ok"
       ],
-      "stage": "V-007 sanity",
+      "stage": "V-000 harness validation",
       "status": "PASS"
     },
     {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 16.75,
+      "duration_s": 19.55,
       "exit_code": 0,
-      "output_sha256": "a3523884c334f9e8657fc7e2c87adf9db57e522d895d4fe0db2b1dfc28440f9d",
+      "output_sha256": "b23ab85f3fc9db0143a2aa10273057c8258eab8b9e6d8d8a68176b6e949e62d1",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -59,37 +84,24 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 1.81,
+      "duration_s": 2.33,
       "exit_code": 0,
-      "output_sha256": "c2ce1be140372b10a82555a091b573f9aafed026b954fc763c15e2e73c490f34",
+      "output_sha256": "c4b00aed9a02ea089f6203b452489b81d53dce09db961ac3ff622e9d9315ab91",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.72s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-40d0be70daa3bb16.exe)"
       ],
       "stage": "V-009 integration/concurrency",
       "status": "PASS"
-    },
-    {
-      "command": "sh scripts/lint.sh",
-      "duration_s": 4.78,
-      "exit_code": 0,
-      "output_sha256": "a89e85baaf09193f76631a86da00007a0bb6fa041cc8c38413fcee97587b10c5",
-      "output_tail": [
-        "packages/contracts lint: Done",
-        "apps/desktop lint: Done",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.99s"
-      ],
-      "stage": "V-012 regression/mutation",
-      "status": "PASS"
     }
   ],
   "stages": [
+    "V-004 supply chain",
     "V-005 clean build",
-    "V-006 smoke",
-    "V-007 sanity",
+    "V-020 exact artifact",
+    "V-000 harness validation",
     "V-008 full functionality",
-    "V-009 integration/concurrency",
-    "V-012 regression/mutation"
+    "V-009 integration/concurrency"
   ]
 }

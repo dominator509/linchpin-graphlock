@@ -14,9 +14,10 @@
 #    custom/source-available licenses require an explicit legal/license ADR
 #    before inclusion and are not allowed by default in distributable core."
 #
-# Nothing here widens that documented policy. MPL-2.0 is deliberately absent
-# pending the file-level review the policy requires; if a dependency needs it,
-# add it with an ADR rather than editing this list quietly.
+# Nothing here widens that documented policy beyond ADR-002. MPL-2.0 is listed
+# above because the ADR-002 file-level review was completed and the project owner
+# permitted it; LICENSE_ALLOWLIST.md records the same change. Any OTHER
+# non-allowlisted license still needs its own ADR rather than a quiet edit here.
 
 [graph]
 targets = [
@@ -59,6 +60,14 @@ allow = [
     "Unicode-DFS-2016",
     "CC0-1.0",
     "0BSD",
+    # MPL-2.0 permitted by ADR-002 (human decision, 2026-09-14).
+    # Reviewed crates: cssparser 0.36.0, cssparser-macros 0.6.1, dtoa-short 0.3.5,
+    # selectors 0.36.1, option-ext 0.2.0 (all via the Tauri foundation) and
+    # htmlescape 0.3.1 (via tantivy -> this project's own storage crate).
+    # None is modified; the notice obligation ships in
+    # .agent/evidence/sbom/THIRD_PARTY_NOTICES.md, covered by generate-sbom.py --check.
+    # Revisit if any of these is ever vendored or patched.
+    "MPL-2.0",
 ]
 # First-party workspace crates are declared MIT OR Apache-2.0 in their
 # manifests. Keep this in sync with the `license` field in each Cargo.toml.

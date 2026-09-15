@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "c582481",
+  "candidate_commit": "75fc35c",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -37,7 +37,7 @@
         "scripts\\bind-requirements.py": "b5b3f5d11af024a5bd363c74cd133a696e64172f34064aae8fbb7b34f881c41f",
         "scripts\\build-accounting.py": "7eee6a642222843a86b0495d98c07e839f99d8902dc76392563f20a9adfa3f4c",
         "scripts\\build-applicability.py": "b2a4a924641168715c2c38fa47e638a85b8a3ad688a877a288535f97221b69ca",
-        "scripts\\build-dod-status.py": "eac85a2ea5359f11b84f270bf01371bed34d98715dda710fd6c76453b5f97284",
+        "scripts\\build-dod-status.py": "f6b36e32afc59e24d5106af9cf846147bc8ace721561779072a3d3fba5598e63",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
         "scripts\\change-invalidation.py": "d73a6d9a2f432bef3c75dde37c5939b735e005fc747a1e1f75dff5c116b25db6",
@@ -49,7 +49,7 @@
         "scripts\\fix-trailing-and-lanes.py": "1975f3d7bfd6693657d2250076f0e71c4786e56f446389afaf77169ff3191ab9",
         "scripts\\format-check.sh": "2d565f3798f61577218798bec689d59bab3e48daaa372c6645985c86fb0ca545",
         "scripts\\generate-icons.py": "cd5649efa6ea2a9ee8d35c95e097c17e1bfff88edf526f2bd7a75c9a0e16a1fe",
-        "scripts\\generate-sbom.py": "96285928a2d5b54165431727d005d0ed73dead5d909654c45a1c09644ffcfdaf",
+        "scripts\\generate-sbom.py": "8ee9a1c44f0acc404b2e71b5e52e52821dd6d0f9e8574cb2de20ff09222de18e",
         "scripts\\graph-next.sh": "3f73444ecc2008a54a7487e6db42f34191f658b5a44bfb5c4739f50ba59c514a",
         "scripts\\harness-accounting.sh": "4e354312bb083d102f8705fa1978b7e5eeffdd0353ea5cc84f9b651c597283b9",
         "scripts\\harness-init.sh": "9e5861aecd7507382f83a2559d85f38aa5a9c0bf3ae7c5e25319c1812cda96fd",
@@ -153,7 +153,7 @@
         "crates\\provider_transport\\Cargo.toml": "c373ec6b9be27b1f7f2bb83425ddb3444dd4bce6294644ed5d3acf5e528b4937",
         "crates\\research\\Cargo.toml": "231cd899881a14253d8caf831a95fe6dd7bd1184b3abbe6d9204c495f95bfd10",
         "crates\\storage\\Cargo.toml": "3efd2a85bbc12a11cdeb0990ce88c717e78a46ef405a5502e73319d21a1a05cf",
-        "deny.toml": "3fea1dc0716ba323feb74a52cf3365bc531eac1fda24639d63f50f57f79138e7",
+        "deny.toml": "4fbd3271d9a0de0d6ff8ba9207670c55408c034a7ba895e6d1238fa12fdfc6d0",
         "rust-toolchain.toml": "89d9c3c3266967c0be43405f082a94cda8eab9b2cfdf28538eda48fa5e08c398"
       },
       "rules": [
@@ -205,6 +205,6 @@
       ]
     }
   },
-  "epoch_digest": "a8f7a236143e374eff9c41e56105e9339afc10046132fceb749124cc055f7e28",
+  "epoch_digest": "d5269b631cdfd477c52375d53a0daf1ba4450da2badf0e59eca0133cecf07df6",
   "total_inputs": 112
 }

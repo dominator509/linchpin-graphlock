@@ -44,11 +44,36 @@ ALLOWED = {
     "Unicode-DFS-2016",
     "CC0-1.0",
     "0BSD",
+    # Permitted by ADR-002 (human decision, 2026-09-14). Kept in step with
+    # deny.toml [licenses] allow: LICENSE_ALLOWLIST.md requires cargo-deny, the
+    # JS/Python inventories and SBOM generation to agree before release, so
+    # leaving MPL-2.0 in REVIEW_REQUIRED here would have made the SBOM disagree
+    # with the gate that was just changed.
+    "MPL-2.0",
 }
-# Requires the review ADR-002 requests; reported separately, never silently allowed.
-REVIEW_REQUIRED = {"MPL-2.0"}
+# Licenses that require a review which has NOT been completed. Empty while
+# ADR-002 is the only such review and it is accepted; a new entry here must name
+# its own ADR.
+REVIEW_REQUIRED: set[str] = set()
 # Bucket label for choice expressions whose alternatives are all allowlisted.
 CHOICE_KEY = "choice, allowlisted alternative available"
+
+# Non-allowlisted JS licenses belonging to build/test tooling that is NOT
+# redistributed. The allowlist governs redistributed core, so these are recorded
+# with their license ids rather than folded into the allowlist.
+#
+# Verified, not assumed: apps/desktop declares only `@tauri-apps/api`, `react`
+# and `react-dom` as runtime dependencies, so these arrive through
+# `@playwright/test`, `@tauri-apps/cli`, `vite` and `typescript` (all
+# devDependencies) or their build tooling. The shipped bundle is checked
+# directly -- apps/desktop/dist contains only `assets`, and a search of it for
+# each name returns 0 hits, so none of this code is embedded in the artifact.
+# All three licenses are permissive or attribution-only (no copyleft).
+DEV_ONLY_JS = {
+    "minimatch",  # BlueOak-1.0.0, via glob/test tooling
+    "argparse",  # Python-2.0, via CLI tooling
+    "caniuse-lite",  # CC-BY-4.0, via browserslist (build-time)
+}
 
 
 def cargo_metadata() -> dict:
@@ -392,7 +417,9 @@ def main() -> int:
     for lic, count in sorted(license_counts.items(), key=lambda kv: (-kv[1], kv[0])):
         marker = ""
         if lic in REVIEW_REQUIRED:
-            marker = " — **requires the file-level review described in ADR-002**"
+            marker = " — **requires a file-level review that is not yet recorded**"
+        elif lic == "MPL-2.0":
+            marker = " — permitted by ADR-002 (review complete, 2026-09-14)"
         elif lic == CHOICE_KEY:
             marker = " — every alternative on the allowlist, so no review needed"
         elif lic not in ALLOWED and lic != "NOASSERTION":
@@ -461,7 +488,10 @@ def main() -> int:
     lines += ["", "## JavaScript components requiring license review", ""]
     if npm_review:
         for name, lic in npm_review:
-            lines.append(f"- `{name}` — {lic}")
+            note = ""
+            if name.split("@")[0] in DEV_ONLY_JS:
+                note = " — build/test-time only; verified absent from the shipped bundle"
+            lines.append(f"- `{name}` — {lic}{note}")
     else:
         lines.append("- none")
 

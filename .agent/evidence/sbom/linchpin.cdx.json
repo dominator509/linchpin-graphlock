@@ -18240,7 +18240,7 @@
     "properties": [
       {
         "name": "linchpin:artifact",
-        "value": "{\"artifact\": \"target\\\\release\\\\linchpin-desktop.exe\", \"sha256\": \"9504cd8d90328435d11f9bb9dd67d03f2dfdeb41c4aee6bd6a59077421dc4842\"}"
+        "value": "{\"artifact\": \"target\\\\release\\\\linchpin-desktop.exe\", \"sha256\": \"8df69a3b9b09925d4d3294c2e7bf807f04563c3d5ecafbdaff3d3252e2d01c84\"}"
       },
       {
         "name": "linchpin:cargo_lock",

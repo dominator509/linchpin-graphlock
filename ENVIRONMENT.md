@@ -5,7 +5,7 @@ Bootstrap toolchain pins verified from first-party release sources on 2026-08-28
 ## Environments
 - `local-dev`: real encrypted disposable workspace; local provider mandatory; cloud provider lanes optional.
 - `integration`: isolated accounts/endpoints, disposable datasets, real service adapters.
-- `e2e-windows`: clean Win10/11 VM, signed/unsigned candidate as appropriate, installer-level execution.
+- `e2e-windows`: clean Windows 10 or higher target (ADR-004 scoped the matrix to Windows 10+; Windows 11 is not verified), **unsigned** candidate per ADR-003, installer-level execution. A zero-state/virgin target is still EXTERNAL_REQUIRED for DOD-034.
 - `release-candidate`: frozen artifact digest; no production-code changes.
 
 ## Config

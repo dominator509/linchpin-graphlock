@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `a8f7a236143e374eff9c41e56105e9339afc10046132fceb749124cc055f7e28`
-- Candidate commit at generation: `c582481`
+- Current epoch digest: `d5269b631cdfd477c52375d53a0daf1ba4450da2badf0e59eca0133cecf07df6`
+- Candidate commit at generation: `75fc35c`
 - Total tracked inputs: 112
-- Previous epoch digest: `bac7d2f08afadc7f78da14bfdc6909ff4c96827b4646200f2f2cf6d447a45ec0`
-- **Changed input classes since that epoch: rust-source**
+- Previous epoch digest: `a8f7a236143e374eff9c41e56105e9339afc10046132fceb749124cc055f7e28`
+- **Changed input classes since that epoch: rust-manifest, gate-script**
 
 ## Input classes and what a change invalidates
 

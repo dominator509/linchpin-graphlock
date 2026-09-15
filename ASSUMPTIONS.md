@@ -1,6 +1,6 @@
 | assumption | reason | risk if wrong | verification | blocks implementation |
 | --- | --- | --- | --- | --- |
-| Windows 10/11 x64 is v1 target | User requested local PC software | Installer/platform APIs differ | Confirm product scope in PROJECT_BRIEF.md and test on clean Win10/11 VMs | no |
+| Windows 10 or higher x64 is v1 target | User requested local PC software | Installer/platform APIs differ | Scope set by ADR-004. Test on a clean Windows 10+ target; Windows 11 is NOT claimed as verified because no Win11 target exists | no |
 | No existing production repo | Uploaded bundle is a generator, not application source | Could duplicate unseen implementation | At executor start: `git status --porcelain=v1` and inventory repository before EP-001 | yes if repo is not greenfield |
 | Provider subscription transports remain permitted under current terms | Terms can change | Commercial integration could violate provider rules | EP-000 re-read first-party auth/CLI terms; record URLs/date/version | yes per adapter |
 | Patent Center has no supported general submission API for this product | Official workflow is interactive | Automation could be brittle or unlawful | EP-000 re-verify USPTO Patent Center/developer docs | yes for filing automation; package generation continues |
