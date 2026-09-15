@@ -1,18 +1,28 @@
 {
   "changed_classes": [
-    "rust-source",
-    "rust-manifest",
-    "lockfile",
     "gate-script"
   ],
-  "epoch_digest": "85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a",
+  "epoch_digest": "783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e",
   "failures": 0,
   "results": [
     {
-      "command": "sh scripts/build.sh",
-      "duration_s": 110.12,
+      "command": "sh scripts/harness-validate.sh",
+      "duration_s": 62.49,
       "exit_code": 0,
-      "output_sha256": "6263895587fc159cb87ab4890471407faaf5c4eb25b6eceed7eee04bb37dcd29",
+      "output_sha256": "d422f625a24049ec920f78118b821412dc779c723b912552251b6dda0a1a00bd",
+      "output_tail": [
+        "reachability check: ok (181 public fns, 23 entry points, 0 unreachable)",
+        "trailing-and check: ok (no trailing &&-test lanes)",
+        "harness-validate: ok"
+      ],
+      "stage": "V-000 harness validation",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/build.sh",
+      "duration_s": 118.53,
+      "exit_code": 0,
+      "output_sha256": "b5dae3b4c4e64ada3aa158cca5fc790f3d1282a44efbde6940ae8807e7259899",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -22,36 +32,10 @@
       "status": "PASS"
     },
     {
-      "command": "sh scripts/smoke-test.sh",
-      "duration_s": 15.91,
-      "exit_code": 0,
-      "output_sha256": "ee5ee3f4766f246c0ed527d0344bb40b44c0664c8bf2ee2b077d32f63c2e9b9c",
-      "output_tail": [
-        "smoke: verifying removal",
-        "smoke: clean removal confirmed",
-        "smoke: ok (artifact e4f0f8bed6c9f30c2e46233c149542ebf48eca9c6b6bf94901fd7d84dcc117e8 verified through install/launch/uninstall)"
-      ],
-      "stage": "V-006 smoke",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/typecheck.sh",
-      "duration_s": 4.92,
-      "exit_code": 0,
-      "output_sha256": "de9179135c37827754adb998d85b0bc2bb7cf9085901f511cf83542e99b33554",
-      "output_tail": [
-        "packages/contracts typecheck: Done",
-        "    Checking platform_windows v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\platform_windows)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.61s"
-      ],
-      "stage": "V-007 sanity",
-      "status": "PASS"
-    },
-    {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 35.22,
+      "duration_s": 25.93,
       "exit_code": 0,
-      "output_sha256": "c0b3d108b18714c0266fbe5eaea5db0749a89e45c4e9f88f910e2857cfd26ace",
+      "output_sha256": "6185d162a2746e64e309d353c9c4c8ee3334d7095f22cf1d5ef892d13b5bce99",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -62,118 +46,22 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 2.64,
+      "duration_s": 2.18,
       "exit_code": 0,
-      "output_sha256": "765b5c8bc898a94e7d956c608d3d8e26f7efc973551b7e2eddb7e643f0445d1c",
+      "output_sha256": "3981feca5d5004677e178d7c746bc26eb46c27ba787b1ced90f333174a9f9216",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.65s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-40d0be70daa3bb16.exe)"
       ],
       "stage": "V-009 integration/concurrency",
       "status": "PASS"
-    },
-    {
-      "command": "sh scripts/lint.sh",
-      "duration_s": 7.18,
-      "exit_code": 0,
-      "output_sha256": "163738a4fe40b1142edc25fed5bae0f6afe23a21a9794d430c0e06a69d4d21d8",
-      "output_tail": [
-        "packages/contracts lint: Done",
-        "apps/desktop lint: Done",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.35s"
-      ],
-      "stage": "V-012 regression/mutation",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/live-fire-local-provider.sh",
-      "duration_s": 259.1,
-      "exit_code": 0,
-      "output_sha256": "8ed4c894d93693351c7f6e2ae64fd8f9d3c16a819d1fbc66442dc608705990d0",
-      "output_tail": [
-        "local-provider: restored the production artifact",
-        "local-provider: rebuilding the production artifact from the committed config",
-        "local-provider: production artifact correctly opens no debug port"
-      ],
-      "stage": "V-013 dynamic security/domain packs",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/security-check.sh",
-      "duration_s": 31.95,
-      "exit_code": 0,
-      "output_sha256": "9179bf1820fb7733c5b93b5177aee675160de53e18b9bde75937f0f680467ab2",
-      "output_tail": [
-        "   \u2502",
-        "60 \u2502     \"Unicode-DFS-2016\",",
-        "   \u2502      \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 unmatched license allowance"
-      ],
-      "stage": "V-004 supply chain",
-      "status": "PASS"
-    },
-    {
-      "command": "python3 scripts/generate-sbom.py --check",
-      "duration_s": 2.56,
-      "exit_code": 0,
-      "output_sha256": "ab1c5d4950dc209fa473305b8c8a10edb5dd4bcff46c26d56521c39d18c91ffd",
-      "output_tail": [
-        "sbom check: ok (720 components, current)"
-      ],
-      "stage": "V-004 supply chain",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/artifact-e2e.sh",
-      "duration_s": 146.82,
-      "exit_code": 0,
-      "output_sha256": "0bff7db0530e87d42d0d98898b6d8f4c4a2abd153830f71de23160507c79daa2",
-      "output_tail": [
-        "  PASS: artifact digest unchanged across the run -- 8fee7329f5c83ce2",
-        "artifact-e2e: wrote .agent/evidence/artifact-e2e/STATUS.md",
-        "artifact-e2e: ok"
-      ],
-      "stage": "V-020 exact artifact",
-      "status": "PASS"
-    },
-    {
-      "command": "cargo deny check licenses",
-      "duration_s": 2.42,
-      "exit_code": 0,
-      "output_sha256": "399cddd063c637ba1d14b992b05e5b5171a1f6ce1c9065e79e49e0ba021d3618",
-      "output_tail": [
-        "   \u2502",
-        "60 \u2502     \"Unicode-DFS-2016\",",
-        "   \u2502      \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 unmatched license allowance"
-      ],
-      "stage": "DOD-021 license gate",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/harness-validate.sh",
-      "duration_s": 61.68,
-      "exit_code": 0,
-      "output_sha256": "5de1bcc4df4eb52077c869d3e5b302e448ac0300ab65f95dac9f54b7440f151a",
-      "output_tail": [
-        "reachability check: ok (181 public fns, 23 entry points, 0 unreachable)",
-        "trailing-and check: ok (no trailing &&-test lanes)",
-        "harness-validate: ok"
-      ],
-      "stage": "V-000 harness validation",
-      "status": "PASS"
     }
   ],
   "stages": [
+    "V-000 harness validation",
     "V-005 clean build",
-    "V-006 smoke",
-    "V-007 sanity",
     "V-008 full functionality",
-    "V-009 integration/concurrency",
-    "V-012 regression/mutation",
-    "V-013 dynamic security/domain packs",
-    "V-004 supply chain",
-    "V-020 exact artifact",
-    "DOD-021 license gate",
-    "V-000 harness validation"
+    "V-009 integration/concurrency"
   ]
 }

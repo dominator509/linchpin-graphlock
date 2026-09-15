@@ -16,11 +16,11 @@ REQ-DOM-007,4,3,3,0,PASS,commands::tests::test_docket_requires_filing_before_com
 REQ-DOM-008,5,4,4,0,PASS,commands::tests::test_export_firewall_blocks_restricted_content;commands::tests::test_export_gateway_hardens_paths_and_blocks_restricted;commands::tests::test_research_validates_its_inputs;firewall_tests::test_disclosure_firewall,apps/desktop/src-tauri/src/commands.rs;crates/evidence/src/lib.rs
 REQ-DOM-009,6,6,6,0,PASS,commands::tests::test_schedule_docket_deadline_requires_ruleset_authority;docket_tests::test_authoritative_deadline_rejects_an_empty_date;docket_tests::test_deadline_requires_ruleset_source_and_version;docket_tests::test_deadline_with_a_ruleset_is_authoritative;docket_tests::test_deadline_without_a_ruleset_is_never_authoritative;docket_tests::test_model_suggestion_is_not_authoritative_until_confirmed,apps/desktop/src-tauri/src/commands.rs;crates/domain/src/lib.rs
 REQ-DOM-010,3,3,3,0,PASS,capsule_tests::test_export_guard_accepts_a_fully_redacted_capsule;capsule_tests::test_export_guard_rejects_surviving_registered_secret;capsule_tests::test_punctuation_wrapped_tokens_are_scrubbed_before_export,crates/crash_reporter/src/lib.rs
-REQ-FOUND-001,1,0,0,0,BOUND_NOT_COLLECTED,,
+REQ-FOUND-001,1,1,1,0,PASS,test_workspace_membership_and_tauri_2x_foundation,crates/platform_windows/tests/licensing_policy.rs
 REQ-FOUND-002,4,4,4,0,PASS,tests::test_config_parses_environment_once_into_typed_values;tests::test_missing_required_value_is_an_error_not_a_fallback;tests::test_release_runtime_is_parsed;tests::test_unknown_keys_warn_in_development_and_fail_in_release,crates/platform_windows/src/lib.rs
-REQ-LIC-001,2,0,0,0,BOUND_NOT_COLLECTED,,
-REQ-LIC-002,1,0,0,0,BOUND_NOT_COLLECTED,,
-REQ-LIC-003,1,0,0,0,BOUND_NOT_COLLECTED,,
+REQ-LIC-001,2,1,1,0,PASS,test_redistributed_core_uses_the_permissive_allowlist,crates/platform_windows/tests/licensing_policy.rs
+REQ-LIC-002,1,1,1,0,PASS,test_license_scanners_agree_and_the_sbom_records_spdx_and_source,crates/platform_windows/tests/licensing_policy.rs
+REQ-LIC-003,1,1,1,0,PASS,test_dependency_versions_are_pinned_and_never_floated,crates/platform_windows/tests/licensing_policy.rs
 REQ-LLM-001,8,7,7,0,PASS,commands::tests::test_local_inference_refuses_non_loopback_endpoint;commands::tests::test_local_inference_returns_no_text_when_no_model_is_served;mcp_tests::probe_injection_filter_covers_variants;mcp_tests::test_injection_filter_allows_benign_payloads;tests::test_extract_text_fails_closed_on_missing_field;tests::test_local_adapter_rejects_non_loopback_endpoint;tests::test_unreachable_endpoint_fails_closed_not_fabricated,apps/desktop/src-tauri/src/commands.rs;crates/mcp_hub/src/lib.rs;crates/provider_transport/src/lib.rs
 REQ-LLM-002,2,2,2,0,PASS,commands::tests::test_correlation_ids_are_unique;commands::tests::test_namespace_status_covers_spec_003_and_is_honest,apps/desktop/src-tauri/src/commands.rs
 REQ-LLM-003,2,2,2,0,PASS,commands::tests::test_command_result_serializes_envelope;tests::test_empty_prompt_is_rejected_before_any_io,apps/desktop/src-tauri/src/commands.rs;crates/provider_transport/src/lib.rs

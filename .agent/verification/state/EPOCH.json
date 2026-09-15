@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "8f7eebb",
+  "candidate_commit": "f63a1c9",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -34,7 +34,7 @@
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
         "scripts\\artifact-e2e.sh": "ae13bb46a1b8bd9fe6f9af86b07479e83c446ae22ba6d007b8d96c0897e17cc9",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
-        "scripts\\bind-requirements.py": "b5b3f5d11af024a5bd363c74cd133a696e64172f34064aae8fbb7b34f881c41f",
+        "scripts\\bind-requirements.py": "9cc8788618425ea7ff066a1be91ff1cafd04f4d539da82be05ef929b915b3b30",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
         "scripts\\build-dod-status.py": "e24977d47a97d69ca745cb2d1cbb90cdd8360f4a68275be437cc5aa563340616",
@@ -211,8 +211,8 @@
       ]
     }
   },
-  "epoch_digest": "85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a",
-  "prior_candidate_commit": "8fdda90",
-  "prior_epoch_digest": "cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a",
+  "epoch_digest": "783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e",
+  "prior_candidate_commit": "f63a1c9",
+  "prior_epoch_digest": "85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a",
   "total_inputs": 117
 }

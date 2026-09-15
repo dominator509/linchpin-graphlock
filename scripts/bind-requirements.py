@@ -78,11 +78,21 @@ def crate_module_prefix(path: Path) -> str | None:
     `commands::tests::name`, not `tests::name`: the file itself is a module of
     the crate root. Attributing it without that prefix made every collected test
     look uncollected.
+
+    A file under `tests/` is different: it is an INTEGRATION test crate root, so
+    cargo lists its functions bare (`name: test`), not `file::name: test`.
+    Measured: `crates/platform_windows/tests/licensing_policy.rs` yielded
+    `test_dependency_versions_are_pinned_and_never_floated: test` with no prefix,
+    so applying one produced `licensing_policy::test_...` and four requirements
+    were reported BOUND_NOT_COLLECTED even though their tests ran and passed.
+    Both cases are crate roots and contribute no prefix.
     """
     parts = list(path.with_suffix("").parts)
-    # Drop the file name; it becomes the last module segment.
     name = parts[-1]
     if name in {"lib", "main", "mod"}:
+        return None
+    # `<crate>/tests/<file>.rs` is an integration-test crate root.
+    if len(parts) >= 2 and parts[-2] == "tests":
         return None
     return name
 

@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a`
-- Candidate commit at generation: `8f7eebb`
+- Current epoch digest: `783f1a1ed83fc95a11c4742b32eb3de2495e3ac13e881a51101059f7d1976d8e`
+- Candidate commit at generation: `f63a1c9`
 - Total tracked inputs: 117
-- Previous epoch digest: `cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a`
-- **Changed input classes since that epoch: rust-source, rust-manifest, lockfile, gate-script**
+- Previous epoch digest: `85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a`
+- **Changed input classes since that epoch: gate-script**
 
 ## Input classes and what a change invalidates
 
@@ -48,7 +48,7 @@ definition and its PASS status is revoked until rerun.
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
   - `scripts\artifact-e2e.sh` `ae13bb46a1b8bd9f…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
-  - `scripts\bind-requirements.py` `b5b3f5d11af024a5…`
+  - `scripts\bind-requirements.py` `9cc8788618425ea7…`
   - … and 51 more
 
 ### `js-manifest` — 7 file(s)
