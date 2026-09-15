@@ -27,6 +27,7 @@ import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
+from urllib.parse import quote
 
 OUT_DIR = Path(".agent/evidence/sbom")
 CDX = OUT_DIR / "linchpin.cdx.json"
@@ -36,6 +37,12 @@ NOTICES = OUT_DIR / "THIRD_PARTY_NOTICES.md"
 ALLOWED = {
     "MIT",
     "Apache-2.0",
+    # Present in deny.toml's allowlist but missing here until the
+    # licensing-policy acceptance test compared the two sets and failed. It is a
+    # permissive licence (Apache-2.0 plus the LLVM exception), so the SBOM was
+    # flagging something the gate already permits -- precisely the scanner
+    # divergence REQ-LIC-002 forbids.
+    "Apache-2.0 WITH LLVM-exception",
     "BSD-2-Clause",
     "BSD-3-Clause",
     "ISC",
@@ -74,6 +81,29 @@ DEV_ONLY_JS = {
     "argparse",  # Python-2.0, via CLI tooling
     "caniuse-lite",  # CC-BY-4.0, via browserslist (build-time)
 }
+
+
+def cargo_purl(name: str, version: str) -> str:
+    """Package URL for a crates.io component.
+
+    REQ-LIC-002 requires every dependency to record a source URL. The components
+    already carried `externalReferences` pointing at the registry, but no `purl`
+    -- the identifier SBOM consumers and vulnerability scanners actually key on.
+    Measured before this change: 0 of 720 components had a purl.
+    """
+    return f"pkg:cargo/{quote(name, safe='')}@{quote(version, safe='')}"
+
+
+def npm_purl(name: str, version: str) -> str:
+    """Package URL for an npm component, with the scope separator encoded.
+
+    A scoped name such as `@babel/core` becomes `pkg:npm/%40babel/core@7.0.0`,
+    which is the form the purl specification defines.
+    """
+    if name.startswith("@") and "/" in name:
+        scope, _, bare = name[1:].partition("/")
+        return f"pkg:npm/%40{scope}/{bare}@{quote(version, safe='')}"
+    return f"pkg:npm/{quote(name, safe='')}@{quote(version, safe='')}"
 
 
 def cargo_metadata() -> dict:
@@ -201,6 +231,7 @@ def npm_components() -> tuple[list[dict], int, int, list[str]]:
                     "name": name,
                     "version": version,
                     "bom-ref": f"npm:{name}@{version}",
+                    "purl": npm_purl(name, version),
                     "scope": "required",
                     "properties": [
                         {"name": "linchpin:ecosystem", "value": "npm"},
@@ -236,6 +267,7 @@ def npm_components() -> tuple[list[dict], int, int, list[str]]:
                 "name": name,
                 "version": version,
                 "bom-ref": f"npm:{name}@{version}",
+                "purl": npm_purl(name, version),
                 "scope": "required",
                 "properties": [
                     {"name": "linchpin:ecosystem", "value": "npm"},
@@ -305,6 +337,7 @@ def main() -> int:
             "name": pkg["name"],
             "version": pkg["version"],
             "bom-ref": pkg["id"],
+            "purl": cargo_purl(pkg["name"], pkg["version"]),
             "scope": "required",
             "properties": [
                 {"name": "linchpin:first_party", "value": str(is_first_party).lower()},

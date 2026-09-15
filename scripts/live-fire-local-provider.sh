@@ -92,7 +92,7 @@ TAURI_CONFIG="$(cat apps/desktop/src-tauri/tauri-e2e.json)"
 export TAURI_CONFIG
 
 echo "local-provider: building the dedicated E2E artifact (tauri build, devtools-e2e)"
-( cd apps/desktop && npx tauri build --no-bundle --features devtools-e2e ) \
+( cd apps/desktop && npx tauri build --no-bundle --features devtools-e2e -- --locked ) \
   > "$REPORT_DIR/build.log" 2>&1 || {
   echo "local-provider: FAIL -- tauri build failed; see $REPORT_DIR/build.log" >&2
   tail -20 "$REPORT_DIR/build.log" >&2

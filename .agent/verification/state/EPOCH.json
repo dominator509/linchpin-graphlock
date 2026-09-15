@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "8fdda90",
+  "candidate_commit": "8f7eebb",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -32,14 +32,14 @@
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\artifact-e2e.sh": "66789e3a58097851dc57d7a8d6d06fbc7b3d6e23c3fe66c69144132a8c8be9f3",
+        "scripts\\artifact-e2e.sh": "ae13bb46a1b8bd9fe6f9af86b07479e83c446ae22ba6d007b8d96c0897e17cc9",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\bind-requirements.py": "b5b3f5d11af024a5bd363c74cd133a696e64172f34064aae8fbb7b34f881c41f",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
         "scripts\\build-dod-status.py": "e24977d47a97d69ca745cb2d1cbb90cdd8360f4a68275be437cc5aa563340616",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
-        "scripts\\build.sh": "e86b87911cc4335a85a395d514273dd4a949afa22d36c3c87072880fb039d198",
+        "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "4a3a415e5911befcdc401208536e230281314563602d8a46c88d2dcdf703fc05",
         "scripts\\clean-build.sh": "4507f635f02652766b18f987a00fbdc79377340cd23d1b2e1ebe93f48a4bb963",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
@@ -50,7 +50,7 @@
         "scripts\\format-check.sh": "2d565f3798f61577218798bec689d59bab3e48daaa372c6645985c86fb0ca545",
         "scripts\\generate-evidence-index.py": "a630cc0ddc88fbbc3d09dea9f5e6f6afb4ae3f189e9f887692656becdf2e5510",
         "scripts\\generate-icons.py": "cd5649efa6ea2a9ee8d35c95e097c17e1bfff88edf526f2bd7a75c9a0e16a1fe",
-        "scripts\\generate-sbom.py": "8ee9a1c44f0acc404b2e71b5e52e52821dd6d0f9e8574cb2de20ff09222de18e",
+        "scripts\\generate-sbom.py": "e74f14638a5a95e2bfb4385f568820eeb70e75366c5e01e19e47b16fbc97c2dc",
         "scripts\\graph-next.sh": "3f73444ecc2008a54a7487e6db42f34191f658b5a44bfb5c4739f50ba59c514a",
         "scripts\\harness-accounting.sh": "4e354312bb083d102f8705fa1978b7e5eeffdd0353ea5cc84f9b651c597283b9",
         "scripts\\harness-init.sh": "9e5861aecd7507382f83a2559d85f38aa5a9c0bf3ae7c5e25319c1812cda96fd",
@@ -60,7 +60,7 @@
         "scripts\\install.sh": "239ce88259366eb9c7fd08be66e72f8e8ad15b0b5fab2406580f3a381a0bbe4a",
         "scripts\\ledger.sh": "81b5ebc8c4ea7b64fe446a869b0080dceea7ae756eb72de59d26f63604eeb755",
         "scripts\\lint.sh": "9ee4326885c8b33befaa74195a8a4d8e83cbcc43a60cdefc62cd86f20a4e222d",
-        "scripts\\live-fire-local-provider.sh": "107e4afabee66253a81b2978b8bae3c6d5fd1c51e9d4ff97e46620d07e45e1f2",
+        "scripts\\live-fire-local-provider.sh": "3d2a234bf6338ebdc5bb3343f8769322a8a49d5ae431c9e2ca875989f06ff7d6",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
@@ -132,7 +132,7 @@
     "lockfile": {
       "count": 2,
       "files": {
-        "Cargo.lock": "e4b6581bcd9abb74c7c5f4ac9155ad95d168dead52caf7f42f138d67b8380cfb",
+        "Cargo.lock": "621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4",
         "pnpm-lock.yaml": "45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf"
       },
       "rules": [
@@ -153,11 +153,11 @@
         "crates\\evidence\\Cargo.toml": "ce1616d9781c52937a83e40b9968dcfdcfdbe0fe572c2866fa6a590d1b23c97d",
         "crates\\mcp_hub\\Cargo.toml": "93fa1c930b882292a38ea2b333b3786b805c04ad3630759bb1703b40a9449ff4",
         "crates\\patent\\Cargo.toml": "bb4d8802e8d730d5aca824d8bb1a6d9b0b70cc857d7252cf692d3f8b8b9e2835",
-        "crates\\platform_windows\\Cargo.toml": "5dd766ee7b6d6ffc2d1d11a2a3172f52ae14a4ef68b5001ade753d0699fa4504",
+        "crates\\platform_windows\\Cargo.toml": "7093b1a68c8424b6a2a617bfd6c4f357a6c03348bf244c0d87d378bdf1924012",
         "crates\\provider_transport\\Cargo.toml": "c373ec6b9be27b1f7f2bb83425ddb3444dd4bce6294644ed5d3acf5e528b4937",
         "crates\\research\\Cargo.toml": "231cd899881a14253d8caf831a95fe6dd7bd1184b3abbe6d9204c495f95bfd10",
         "crates\\storage\\Cargo.toml": "3efd2a85bbc12a11cdeb0990ce88c717e78a46ef405a5502e73319d21a1a05cf",
-        "deny.toml": "4fbd3271d9a0de0d6ff8ba9207670c55408c034a7ba895e6d1238fa12fdfc6d0",
+        "deny.toml": "280e8e73e6e7d076b955bdc21f3c4d564971343275bbf4141427603d380ff569",
         "rust-toolchain.toml": "89d9c3c3266967c0be43405f082a94cda8eab9b2cfdf28538eda48fa5e08c398"
       },
       "rules": [
@@ -167,7 +167,7 @@
       ]
     },
     "rust-source": {
-      "count": 16,
+      "count": 17,
       "files": {
         "apps\\desktop\\src-tauri\\src\\commands.rs": "90409428bffae531049bd649b13095f6be54f9bd83f62cbccd85dfbeaf03b884",
         "apps\\desktop\\src-tauri\\src\\lib.rs": "829298a5f2b87f9453c4ce7c43f606563bd999203df5560d0fc05788a123fc0a",
@@ -180,6 +180,7 @@
         "crates\\mcp_hub\\src\\lib.rs": "bac47aab7e67b1e81cb3852515b18ca6006f548d69313d5036ee9646ec2222aa",
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
         "crates\\platform_windows\\src\\lib.rs": "20bbb410079f4faf5644c6f63ae900b0b4a1e5dddd4aeaaa5acc92c1088042c9",
+        "crates\\platform_windows\\tests\\licensing_policy.rs": "93cbf446566964963c6c6febe01aa3ea8ff278aa570a4eb5389b9df5154d3452",
         "crates\\provider_transport\\src\\lib.rs": "a62348a0bfcf96e67c141cc8f3c593d45a80e6ca1939873c1df6c7a1b9c59813",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
@@ -210,8 +211,8 @@
       ]
     }
   },
-  "epoch_digest": "cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a",
-  "prior_candidate_commit": "26317da",
+  "epoch_digest": "85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a",
+  "prior_candidate_commit": "8fdda90",
   "prior_epoch_digest": "cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a",
-  "total_inputs": 116
+  "total_inputs": 117
 }

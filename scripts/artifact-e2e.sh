@@ -63,7 +63,11 @@ fi
 TAURI_CONFIG="$(cat apps/desktop/src-tauri/tauri-e2e.json)"
 export TAURI_CONFIG
 
-( cd apps/desktop && npx tauri build --no-bundle ) > "$REPORT_DIR/build.log" 2>&1 || {
+# `-- --locked` forwards to cargo. REQ-LIC-003 requires dependency versions to be
+# pinned exactly and never floated; without this, `tauri build` could silently
+# re-resolve and rewrite Cargo.lock, which every other cargo invocation in this
+# repository forbids via --locked.
+( cd apps/desktop && npx tauri build --no-bundle -- --locked ) > "$REPORT_DIR/build.log" 2>&1 || {
   echo "artifact-e2e: FAIL -- tauri build failed; see $REPORT_DIR/build.log" >&2
   tail -20 "$REPORT_DIR/build.log" >&2
   [ "$HAD_PROD" = "yes" ] && cp "$PROD_STASH" "$PROD_EXE"

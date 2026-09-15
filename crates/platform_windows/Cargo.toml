@@ -15,3 +15,10 @@ windows = { version = "0.61.3", features = [
     "Win32_System_ProcessStatus",
     "Win32_System_Threading",
 ] }
+
+[dev-dependencies]
+# Already in the workspace Cargo.lock (serde_json 1.0.151, via the desktop
+# crate). Used only to read the CycloneDX SBOM in the licensing-policy
+# acceptance tests (REQ-LIC-002), which assert that the scanners agree. No new
+# transitive package is introduced.
+serde_json = "1.0"

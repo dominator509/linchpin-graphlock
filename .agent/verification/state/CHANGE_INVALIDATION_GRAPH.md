@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a`
-- Candidate commit at generation: `8fdda90`
-- Total tracked inputs: 116
+- Current epoch digest: `85fd4d07cb1a56b5007d75336e8a0944d081ce03873c1f31b2cbb83041f0630a`
+- Candidate commit at generation: `8f7eebb`
+- Total tracked inputs: 117
 - Previous epoch digest: `cfa7b9d77bc68899a94e52bb02df571fd025437879278b34e01037837df91d2a`
-- Changed input classes since that epoch: none
+- **Changed input classes since that epoch: rust-source, rust-manifest, lockfile, gate-script**
 
 ## Input classes and what a change invalidates
 
@@ -46,7 +46,7 @@ definition and its PASS status is revoked until rerun.
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
-  - `scripts\artifact-e2e.sh` `66789e3a58097851…`
+  - `scripts\artifact-e2e.sh` `ae13bb46a1b8bd9f…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
   - `scripts\bind-requirements.py` `b5b3f5d11af024a5…`
   - … and 51 more
@@ -82,7 +82,7 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-005 clean build
 - invalidates: DOD-021 license gate
 
-  - `Cargo.lock` `e4b6581bcd9abb74…`
+  - `Cargo.lock` `621c52cd81b62799…`
   - `pnpm-lock.yaml` `45b0fad113529e45…`
 
 ### `rust-manifest` — 15 file(s)
@@ -98,7 +98,7 @@ definition and its PASS status is revoked until rerun.
   - `crates\crash_reporter\Cargo.toml` `be20a3f1e5b5e0b5…`
   - … and 10 more
 
-### `rust-source` — 16 file(s)
+### `rust-source` — 17 file(s)
 
 - invalidates: V-005 clean build
 - invalidates: V-006 smoke
@@ -113,7 +113,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
   - `crates\commercialization\src\lib.rs` `59bbcf33978af42a…`
-  - … and 11 more
+  - … and 12 more
 
 ### `test-oracle` — 3 file(s)
 
