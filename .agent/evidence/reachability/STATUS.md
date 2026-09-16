@@ -13,10 +13,10 @@ trait dispatch.
 
 ## Result
 
-- Public functions analysed: 230
-- ENTRY_POINT (registered Tauri commands): 31
-- REACHABLE: 155
-- TEST_ONLY: 44
+- Public functions analysed: 233
+- ENTRY_POINT (registered Tauri commands): 32
+- REACHABLE: 158
+- TEST_ONLY: 43
 - UNREACHABLE: 0
 
 ## Unreachable public functions

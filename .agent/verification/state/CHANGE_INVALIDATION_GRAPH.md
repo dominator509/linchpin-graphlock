@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `e0ddeec55ab1fc803211e7fd7a2c8d6c31dea690e25287e9875b33505dcc63b4`
-- Candidate commit at generation: `fc927f2`
-- Total tracked inputs: 125
-- Previous epoch digest: `e0ddeec55ab1fc803211e7fd7a2c8d6c31dea690e25287e9875b33505dcc63b4`
+- Current epoch digest: `67d3d1b6418bd45de7e0ef33a11916e2a11836a7b1f19fc848637bfbd454482d`
+- Candidate commit at generation: `1c6a77b`
+- Total tracked inputs: 127
+- Previous epoch digest: `67d3d1b6418bd45de7e0ef33a11916e2a11836a7b1f19fc848637bfbd454482d`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -37,7 +37,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 59 file(s)
+### `gate-script` — 61 file(s)
 
 - invalidates: V-000 harness validation
 - invalidates: V-005 clean build
@@ -49,7 +49,7 @@ definition and its PASS status is revoked until rerun.
   - `scripts\artifact-e2e.sh` `665ba19ebd5fd33f…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
   - `scripts\assert-no-debug-port.py` `54b17113000ddaec…`
-  - … and 54 more
+  - … and 56 more
 
 ### `js-manifest` — 7 file(s)
 
@@ -69,8 +69,8 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-008 full functionality
 - invalidates: V-015 usability/accessibility
 
-  - `apps\desktop\e2e\shell.spec.ts` `5867ef8ba1001ee7…`
-  - `apps\desktop\src\App.tsx` `9da18607dcd5e00f…`
+  - `apps\desktop\e2e\shell.spec.ts` `4e3c376513ef06e7…`
+  - `apps\desktop\src\App.tsx` `07c20e3e913af0d7…`
   - `apps\desktop\src\main.tsx` `bfcf131d8fb04a4d…`
   - `apps\desktop\tests\has-ipc.test.ts` `8f2e208b7f1499e6…`
   - `packages\contracts\src\index.ts` `72fd005dc2fdd303…`
@@ -108,10 +108,10 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-012 regression/mutation
 - invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `d61a3c83ba435815…`
-  - `apps\desktop\src-tauri\src\lib.rs` `a803e953da69ccf9…`
+  - `apps\desktop\src-tauri\src\commands.rs` `6897ce998fafb06e…`
+  - `apps\desktop\src-tauri\src\lib.rs` `7e69fd84b4f59d28…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
-  - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
+  - `crates\application\src\lib.rs` `9e8dd477b8dcd22d…`
   - `crates\commercialization\src\asset_readiness.rs` `f4143f42b1e5da03…`
   - … and 15 more
 
@@ -126,8 +126,8 @@ definition and its PASS status is revoked until rerun.
 
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
-  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `f0c6f073837071db…`
-  - `apps\desktop\e2e-artifact.mjs` `2c6bf4d43f738464…`
+  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `7ad86ede8f877d81…`
+  - `apps\desktop\e2e-artifact.mjs` `8158dece62729450…`
   - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
 
 ## Rerun obligations on epoch change

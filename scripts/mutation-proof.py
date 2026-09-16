@@ -286,6 +286,64 @@ MUTATIONS = [
         ],
         "expect_test": "test_redaction_covers_key_values_not_only_token_shapes",
     },
+    {
+        "id": "MUT-DOD-016-a",
+        "clause": "DOD-018",
+        "covers": "DOD-016, REQ-DATA-003",
+        "feature": "a vault claiming a migration it never applied is refused",
+        "changed_behavior": (
+            "the post-migration schema check is removed, so a database whose "
+            "schema_migrations rows exist while the tables do not opens "
+            "successfully and fails later at a random write."
+        ),
+        "edits": [
+            {
+                "path": "crates/storage/src/vault.rs",
+                "old": "        self.verify_schema()\n    }\n",
+                "new": "        Ok(())\n    }\n",
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "storage",
+            "test_recorded_migration_without_its_tables_is_refused",
+        ],
+        "expect_test": "test_recorded_migration_without_its_tables_is_refused",
+    },
+    {
+        "id": "MUT-DATA-001-a",
+        "clause": "DOD-018",
+        "covers": "REQ-DATA-001, DOD-015",
+        "feature": "the conception ledger reads durable state back",
+        "changed_behavior": (
+            "the ledger read returns an empty list regardless of what is stored, "
+            "so the ledger reports no events while the vault holds them."
+        ),
+        "edits": [
+            {
+                "path": "apps/desktop/src-tauri/src/commands.rs",
+                "old": (
+                    "    let stored = match vault.list_conception_events(&scope.workspace_id) {\n"
+                    "        Ok(events) => events,\n"
+                ),
+                "new": (
+                    "    let stored = match vault.list_conception_events(&scope.workspace_id) {\n"
+                    "        Ok(events) => events.into_iter().take(0).collect::<Vec<_>>(),\n"
+                ),
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "linchpin-desktop",
+            "--lib",
+            "test_conception_ledger_reads_durable_state_and_separates_origins",
+        ],
+        "expect_test": "test_conception_ledger_reads_durable_state_and_separates_origins",
+    },
 ]
 
 

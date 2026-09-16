@@ -2108,39 +2108,23 @@ pub fn record_diagnostic_outcome(
 
 /// Health, readiness, logs, traces, metrics and alerts (DOD-037).
 ///
-/// Readiness is MEASURED: the vault directory is probed and the app reports
-/// DEGRADED when it is missing or unwritable, rather than returning a constant.
-/// Alerts are derived from the same measurement plus the recorded outcomes, so a
-/// known failure (storage gone, repeated failures) produces a signal an operator
-/// can act on instead of a green status.
-pub fn get_diagnostics(vault_path: &std::path::Path) -> CommandResult<DiagnosticsView> {
+/// The storage probe is PASSED IN rather than derived here, and that is the
+/// correction of a measured defect: this command used to derive readiness from
+/// `vault_path.parent()`, and every caller obtains that path through
+/// `vault_file()`, which CREATES the directory. The probe therefore mutated the
+/// state it measured and could never report a missing directory -- while
+/// `get_system_health`, probing the untouched root, reported DEGRADED at the same
+/// moment. Measured on the packaged artifact: `health.storage_ok=false` with
+/// detail "path does not exist: C:\\Users\\<user>\\AppData\\Local\\LINCHPIN"
+/// beside `diagnostics.storage_ok=true` for the same directory. Both surfaces now
+/// read the same `application::probe_storage` result over the same root.
+pub fn get_diagnostics_from_probe(
+    probe: &application::HealthProbe,
+    vault_path: &std::path::Path,
+) -> CommandResult<DiagnosticsView> {
     let correlation = CorrelationId::new();
-
-    let parent = vault_path.parent();
-    let (storage_ok, storage_detail) = match parent {
-        Some(dir) if dir.as_os_str().is_empty() => {
-            (true, "vault path has no directory".to_string())
-        }
-        Some(dir) if !dir.exists() => (
-            false,
-            format!("storage directory {} does not exist", dir.display()),
-        ),
-        Some(dir) => match std::fs::metadata(dir) {
-            Ok(meta) if meta.permissions().readonly() => (
-                false,
-                format!("storage directory {} is read-only", dir.display()),
-            ),
-            Ok(_) => (
-                true,
-                format!("storage directory {} is writable", dir.display()),
-            ),
-            Err(e) => (
-                false,
-                format!("storage directory {} is unreadable: {e}", dir.display()),
-            ),
-        },
-        None => (false, "vault path has no parent directory".to_string()),
-    };
+    let storage_ok = probe.ok;
+    let storage_detail = probe.detail.clone();
 
     let events: Vec<DiagnosticEventView> = diagnostic_window()
         .lock()
@@ -2225,6 +2209,101 @@ pub fn get_diagnostics(vault_path: &std::path::Path) -> CommandResult<Diagnostic
             traces,
             redaction_applied: true,
             detail,
+        },
+    )
+}
+
+/// One event in the Human Conception Ledger (UO-01, REQ-DATA-001).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LedgerEventView {
+    pub event_id: String,
+    /// `HumanConception` or `AiSuggestion`, never merged (REQ-DOM-002).
+    pub origin: String,
+    pub content_hash: String,
+    pub content_bytes: usize,
+    pub created_utc: String,
+    pub version: i64,
+    pub content: String,
+}
+
+/// The Human Conception Ledger as read back from durable storage.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ConceptionLedgerView {
+    pub workspace_id: String,
+    pub count: usize,
+    pub human_count: usize,
+    pub ai_count: usize,
+    pub events: Vec<LedgerEventView>,
+}
+
+/// Read the Human Conception Ledger back out of the vault.
+///
+/// The ledger was WRITE-ONLY: `record_conception` durably stored events and no
+/// product path ever read them back, so the "Human Conception Ledger" of UO-01
+/// could not actually be consulted. It is also the read path a restart proof
+/// needs: after the process is killed and relaunched, the ledger is what shows
+/// whether the state survived. Origins are counted separately rather than
+/// merged, because the distinction is the point (REQ-DOM-002, TB-5).
+pub fn list_conception_events(
+    scope: &WorkspaceScope,
+    vault_path: &std::path::Path,
+) -> CommandResult<ConceptionLedgerView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if !vault_path.exists() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::policy(format!("no vault at {}", vault_path.display())),
+        );
+    }
+
+    let vault = match storage::vault::Vault::open(vault_path) {
+        Ok(v) => v,
+        Err(e) => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::policy(format!("cannot open vault: {e}")),
+            )
+        }
+    };
+    let stored = match vault.list_conception_events(&scope.workspace_id) {
+        Ok(events) => events,
+        Err(e) => return CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    };
+
+    let events: Vec<LedgerEventView> = stored
+        .into_iter()
+        .map(|event| LedgerEventView {
+            event_id: event.event_id,
+            origin: event.origin,
+            content_hash: event.content_hash,
+            content_bytes: event.content.len(),
+            created_utc: event.created_utc,
+            version: event.version,
+            content: event.content,
+        })
+        .collect();
+
+    let human_count = events
+        .iter()
+        .filter(|event| event.origin == "HumanConception")
+        .count();
+    let ai_count = events
+        .iter()
+        .filter(|event| event.origin == "AiSuggestion")
+        .count();
+
+    CommandResult::success(
+        correlation,
+        ConceptionLedgerView {
+            workspace_id: scope.workspace_id.clone(),
+            count: events.len(),
+            human_count,
+            ai_count,
+            events,
         },
     )
 }
@@ -2596,26 +2675,49 @@ pub struct InferenceOutcome {
 
 /// Report provider transport availability honestly.
 ///
-/// `PROVIDER_TRANSPORT_MATRIX.md` defines the lanes. No live provider is
-/// configured on this host (PF-011 unmet), so this reports availability rather
-/// than performing inference. It never returns generated text.
+/// `PROVIDER_TRANSPORT_MATRIX.md` defines the lanes. The local lane's selection
+/// is MEASURED now rather than asserted: the command probes the loopback endpoint
+/// with a bounded TCP connect, so the status reflects whether a provider is
+/// actually being served on this device.
+///
+/// Measured defect this replaces: the detail string was the constant "no model
+/// served on this host (PF-011)" and `configured` was hardcoded `false` while
+/// PF-011 WAS satisfied and the provider live-fire lane was passing 23/23
+/// assertions against a real model. The signal under-claimed and was simply
+/// wrong -- the same class as the Settings surface that once displayed a vault
+/// directory the product never wrote to (DOD-037 requires signals that
+/// truthfully describe critical workflows, and an inaccurate one is a defect
+/// whether it flatters or disparages the product).
 pub fn provider_status() -> CommandResult<Vec<ProviderLane>> {
     let correlation = CorrelationId::new();
 
+    let endpoint = "http://127.0.0.1:11434";
     let local = provider_transport::LocalModelAdapter::new(
-        "http://127.0.0.1:11434",
+        endpoint,
         "unset",
         provider_transport::LocalFlavor::Ollama,
     );
-    let local_reachable = local.is_ok();
+    let transport_available = local.is_ok();
+    let serving =
+        loopback_provider_serving("127.0.0.1:11434", std::time::Duration::from_millis(400));
 
     let lanes = vec![
         ProviderLane {
             lane: "local".to_string(),
-            transport_available: local_reachable,
-            configured: false,
-            detail: "llama.cpp/Ollama on loopback; no model served on this host (PF-011)"
-                .to_string(),
+            transport_available,
+            configured: serving,
+            detail: if serving {
+                format!(
+                    "llama.cpp/Ollama on loopback; a provider answered a TCP connect on {endpoint}"
+                )
+            } else if transport_available {
+                format!(
+                    "llama.cpp/Ollama on loopback is available, but nothing is serving {endpoint}; \
+                     start the local runtime before relying on this lane"
+                )
+            } else {
+                format!("local transport refused for {endpoint}")
+            },
         },
         ProviderLane {
             lane: "openai".to_string(),
@@ -2644,6 +2746,17 @@ pub fn provider_status() -> CommandResult<Vec<ProviderLane>> {
     ];
 
     CommandResult::success(correlation, lanes)
+}
+
+/// Whether something is listening on a loopback `host:port`, measured.
+///
+/// A TCP connect is enough to answer "is a provider being served here": it is
+/// bounded, it sends nothing, and it cannot hang the UI beyond the timeout.
+fn loopback_provider_serving(address: &str, timeout: std::time::Duration) -> bool {
+    match address.parse() {
+        Ok(socket) => std::net::TcpStream::connect_timeout(&socket, timeout).is_ok(),
+        Err(_) => false,
+    }
 }
 
 /// A provider lane and its real availability.
@@ -3209,22 +3322,50 @@ mod tests {
 
     // --- provider namespace ------------------------------------------------
 
-    /// covers: REQ-LLM-004
-    /// PF-011 is unmet, so no lane may report itself configured, and the
-    /// command must not perform inference or return generated text.
+    /// covers: REQ-LLM-004, REQ-OPS-010, DOD-020
+    /// The lane signal must MEASURE the provider rather than assert a constant.
+    ///
+    /// This test previously read `test_provider_status_reports_no_configured_lane`
+    /// and asserted that EVERY lane reported `configured == false` -- true while
+    /// PF-011 was unmet, and FALSE ever after, because the local lane's flag was
+    /// hardcoded while a real model was being served. The honest property is the
+    /// relationship: the local lane's flag follows a measured TCP connect on the
+    /// loopback endpoint, and the credential-bearing lanes never claim to be
+    /// configured.
     #[test]
-    fn test_provider_status_reports_no_configured_lane() {
+    fn test_provider_status_local_lane_is_measured_and_others_are_not_configured() {
         let result = provider_status();
         assert!(result.ok);
         let lanes = result.value.unwrap();
         assert_eq!(lanes.len(), 5);
+
+        let local = lanes.iter().find(|l| l.lane == "local").unwrap();
         assert!(
-            lanes.iter().all(|l| !l.configured),
-            "a provider lane claimed to be configured with no credentials"
+            local.transport_available,
+            "the local transport must be available on a loopback endpoint: {local:?}"
+        );
+        // The measured flag and the detail must AGREE with each other, whichever
+        // way the probe went -- that is the property a hardcoded string breaks.
+        let detail_claims_serving = local.detail.contains("answered a TCP connect");
+        assert_eq!(
+            local.configured, detail_claims_serving,
+            "the configured flag and its detail disagree: {local:?}"
+        );
+        assert!(
+            local.detail.contains("127.0.0.1:11434"),
+            "the detail must name the endpoint that was probed: {local:?}"
         );
 
+        // Remote lanes carry no credentials on this host and must never claim to
+        // be configured.
+        for lane in lanes.iter().filter(|l| l.lane != "local") {
+            assert!(
+                !lane.configured && !lane.transport_available,
+                "a remote lane claimed availability with no credentials: {lane:?}"
+            );
+        }
+
         let google = lanes.iter().find(|l| l.lane == "google").unwrap();
-        assert!(!google.transport_available);
         assert!(google.detail.contains("disabled by provider policy"));
     }
 
@@ -4355,7 +4496,7 @@ mod tests {
         let vault_path = dir.join("vault.db");
 
         // --- healthy state -------------------------------------------------
-        let healthy = get_diagnostics(&vault_path);
+        let healthy = diagnostics_for_test(&vault_path);
         assert!(healthy.ok);
         let healthy = healthy.value.unwrap();
         assert_eq!(healthy.readiness, "OK", "{}", healthy.detail);
@@ -4364,7 +4505,7 @@ mod tests {
 
         // --- INDICATED FAILURE 1: the storage directory is gone ------------
         let missing_dir = dir.join("not-created");
-        let degraded = get_diagnostics(&missing_dir.join("vault.db"));
+        let degraded = diagnostics_for_test(&missing_dir.join("vault.db"));
         assert!(degraded.ok);
         let degraded = degraded.value.unwrap();
         assert_eq!(degraded.readiness, "DEGRADED");
@@ -4409,7 +4550,7 @@ mod tests {
             std::time::Duration::from_millis(3),
         );
 
-        let view = get_diagnostics(&vault_path).value.unwrap();
+        let view = diagnostics_for_test(&vault_path).value.unwrap();
         assert!(view.redaction_applied);
         let recorded = view
             .events
@@ -4462,6 +4603,104 @@ mod tests {
         );
 
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-DATA-001, DOD-015
+    /// The Human Conception Ledger must be READABLE, not only writable, and it
+    /// must read the state back from durable storage rather than from memory.
+    #[test]
+    fn test_conception_ledger_reads_durable_state_and_separates_origins() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-ledger-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+        let scope = WorkspaceScope {
+            workspace_id: "ws-ledger".to_string(),
+        };
+        let canary = format!("LEDGER-CANARY-{}-{}", std::process::id(), 4242);
+
+        // Nothing recorded yet: an empty ledger is reported as empty, not as an
+        // error and not as missing.
+        let empty = list_conception_events(&scope, &vault_path);
+        assert!(!empty.ok, "a vault that does not exist must be refused");
+
+        assert!(commands_put_event(
+            &vault_path,
+            "ws-ledger",
+            "ev-h",
+            "human first"
+        ));
+        let human = record_conception(&scope, &canary, true, Some(&vault_path));
+        assert!(human.ok, "{:?}", human.error);
+        let ai = record_conception(&scope, "a model suggestion", false, Some(&vault_path));
+        assert!(ai.ok);
+
+        let ledger = list_conception_events(&scope, &vault_path);
+        assert!(ledger.ok, "ledger read failed: {:?}", ledger.error);
+        let view = ledger.value.unwrap();
+        assert_eq!(view.workspace_id, "ws-ledger");
+        assert_eq!(view.count, 3, "every stored event must be read back");
+        assert_eq!(view.human_count, 2, "human origin counted separately");
+        assert_eq!(view.ai_count, 1, "AI origin counted separately");
+        assert!(
+            view.events.iter().any(|e| e.content.contains(&canary)),
+            "the recorded content must be readable back: {:?}",
+            view.events.iter().map(|e| &e.content).collect::<Vec<_>>()
+        );
+        assert!(
+            view.events
+                .iter()
+                .all(|e| e.content_hash.starts_with("sha256:") && e.version >= 1),
+            "each event carries its content address and version"
+        );
+
+        // Origins are never merged: an AI suggestion is not reported as human.
+        assert_eq!(
+            view.events
+                .iter()
+                .filter(|e| e.origin == "AiSuggestion")
+                .count(),
+            1
+        );
+
+        // The read is from DISK, not memory: reopening from a fresh path context
+        // returns the same ledger.
+        drop(view);
+        let reopened = list_conception_events(&scope, &vault_path).value.unwrap();
+        assert_eq!(reopened.count, 3);
+
+        // A different workspace sees nothing of another workspace's ledger.
+        let other = WorkspaceScope {
+            workspace_id: "ws-other".to_string(),
+        };
+        let other_view = list_conception_events(&other, &vault_path);
+        assert!(
+            !other_view.ok || other_view.value.unwrap().count == 0,
+            "the ledger leaked across workspaces"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// Build the diagnostics view the way the IPC layer does: probe the storage
+    /// root FIRST, then report.
+    ///
+    /// A test that called the view with only a vault path would hide the very
+    /// defect this shape fixes -- the probe must not create the directory it
+    /// measures, or it can never report it missing.
+    fn diagnostics_for_test(vault_path: &std::path::Path) -> CommandResult<DiagnosticsView> {
+        let root = vault_path
+            .parent()
+            .expect("test vault has a parent directory")
+            .to_path_buf();
+        let probe = application::probe_storage(&root);
+        get_diagnostics_from_probe(&probe, vault_path)
     }
 
     /// Seed a conception event directly through the vault, for the backup tests.

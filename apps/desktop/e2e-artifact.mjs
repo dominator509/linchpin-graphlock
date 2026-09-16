@@ -62,7 +62,10 @@ async function waitForPageTarget(timeoutMs = 40000) {
 
 const digestBefore = sha256(EXE);
 const size = readFileSync(EXE).length;
-const app = spawn(EXE, [], { stdio: "ignore" });
+// `let`, not `const`: the hard-restart proof below kills this process and
+// relaunches the artifact, and the cleanup path must kill whichever one is
+// currently running.
+let app = spawn(EXE, [], { stdio: "ignore" });
 
 /**
  * Unpredictable per-run marker (DOD-013).
@@ -157,6 +160,60 @@ try {
     body.includes("Local-First Confidentiality") ? "present" : "MISSING",
   );
 
+  // DOD-020: production mode must never select a mock/fake/demo adapter for a
+  // feature presented as production-ready. This is the PACKAGED build, so the
+  // runtime adapter identity it reports is the real one -- a source-level test
+  // cannot show which adapter a shipped binary resolves.
+  const lanes = await page.evaluate(async () => {
+    try {
+      return await window.__TAURI_INTERNALS__.invoke("provider_status");
+    } catch (e) {
+      return { __error: String(e) };
+    }
+  });
+  const lanesOk = lanes && !lanes.__error && lanes.ok === true;
+  record(
+    "provider_status round-trip in the packaged build (DOD-020)",
+    lanesOk,
+    lanesOk
+      ? lanes.value
+          .map(
+            (l) =>
+              `${l.lane}:configured=${l.configured},transport=${l.transport_available}`,
+          )
+          .join("; ")
+      : String(lanes?.__error ?? JSON.stringify(lanes)),
+  );
+  if (lanesOk) {
+    const local = lanes.value.find((l) => l.lane === "local");
+    const others = lanes.value.filter((l) => l.lane !== "local");
+    record(
+      "the packaged build resolves a REAL local adapter, not a simulated one (DOD-020)",
+      Boolean(local) && local.transport_available === true,
+      local
+        ? `local transport_available=${local.transport_available} configured=${local.configured} detail=${local.detail}`
+        : "no local lane reported",
+    );
+    record(
+      "unwired lanes are reported as unavailable rather than faked (DOD-020)",
+      others.length > 0 &&
+        others.every(
+          (l) => l.configured === false && l.transport_available === false,
+        ),
+      others.map((l) => `${l.lane}=${l.configured}`).join(", ") ||
+        "no other lanes reported",
+    );
+    // The local lane's own signal must match the measurement, not a constant:
+    // the provider live-fire lane proves a model IS served on this host when the
+    // runtime is up, so "configured" must follow the probe rather than claim
+    // otherwise in either direction.
+    record(
+      "the local lane's configured flag is measured, not asserted (DOD-037)",
+      Boolean(local) && local.detail.includes("127.0.0.1:11434"),
+      local ? String(local.detail) : "no local lane reported",
+    );
+  }
+
   // REQ-SCOPE-001: the declared scope and the five truth boundaries must be
   // visible in the PRODUCT, read from the backend declaration rather than a
   // copy in the UI. This is the only lane where the IPC bridge is real, so it is
@@ -230,14 +287,55 @@ try {
   if (healthOk) {
     record(
       "health payload typed",
-      ["status", "version", "storage_ok"].every((k) => k in health),
+      ["status", "storage_detail", "storage_ok", "version"].every(
+        (k) => k in health,
+      ),
       `keys=${Object.keys(health).sort().join(",")}`,
     );
     record(
       "health reports a real status",
       health.status === "OK" || health.status === "DEGRADED",
-      `status=${health.status} storage_ok=${health.storage_ok}`,
+      `status=${health.status} storage_ok=${health.storage_ok} detail=${health.storage_detail}`,
     );
+
+    // DOD-037: the health signal must AGREE with the diagnostics probe, and the
+    // detail must say WHICH path it judged. A status boolean with no path is a
+    // signal an operator cannot act on, and a disagreement between two health
+    // surfaces is itself the finding.
+    const diagnostics = await page.evaluate(async () => {
+      try {
+        return await window.__TAURI_INTERNALS__.invoke("get_diagnostics");
+      } catch (e) {
+        return { __error: String(e) };
+      }
+    });
+    const diagnosticsOk =
+      diagnostics && !diagnostics.__error && diagnostics.ok === true;
+    record(
+      "get_diagnostics round-trip in the packaged build (DOD-037)",
+      diagnosticsOk,
+      diagnosticsOk
+        ? `readiness=${diagnostics.value.readiness} storage_ok=${diagnostics.value.storage_ok} alerts=${diagnostics.value.alerts.length}`
+        : String(diagnostics?.__error ?? JSON.stringify(diagnostics)),
+    );
+    if (diagnosticsOk) {
+      // The property is AGREEMENT on the same directory, not a particular value.
+      // The directory can legitimately be absent (the installer lane removes the
+      // product's app-data directory as part of its cleanup), and in that state
+      // both surfaces must say so -- an earlier revision compared two probes that
+      // measured different moments and one of them CREATED the directory as a
+      // side effect, so they disagreed on a healthy app.
+      record(
+        "health and diagnostics agree on storage (DOD-037)",
+        diagnostics.value.storage_ok === health.storage_ok,
+        `health.storage_ok=${health.storage_ok} (${health.storage_detail}) diagnostics.storage_ok=${diagnostics.value.storage_ok} (${diagnostics.value.detail})`,
+      );
+      record(
+        "the diagnostics detail names the path it judged (DOD-037)",
+        String(diagnostics.value.detail).includes("LINCHPIN"),
+        String(diagnostics.value.detail).slice(0, 160),
+      );
+    }
   }
 
   const ns = await page.evaluate(async () => {
@@ -363,6 +461,134 @@ try {
       "confirmed action is recorded in the audit trail (REQ-UI-004)",
       auditAfter > auditBefore && /correlation/.test(auditText),
       `entries ${auditBefore} -> ${auditAfter}; ${auditText.replace(/\s+/g, " ").slice(0, 120)}`,
+    );
+  }
+
+  // --- HARD RESTART: kill the process, relaunch, read the state back --------
+  //
+  // DOD-015 requires "Persistent state survives full process and container
+  // restart and is readable by the supported runtime", with a pre-restart state
+  // hash, hard restart evidence and a post-restart INDEPENDENT read. A
+  // connection-level reopen inside one process does not satisfy "full process
+  // restart", so this lane — the only one driving the packaged executable —
+  // kills it and starts it again.
+  //
+  // The read-back goes through the PRODUCT (`list_conception_events`), not
+  // through a file search, because "readable by the supported runtime" is the
+  // clause's own wording.
+  const preRestart = await page.evaluate(async (workspaceId) => {
+    try {
+      return await window.__TAURI_INTERNALS__.invoke("list_conception_events", {
+        workspaceId,
+      });
+    } catch (e) {
+      return { __error: String(e) };
+    }
+  }, "e2e-workspace");
+  const preRestartOk =
+    preRestart && !preRestart.__error && preRestart.ok === true;
+  const preRestartCount = preRestartOk ? preRestart.value.count : -1;
+
+  app.kill();
+  try {
+    app.kill("SIGKILL");
+  } catch {
+    /* already gone */
+  }
+  // Wait for the debug endpoint to actually stop answering, so the relaunch
+  // cannot be mistaken for the old process still running.
+  const goneDeadline = Date.now() + 20000;
+  let portFree = false;
+  while (!portFree && Date.now() < goneDeadline) {
+    try {
+      await fetch(`http://127.0.0.1:${PORT}/json`, {
+        signal: AbortSignal.timeout(500),
+      });
+      await sleep(200);
+    } catch {
+      portFree = true;
+    }
+  }
+  record(
+    "hard restart: the previous process is gone (DOD-015)",
+    portFree,
+    portFree ? "debug endpoint stopped answering" : "port still answering",
+  );
+
+  if (browser) await browser.close().catch(() => {});
+  app = spawn(EXE, [], { stdio: "ignore" });
+  const restartTarget = await waitForPageTarget();
+  record(
+    "hard restart: the artifact relaunches (DOD-015)",
+    restartTarget !== null,
+    restartTarget ? "page target available after restart" : "no page target",
+  );
+  if (restartTarget) {
+    browser = await chromium.connectOverCDP(`http://127.0.0.1:${PORT}`);
+    const restartedPages = browser.contexts().flatMap((c) => c.pages());
+    const restarted = restartedPages[0];
+    await restarted
+      .waitForFunction(() => document.readyState === "complete", {
+        timeout: 20000,
+      })
+      .catch(() => {});
+    // Wait for the IPC bridge AND retry the read: measured flake, the first
+    // evaluate after a relaunch hit "Execution context was destroyed, most
+    // likely because of a navigation" because the fresh webview was still
+    // navigating. The read is idempotent, so retrying is safe; a permanently
+    // absent bridge still fails after the bound.
+    const bridgeDeadline = Date.now() + 30000;
+    let bridgeReady = false;
+    while (!bridgeReady && Date.now() < bridgeDeadline) {
+      bridgeReady = await restarted
+        .evaluate(() => typeof window.__TAURI_INTERNALS__ !== "undefined")
+        .catch(() => false);
+      if (!bridgeReady) await sleep(150);
+    }
+    record(
+      "hard restart: the runtime's command bridge is ready (DOD-015)",
+      bridgeReady,
+      `ready=${bridgeReady}`,
+    );
+
+    let postRestart = { __error: "not attempted" };
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      postRestart = await restarted
+        .evaluate(async (workspaceId) => {
+          try {
+            return await window.__TAURI_INTERNALS__.invoke(
+              "list_conception_events",
+              { workspaceId },
+            );
+          } catch (e) {
+            return { __error: String(e) };
+          }
+        }, "e2e-workspace")
+        .catch((e) => ({ __error: String(e) }));
+      if (postRestart && postRestart.ok === true) break;
+      if (!String(postRestart?.__error ?? "").includes("context")) break;
+      await sleep(500);
+    }
+
+    const postRestartOk =
+      postRestart && !postRestart.__error && postRestart.ok === true;
+    const events = postRestartOk ? postRestart.value.events : [];
+    const canarySurvived = events.some((e) => e.content.includes(canary));
+    record(
+      "hard restart: the ledger is readable by the runtime after relaunch (DOD-015)",
+      postRestartOk &&
+        postRestart.value.count >= preRestartCount &&
+        preRestartCount > 0,
+      postRestartOk
+        ? `pre-restart ${preRestartCount} event(s), post-restart ${postRestart.value.count}`
+        : String(postRestart?.__error ?? JSON.stringify(postRestart)),
+    );
+    record(
+      "hard restart: the pre-restart canary is still present (DOD-015, DOD-013)",
+      canarySurvived,
+      canarySurvived
+        ? `${canary} found in the ledger read back through the runtime`
+        : `canary absent from ${events.length} ledger event(s)`,
     );
   }
 } catch (err) {

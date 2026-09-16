@@ -26,6 +26,35 @@ use std::path::Path;
 ///
 /// `REQ-RES-002`: IDs are monotonic and never edited after release. Appending
 /// is the only permitted change; existing entries are frozen.
+/// The tables each migration must leave behind, checked after opening.
+///
+/// Kept beside `MIGRATIONS` so a new migration without an entry here is visible
+/// in review rather than silently unverified.
+pub const REQUIRED_SCHEMA: &[(&str, &[&str])] = &[
+    ("0001_workspaces", &["workspaces"]),
+    (
+        "0002_conception_events",
+        &["conception_events", "idx_conception_workspace"],
+    ),
+    ("0003_audit_chain", &["audit_events"]),
+    ("0004_vault_blobs", &["vault_blobs"]),
+    (
+        "0005_claim_support_evidence",
+        &[
+            "claims",
+            "support_anchors",
+            "evidence_records",
+            "claim_support",
+            "claim_evidence",
+            "idx_claims_workspace",
+            "idx_anchors_workspace",
+            "idx_evidence_workspace",
+            "idx_claim_support_anchor",
+            "idx_claim_evidence_evidence",
+        ],
+    ),
+];
+
 pub const MIGRATIONS: &[(&str, &str)] = &[
     (
         "0001_workspaces",
@@ -208,6 +237,9 @@ pub enum VaultError {
     BackupMissing(String),
     /// Filesystem failure while backing up or restoring.
     Io(String),
+    /// A migration is recorded but the objects it creates are absent, so the
+    /// vault would fail later at a random write instead of at open (DOD-016).
+    SchemaIncomplete(String),
 }
 
 impl std::fmt::Display for VaultError {
@@ -223,6 +255,11 @@ impl std::fmt::Display for VaultError {
             VaultError::InvalidAnchorReference => write!(f, "anchor reference is required"),
             VaultError::BackupMissing(p) => write!(f, "backup file does not exist: {p}"),
             VaultError::Io(m) => write!(f, "io error: {m}"),
+            VaultError::SchemaIncomplete(m) => write!(
+                f,
+                "migration state is inconsistent: {m}. The vault records migrations whose \
+                 tables are missing, so it would fail later at a write instead of here"
+            ),
             VaultError::ChainBroken {
                 seq,
                 expected,
@@ -301,6 +338,36 @@ impl Vault {
                 Err(e) => {
                     self.conn.execute_batch("ROLLBACK")?;
                     return Err(VaultError::Database(e));
+                }
+            }
+        }
+        self.verify_schema()
+    }
+
+    /// Prove the objects every recorded migration creates are actually present.
+    ///
+    /// A record is not a schema. Measured failure mode this closes: a vault whose
+    /// `schema_migrations` rows exist while the tables do not (a partially
+    /// restored file, a copy taken mid-migration, a hand-edited database) opened
+    /// SUCCESSFULLY, because every migration was already "applied" and nothing
+    /// checked -- and then failed later at whichever write happened to touch a
+    /// missing table. Failing at open names the missing object once, in the place
+    /// where the operator can still do something about it.
+    fn verify_schema(&self) -> Result<(), VaultError> {
+        for (id, objects) in REQUIRED_SCHEMA {
+            for object in *objects {
+                let present: Option<String> = self
+                    .conn
+                    .query_row(
+                        "SELECT name FROM sqlite_master WHERE name = ?1",
+                        [*object],
+                        |r| r.get(0),
+                    )
+                    .optional()?;
+                if present.is_none() {
+                    return Err(VaultError::SchemaIncomplete(format!(
+                        "migration {id} is recorded but {object} is missing"
+                    )));
                 }
             }
         }
@@ -902,6 +969,228 @@ mod tests {
         let path = dir.join("vault.db");
         let vault = Vault::open(&path).expect("open vault");
         (dir, vault)
+    }
+
+    /// Build a vault at an EARLIER schema state: apply only the first `levels`
+    /// migrations, exactly as a vault created by that older build would look.
+    ///
+    /// Test-only, and deliberately hand-rolled rather than calling
+    /// `Vault::open`: the point of the matrix is to reach a state the current
+    /// build does not produce on its own.
+    fn vault_at_schema(path: &std::path::Path, levels: usize) -> Connection {
+        let conn = Connection::open(path).expect("open raw");
+        conn.execute_batch(
+            "CREATE TABLE IF NOT EXISTS schema_migrations (
+                migration_id TEXT PRIMARY KEY,
+                applied_utc  TEXT NOT NULL
+            );",
+        )
+        .expect("bookkeeping table");
+        for (id, sql) in MIGRATIONS.iter().take(levels) {
+            conn.execute_batch(sql).expect("apply prefix migration");
+            conn.execute(
+                "INSERT INTO schema_migrations (migration_id, applied_utc) VALUES (?1, ?2)",
+                (id, now_utc()),
+            )
+            .expect("record prefix migration");
+        }
+        conn
+    }
+
+    /// covers: REQ-DATA-003, DOD-016
+    /// Every prior schema state must migrate forward to the current one with the
+    /// data that existed at that state preserved, and the migrated vault must be
+    /// usable afterwards.
+    ///
+    /// The clause names "an empty database and every supported prior released
+    /// schema". There are no prior RELEASES (v0.1.0 is unreleased), so the
+    /// supported prior schemas are the intermediate states the migration list
+    /// defines -- and each one is executed here rather than assumed.
+    #[test]
+    fn test_migration_matrix_preserves_data_from_every_prior_schema() {
+        let mut matrix: Vec<String> = Vec::new();
+
+        for levels in 1..=MIGRATIONS.len() {
+            let dir = std::env::temp_dir().join(format!(
+                "linchpin-migmatrix-{}-{}-{}",
+                levels,
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_nanos())
+                    .unwrap_or(0)
+            ));
+            std::fs::create_dir_all(&dir).expect("temp dir");
+            let path = dir.join("vault.db");
+
+            // --- state at the prior schema, with data that schema can hold ---
+            {
+                let conn = vault_at_schema(&path, levels);
+                conn.execute(
+                    "INSERT INTO workspaces (workspace_id, created_utc) VALUES ('ws-old', '2026-01-01T00:00:00Z')",
+                    [],
+                )
+                .expect("seed workspace");
+                if levels >= 2 {
+                    conn.execute(
+                        "INSERT INTO conception_events
+                           (event_id, workspace_id, origin, content_hash, content, created_utc)
+                         VALUES ('ev-old', 'ws-old', 'HumanConception', 'sha256:abc', 'pre-migration content', '2026-01-02T00:00:00Z')",
+                        [],
+                    )
+                    .expect("seed event");
+                }
+                if levels >= 5 {
+                    conn.execute(
+                        "INSERT INTO claims (claim_id, workspace_id, label, created_utc)
+                         VALUES ('cl-old', 'ws-old', 'pre-migration claim', '2026-01-03T00:00:00Z')",
+                        [],
+                    )
+                    .expect("seed claim");
+                    conn.execute(
+                        "INSERT INTO support_anchors (anchor_id, workspace_id, kind, reference, created_utc)
+                         VALUES ('an-old', 'ws-old', 'SPECIFICATION', '[0001]', '2026-01-03T00:00:00Z')",
+                        [],
+                    )
+                    .expect("seed anchor");
+                    conn.execute(
+                        "INSERT INTO claim_support (claim_id, anchor_id, linked_utc)
+                         VALUES ('cl-old', 'an-old', '2026-01-03T00:00:00Z')",
+                        [],
+                    )
+                    .expect("seed junction");
+                }
+            }
+
+            // --- migrate forward by opening normally --------------------------
+            let vault = Vault::open(&path).expect("the vault must migrate forward");
+            let applied = vault.applied_migrations().unwrap();
+            assert_eq!(
+                applied.len(),
+                MIGRATIONS.len(),
+                "schema level {levels} did not reach the current migration count"
+            );
+            assert_eq!(applied, {
+                let mut expected: Vec<String> =
+                    MIGRATIONS.iter().map(|(id, _)| id.to_string()).collect();
+                expected.sort();
+                expected
+            });
+
+            // --- logical data preservation ------------------------------------
+            let workspace: Option<String> = vault
+                .connection()
+                .query_row(
+                    "SELECT workspace_id FROM workspaces WHERE workspace_id = 'ws-old'",
+                    [],
+                    |r| r.get(0),
+                )
+                .optional()
+                .unwrap();
+            assert_eq!(
+                workspace.as_deref(),
+                Some("ws-old"),
+                "workspace lost migrating from schema level {levels}"
+            );
+
+            if levels >= 2 {
+                let events = vault.list_conception_events("ws-old").unwrap();
+                assert_eq!(
+                    events.len(),
+                    1,
+                    "event lost migrating from schema level {levels}"
+                );
+                assert_eq!(events[0].content, "pre-migration content");
+                assert_eq!(events[0].content_hash, "sha256:abc");
+            }
+
+            if levels >= 5 {
+                let rows = vault.claim_support_rows("ws-old").unwrap();
+                assert_eq!(
+                    rows.len(),
+                    1,
+                    "claim/anchor junction lost migrating from schema level {levels}"
+                );
+            }
+
+            // --- the migrated vault is USABLE, not merely readable ------------
+            vault
+                .put_conception_event("ws-old", "ev-new", "HumanConception", "post-migration")
+                .expect("a write after migration must succeed");
+            let after = vault.list_conception_events("ws-old").unwrap();
+            assert!(
+                after.iter().any(|e| e.content == "post-migration"),
+                "the migrated vault rejected a new write at schema level {levels}"
+            );
+
+            matrix.push(format!(
+                "from {levels} of {} prior migration(s): preserved and writable",
+                MIGRATIONS.len()
+            ));
+            drop(vault);
+            std::fs::remove_dir_all(&dir).ok();
+        }
+
+        assert_eq!(
+            matrix.len(),
+            MIGRATIONS.len(),
+            "the matrix must cover every prior schema state"
+        );
+    }
+
+    /// covers: DOD-016
+    /// A vault that CLAIMS a migration it did not apply must be refused at open,
+    /// not accepted and then failed at a random later write.
+    #[test]
+    fn test_recorded_migration_without_its_tables_is_refused() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-migincomplete-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let path = dir.join("vault.db");
+
+        // Every migration recorded, but the claim tables were never created --
+        // the shape a copy taken mid-migration or a hand-edited file has.
+        {
+            let conn = Connection::open(&path).unwrap();
+            vault_at_schema(&path, 0);
+            for (id, _) in MIGRATIONS.iter().take(4) {
+                conn.execute_batch(MIGRATIONS.iter().find(|(m, _)| m == id).unwrap().1)
+                    .unwrap();
+                conn.execute(
+                    "INSERT INTO schema_migrations (migration_id, applied_utc) VALUES (?1, ?2)",
+                    (id, now_utc()),
+                )
+                .unwrap();
+            }
+            conn.execute(
+                "INSERT INTO schema_migrations (migration_id, applied_utc) VALUES ('0005_claim_support_evidence', '2026-01-01T00:00:00Z')",
+                [],
+            )
+            .unwrap();
+        }
+
+        let refused = Vault::open(&path);
+        match refused {
+            Err(VaultError::SchemaIncomplete(message)) => {
+                assert!(
+                    message.contains("claims"),
+                    "the refusal must name the missing object: {message}"
+                );
+            }
+            Err(other) => panic!("refused with the wrong error: {other}"),
+            Ok(_) => panic!(
+                "a vault claiming a migration it never applied was accepted; it would fail later \
+                 at whichever write touches the missing table"
+            ),
+        }
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     /// covers: REQ-RES-002

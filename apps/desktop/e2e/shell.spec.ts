@@ -436,6 +436,29 @@ test.describe("LINCHPIN desktop shell", () => {
     await expect(panel).toContainText("preserved rather than deleted");
   });
 
+  // covers: REQ-DATA-001
+  test("exposes the Human Conception Ledger read path and states it honestly", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // UO-01 promised a Human Conception LEDGER. Recording an event stored it
+    // durably, but no surface could read it back, so the ledger could not be
+    // consulted. This lane has no IPC, so it asserts the control exists and that
+    // the failure to read is reported rather than shown as an empty ledger.
+    await expect(
+      page.getByRole("heading", { name: "Human Conception Ledger", level: 3 }),
+    ).toBeVisible();
+    const load = page.getByRole("button", {
+      name: "Load ledger from the vault",
+    });
+    await expect(load).toBeVisible();
+    await load.click();
+    await expect(
+      page.getByText("Cannot read the ledger: desktop backend unavailable."),
+    ).toBeVisible();
+  });
+
   // covers: REQ-SCOPE-001
   test("declares the scope surface and reports it honestly when disconnected", async ({
     page,

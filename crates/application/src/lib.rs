@@ -3,6 +3,12 @@ pub struct SystemHealth {
     pub status: String,
     pub version: String,
     pub storage_ok: bool,
+    /// What the storage probe actually observed, including the error text when it
+    /// failed. Added because a bare `storage_ok=false` is not actionable: measured
+    /// on the packaged artifact, the flag disagreed with a second probe on a
+    /// demonstrably writable directory and there was no way to tell WHY. A health
+    /// signal an operator cannot diagnose is half a signal.
+    pub storage_detail: String,
 }
 
 /// A named readiness probe. Health is derived from probes, never asserted.
@@ -39,7 +45,17 @@ pub fn probe_storage(path: &std::path::Path) -> HealthProbe {
         };
     }
     // A directory is only usable if it can actually be written to.
-    let probe_file = path.join(".linchpin-health-probe");
+    //
+    // The probe file is PER PROCESS. Measured: the exact-artifact lane once
+    // reported `storage_ok=false` while the same path was demonstrably writable
+    // (the vault file was being written to it in the same run). The lanes run
+    // several instances of the product against ONE app-data directory -- the
+    // artifact under test, the production binary in the debug-port check and the
+    // installer lane -- and a single shared probe filename lets two instances
+    // race: one writes while the other removes, and the loser reports a false
+    // storage failure. On a health surface a false failure is worse than no
+    // signal, because an operator cannot tell it from a real one.
+    let probe_file = path.join(format!(".linchpin-health-probe-{}", std::process::id()));
     match std::fs::write(&probe_file, b"probe") {
         Ok(()) => {
             let _ = std::fs::remove_file(&probe_file);
@@ -62,16 +78,18 @@ pub fn probe_storage(path: &std::path::Path) -> HealthProbe {
 /// `status` is `"OK"` only when every probe passed, otherwise `"DEGRADED"`.
 /// There is no code path that reports OK with a failing probe.
 pub fn check_system_health_with(probes: &[HealthProbe]) -> SystemHealth {
-    let storage_ok = probes
-        .iter()
-        .find(|p| p.name == "storage")
-        .map(|p| p.ok)
-        .unwrap_or(false);
+    let storage = probes.iter().find(|p| p.name == "storage");
+    let storage_ok = storage.map(|p| p.ok).unwrap_or(false);
+    let storage_detail = match storage {
+        Some(probe) => probe.detail.clone(),
+        None => "no storage probe ran".to_string(),
+    };
     let all_ok = !probes.is_empty() && probes.iter().all(|p| p.ok);
     SystemHealth {
         status: if all_ok { "OK" } else { "DEGRADED" }.to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
         storage_ok,
+        storage_detail,
     }
 }
 
@@ -97,7 +115,8 @@ mod tests {
 
     /// covers: REQ-OPS-010
     /// A writable directory must be reported healthy, and the probe must not
-    /// leave its scratch file behind.
+    /// leave its scratch file behind. The scratch file is per process, so
+    /// concurrent instances of the product cannot make each other fail.
     #[test]
     fn test_health_reports_ok_for_writable_storage() {
         let dir = std::env::temp_dir();
@@ -109,7 +128,13 @@ mod tests {
         assert!(health.storage_ok);
         assert!(
             !dir.join(".linchpin-health-probe").exists(),
-            "probe left its scratch file behind"
+            "probe left its shared scratch file behind"
+        );
+        let pid_named = dir.join(format!(".linchpin-health-probe-{}", std::process::id()));
+        assert!(
+            !pid_named.exists(),
+            "probe left its per-process scratch file behind: {}",
+            pid_named.display()
         );
     }
 

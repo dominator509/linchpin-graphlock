@@ -1,10 +1,52 @@
 {
-  "project": "LINCHPIN",
-  "mode": "FORGE_BLUEPRINT",
-  "registry_count": 484,
-  "dod_count": 42,
-  "candidate_epoch": 0,
-  "candidate_commit": null,
-  "artifact_digest": null,
-  "generated_date": "2026-08-28"
+  "clause": "DOD-029",
+  "harness": "scripts/run-manifest.py",
+  "measured_at_utc": "2026-09-16T13:28:37Z",
+  "candidate_commit": "1c6a77badf81912efb84c7ec891d629d9bb36bba",
+  "candidate_commit_short": "1c6a77b",
+  "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
+  "branch": "main",
+  "working_tree": {
+    "dirty": true,
+    "changed_files": 37,
+    "statement": "evidence in this run was produced on a DIRTY tree; the manifest records that rather than implying a frozen revision"
+  },
+  "epoch": {
+    "digest": "67d3d1b6418bd45de7e0ef33a11916e2a11836a7b1f19fc848637bfbd454482d",
+    "total_inputs": 127,
+    "candidate_commit": "1c6a77b"
+  },
+  "artifacts": {
+    "executable": "target\\release\\linchpin-desktop.exe",
+    "executable_sha256": "8dfe9f0f53812b7455049d73fa33f4f231bbd7401b9ae956d0b5f13f1d6af797",
+    "executable_bytes": 12486144,
+    "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
+    "msi_sha256": "2c5c9c2cbf305d04c35cbde325e59990c1fa8b4bb197216ca28a21866e045eb6",
+    "msi_bytes": 5701632,
+    "recorded_in_release_gate": {
+      "candidate_commit": "1bca002",
+      "executable": "target\\release\\linchpin-desktop.exe",
+      "executable_bytes": "12453376",
+      "executable_sha256": "3494f766f58ee2c72f650ee5cd4ad64b8867dd79613668ea117bfcaa8c587c87",
+      "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
+      "msi_bytes": "5693440",
+      "msi_sha256": "f6da8cbdcf33b2b730748a4ad07bee52d107a0cb7ea0d4c65857ffbe0d788543"
+    }
+  },
+  "results": {
+    "rerun_record": ".agent\\verification\\state\\RERUN_RECORD.json",
+    "rerun_record_sha256": "f3a99730baad4ef19d892910db5a1ad00d628b1ca057376ccd272e88ca7fd231",
+    "accounting": ".agent\\verification\\reports\\COMPLETE_TEST_ACCOUNTING.csv",
+    "accounting_sha256": "e8282c11d6fd8e1ec47737324fd81f9df403aa35e234ddb67473c57d993efa71",
+    "dod_status": ".agent\\verification\\state\\DOD_STATUS.jsonl",
+    "dod_status_sha256": "c4dfd7234c47be7e5de894b239b4b286a61cb270ed112a6e5a4fd266d08cc5dd"
+  },
+  "lockfiles": {
+    "Cargo.lock_sha256": "621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4",
+    "pnpm-lock.yaml_sha256": "45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf"
+  },
+  "notes": [
+    "one file pins candidate, base revision, epoch, build inputs, artifact digests and results",
+    "a dirty tree is recorded as dirty; it is never reported as a frozen revision"
+  ]
 }

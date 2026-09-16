@@ -101,10 +101,30 @@ fn record_outcome<T>(
     );
 }
 
+/// Read the Human Conception Ledger back (UO-01, REQ-DATA-001).
+#[tauri::command]
+fn list_conception_events(
+    workspace_id: String,
+) -> commands::CommandResult<commands::ConceptionLedgerView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    let started = std::time::Instant::now();
+    let result = commands::list_conception_events(&scope, &vault_file());
+    record_outcome("list_conception_events", started, &result);
+    result
+}
+
 /// Health, readiness, logs, metrics and alerts (DOD-037).
 #[tauri::command]
 fn get_diagnostics() -> commands::CommandResult<commands::DiagnosticsView> {
-    commands::get_diagnostics(&vault_file())
+    // Probe the storage ROOT before any call creates it. `vault_file()` calls
+    // `create_dir_all`, so deriving readiness from the vault path made the probe
+    // mutate what it measured and disagree with `get_system_health`, which probes
+    // the untouched root -- measured on the packaged artifact as
+    // `health.storage_ok=false` beside `diagnostics.storage_ok=true` for the same
+    // directory.
+    let root = storage_root();
+    let probe = application::probe_storage(&root);
+    commands::get_diagnostics_from_probe(&probe, &root.join("linchpin-vault.db"))
 }
 
 /// Report SPEC-003 namespace coverage.
@@ -457,6 +477,7 @@ pub fn run() {
             get_namespace_status,
             get_configuration,
             get_diagnostics,
+            list_conception_events,
             get_scope_declaration,
             apply_research_action,
             evaluate_export,

@@ -1,0 +1,47 @@
+feat(DOD-011/012/015/016/020/028/029/033): ledger read path, hard restart, migration matrix, run manifest
+
+Eight clauses re-dispositioned against measurement (DoD tally: PASS 23 -> 32,
+PARTIAL 16 -> 7, FAIL 1, EXTERNAL_REQUIRED 2). Requirements stay 57/59 bound.
+
+Real defects found and fixed:
+- The Human Conception Ledger was WRITE-ONLY: record_conception stored events
+  durably and no product path ever read them back, so the ledger of UO-01 could
+  not be consulted. commands::list_conception_events now reads it with human and
+  AI origins counted separately, and the Conception Lab renders it.
+- provider_status hardcoded configured=false with the detail "no model served on
+  this host (PF-011)" while PF-011 was satisfied and the provider lane was
+  passing. It now measures the loopback endpoint with a bounded TCP connect and
+  says what it observed; its test asserted the constant and now asserts the
+  relationship between the flag and the detail.
+- get_diagnostics probed a directory that vault_file() CREATES, so the probe
+  mutated what it measured and could never report a missing directory -- measured
+  on the packaged artifact as health.storage_ok=false beside
+  diagnostics.storage_ok=true for the same path. Both surfaces now read the same
+  application::probe_storage result over the same untouched root, and health
+  carries a storage_detail so a bare false is diagnosable.
+- The health probe file was shared, so concurrent instances of the product raced
+  on it; it is now per process.
+- A vault whose schema_migrations rows exist while the tables do not opened
+  SUCCESSFULLY and failed later at a random write; Vault::open verifies
+  REQUIRED_SCHEMA and refuses with SchemaIncomplete naming the object.
+- test-e2e.sh left a preview server on 4173 when interrupted, and later runs
+  failed in 3 seconds with a message naming no process; the lane now reports the
+  owning pid and clears its own leftovers on exit.
+
+New evidence:
+- Hard-restart proof on the packaged artifact: kill until the debug endpoint
+  stops answering, relaunch, read the ledger back through the runtime, find the
+  pre-restart canary.
+- Migration matrix: five prior schema states migrated forward with logical data
+  preservation and a write proving the migrated vault is usable.
+- scripts/run-manifest.py pins candidate, base revision, epoch, lockfiles,
+  artifact digests and results in one manifest; scripts/completion-report.py
+  derives the DOD-028 report from the state instead of by hand. Both are enforced
+  by verify.sh lanes, and both are cited by generator rather than by digest to
+  avoid an unconvergeable cycle.
+- Nine controlled defects caught and restored by scripts/mutation-proof.py,
+  including MUT-DOD-016-a (schema check removed) and MUT-DATA-001-a (ledger read
+  emptied). An earlier attempt at the latter was rejected by the harness as a
+  BUILD_ERROR, which is exactly the false proof it exists to prevent.
+
+verify.sh: ok.

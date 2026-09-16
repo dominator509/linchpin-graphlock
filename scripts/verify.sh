@@ -55,6 +55,13 @@ run "ledger evidence currency" python3 scripts/build-accounting.py --check
 run "DOD evidence currency" python3 scripts/build-dod-status.py --check
 run "evidence index currency" python3 scripts/generate-evidence-index.py --check
 
+# Identity check LAST, after the epoch has settled: DOD-029 requires the
+# candidate commit, base revision, epoch and artifact digests to belong to the
+# SAME run, and this lane fails when any of them has moved since the manifest was
+# written. Re-derive with `python3 scripts/run-manifest.py` after settling.
+run "run manifest identity" python3 scripts/run-manifest.py --check
+run "completion report" python3 scripts/completion-report.py --check
+
 if [ "$status" -eq 0 ]; then
   echo "verify: ok"
 else

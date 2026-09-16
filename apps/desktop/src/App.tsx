@@ -101,6 +101,24 @@ interface ScopeView {
   capabilities: CapabilityView[];
 }
 
+interface LedgerEventView {
+  event_id: string;
+  origin: string;
+  content_hash: string;
+  content_bytes: number;
+  created_utc: string;
+  version: number;
+  content: string;
+}
+
+interface ConceptionLedgerView {
+  workspace_id: string;
+  count: number;
+  human_count: number;
+  ai_count: number;
+  events: LedgerEventView[];
+}
+
 interface ConceptionEventView {
   event_id: string;
   content_hash: string;
@@ -384,6 +402,8 @@ export default function App() {
   const [authorIsHuman, setAuthorIsHuman] = useState(true);
   const [lastRecord, setLastRecord] =
     useState<CommandResult<RecordConceptionOutcome> | null>(null);
+  const [ledger, setLedger] =
+    useState<CommandResult<ConceptionLedgerView> | null>(null);
 
   // Opportunity Radar
   const [opportunityDescription, setOpportunityDescription] = useState(
@@ -527,6 +547,23 @@ export default function App() {
       setIpcError(String(err));
     }
   }, [draft, authorIsHuman]);
+
+  const onLoadLedger = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot read the ledger: desktop backend unavailable.");
+      return;
+    }
+    try {
+      setLedger(
+        await invoke<CommandResult<ConceptionLedgerView>>(
+          "list_conception_events",
+          { workspaceId: WORKSPACE },
+        ),
+      );
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, []);
 
   const onEvaluateOpportunity = useCallback(async () => {
     if (!hasIpc()) {
@@ -1146,6 +1183,43 @@ export default function App() {
               </p>
             )}
             <p>Correlation: {lastRecord.correlation_id}</p>
+          </div>
+        )}
+
+        {/* UO-01: the ledger was write-only. Recording an event stored it
+            durably and no surface could read it back, so the "Human Conception
+            Ledger" could not actually be consulted. */}
+        <h3 id="ledger-heading">Human Conception Ledger</h3>
+        <button type="button" onClick={() => void onLoadLedger()}>
+          Load ledger from the vault
+        </button>
+        {ledger && (
+          <div>
+            {ledger.ok && ledger.value ? (
+              <>
+                <p>
+                  {ledger.value.count} event(s) read back from durable storage —{" "}
+                  {ledger.value.human_count} human, {ledger.value.ai_count} AI
+                </p>
+                {ledger.value.events.length === 0 ? (
+                  <p>No events recorded in this workspace.</p>
+                ) : (
+                  <ol>
+                    {ledger.value.events.map((e) => (
+                      <li key={e.event_id}>
+                        [{e.origin}] {e.content} ({e.content_hash.slice(0, 18)}
+                        …, {e.created_utc})
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </>
+            ) : (
+              <p>
+                {ledger.error?.class}: {ledger.error?.message}
+              </p>
+            )}
+            <p>Correlation: {ledger.correlation_id}</p>
           </div>
         )}
       </section>

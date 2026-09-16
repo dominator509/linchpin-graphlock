@@ -193,6 +193,14 @@ def refresh_derived_evidence() -> None:
     for label, script in (
         ("accounting", "scripts/build-accounting.py"),
         ("DOD evidence digests", "scripts/build-dod-status.py"),
+        # The run manifest and the completion report are derived from the state
+        # the two steps above just refreshed, so they are regenerated HERE rather
+        # than by hand -- measured: regenerating them after the rerun left their
+        # cited digests stale and verify.sh failed two currency lanes that had
+        # done nothing wrong. They are not cited by digest (that would be a cycle)
+        # but their content must still be current when verify.sh checks it.
+        ("the run manifest", "scripts/run-manifest.py"),
+        ("the completion report", "scripts/completion-report.py"),
         ("the evidence index", "scripts/generate-evidence-index.py"),
     ):
         step = subprocess.run(

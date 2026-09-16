@@ -24,6 +24,66 @@ if [ ! -f apps/desktop/dist/index.html ]; then
   pnpm --filter @linchpin/desktop build
 fi
 
+# --- port hygiene on 4173 -------------------------------------------------
+# Measured failure: an interrupted run of this lane (a killed doc-exec pass) left
+# its `vite preview` listening on 4173, and every later run failed within three
+# seconds with Playwright's "http://localhost:4173 is already used". That message
+# names no process, so the cause was invisible for several runs. This lane now
+# reports the OWNING process before failing, and clears its own leftovers on the
+# way out -- a leaked server otherwise breaks the NEXT run, which is how this was
+# found.
+PREVIEW_PORT=4173
+port_pids() {
+  python3 - "$PREVIEW_PORT" <<'PY'
+import subprocess, sys
+port = sys.argv[1]
+try:
+    out = subprocess.run(
+        ["powershell", "-NoProfile", "-Command",
+         f"Get-NetTCPConnection -LocalPort {port} -State Listen -ErrorAction SilentlyContinue "
+         f"| Select-Object -ExpandProperty OwningProcess -Unique"],
+        capture_output=True, text=True, timeout=30,
+    ).stdout
+except Exception:
+    out = ""
+print(" ".join(line.strip() for line in out.split() if line.strip().isdigit()))
+PY
+}
+
+OCCUPIED="$(port_pids)"
+if [ -n "$OCCUPIED" ]; then
+  echo "e2e: FAIL -- port $PREVIEW_PORT is already in use by pid(s): $OCCUPIED" >&2
+  for pid in $OCCUPIED; do
+    python3 - "$pid" <<'PY' >&2
+import subprocess, sys
+pid = sys.argv[1]
+out = subprocess.run(
+    ["powershell", "-NoProfile", "-Command",
+     f"(Get-CimInstance Win32_Process -Filter \"ProcessId = {pid}\").CommandLine"],
+    capture_output=True, text=True, timeout=30,
+).stdout.strip()
+print(f"  pid {pid}: {out or 'command line unavailable'}")
+PY
+  done
+  echo "  This lane refuses to reuse a server it did not start (reuseExistingServer=false)." >&2
+  echo "  Stop that process and rerun; an interrupted earlier run of this lane is the usual cause." >&2
+  exit 2
+fi
+
+cleanup_preview() {
+  LEFTOVER="$(port_pids)"
+  if [ -n "$LEFTOVER" ]; then
+    echo "e2e: clearing leftover preview server on $PREVIEW_PORT (pid $LEFTOVER)"
+    for pid in $LEFTOVER; do
+      python3 - "$pid" <<'PY'
+import subprocess, sys
+subprocess.run(["taskkill", "/PID", sys.argv[1], "/T", "/F"], capture_output=True)
+PY
+    done
+  fi
+}
+trap cleanup_preview EXIT
+
 echo "=== e2e lane 1/3: Playwright against the built bundle (system Edge) ==="
 pnpm --filter @linchpin/desktop exec playwright test
 
