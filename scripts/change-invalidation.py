@@ -132,6 +132,18 @@ INPUT_GLOBS: dict[str, list[str]] = {
         # e2e-local-provider.mjs changed what the lane could observe, and nothing
         # in the invalidation graph noticed.
         "apps/desktop/*.mjs",
+        # The acceptance oracles themselves. The .mjs drivers above were pulled in
+        # after measuring that editing an assertion did not move the epoch; the
+        # SAME defect still stood for the Rust and JS test sources, which were in
+        # no class at all. Measured while fixing a flaky stress trial: editing
+        # apps/desktop/src-tauri/tests/stress_concurrency.rs -- the oracle that
+        # guards DOD-038 and DOD-017 -- did not change the epoch, so a recorded
+        # PASS could have stood for an oracle that no longer existed in that form.
+        "crates/*/tests/*.rs",
+        "apps/desktop/src-tauri/tests/*.rs",
+        "apps/desktop/tests/**/*.ts",
+        "apps/desktop/e2e/**/*.ts",
+        "packages/*/tests/**/*.ts",
     ],
     "config": [
         "apps/desktop/src-tauri/tauri.conf.json",

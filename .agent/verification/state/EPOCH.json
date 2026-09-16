@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "5365f79",
+  "candidate_commit": "da08789",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -28,20 +28,21 @@
       ]
     },
     "gate-script": {
-      "count": 62,
+      "count": 63,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
+        "scripts\\applicable-case-evidence.py": "7b10143e6b158932f719bb2f76a9c3b69a65265e4606cf5ee9844889c76923fd",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\assert-no-debug-port.py": "54b17113000ddaec872c310d5c063a3aba002cda17d03adebc8cb57b70589b44",
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
-        "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
+        "scripts\\build-accounting.py": "1fa5a88c4432051ff15363b2c02cbcafa5d2fff36a9e54adaa3dacfa678003f9",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "248551647dfabd569181db338c6c61473f1fc82acc1bed5284e0cdbd5ecaee71",
+        "scripts\\build-dod-status.py": "ef476e2590b4eb02014b2f1d5788d336764a73d5a8890bcc1b2a163617d2b734",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
-        "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
+        "scripts\\change-invalidation.py": "7bb6499a61a35585e38e31e26ab4c24e07c0af4de1ae80915b40114aee879988",
         "scripts\\clean-build.sh": "b262d0333310aab42dc803355d856a1099686f981d6f3f891fd058ecbcf9dde6",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
         "scripts\\completion-report.py": "9ae9d8f20106772a311dad91d687ad91a214c8327ae00292dd9dd1166c271e93",
@@ -77,7 +78,7 @@
         "scripts\\run-live-fire-real.sh": "b3641eed140c03789261aac8c5b371fe3c35616f9a03844b5c85a721c9f69e31",
         "scripts\\run-manifest.py": "9cbcd264b06362b4b93cdca9daac9e502f442485dea67ab385c00132636faf6e",
         "scripts\\secret-scan.py": "f1e753e9eab570336274b4f645192ed8346a9645856173c9f8729e7f21edfece",
-        "scripts\\security-check.sh": "e27eb5010d866c51b27d353192b3add0b1bc8642a8e3af7b54716a9b619ad618",
+        "scripts\\security-check.sh": "e4d605f8caa76b7142962ad975c871ba60617cc6916f553f822048b1cd322529",
         "scripts\\ship-gate.py": "c7650a1f78b9b256dfe7ca7e968cfedc129b50aaa374494a790f9961e465f5cc",
         "scripts\\smoke-installed-artifact.sh": "71de10b34c0a69e915773b1bcc92a8a08d4757b9c7a4e5dd963a343a4f4448ac",
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
@@ -91,7 +92,7 @@
         "scripts\\validate-generated-pack.py": "50dc425bbcc17145e559a7fc1eccc9957b0ecbcbb6b6539a2ac5cde1cb8adf47",
         "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
         "scripts\\vault-preservation-e2e.sh": "99077fbdbbebea0d09390a2c6d0bdb67a63698e796a6f3ac884b3b12cc0fca7a",
-        "scripts\\verify.sh": "65cf1632a67f89cd4c8f639921dfb6e2938d2109fd5095870956dfd2c4203ed6"
+        "scripts\\verify.sh": "b7ee4a660dd1c1e2822b176cbc1ad1befce1b8d6bd396ec19b5287503c6064ed"
       },
       "rules": [
         "V-000 harness validation",
@@ -207,13 +208,25 @@
       ]
     },
     "test-oracle": {
-      "count": 5,
+      "count": 17,
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
         ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "1c34dc60b47ef1ee021d24098541929373da34f484d717a19e56aa3a955dd432",
         "apps\\desktop\\e2e-artifact.mjs": "9d2d096495635d89e0c6d9ea198b5ae900c3034cab0e18275e3e6ac67af3b625",
-        "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
+        "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671",
+        "apps\\desktop\\e2e\\shell.spec.ts": "d4a08469939173f196d158de33d1c00b91c5ccc9785ac995e4589e3864641eb2",
+        "apps\\desktop\\src-tauri\\tests\\fuzz_campaign.rs": "403e7ae8bc39e52db7bdbd65032366626d84eefdf894274421d738e632574972",
+        "apps\\desktop\\src-tauri\\tests\\performance_gate.rs": "d2db51b86e4c130c00257e539dd4d9c056e00eb1eb60e6a664928df3876c9f3c",
+        "apps\\desktop\\src-tauri\\tests\\recovery_drill.rs": "1ae2c1b160d7556a89748e2b1c2fa1da06419a5911515415f657c0df09f0136c",
+        "apps\\desktop\\src-tauri\\tests\\soak_abbreviated.rs": "6c781323b57b1298b739a9be3805ec58a4555873488c6d727305b8cca93f3b50",
+        "apps\\desktop\\src-tauri\\tests\\stress_concurrency.rs": "b61703ff6865af062f265e3b0be41ccffe5bd74022be4175a5a46262db7aece3",
+        "apps\\desktop\\tests\\has-ipc.test.ts": "8f2e208b7f1499e680843f672d5ebe4c6be7dd528740e5ff1f1bf7e8d09ba10c",
+        "crates\\platform_windows\\tests\\licensing_policy.rs": "93cbf446566964963c6c6febe01aa3ea8ff278aa570a4eb5389b9df5154d3452",
+        "crates\\platform_windows\\tests\\local_first.rs": "fbb25c61b5b081625e246224771fbdec9eab36ea923b79a2047aeb8b983f92b1",
+        "crates\\storage\\tests\\integration_real_dependencies.rs": "f1a3c433b86e22cdddfaaa95d1658e76b1c2a81414a06bd33299da73f7d51539",
+        "packages\\contracts\\tests\\validate.test.ts": "04de828602a4c215f12acd940e164a87d20884f6e71a3a36a8cc952e0c128af7",
+        "packages\\ui\\tests\\index.test.ts": "f5ecf3cbb6217514ab49f10e40b9b2c1fb2f9bf25771bfdbf12a2fffb027227f"
       },
       "rules": [
         "V-008 full functionality",
@@ -225,8 +238,8 @@
       ]
     }
   },
-  "epoch_digest": "4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf",
-  "prior_candidate_commit": "c85e638",
-  "prior_epoch_digest": "4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf",
-  "total_inputs": 128
+  "epoch_digest": "1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3",
+  "prior_candidate_commit": "da08789",
+  "prior_epoch_digest": "1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3",
+  "total_inputs": 141
 }

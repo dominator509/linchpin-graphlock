@@ -38,15 +38,10 @@ if [ -f Cargo.toml ]; then
   run "cargo-deny advisories" cargo deny check advisories
   run "cargo-deny bans" cargo deny check bans
   run "cargo-deny sources" cargo deny check sources
-  # Licences is expected to FAIL while ADR-002 (MPL-2.0) is open. It is run and
-  # reported rather than skipped: DOD-021 forbids silent continuation.
-  echo "--- security: cargo-deny licenses (FAIL expected pending ADR-002)"
-  if cargo deny check licenses; then
-    echo "    cargo-deny licenses: ok"
-  else
-    echo "    cargo-deny licenses: FAIL -- see ADR-002" >&2
-    status=1
-  fi
+  # Licences ran RED while ADR-002 (MPL-2.0) was open; ADR-002 is now ACCEPTED and
+  # MPL-2.0 is permitted, so this lane is expected to pass and a failure is a real
+  # failure. The lane is never skipped: DOD-021 forbids silent continuation.
+  run "cargo-deny licenses" cargo deny check licenses
 fi
 
 if [ -f package.json ]; then

@@ -92,6 +92,13 @@ struct Shared {
     read_failures: AtomicU64,
     /// Reads refused because the vault file did not exist yet.
     reads_before_vault_existed: AtomicU64,
+    /// Backups refused because the vault file did not exist yet.
+    backups_before_vault_existed: AtomicU64,
+    /// Set once the FIRST write has committed. Before that, "no vault at <path>"
+    /// is the product correctly reporting an absent vault; after it, the same
+    /// message means a vault that existed has vanished, which IS a defect. This
+    /// flag is what keeps the pre-creation allowance from becoming a mask.
+    vault_written: AtomicBool,
     backups: AtomicU64,
     backup_failures: AtomicU64,
     /// Backups that failed because the database was busy or locked: reported as a
@@ -222,6 +229,8 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
         read_backs: AtomicU64::new(0),
         read_failures: AtomicU64::new(0),
         reads_before_vault_existed: AtomicU64::new(0),
+        backups_before_vault_existed: AtomicU64::new(0),
+        vault_written: AtomicBool::new(false),
         backups: AtomicU64::new(0),
         backup_failures: AtomicU64::new(0),
         backup_busy_failures: AtomicU64::new(0),
@@ -257,6 +266,7 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
                     }
                     Some(_) => {
                         shared.writes_ok.fetch_add(1, Ordering::Relaxed);
+                        shared.vault_written.store(true, Ordering::Release);
                     }
                     None => {
                         let message = result
@@ -308,7 +318,13 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
                             .as_ref()
                             .map(|error| error.safe_message().to_string())
                             .unwrap_or_default();
-                        if message.contains("no vault at") {
+                        // Tightened: the allowance applies only while NO write has
+                        // committed yet. After the first commit, "no vault at"
+                        // means a vault that existed is gone -- a real defect --
+                        // so the classification can no longer hide one.
+                        if message.contains("no vault at")
+                            && !shared.vault_written.load(Ordering::Acquire)
+                        {
                             shared
                                 .reads_before_vault_existed
                                 .fetch_add(1, Ordering::Relaxed);
@@ -354,12 +370,29 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
                             .map(|error| error.safe_message().to_string())
                             .unwrap_or_default();
                         let lower = message.to_lowercase();
-                        if lower.contains("lock") || lower.contains("busy") {
+                        // SAME CLASSIFICATION AS THE READERS, fixed here after this
+                        // trial failed with "backup: no vault at <path>": the backup
+                        // thread's first attempt can land before any writer has
+                        // created the database, and refusing THAT is the product
+                        // reporting an absent vault rather than a concurrency
+                        // defect. The earlier run counted it as a failure, so a
+                        // correct refusal failed the trial.
+                        //
+                        // The allowance is bounded by `vault_written`: once a write
+                        // has committed, "no vault at" is a defect and is counted.
+                        if message.contains("no vault at")
+                            && !shared.vault_written.load(Ordering::Acquire)
+                        {
+                            shared
+                                .backups_before_vault_existed
+                                .fetch_add(1, Ordering::Relaxed);
+                        } else if lower.contains("lock") || lower.contains("busy") {
                             shared.backup_busy_failures.fetch_add(1, Ordering::Relaxed);
+                            note_failure(&shared, format!("backup: {message}"));
                         } else {
                             shared.backup_failures.fetch_add(1, Ordering::Relaxed);
+                            note_failure(&shared, format!("backup: {message}"));
                         }
-                        note_failure(&shared, format!("backup: {message}"));
                     }
                 }
                 std::thread::sleep(Duration::from_millis(250));
@@ -399,6 +432,8 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
     let read_failures = shared.read_failures.load(Ordering::Relaxed);
     let backups = shared.backups.load(Ordering::Relaxed);
     let backup_failures = shared.backup_failures.load(Ordering::Relaxed);
+    let reads_before = shared.reads_before_vault_existed.load(Ordering::Relaxed);
+    let backups_before = shared.backups_before_vault_existed.load(Ordering::Relaxed);
     let latencies: Vec<f64> = {
         let raw = shared
             .latencies_us
@@ -451,6 +486,9 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
             "reads_before_vault_existed": shared.reads_before_vault_existed.load(Ordering::Relaxed),
             "backups": backups,
             "backup_failures": backup_failures,
+            "backups_before_vault_existed": shared
+                .backups_before_vault_existed
+                .load(Ordering::Relaxed),
             "backup_failures_reported_busy_or_locked": shared
                 .backup_busy_failures
                 .load(Ordering::Relaxed),
@@ -481,6 +519,7 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
         "limits": [
             "one machine, one disk, threads rather than separate processes or hosts",
             "busy/locked failures are reported as a locking fact only if the message says so; every other failure fails the trial",
+            "a read or backup refused with 'no vault at <path>' is classified as the product reporting an ABSENT vault only while no write has committed yet; after the first commit the same message is counted as a failure",
             "throughput figures are a regression bound on this host, not a capacity claim",
         ],
     });
@@ -515,6 +554,8 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
                  (of which reported busy/locked: {busy_failures}); **events lost: {lost}**\n\
                  - Ledger holds {events_in_ledger} events; read-backs {read_backs} (failures {read_failures}); \
                  backups {backups} (failures {backup_failures})\n\
+                 - Refusals before the vault file existed (product reporting an absent vault, not a \
+                 concurrency defect): reads {reads_before}, backups {backups_before}\n\
                  - Peak working set: {peak_rss} bytes; vault {final_bytes} bytes ({bytes_per_event} bytes/event)\n\n\
                  **This is an ABBREVIATED trial and is labeled as such.** No stress concurrency\n\
                  level, duration or throughput target is specified in the repository, so the\n\
@@ -568,6 +609,18 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
     assert_eq!(
         backup_failures, 0,
         "{backup_failures} concurrent backup(s) failed"
+    );
+    // Non-vacuity: the trial must actually have exercised both concurrent
+    // readers and concurrent backups. Without these, a run in which the backup
+    // thread never completed an attempt would still pass the failure assertions
+    // and the evidence would claim concurrency that did not happen.
+    assert!(
+        backups > 0,
+        "no backup completed during the trial, so the concurrent-backup claim is vacuous"
+    );
+    assert!(
+        read_backs > 0,
+        "no ledger read completed during the trial, so the concurrent-read claim is vacuous"
     );
     assert!(
         p95 <= MAX_P95_WRITE_MS,

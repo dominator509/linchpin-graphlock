@@ -1,0 +1,162 @@
+[
+  {
+    "key": "fmt",
+    "argv": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "resolved": "C:\\dev\\ScriptureForgeAI\\.tools\\cargo\\bin\\cargo.EXE",
+    "exit_code": 0,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output_bytes": 0,
+    "output_lines": 0
+  },
+  {
+    "key": "lint",
+    "argv": [
+      "sh",
+      "scripts/lint.sh"
+    ],
+    "resolved": "C:\\Program Files\\Git\\bin\\sh.EXE",
+    "exit_code": 0,
+    "output_sha256": "85b382dadd552896a69dcee59064df249b04d52af23e4c1738dd0d8ab9cc7d96",
+    "output_bytes": 1863,
+    "output_lines": 20
+  },
+  {
+    "key": "anti-gaming",
+    "argv": [
+      "python3",
+      "scripts/anti-gaming-scan.py",
+      "."
+    ],
+    "resolved": "C:\\Users\\domin\\AppData\\Local\\Microsoft\\WinGet\\Links\\python3.EXE",
+    "exit_code": 0,
+    "output_sha256": "60abd531ec80a91f28590bdb70379b278e95725a260f612fec31504b6a27b819",
+    "output_bytes": 42474,
+    "output_lines": 565
+  },
+  {
+    "key": "secret-scan",
+    "argv": [
+      "python3",
+      "scripts/secret-scan.py",
+      "--check"
+    ],
+    "resolved": "C:\\Users\\domin\\AppData\\Local\\Microsoft\\WinGet\\Links\\python3.EXE",
+    "exit_code": 0,
+    "output_sha256": "c4842551ef6d5a064dfd4e80c11a874ebb32d7b5614ae28f865eb0368f10eb3d",
+    "output_bytes": 45,
+    "output_lines": 1
+  },
+  {
+    "key": "sbom-currency",
+    "argv": [
+      "python3",
+      "scripts/generate-sbom.py",
+      "--check"
+    ],
+    "resolved": "C:\\Users\\domin\\AppData\\Local\\Microsoft\\WinGet\\Links\\python3.EXE",
+    "exit_code": 0,
+    "output_sha256": "ab1c5d4950dc209fa473305b8c8a10edb5dd4bcff46c26d56521c39d18c91ffd",
+    "output_bytes": 41,
+    "output_lines": 1
+  },
+  {
+    "key": "deny-advisories",
+    "argv": [
+      "cargo",
+      "deny",
+      "check",
+      "advisories"
+    ],
+    "resolved": "C:\\dev\\ScriptureForgeAI\\.tools\\cargo\\bin\\cargo.EXE",
+    "exit_code": 0,
+    "output_sha256": "799fc05e6513bf365cc7565ea51cc5cb9ca6690b1cd1fe7777339be83437131b",
+    "output_bytes": 14,
+    "output_lines": 1
+  },
+  {
+    "key": "deny-bans",
+    "argv": [
+      "cargo",
+      "deny",
+      "check",
+      "bans"
+    ],
+    "resolved": "C:\\dev\\ScriptureForgeAI\\.tools\\cargo\\bin\\cargo.EXE",
+    "exit_code": 0,
+    "output_sha256": "9241518896e021bf25e0570a4fd2db1b38183089d083b217dca084aea3c35e29",
+    "output_bytes": 80283,
+    "output_lines": 1062
+  },
+  {
+    "key": "deny-sources",
+    "argv": [
+      "cargo",
+      "deny",
+      "check",
+      "sources"
+    ],
+    "resolved": "C:\\dev\\ScriptureForgeAI\\.tools\\cargo\\bin\\cargo.EXE",
+    "exit_code": 0,
+    "output_sha256": "5cba1c1c8bf7b4f0398abfd62fa5e0d2d8f72d9f59aa1ab0ec4c54d3a2cd2f90",
+    "output_bytes": 11,
+    "output_lines": 1
+  },
+  {
+    "key": "deny-licenses",
+    "argv": [
+      "cargo",
+      "deny",
+      "check",
+      "licenses"
+    ],
+    "resolved": "C:\\dev\\ScriptureForgeAI\\.tools\\cargo\\bin\\cargo.EXE",
+    "exit_code": 0,
+    "output_sha256": "f4ca9ef7f07f25736657144de9da11bfad65666bd4a8defa177f36b988ddf218",
+    "output_bytes": 1365,
+    "output_lines": 25
+  },
+  {
+    "key": "pnpm-audit",
+    "argv": [
+      "pnpm",
+      "audit",
+      "--audit-level",
+      "high"
+    ],
+    "resolved": "C:\\Program Files\\nodejs\\pnpm.CMD",
+    "exit_code": 0,
+    "output_sha256": "1219a1f58e0db7181ea8599c000603ca8b2b1ed70ca12cd7861a0912624d2ade",
+    "output_bytes": 45,
+    "output_lines": 2
+  },
+  {
+    "key": "security-check",
+    "argv": [
+      "sh",
+      "scripts/security-check.sh"
+    ],
+    "resolved": "C:\\Program Files\\Git\\bin\\sh.EXE",
+    "exit_code": 0,
+    "output_sha256": "65d62f1e7734e1564fb463d258f19b34f04ebe0b94142fed80376739a8b7f46e",
+    "output_bytes": 124735,
+    "output_lines": 1675
+  },
+  {
+    "key": "harness-validate",
+    "argv": [
+      "sh",
+      "scripts/harness-validate.sh"
+    ],
+    "resolved": "C:\\Program Files\\Git\\bin\\sh.EXE",
+    "exit_code": 1,
+    "output_sha256": "07390af5111bc07b86f8e982c6cc434f6bc0e9023197bcd6900568cc9c0012be",
+    "output_bytes": 1287,
+    "output_lines": 17
+  }
+]

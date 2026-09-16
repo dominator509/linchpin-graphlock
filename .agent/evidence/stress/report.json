@@ -7,18 +7,20 @@
   "limits": [
     "one machine, one disk, threads rather than separate processes or hosts",
     "busy/locked failures are reported as a locking fact only if the message says so; every other failure fails the trial",
+    "a read or backup refused with 'no vault at <path>' is classified as the product reporting an ABSENT vault only while no write has committed yet; after the first commit the same message is counted as a failure",
     "throughput figures are a regression bound on this host, not a capacity claim"
   ],
   "outcomes": {
     "backup_failures": 0,
     "backup_failures_reported_busy_or_locked": 0,
-    "backups": 50,
+    "backups": 49,
+    "backups_before_vault_existed": 0,
     "events_in_ledger": 2000,
     "events_lost": 0,
     "hung": false,
-    "read_backs": 779,
+    "read_backs": 845,
     "read_failures": 0,
-    "reads_before_vault_existed": 2,
+    "reads_before_vault_existed": 0,
     "replays": 0,
     "sample_failure_messages": [],
     "write_failures": 0,
@@ -27,13 +29,13 @@
   },
   "performance": {
     "bytes_per_event": 643,
-    "elapsed_s": 18.58,
+    "elapsed_s": 19.46,
     "final_vault_bytes": 1286144,
-    "peak_working_set_bytes": 16781312,
-    "throughput_events_per_s": 107.64,
-    "write_max_ms": 753.53,
-    "write_p50_ms": 40.25,
-    "write_p95_ms": 185.62
+    "peak_working_set_bytes": 18317312,
+    "throughput_events_per_s": 102.76,
+    "write_max_ms": 490.1,
+    "write_p50_ms": 42.3,
+    "write_p95_ms": 185.08
   },
   "specification_gap": "no stress concurrency level, duration or throughput target is specified anywhere in the repository, so 'their specified scale' has no defined value to complete; this trial defines a workload, labels itself ABBREVIATED and does not claim DOD-038",
   "thresholds": {

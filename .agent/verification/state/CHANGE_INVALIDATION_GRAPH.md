@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf`
-- Candidate commit at generation: `5365f79`
-- Total tracked inputs: 128
-- Previous epoch digest: `4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf`
+- Current epoch digest: `1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3`
+- Candidate commit at generation: `da08789`
+- Total tracked inputs: 141
+- Previous epoch digest: `1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -37,7 +37,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 62 file(s)
+### `gate-script` — 63 file(s)
 
 - invalidates: V-000 harness validation
 - invalidates: V-005 clean build
@@ -46,10 +46,10 @@ definition and its PASS status is revoked until rerun.
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
+  - `scripts\applicable-case-evidence.py` `7b10143e6b158932…`
   - `scripts\artifact-e2e.sh` `665ba19ebd5fd33f…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
-  - `scripts\assert-no-debug-port.py` `54b17113000ddaec…`
-  - … and 57 more
+  - … and 58 more
 
 ### `js-manifest` — 7 file(s)
 
@@ -115,7 +115,7 @@ definition and its PASS status is revoked until rerun.
   - `crates\commercialization\src\asset_readiness.rs` `f4143f42b1e5da03…`
   - … and 15 more
 
-### `test-oracle` — 5 file(s)
+### `test-oracle` — 17 file(s)
 
 - invalidates: V-008 full functionality
 - invalidates: V-012 regression/mutation
@@ -129,6 +129,7 @@ definition and its PASS status is revoked until rerun.
   - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `1c34dc60b47ef1ee…`
   - `apps\desktop\e2e-artifact.mjs` `9d2d096495635d89…`
   - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
+  - … and 12 more
 
 ## Rerun obligations on epoch change
 

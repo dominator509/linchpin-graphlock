@@ -13,22 +13,16 @@
   },
   "results": [
     {
-      "test_id": "SUP-004",
-      "status": "PARTIAL",
-      "evidence_path": ".agent/evidence/EP-009/M2/SUP-004-reproducible-build.md",
-      "reason": "EXECUTED. Two release builds of the same revision produced non-identical artifacts. Root cause fully measured: (1) WiX regenerates MSI ProductCode per build (UpgradeCode stable); (2) the binary differs by exactly 19 bytes, all PE TimeDateStamp + CodeView RSDS GUID/age. A [profile.release] was added and strip=debuginfo verified to reach rustc, but the residual remains because both fields are written by the MSVC linker. Normalized comparison proved semantic equivalence (0 differing bytes after zeroing the 5 metadata ranges). NOT PASS: differences explained but not eliminated, and single-environment only."
+      "test_id": "BC-111",
+      "status": "NOT_RUN_BLOCKED_MATERIAL",
+      "evidence_path": ".agent/evidence/applicable-cases/BC-111.md",
+      "reason": "EXECUTED: architecture probe -- `hardware_key_store_hits: 1` (captured in `probes.log`); first-party source `crates/platform_windows/src/lib.rs` -- quoted and verified: 'KeyringStore', 'MemoryKeyring'; first-party source `crates/domain/src/scope.rs` -- quoted and verified: 'no DPAPI/OS keyring integration'. Measured absence of any hardware key-store integration, with the product's own scope map stating the limitation. NAMED BLOCKING MATERIAL: hardware or OS-backed key storage to test. Measured: first-party source contains exactly ONE match for dpapi/ncrypt/CryptAcquireContext/pkcs11/hsm/tpm/cng, and it is the scope map's own limitation sentence (crates/domain/src/scope.rs:58) -- \"the vault itself is a device-local SQLite database, not an OS-encrypted container, and the only KeyringStore is an in-process map (no DPAPI/OS keyring integration)\". The only KeyringStore implementation in the workspace is MemoryKeyring (crates/platform_windows/src/lib.rs:214), which holds keys in process memory, so there is no device, driver or OS key-store operation for an HSM test to exercise. The encrypted-blob container that DOES exist is covered by its own tests under REQ-DATA-006; hardware-backed key storage would be new architecture, not an unrun test. NOT PROVEN: No HSM/TPM test was executed, because no such device is used by the product and none can be truthfully emulated from this host."
     },
     {
-      "test_id": "SUP-003",
+      "test_id": "E2E-001",
       "status": "PASS",
-      "evidence_path": ".agent/evidence/artifact-e2e/STATUS.md",
-      "reason": "THE FOUR NAMED GAPS ARE CLOSED OR RECLASSIFIED, none left dangling. INSTALL/READ-BACK: the real MSI installs (exit 0), its files and Add/Remove Programs entry are read back independently, the installed binary launches, and uninstall removes it cleanly -- repeated automatically by scripts/smoke-installed-artifact.sh with the digest pinned. SBOM/NOTICES: CycloneDX 1.5 with 720 components is generated and a gate checks its currency, and THIRD_PARTY_NOTICES.md carries the artifact and lockfile digests. PROHIBITED-CONTENT SCAN: the anti-gaming scan and the 9-rule secret scan both run as enforced lanes over the tracked tree. SIGNING: not 'missing' but DECIDED -- ADR-003 records, after probing for a code-signing certificate, that signing is not applicable to this release, with the unsigned status, the expected SmartScreen/AV warnings and the digest-based verification procedure disclosed in RELEASE.md and DEPLOYMENT.md. That is an accepted risk with a recorded decision, which is a different thing from an unfinished task. CLEAN ROOM: not this capability's gate -- a virgin clean-room install is DOD-034, recorded EXTERNAL_REQUIRED with ADR-004."
-    },
-    {
-      "test_id": "E2E-011",
-      "status": "PARTIAL",
-      "evidence_path": ".agent/evidence/EP-009/M3/STATUS.md",
-      "reason": "EXECUTED in part. Exact installer artifact installed, launched and uninstalled with independently verified pre/post state. NOT PASS: not a virgin clean room; the host carries the full Rust/Node/WebView2 toolchain so hidden prerequisites are not excluded (PF-016 unmet)."
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-001.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/clean-build/STATUS.md` -- quoted and verified: '| Verdict |', 'Checkout'; first-party source `scripts/smoke-installed-artifact.sh` -- quoted and verified: 'msiexec'; evidence artifact `.agent/evidence/artifact-e2e/STATUS.md` -- quoted and verified: 'linchpin-desktop-e2e.exe'. Smoke and infrastructure verification executed: the clean-environment gate provisions from committed locks alone and proves teardown, the installer smoke lane installs the real MSI, launches the installed binary to a responsive window and removes it, and the artifact lane drives the packaged executable. NOT PROVEN: Smoke coverage is the golden path on this host's Windows version; no matrix of supported Windows builds, locales or hardware profiles is exercised."
     },
     {
       "test_id": "E2E-002",
@@ -37,28 +31,10 @@
       "reason": "RE-MEASURED, because the recorded counts and scope are stale: the browser lane ran 5 tests when this row was written and runs 22 now, in real Edge against the production bundle over loopback, and it no longer stops at shell sanity. It asserts the product heading with zero uncaught page errors, the confidentiality boundary, the absence of prohibited definitive legal claims, title and html lang, a single main landmark, all thirteen navigation surfaces, the four status badges, screening vocabulary, keyboard reachability of every labelled control, the recovery controls with their point-in-time wording, the ledger read path, the diagnostics dashboard, the scope declaration, and consequence-specific confirmation. The recorded gap 'no golden-path workflow is driven' is closed at the PRODUCT level rather than in this lane: the browser cannot carry the Tauri bridge, so the state-changing golden path (record -> persist -> read back -> hard restart -> read back again) is driven over real IPC in the exact-artifact lane, which is the correct place for it."
     },
     {
-      "test_id": "E2E-012",
+      "test_id": "E2E-003",
       "status": "PASS",
-      "evidence_path": ".agent/evidence/DOD-015-016-restart-and-migrations.md",
-      "reason": "BOTH RECORDED GAPS ARE CLOSED. The recorded reason ended 'single-process reopen rather than a full OS process restart, and no migration matrix from a prior released schema (DOD-016 untested)'. MEASURED: the exact-artifact lane now kills the packaged executable (waiting until its debug endpoint stops answering), relaunches it, and reads the ledger back THROUGH THE RUNTIME in the new process, with the pre-restart canary present and the count reconciled -- a real process restart, not a reopen. The migration matrix executes five prior schema states with logical data preservation and a post-migration write, and Vault::open refuses a database whose recorded migrations have no tables. Original evidence retained: the vault commit, independent read-back with version intact, and the audit chain verified after reopen, mutation-proven against the tamper guard."
-    },
-    {
-      "test_id": "SUP-006",
-      "status": "PASS",
-      "evidence_path": ".agent/evidence/DOD-017-idempotency.md",
-      "reason": "THE RECORDED GAP IS CLOSED. It read 'no retry/reorder/delayed-delivery semantics, no idempotency keys at the API boundary'. MEASURED TODAY: writes accept a CLIENT-CHOSEN key and return Recorded or Replayed; a retry with the same payload is recognised as a replay naming the event the first attempt stored and does NOT restamp it; a key replayed with different content is REFUSED as IdempotencyConflict naming the key and both fingerprints; duplicates, reordering, delayed duplicates and four concurrent submitters of one key each yield exactly one event; a write refused before commit leaves no row and the same key stays usable; and the packaged artifact proves the same over real IPC (first write replayed=false, retry replayed=true naming the same event, ledger unchanged, conflicting payload refused). The original concurrency evidence is retained and extended: 4 writers x 25 inserts with no silent loss, and the abbreviated stress trial's 8 writers x 250 events measured 2 000 submissions with ZERO lost events at 106 events/s."
-    },
-    {
-      "test_id": "GEN-016",
-      "status": "PARTIAL",
-      "evidence_path": "crates/storage/tests/integration_real_dependencies.rs",
-      "reason": "RESTATED PRECISELY, because the previous note was both stale and mis-scoped. EXECUTED AND MUTATION-PROVEN at the database boundary: a query against a schema that does not exist fails closed with 'no such table' rather than returning empty results, a unique-constraint violation is verified not to mutate the existing row, a vault whose recorded migrations have no tables is refused at open rather than failing later at a random write, and a mistyped backup path is refused without touching the destination. EXECUTED at the policy and provider boundaries: a non-loopback endpoint is refused with POLICY and no attempt, an unreachable endpoint yields UNREACHABLE with text=null, the bounded retry policy is observed to exhaust, and a mutation-fuzz campaign now sweeps ten text-parsing targets with 4 634 adversarial inputs each (it found and fixed a real panic in the credential redactor). STILL NOT COVERED, and stated as such: there is no AUTH boundary to exercise -- this is a local-first single-user application with no login, session or role surface, so 'negative-path coverage across auth' is NOT_APPLICABLE rather than absent; and no wrong-credential case exists for the same reason DOD-014 records (no credentialed provider lane is wired)."
-    },
-    {
-      "test_id": "SUP-001",
-      "status": "PASS",
-      "evidence_path": ".agent/evidence/artifact-e2e/STATUS.md",
-      "reason": "THE GAP RECORDED HERE IS CLOSED, and it was release-blocking when written: the repository advertised a domain layer whose crates were used by nothing, and the app exposed one Tauri command while the React shell called none. MEASURED TODAY against the packaged executable: the namespace command reports 14 of 14 SPEC-003 namespaces implemented (the recorded gap was 2 of 14); the vault write path is wired, so record_conception reports persisted=true with a sha256 content address written to the product's real vault; the UI invokes the backend over the real IPC bridge and its confirmed actions are audited with correlation ids; and every crate is now reached from production paths (reachability: 0 UNREACHABLE over 220 public functions, 30 entry points). Evidence: the artifact lane's namespace and persistence assertions, plus .agent/evidence/REACHABILITY.csv."
+      "evidence_path": "apps/desktop/e2e/shell.spec.ts",
+      "reason": "RE-MEASURED. The recorded reason described 11 tests and a gap of 'no golden-path workflow end to end'; the lane now runs 22 real-browser tests covering the reachable UI surface -- navigation, badges, vocabulary prohibitions, the Conception Lab origin selector, research kill-search, the Disclosure Firewall, the Patent Architect linter, filing receipt import, the recovery controls, the ledger, the diagnostics dashboard and the declared scope -- and the state-changing workflow it could not reach is exercised in the exact-artifact lane over the real IPC bridge, which is where a browser cannot follow. The boundary is stated rather than glossed: the browser lane verifies the UI, the artifact lane verifies behaviour behind it."
     },
     {
       "test_id": "E2E-004",
@@ -67,16 +43,286 @@
       "reason": "BOTH RECORDED GAPS ARE CLOSED. The recorded reason read 'no suite exercises the commands over the real Tauri IPC boundary, and 10 of 14 namespaces have no command at all'. MEASURED TODAY: the exact-artifact lane drives the PACKAGED executable over its real IPC bridge and asserts the typed envelope, per-call correlation ids, the SPEC-006 error class on refusals, the scope declaration, the diagnostics view, the conception ledger, keyed writes with a replay and a conflicting-payload REFUSAL, provider lane identity, a confirmation-gated action recorded in the audit trail, and persistence of a runtime canary read back from the durable vault -- 42 assertions against the shipped binary. The product now implements all 14 SPEC-003 namespaces (asserted in the same lane), so the '10 of 14 have no command' half is closed too."
     },
     {
-      "test_id": "E2E-003",
+      "test_id": "E2E-005",
       "status": "PASS",
-      "evidence_path": "apps/desktop/e2e/shell.spec.ts",
-      "reason": "RE-MEASURED. The recorded reason described 11 tests and a gap of 'no golden-path workflow end to end'; the lane now runs 22 real-browser tests covering the reachable UI surface -- navigation, badges, vocabulary prohibitions, the Conception Lab origin selector, research kill-search, the Disclosure Firewall, the Patent Architect linter, filing receipt import, the recovery controls, the ledger, the diagnostics dashboard and the declared scope -- and the state-changing workflow it could not reach is exercised in the exact-artifact lane over the real IPC bridge, which is where a browser cannot follow. The boundary is stated rather than glossed: the browser lane verifies the UI, the artifact lane verifies behaviour behind it."
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-005.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/state/RERUN_RECORD.json` -- quoted and verified: 'epoch_digest'; first-party source `scripts/change-invalidation.py` -- quoted and verified: 'changed_classes'; evidence artifact `.agent/evidence/mutation-proof/REPORT.json` -- quoted and verified: 'MUT-OPS-037'. Regression and differential verification executed: a change to any tracked input class advances the epoch and obliges a rerun of the affected stages, recorded with commands, exit codes and output digests, while the mutation harness supplies the differential half by proving the guarded behaviour fails when the guard is removed. NOT PROVEN: Differential comparison is against the guard's absence, not against a previous release build; no historical version-to-version differential run exists (see DOD-035)."
+    },
+    {
+      "test_id": "E2E-010",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-010.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/recovery-drill/report.json` -- quoted and verified: 'objectives_measured', 'rto_ms_threshold', 'restore_vault (production command)'; evidence artifact `.agent/evidence/stress/STATUS.md` -- quoted and verified: 'concurrent'; first-party source `apps/desktop/src-tauri/tests/recovery_drill.rs` -- quoted and verified: 'fault'. Resilience and recovery verification executed: repeated fault-injected cycles alternate total loss of the vault file with in-place corruption, recovery runs through the production restore command, the recovered state is reconciled by content digest through an independent connection, and RPO/RTO are measured against a stated threshold. NOT PROVEN: RPO for work committed after the last backup is unbounded and asserted as such: there is no off-device replication, so loss of the device between backups loses that work. The drill covers the vault, not the whole machine."
+    },
+    {
+      "test_id": "E2E-011",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/EP-009/M3/STATUS.md",
+      "reason": "EXECUTED in part. Exact installer artifact installed, launched and uninstalled with independently verified pre/post state. NOT PASS: not a virgin clean room; the host carries the full Rust/Node/WebView2 toolchain so hidden prerequisites are not excluded (PF-016 unmet)."
+    },
+    {
+      "test_id": "E2E-012",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/DOD-015-016-restart-and-migrations.md",
+      "reason": "BOTH RECORDED GAPS ARE CLOSED. The recorded reason ended 'single-process reopen rather than a full OS process restart, and no migration matrix from a prior released schema (DOD-016 untested)'. MEASURED: the exact-artifact lane now kills the packaged executable (waiting until its debug endpoint stops answering), relaunches it, and reads the ledger back THROUGH THE RUNTIME in the new process, with the pre-restart canary present and the count reconciled -- a real process restart, not a reopen. The migration matrix executes five prior schema states with logical data preservation and a post-migration write, and Vault::open refuses a database whose recorded migrations have no tables. Original evidence retained: the vault commit, independent read-back with version intact, and the audit chain verified after reopen, mutation-proven against the tamper guard."
+    },
+    {
+      "test_id": "E2E-015",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-015.md",
+      "reason": "EXECUTED: first-party source `apps/desktop/e2e-artifact.mjs` -- quoted and verified: 'canary', 'HARD RESTART'; evidence artifact `.agent/evidence/artifact-e2e/STATUS.md` -- quoted and verified: 'confirmation'; first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'test_export_firewall_blocks_restricted_content'; evidence artifact `.agent/evidence/recovery-drill/report.json` -- quoted and verified: 'read_back_by'. Import/export/data-portability round-trip executed: a runtime canary generated in the product is read back from the durable vault and again after a hard restart, the evidence/package export is confirmation-gated and audited, and the disclosure firewall blocks export of restricted content. NOT PROVEN: Round-trip coverage is the product's own formats (vault, evidence bundle, filing package); no third-party patent-management or docketing interchange format is implemented or tested."
+    },
+    {
+      "test_id": "E2E-019",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-019.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/local-provider/STATUS.md` -- quoted and verified: 'smollm2:135m', 'transport identity is the local adapter', 'non-loopback endpoint is refused'; first-party source `apps/desktop/e2e-local-provider.mjs` -- quoted and verified: 'canary'; first-party source `crates/provider_transport/src/lib.rs` -- quoted and verified: 'test_local_adapter_rejects_non_loopback_endpoint'; first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'test_local_inference_refuses_non_loopback_endpoint'; architecture probe -- `loopback_guard_hits: 66` (captured in `probes.log`); architecture probe -- `concern[provider]_tests: 9` (captured in `probes.log`). AI/agentic safety verification executed: the provider lane drives the product's inference command against a real loopback model and asserts a live completion with a runtime canary that must not already exist in the tracked tree, proves the fail-closed negatives (non-loopback endpoint refused with POLICY and no attempt; unreachable endpoint yields a transport error rather than fabricated text), labels AI-origin content distinctly from human conception, and denies MCP capabilities by default. NOT PROVEN: One small local model is exercised; no adversarial prompt-injection campaign is run against the model, and model-output trustworthiness is bounded by the labelling and the disclosure firewall rather than by output verification."
+    },
+    {
+      "test_id": "GEN-001",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-001.md",
+      "reason": "EXECUTED: `sh scripts/lint.sh` -- exit 0, output sha256 `85b382dadd552896...`, 1863 bytes (log `lint.log`); asserted: 'lint: Done'; 'Finished `dev` profile'; `cargo fmt --all -- --check` -- exit 0, output sha256 `e3b0c44298fc1c14...`, 0 bytes (log `fmt.log`); asserted: exit status only; `python3 scripts/anti-gaming-scan.py .` -- exit 0, output sha256 `60abd531ec80a91f...`, 42474 bytes (log `anti-gaming.log`); asserted: exit status only; `sh scripts/security-check.sh` -- exit 0, output sha256 `65d62f1e7734e156...`, 124735 bytes (log `security-check.log`); asserted: 'security-check: ok'. The static-analysis lane runs clippy over the whole workspace with all targets and warnings denied, ESLint over all three JS packages, and a rustfmt check; every lane exited 0 on this candidate. The security gate additionally runs a lexical anti-gaming scan for fabricated behaviour and requires each match to be classified. NOT PROVEN: No dedicated multi-rule SAST engine or dataflow/taint analysis is installed; the depth here is compiler lints, lint rules and a lexical scan."
+    },
+    {
+      "test_id": "GEN-002",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-002.md",
+      "reason": "EXECUTED: `cargo deny check advisories` -- exit 0, output sha256 `799fc05e6513bf36...`, 14 bytes (log `deny-advisories.log`); asserted: 'advisories ok'; `cargo deny check bans` -- exit 0, output sha256 `9241518896e021bf...`, 80283 bytes (log `deny-bans.log`); asserted: exit status only; `cargo deny check sources` -- exit 0, output sha256 `5cba1c1c8bf7b4f0...`, 11 bytes (log `deny-sources.log`); asserted: 'sources ok'; `pnpm audit --audit-level high` -- exit 0, output sha256 `1219a1f58e0db718...`, 45 bytes (log `pnpm-audit.log`); asserted: 'Severity: 2 moderate'. Composition analysis executed against the locked graphs of both ecosystems: cargo-deny advisories/bans/sources and `pnpm audit --audit-level high`, all exit 0. NOT PROVEN: The npm audit reports 2 moderate advisories; they are below the enforced high threshold and are dev-only, which is a disclosed accepted risk rather than a clean bill."
+    },
+    {
+      "test_id": "GEN-003",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-003.md",
+      "reason": "EXECUTED: `cargo deny check advisories` -- exit 0, output sha256 `799fc05e6513bf36...`, 14 bytes (log `deny-advisories.log`); asserted: 'advisories ok'; `pnpm audit --audit-level high` -- exit 0, output sha256 `1219a1f58e0db718...`, 45 bytes (log `pnpm-audit.log`); asserted: exit status only; evidence artifact `.agent/evidence/sbom/linchpin.cdx.json` -- quoted and verified: '\"bomFormat\"', '\"CycloneDX\"'. Dependency scanning executed for both ecosystems against committed locks, and the resulting component inventory is materialised as a CycloneDX SBOM with 720 components. NOT PROVEN: Scanning is per-candidate, not continuous: no scheduled re-scan runs between candidates, so an advisory published later is only seen on the next run."
+    },
+    {
+      "test_id": "GEN-004",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-004.md",
+      "reason": "EXECUTED: `cargo deny check licenses` -- exit 0, output sha256 `f4ca9ef7f07f2573...`, 1365 bytes (log `deny-licenses.log`); asserted: 'licenses ok'; `sh scripts/security-check.sh` -- exit 0, output sha256 `65d62f1e7734e156...`, 124735 bytes (log `security-check.log`); asserted: 'security-check: ok'; evidence artifact `.agent/evidence/sbom/linchpin.cdx.json` -- quoted and verified: '\"licenses\"'; first-party source `deny.toml` -- quoted and verified: 'MPL-2.0'. Licence compliance executed: `cargo deny check licenses` exits 0 against an explicit allowlist (MPL-2.0 permitted under ACCEPTED ADR-002), and the SBOM generator enforces the same allowlist so the scanner and the inventory cannot disagree. NOT PROVEN: Four allowlist entries were never encountered in the graph (Apache-2.0 WITH LLVM-exception, BSD-2-Clause, ISC, Unicode-DFS-2016), so the policy is broader than the measured graph requires; licence classification comes from crate metadata, not from a legal review of texts."
+    },
+    {
+      "test_id": "GEN-005",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-005.md",
+      "reason": "EXECUTED: `python3 scripts/secret-scan.py --check` -- exit 0, output sha256 `c4842551ef6d5a06...`, 45 bytes (log `secret-scan.log`); asserted: 'secret-scan check: ok (9 rules, no findings)'; `sh scripts/security-check.sh` -- exit 0, output sha256 `65d62f1e7734e156...`, 124735 bytes (log `security-check.log`); asserted: 'security-check: ok'. Secret scanning executed as an enforced lane with 9 rules over the git-tracked tree, reporting no findings on this candidate. NOT PROVEN: The scan is pattern-based over tracked text: it does not scan git history, ignored or untracked files, or binaries, and it cannot detect a credential shape no rule describes."
+    },
+    {
+      "test_id": "GEN-006",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-006.md",
+      "reason": "EXECUTED: `python3 scripts/secret-scan.py --check` -- exit 0, output sha256 `c4842551ef6d5a06...`, 45 bytes (log `secret-scan.log`); asserted: 'secret-scan check: ok (9 rules, no findings)'; first-party source `crates/crash_reporter/src/lib.rs` -- quoted and verified: 'redact_key_values'; architecture probe -- `concern[redaction]_tests: 21` (captured in `probes.log`); evidence artifact `.agent/evidence/fuzz/STATUS.md` -- quoted and verified: 'panic'; evidence artifact `.agent/evidence/mutation-proof/REPORT.json` -- quoted and verified: 'MUT-OPS-037'. Credential scanning executed at two layers: the repository-wide scan, and the product's own redaction policy (21 redaction/secret/credential tests), whose discrimination is proven by mutation MUT-OPS-037 -- removing the key-value redaction pass makes the guarding test fail. NOT PROVEN: Runtime redaction only removes values it can attribute to a key name or a known token shape; unlabelled credential material pasted as free text is not detectable by either layer."
+    },
+    {
+      "test_id": "GEN-007",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-007.md",
+      "reason": "EXECUTED: `python3 scripts/secret-scan.py --check` -- exit 0, output sha256 `c4842551ef6d5a06...`, 45 bytes (log `secret-scan.log`); asserted: 'secret-scan check: ok (9 rules, no findings)'; first-party source `crates/crash_reporter/src/lib.rs` -- quoted and verified: 'redact_key_values', 'looks_like_secret'; architecture probe -- `concern[redaction]_tests: 21` (captured in `probes.log`). Hardcoded-credential detection executed: the tracked tree is scanned, and the shipping redactor detects credential shapes at runtime (`looks_like_secret`, `redact_key_values`) with the defect history recorded rather than tidied -- an earlier version both leaked short credentials and panicked on case-folding characters, and both were fixed with regression tests. NOT PROVEN: Pattern rules cover known provider shapes; a fabricated or unusual credential format in source would not be flagged by either layer."
+    },
+    {
+      "test_id": "GEN-016",
+      "status": "PARTIAL",
+      "evidence_path": "crates/storage/tests/integration_real_dependencies.rs",
+      "reason": "RESTATED PRECISELY, because the previous note was both stale and mis-scoped. EXECUTED AND MUTATION-PROVEN at the database boundary: a query against a schema that does not exist fails closed with 'no such table' rather than returning empty results, a unique-constraint violation is verified not to mutate the existing row, a vault whose recorded migrations have no tables is refused at open rather than failing later at a random write, and a mistyped backup path is refused without touching the destination. EXECUTED at the policy and provider boundaries: a non-loopback endpoint is refused with POLICY and no attempt, an unreachable endpoint yields UNREACHABLE with text=null, the bounded retry policy is observed to exhaust, and a mutation-fuzz campaign now sweeps ten text-parsing targets with 4 634 adversarial inputs each (it found and fixed a real panic in the credential redactor). STILL NOT COVERED, and stated as such: there is no AUTH boundary to exercise -- this is a local-first single-user application with no login, session or role surface, so 'negative-path coverage across auth' is NOT_APPLICABLE rather than absent; and no wrong-credential case exists for the same reason DOD-014 records (no credentialed provider lane is wired)."
+    },
+    {
+      "test_id": "GEN-024",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-024.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/fuzz/STATUS.md` -- quoted and verified: 'fuzz_campaign.rs', '4 634 inputs per target'; first-party source `apps/desktop/src-tauri/tests/fuzz_campaign.rs` -- quoted and verified: 'deterministic'; evidence artifact `.agent/evidence/mutation-proof/REPORT.json` -- quoted and verified: 'MUT-FUZZ-001'. Mutation-based fuzzing executed: a seeded, deterministic campaign over ten IPC-reachable parsers (4 634 adversarial inputs per target plus 20 000 random mutations) with reproducible shrinking. It found a real panic in the credential redactor, and the campaign is itself mutation-proven by MUT-FUZZ-001. NOT PROVEN: No coverage-guided engine and no nightly sanitizers; the campaign is labelled ABBREVIATED because no fuzzing scale is specified for this registry ID."
+    },
+    {
+      "test_id": "GEN-035",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-035.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/artifact-e2e/STATUS.md` -- quoted and verified: 'linchpin-desktop-e2e.exe', 'DevTools endpoint', 'tauri.localhost'; first-party source `scripts/artifact-e2e.sh` -- quoted and verified: 'does NOT open a debug port'; first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'test_export_firewall_blocks_restricted_content'. Desktop application security testing executed against the packaged executable: the loaded origin is the embedded frontend rather than a dev server, the production artifact is asserted to open no debug port, and the confidentiality boundary (disclosure firewall, export blocking) is exercised. NOT PROVEN: There is no third-party penetration test and no fuzzing of the WebView2 attack surface; the debug-port assertion is a liveness-checked probe of the exact artifact, not a full network attack simulation."
+    },
+    {
+      "test_id": "GEN-042",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-042.md",
+      "reason": "EXECUTED: `cargo deny check advisories` -- exit 0, output sha256 `799fc05e6513bf36...`, 14 bytes (log `deny-advisories.log`); asserted: 'advisories ok'; `pnpm audit --audit-level high` -- exit 0, output sha256 `1219a1f58e0db718...`, 45 bytes (log `pnpm-audit.log`); asserted: '2 vulnerabilities found'; `sh scripts/security-check.sh` -- exit 0, output sha256 `65d62f1e7734e156...`, 124735 bytes (log `security-check.log`); asserted: 'security-check: ok'. Vulnerability scanning executed for both ecosystems against the RustSec and npm advisory databases, with the enforced threshold stated and the two moderate dev-only npm advisories disclosed rather than suppressed. NOT PROVEN: No container or image scanning applies (there is no container), and no host-level vulnerability scan of the operator machine is performed."
+    },
+    {
+      "test_id": "GEN-044",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-044.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/ANTI_GAMING_FINDINGS.md` -- quoted and verified: 'AG-001', 'AG-014'; architecture probe -- `concern[redaction]_tests: 21` (captured in `probes.log`). Fourteen fabricated-behaviour findings (AG-001..AG-014) and the fuzz-found panic are recorded with root cause, and the weakness families they represent are identifiable (CWE-703 for the panic, CWE-20 for traversal/validation gaps, CWE-798 for the planted-credential proof). NOT PROVEN: NOT PASS: the CWE mapping is prose in the findings file, not a machine-readable weakness column per finding, and no dedicated weakness-enumeration scanner runs."
+    },
+    {
+      "test_id": "GEN-045",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-045.md",
+      "reason": "EXECUTED: first-party source `crates/evidence/src/lib.rs` -- quoted and verified: 'sanitize_path', 'test_archive_entry_rejects_zip_slip'; architecture probe -- `concern[traversal]_tests: 3` (captured in `probes.log`); first-party source `crates/provider_transport/src/lib.rs` -- quoted and verified: 'test_local_adapter_rejects_non_loopback_endpoint'; evidence artifact `.agent/evidence/fuzz/STATUS.md` -- quoted and verified: 'fuzz_campaign.rs'. Injection testing executed at the boundaries this product has: path/zip-slip hardening with a generated-corpus property test, fuzzed text parsers, punctuation-quoted credential forms in the redactor, and the local provider refusing a non-loopback endpoint. NOT PROVEN: There is no SQL-injection or HTML-injection scan by a dedicated tool; the datastore is accessed through parameterised statements and the UI through React, both covered by tests rather than by an injection scanner."
+    },
+    {
+      "test_id": "GEN-049",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-049.md",
+      "reason": "EXECUTED: architecture probe -- `concern[validation]_tests: 23` (captured in `probes.log`); first-party source `crates/commercialization/src/asset_readiness.rs` -- quoted and verified: 'test_invalid_records_are_refused'; first-party source `crates/evidence/src/lib.rs` -- quoted and verified: 'sanitize_path'. Input validation executed: 23 boundary/invalid-input tests across the domain, commercialization, evidence and IPC layers, covering empty values, unknown identities, blank references, malformed dates, invalid record kinds and hardened paths. NOT PROVEN: Validation depth is per-command and typed (SPEC-006 classes) rather than driven by a schema-fuzzing harness; there is no property-based generator over the full command surface."
+    },
+    {
+      "test_id": "GEN-051",
+      "status": "NOT_RUN_BLOCKED_MATERIAL",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-051.md",
+      "reason": "EXECUTED: architecture probe -- `auth_surface_hits: 0` (captured in `probes.log`); architecture probe -- `mcp_capability_grant_hits: 11` (captured in `probes.log`); architecture probe -- `disclosure_firewall_hits: 42` (captured in `probes.log`). Measured absence of the subject of the test, with both nearest real controls measured present. NAMED BLOCKING MATERIAL: an authorization decision to test. A measured scan of all first-party source finds ZERO login/logout/authenticate/session-token/is-admin/role-based-access constructs: this is a local-first single-user desktop application with no caller identity, no session, no roles and no remote API, so there is no subject/object/permission triple for an authorization test to exercise. The nearest real control is the MCP capability grant (11 sites) and the disclosure firewall (42 sites), which are recorded under GEN-052. The registry pack declares this ID applicable to applications in general; the material an authorization test requires is absent from this architecture rather than missing from the harness. NOT PROVEN: No authorization test was executed, because executing one would require inventing an identity model the product does not have."
+    },
+    {
+      "test_id": "GEN-052",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-052.md",
+      "reason": "EXECUTED: architecture probe -- `mcp_capability_grant_hits: 11` (captured in `probes.log`); architecture probe -- `disclosure_firewall_hits: 42` (captured in `probes.log`); first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'test_mcp_capability_grant_is_explicit', 'test_export_firewall_blocks_restricted_content'; first-party source `crates/storage/src/vault.rs` -- quoted and verified: 'test_events_are_workspace_scoped', 'test_unknown_workspace_is_refused'; first-party source `crates/mcp_hub/src/lib.rs` -- quoted and verified: 'test_mcp_grants_and_boundaries'. Broken-access-control testing executed for the access controls this product actually has: MCP capability grants are explicit per server/client/workspace/capability and deny by default (an unknown capability and an empty grant list are both refused), the disclosure firewall blocks export of restricted content, and workspace-scoped reads do not expose another workspace's events. NOT PROVEN: There is no multi-user or remote access-control model to break, so this ID is satisfied by the grants and the firewall rather than by role enforcement."
+    },
+    {
+      "test_id": "GEN-063",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-063.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/DOD-037-operator-diagnostics.md` -- quoted and verified: 'alert', 'correlation', 'DEGRADED'; first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'diagnostics_redactor', 'record_diagnostic_outcome'; architecture probe -- `concern[diagnostics]_tests: 16` (captured in `probes.log`). Logging and monitoring verification executed against induced failures: the diagnostics surface reports readiness measured by probing storage, records every command outcome with measured duration and a correlation id, derives alerts from those measurements, and redaction is asserted on the same path with 16 diagnostics/health tests. NOT PROVEN: Telemetry is device-local with no exporter, so there is no central monitoring stack to verify; alert routing beyond the in-app surface is not implemented."
+    },
+    {
+      "test_id": "GEN-071",
+      "status": "NOT_RUN_BLOCKED_MATERIAL",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-071.md",
+      "reason": "EXECUTED: architecture probe -- `sandbox_primitive_hits: 8` (captured in `probes.log`); architecture probe -- `sandbox_artifact[Dockerfile]: False` (captured in `probes.log`); architecture probe -- `sandbox_artifact[.devcontainer]: False` (captured in `probes.log`); architecture probe -- `sandbox_artifact[k8s]: False` (captured in `probes.log`). Measured absence of any isolation primitive or container artifact in the repository. NAMED BLOCKING MATERIAL: an isolation boundary to test. The product ships as a per-user Windows application with no container, job object, AppContainer, seccomp profile or VM boundary: no Dockerfile, devcontainer, kubernetes manifest or container runtime exists in the repository, and the only `sandbox` symbol in first-party source is a test double for git integration (`GitIntegrationSandbox`), which isolates nothing. The isolation controls that DO exist are recorded under their own IDs (loopback-only provider transport, device-local storage, clean-build environment isolation under DOD-002/DOD-005). Executing this capability would require building a sandboxed runtime the architecture does not have, not enabling an existing test. NOT PROVEN: No sandbox escape or confinement test was executed, because there is no confinement to escape."
+    },
+    {
+      "test_id": "GEN-072",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-072.md",
+      "reason": "EXECUTED: `python3 scripts/generate-sbom.py --check` -- exit 0, output sha256 `ab1c5d4950dc209f...`, 41 bytes (log `sbom-currency.log`); asserted: 'sbom check: ok (720 components, current)'; `sh scripts/security-check.sh` -- exit 0, output sha256 `65d62f1e7734e156...`, 124735 bytes (log `security-check.log`); asserted: 'security-check: ok'; evidence artifact `.agent/evidence/sbom/linchpin.cdx.json` -- quoted and verified: '\"bomFormat\"', '\"CycloneDX\"', '\"licenses\"', 'purl'. SBOM generation and verification executed: CycloneDX 1.5 with 720 components and purls on every component, generated from the committed locks by scripts/generate-sbom.py, with a currency check enforced as a lane (it fails if the SBOM drifts from the locks). An earlier defect in which 0 of 720 components carried a purl was measured and fixed. NOT PROVEN: The SBOM covers Rust and npm components; OS-level and toolchain components are recorded in the environment manifest rather than the SBOM, and no VEX document accompanies it."
+    },
+    {
+      "test_id": "GEN-073",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-073.md",
+      "reason": "EXECUTED: first-party source `scripts/lint.sh` -- quoted and verified: '--locked'; first-party source `deny.toml` -- quoted and verified: 'unknown-registry'; `cargo deny check sources` -- exit 0, output sha256 `5cba1c1c8bf7b4f0...`, 11 bytes (log `deny-sources.log`); asserted: 'sources ok'; `cargo deny check bans` -- exit 0, output sha256 `9241518896e021bf...`, 80283 bytes (log `deny-bans.log`); asserted: exit status only. Dependency integrity executed: every enforced build and test lane passes `--locked` so resolution cannot drift from Cargo.lock, cargo-deny verifies crate sources and bans, and the JS graph is installed with a frozen lockfile; the clean-build gate proves the committed locks alone build the workspace. NOT PROVEN: Hash-level verification of downloaded crates is delegated to Cargo's own checksum verification rather than an independent integrity check, and no signature/attestation verification is performed on registry metadata."
+    },
+    {
+      "test_id": "GEN-077",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-077.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/reports/RELEASE_GATE.json` -- quoted and verified: 'executable_sha256', 'msi_sha256'; evidence artifact `.agent/evidence/artifact-e2e/STATUS.md` -- quoted and verified: 'SHA-256'; first-party source `scripts/smoke-installed-artifact.sh` -- quoted and verified: 'msiexec'. Binary integrity verification executed: the release gate pins the SHA-256 and byte size of both the executable and the MSI, the exact-artifact lane records the digest of the binary it drives, and the installer lane installs the real MSI and verifies the installed artifact. NOT PROVEN: The digests are recorded and checked against the built artifacts, but the release is UNSIGNED (documented limitation in ADR-003), so integrity rests on published digests rather than on an Authenticode signature or attestation."
+    },
+    {
+      "test_id": "GEN-081",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-081.md",
+      "reason": "EXECUTED: architecture probe -- `ci_config[.github/workflows]: False` (captured in `probes.log`); architecture probe -- `ci_config[.gitlab-ci.yml]: False` (captured in `probes.log`); architecture probe -- `ci_config[Jenkinsfile]: False` (captured in `probes.log`); `sh scripts/security-check.sh` -- exit 0, output sha256 `65d62f1e7734e156...`, 124735 bytes (log `security-check.log`); asserted: 'security-check: ok'. The security gates that a pipeline would run are executed and enforced locally, by exit code, in one composed ladder: secret scan, SBOM currency, cargo-deny advisories/bans/sources/licences, pnpm audit, lint, and the unit/integration/artifact lanes. NOT PROVEN: NOT PASS: no hosted CI configuration exists in this repository (measured: no GitHub Actions, GitLab, Jenkins, CircleCI or Woodpecker config), so nothing prevents a merge that bypasses these gates on a machine that does not run them, and there is no pipeline-runner security posture (secrets scoping, runner isolation, artifact provenance) to test."
+    },
+    {
+      "test_id": "GEN-082",
+      "status": "NOT_RUN_BLOCKED_MATERIAL",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-082.md",
+      "reason": "EXECUTED: architecture probe -- `git_hooks_active: 0` (captured in `probes.log`); architecture probe -- `hook_framework[.husky]: False` (captured in `probes.log`); architecture probe -- `hook_framework[.pre-commit-config.yaml]: False` (captured in `probes.log`); architecture probe -- `root_package_husky_field: False` (captured in `probes.log`). Measured absence of any installed git hook or hook framework, with the equivalent later-stage lanes recorded under GEN-001/GEN-005. NAMED BLOCKING MATERIAL: a pre-commit boundary to exercise. Measured: `.git/hooks` contains ZERO active hooks (only `.sample` files) and no hook framework is configured (no .husky, lefthook, pre-commit config or husky field in the root package manifest). The same checks -- secret scan, lint, format, typecheck -- run one step later as enforced gate lanes, and that is recorded rather than used to claim this ID: testing a pre-commit hook requires a hook to exist, and installing one would change the developer workflow for every future candidate without owner authorization. NOT PROVEN: No pre-commit hook was tested, because none is installed."
+    },
+    {
+      "test_id": "GEN-084",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-084.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/artifact-e2e/STATUS.md` -- quoted and verified: 'linchpin-desktop-e2e.exe', 'SHA-256'; first-party source `scripts/smoke-installed-artifact.sh` -- quoted and verified: 'msiexec'; first-party source `scripts/artifact-e2e.sh` -- quoted and verified: 'does NOT open a debug port'. Post-build security testing executed on the produced artifact rather than on source: the packaged executable is driven over its real WebView2 instance, asserted to open no debug port, and the installer lane installs, launches and removes the actual MSI. NOT PROVEN: The post-build checks are behavioural assertions (origin, debug port, confirmation gating, redaction); no binary-hardening audit (ASLR/CFG/DEP flags, symbol stripping, dependency signature check) is performed on the linked image."
+    },
+    {
+      "test_id": "GEN-087",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-087.md",
+      "reason": "EXECUTED: `sh scripts/security-check.sh` -- exit 0, output sha256 `65d62f1e7734e156...`, 124735 bytes (log `security-check.log`); asserted: 'security-check: ok'; `python3 scripts/secret-scan.py --check` -- exit 0, output sha256 `c4842551ef6d5a06...`, 45 bytes (log `secret-scan.log`); asserted: 'secret-scan check: ok (9 rules, no findings)'; evidence artifact `.agent/verification/reports/RELEASE_GATE.json` -- quoted and verified: 'blocking_clauses'; first-party source `scripts/ship-gate.py` -- quoted and verified: 'NO_GO'. Security gate enforcement executed by exit code, not intention: every scanner lane reports its own status and the gate exits non-zero if any lane fails, one failing lane cannot be masked by a later passing one, and the release verdict is computed from measured state (currently NO_GO with the blocking clause recorded). NOT PROVEN: Enforcement binds only processes that invoke the ladder; there is no CI runner or branch protection to make it unbypassable (see GEN-081)."
+    },
+    {
+      "test_id": "GEN-088",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-088.md",
+      "reason": "EXECUTED: first-party source `scripts/rerun-invalidated.py` -- quoted and verified: 'NO_RUNNER', 'digest'; evidence artifact `.agent/evidence/coverage/SUMMARY.md` -- quoted and verified: 'Generated by `scripts/coverage-gate.py`'; architecture probe -- `concern[concurrency]_tests: 5` (captured in `probes.log`). Security test automation executed: every stage is mapped to a concrete repository command, a stage whose runner is missing is reported NO_RUNNER rather than silently skipped, and the commands run with recorded exit codes and output digests; the coverage gate runs each test binary itself rather than trusting a summary. NOT PROVEN: Automation is a local harness invoked by the operator/agent; scheduling and triggering are not automated (no CI, see GEN-081)."
+    },
+    {
+      "test_id": "GEN-089",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-089.md",
+      "reason": "EXECUTED: first-party source `scripts/change-invalidation.py` -- quoted and verified: 'changed_classes'; evidence artifact `.agent/evidence/coverage/SUMMARY.md` -- quoted and verified: 'Epoch:'; evidence artifact `.agent/verification/state/RERUN_RECORD.json` -- quoted and verified: 'epoch_digest'. Security test orchestration executed through the change-invalidation graph: tracked inputs are grouped into classes, an epoch digest is computed, a change to any class names the stages it invalidates, and the rerun obligation is recorded and enforced (a moved epoch fails the structural validator until the rerun happens). NOT PROVEN: Orchestration covers the stages the graph knows about; a stage added without registering its inputs would not be invalidated, which is why the stage list is itself checked."
+    },
+    {
+      "test_id": "GEN-090",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-090.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/REQUIREMENT_TRACEABILITY.csv` -- quoted and verified: 'REQ-'; first-party source `scripts/bind-requirements.py` -- quoted and verified: 'covers:'; evidence artifact `.agent/evidence/DOD-037-operator-diagnostics.md` -- quoted and verified: 'alert'. Requirements-driven security testing executed: security-relevant requirements are bound to executed acceptance tests by reading an explicit `covers:` marker from each test's own source, producing a traceability table that currently binds 57 of 59 requirements to executed PASS evidence, with the remaining two recorded EXTERNAL_REQUIRED. NOT PROVEN: Two requirements (REQ-REL-001, REQ-REL-004) remain unbound because the paths they describe are external; the binding proves a test claims and passes the requirement, not that the requirement is sufficient for the risk."
+    },
+    {
+      "test_id": "GEN-098",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-098.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/mutation-proof/REPORT.json` -- quoted and verified: 'MUT-OPS-037', 'MUT-FUZZ-001', 'restored'; first-party source `crates/storage/src/vault.rs` -- quoted and verified: 'test_migration_matrix_preserves_data_from_every_prior_schema'; first-party source `crates/evidence/src/lib.rs` -- quoted and verified: 'test_archive_entry_rejects_zip_slip'. Security control verification executed by controlled defect: thirteen mutations are applied to the controls that matter (credential redaction, traversal guard, truth-boundary guard, keyed-write replay/conflict detection, schema verification, ledger read, diagnostics recording, and the fuzz campaign itself), each caught by its guarding test, restored byte-for-byte and rerun green. NOT PROVEN: Two further mutations could not be shown to be discriminating and were WITHDRAWN rather than reported as caught, so the proof covers thirteen controls, not every control in the product."
+    },
+    {
+      "test_id": "GEN-099",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-099.md",
+      "reason": "EXECUTED: `cargo deny check licenses` -- exit 0, output sha256 `f4ca9ef7f07f2573...`, 1365 bytes (log `deny-licenses.log`); asserted: 'licenses ok'; evidence artifact `.agent/evidence/sbom/linchpin.cdx.json` -- quoted and verified: '\"licenses\"'; first-party source `deny.toml` -- quoted and verified: 'MPL-2.0'; first-party source `scripts/generate-sbom.py` -- quoted and verified: 'licenses'. Compliance testing executed for the obligations this repository can satisfy: licence allowlisting enforced in both the cargo-deny gate and the SBOM generator, a waiver register that is empty and validated, and advisory findings disclosed with their threshold. NOT PROVEN: No regulatory certification, accreditation or legal review is claimed or performed; export-control and patent-practice compliance are outside this harness."
+    },
+    {
+      "test_id": "GEN-100",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-100.md",
+      "reason": "EXECUTED: first-party source `deny.toml` -- quoted and verified: '[licenses]', '[bans]'; first-party source `scripts/ship-gate.py` -- quoted and verified: 'NO_GO'; `sh scripts/lint.sh` -- exit 0, output sha256 `85b382dadd552896...`, 1863 bytes (log `lint.log`); asserted: 'lint: Done'. Policy-as-code executed: the rules are executable configuration that returns non-zero when violated -- deny.toml for licences/bans/sources/advisories, ESLint and Prettier and TypeScript strictness for source, the applicability matrix that decides pack activation from repository probes, and the ship gate that maps clause statuses to a verdict. NOT PROVEN: The policies are enforced where the ladder runs; there is no policy engine evaluating infrastructure or runtime state, and no continuous compliance monitor."
+    },
+    {
+      "test_id": "GEN-110",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-110.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/mutation-proof/REPORT.json` -- quoted and verified: 'MUT-OPS-037'; first-party source `scripts/change-invalidation.py` -- quoted and verified: 'changed_classes'; evidence artifact `.agent/evidence/coverage/SUMMARY.md` -- quoted and verified: 'Epoch:'. Security regression testing executed by three mechanisms together: the mutation harness re-verifies that each guard still discriminates, the coverage gate records the epoch so a source change invalidates the measurement, and the change-invalidation graph re-runs every affected stage after a change. NOT PROVEN: Regression sensitivity is bounded by the mutations listed (thirteen); a control with no mutation would regress silently, and the harness does not enumerate missing mutations per control."
+    },
+    {
+      "test_id": "GEN-112",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-112.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/clean-build/STATUS.md` -- quoted and verified: '| Verdict |', 'Checkout'; evidence artifact `.agent/evidence/clean-build/ENVIRONMENT.json` -- quoted and verified: 'toolchain'; `cargo fmt --all -- --check` -- exit 0, output sha256 `e3b0c44298fc1c14...`, 0 bytes (log `fmt.log`); asserted: exit status only; `sh scripts/lint.sh` -- exit 0, output sha256 `85b382dadd552896...`, 1863 bytes (log `lint.log`); asserted: 'lint: Done'; `cargo deny check licenses` -- exit 0, output sha256 `f4ca9ef7f07f2573...`, 1365 bytes (log `deny-licenses.log`); asserted: 'licenses ok'. Security baseline validation executed: the clean-environment gate materialises an ephemeral checkout with no build output and no installed packages, builds it from the committed locks, runs the whole Rust suite there and proves teardown; format, lint and licence baselines are enforced lanes. NOT PROVEN: The baseline is a fresh checkout of the same host and toolchain, not a hardened or minimal OS image, so it proves freedom from local state rather than a hardened configuration."
+    },
+    {
+      "test_id": "GEN-118",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-118.md",
+      "reason": "EXECUTED: first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'diagnostics_redactor', 'record_diagnostic_outcome'; evidence artifact `.agent/evidence/DOD-037-operator-diagnostics.md` -- quoted and verified: 'correlation', 'alert'; architecture probe -- `concern[diagnostics]_tests: 16` (captured in `probes.log`). Security observability validation executed: recorded command outcomes carry a correlation id and measured duration, alerts derive from those measurements, a fault-injection test asserts DEGRADED plus an alert when storage is absent and a FAILED entry with its policy class when a restore is refused, and everything the surface records passes through the redactor. NOT PROVEN: Observability is confined to the device-local surface and vault audit chain; there is no log shipping, no tamper-evident off-device store, and no alerting to a human outside the application."
+    },
+    {
+      "test_id": "SUP-001",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/artifact-e2e/STATUS.md",
+      "reason": "THE GAP RECORDED HERE IS CLOSED, and it was release-blocking when written: the repository advertised a domain layer whose crates were used by nothing, and the app exposed one Tauri command while the React shell called none. MEASURED TODAY against the packaged executable: the namespace command reports 14 of 14 SPEC-003 namespaces implemented (the recorded gap was 2 of 14); the vault write path is wired, so record_conception reports persisted=true with a sha256 content address written to the product's real vault; the UI invokes the backend over the real IPC bridge and its confirmed actions are audited with correlation ids; and every crate is now reached from production paths (reachability: 0 UNREACHABLE over 220 public functions, 30 entry points). Evidence: the artifact lane's namespace and persistence assertions, plus .agent/evidence/REACHABILITY.csv."
+    },
+    {
+      "test_id": "SUP-002",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/SUP-002.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/REQUIREMENT_TRACEABILITY.csv` -- quoted and verified: 'REQ-'; first-party source `scripts/bind-requirements.py` -- quoted and verified: 'covers:'; evidence artifact `.agent/verification/reports/RELEASE_GATE.json` -- quoted and verified: 'blocking_clauses'; evidence artifact `.agent/evidence/sbom/linchpin.cdx.json` -- quoted and verified: '\"bomFormat\"'. Requirements-to-release traceability executed: requirement -> executed test -> real result is generated from collected test IDs rather than prose (57 of 59 bound to PASS, 2 EXTERNAL_REQUIRED), and the same artifacts feed the ship gate that computes the release verdict alongside the pinned artifact identity. NOT PROVEN: Traceability proves a binding to executed evidence; it does not prove the requirement set is complete with respect to the product's risks."
+    },
+    {
+      "test_id": "SUP-003",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/artifact-e2e/STATUS.md",
+      "reason": "THE FOUR NAMED GAPS ARE CLOSED OR RECLASSIFIED, none left dangling. INSTALL/READ-BACK: the real MSI installs (exit 0), its files and Add/Remove Programs entry are read back independently, the installed binary launches, and uninstall removes it cleanly -- repeated automatically by scripts/smoke-installed-artifact.sh with the digest pinned. SBOM/NOTICES: CycloneDX 1.5 with 720 components is generated and a gate checks its currency, and THIRD_PARTY_NOTICES.md carries the artifact and lockfile digests. PROHIBITED-CONTENT SCAN: the anti-gaming scan and the 9-rule secret scan both run as enforced lanes over the tracked tree. SIGNING: not 'missing' but DECIDED -- ADR-003 records, after probing for a code-signing certificate, that signing is not applicable to this release, with the unsigned status, the expected SmartScreen/AV warnings and the digest-based verification procedure disclosed in RELEASE.md and DEPLOYMENT.md. That is an accepted risk with a recorded decision, which is a different thing from an unfinished task. CLEAN ROOM: not this capability's gate -- a virgin clean-room install is DOD-034, recorded EXTERNAL_REQUIRED with ADR-004."
+    },
+    {
+      "test_id": "SUP-004",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/EP-009/M2/SUP-004-reproducible-build.md",
+      "reason": "EXECUTED. Two release builds of the same revision produced non-identical artifacts. Root cause fully measured: (1) WiX regenerates MSI ProductCode per build (UpgradeCode stable); (2) the binary differs by exactly 19 bytes, all PE TimeDateStamp + CodeView RSDS GUID/age. A [profile.release] was added and strip=debuginfo verified to reach rustc, but the residual remains because both fields are written by the MSVC linker. Normalized comparison proved semantic equivalence (0 differing bytes after zeroing the 5 metadata ranges). NOT PASS: differences explained but not eliminated, and single-environment only."
+    },
+    {
+      "test_id": "SUP-006",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/DOD-017-idempotency.md",
+      "reason": "THE RECORDED GAP IS CLOSED. It read 'no retry/reorder/delayed-delivery semantics, no idempotency keys at the API boundary'. MEASURED TODAY: writes accept a CLIENT-CHOSEN key and return Recorded or Replayed; a retry with the same payload is recognised as a replay naming the event the first attempt stored and does NOT restamp it; a key replayed with different content is REFUSED as IdempotencyConflict naming the key and both fingerprints; duplicates, reordering, delayed duplicates and four concurrent submitters of one key each yield exactly one event; a write refused before commit leaves no row and the same key stays usable; and the packaged artifact proves the same over real IPC (first write replayed=false, retry replayed=true naming the same event, ledger unchanged, conflicting payload refused). The original concurrency evidence is retained and extended: 4 writers x 25 inserts with no silent loss, and the abbreviated stress trial's 8 writers x 250 events measured 2 000 submissions with ZERO lost events at 106 events/s."
+    },
+    {
+      "test_id": "SUP-009",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/SUP-009.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/documentation/STATUS.md` -- quoted and verified: 'Commands executed: 25 (PASS 22, FAIL 3)'; first-party source `scripts/doc-exec.py` -- quoted and verified: 'SKIPPED'. Executable documentation and quickstart verification executed: commands are extracted from the seven operator-facing documents and run as written, referenced file paths are checked, and the latest full run reports 25 commands executed (22 PASS, 3 accounted failures), 3 skipped with reasons, and no referenced path missing. NOT PROVEN: The three failures are accounted rather than hidden: the documented NO_GO verdict, the two dev-only advisories, and verify.sh's documented ordering requirement. Documentation was executed on this host only, not across supported Windows versions."
     },
     {
       "test_id": "SUP-015",
       "status": "EXTERNAL_REQUIRED",
-      "evidence_path": ".agent/verification/state/ACCOUNTING_STATUS.md",
-      "reason": "Manual accessibility and assistive-technology validation requires named human validators. Automated checks (html lang, labelled controls, keyboard focusability, single landmark, WCAG-2.2-AA target declared in SPEC-004) are necessary but cannot satisfy this gate. DOD-039 forbids an AI from impersonating sign-off. PF-017 unmet."
+      "evidence_path": ".agent/evidence/ADR-005-external-signoff-gates.md",
+      "reason": "EXTERNAL_REQUIRED, and the evidence cited here is the ACCEPTED owner decision that keeps it so (ADR-005), not a test result. Manual accessibility and assistive-technology validation requires named human validators: automated checks (html lang, labelled controls, keyboard focusability, single landmark, WCAG-2.2-AA target declared in SPEC-004) are necessary but cannot satisfy this gate. DOD-039's REQUIRED EVIDENCE -- named authorized sign-off, scope, date, scenarios/evidence, unresolved findings -- must come from the real participant. PF-017 remains unmet; the automated accessibility baseline test says so in its own comment, and ADR-005 forbids fabricating a UAT record (precedent: AG-006)."
     }
   ]
 }

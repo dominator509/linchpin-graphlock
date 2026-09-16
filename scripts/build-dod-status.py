@@ -138,6 +138,66 @@ DISPOSITIONS: dict[str, tuple[str, str, str]] = {
 }
 
 
+def ledger_tally() -> dict[str, int]:
+    """Measured status tally of the 484 registry IDs, from the accounting ledger."""
+    path = Path(".agent/verification/state/TEST_LEDGER.jsonl")
+    if not path.exists():
+        raise SystemExit(f"accounting ledger missing: {path}")
+    tally: dict[str, int] = {}
+    for line in path.read_text("utf-8").splitlines():
+        if not line.strip():
+            continue
+        status = json.loads(line)["final_status"]
+        tally[status] = tally.get(status, 0) + 1
+    return tally
+
+
+# Reasons that COUNT registry rows were previously written as frozen prose and
+# went stale when the accounting changed (DOD-026 claimed "481 NOT_RUN_BLOCKED_
+# MATERIAL and 3 PARTIAL; zero PASS", DOD-030 claimed "0 IDs have PASS", and
+# DOD-031 named a gate that had since been fixed). A clause whose reason is a
+# measurement must derive it from the ledger at generation time, so the text
+# cannot drift from the rows it describes.
+DERIVED_REASONS = {
+    "DOD-026": (
+        "Status taxonomy applied exactly: no unmet condition is reported as "
+        "complete. MEASURED TALLY of the 484 registry IDs at this candidate -- "
+        "{tally}. Each row's reason states that ID's own decision and the evidence "
+        "behind it (the four NOT_RUN rows name the specific material their subject "
+        "requires), and scripts/build-accounting.py --check fails if any cited "
+        "evidence document has changed since the row was recorded."
+    ),
+    "DOD-030": (
+        "All 484 registry IDs carry exactly one accounted status: 484 rows, 484 "
+        "unique IDs, 0 missing, 0 duplicated, validated by scripts/build-accounting.py "
+        "--check, which additionally verifies that every cited evidence document "
+        "still matches its recorded digest and that the generated status summary "
+        "matches the ledger. MEASURED TALLY -- {tally}."
+    ),
+    "DOD-031": (
+        "Blockers are non-cascading and are decided per ID: the measured tally of "
+        "484 registry IDs -- {tally} -- uses {distinct} distinct statuses, so no "
+        "status was applied to the registry as a whole and no ID inherited a "
+        "neighbour's blocker. The {blocked} NOT_RUN_BLOCKED_MATERIAL rows each name "
+        "the material their subject requires, and the {na} NOT_APPLICABLE rows each "
+        "carry their own applicability evidence rather than a deferral note. "
+        "Independent lanes continued to completion while other lanes were red."
+    ),
+}
+
+
+def derived_reason(clause: str, tally: dict[str, int]) -> str | None:
+    template = DERIVED_REASONS.get(clause)
+    if template is None:
+        return None
+    return template.format(
+        tally=", ".join(f"{k} {tally[k]}" for k in sorted(tally)),
+        distinct=len(tally),
+        blocked=tally.get("NOT_RUN_BLOCKED_MATERIAL", 0),
+        na=tally.get("NOT_APPLICABLE", 0),
+    )
+
+
 def main() -> int:
     check = "--check" in sys.argv
     with REGISTRY.open(newline="", encoding="utf-8") as fh:
@@ -151,10 +211,12 @@ def main() -> int:
         raise SystemExit(f"disposition for unknown clause: {extra}")
 
     rows = []
+    tally = ledger_tally()
     for c in clauses:
         status, evidence, reason = DISPOSITIONS[c]
         if status == "PASS" and not Path(evidence).exists():
             raise SystemExit(f"{c}: PASS claimed but evidence {evidence} is absent")
+        reason = derived_reason(c, tally) or reason
         rows.append(
             {
                 "dod_id": c,
