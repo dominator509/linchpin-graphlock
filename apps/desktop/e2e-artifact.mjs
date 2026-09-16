@@ -464,6 +464,46 @@ try {
     );
   }
 
+  // DASHBOARD (DOD-037): the signals must reach a USER, not only an IPC client.
+  // This runs AFTER commands have actually executed, so the panel has something
+  // true to show: the button is clicked, the RENDERED panel is read back, and it
+  // must contain the correlation id of the `record_conception` call made earlier
+  // in this run -- a dashboard that renders a constant would fail here.
+  await page.getByRole("button", { name: "Refresh diagnostics" }).click();
+  await page.waitForTimeout(800);
+  const dashboard = await page
+    .locator("#diagnostics-panel")
+    .innerText()
+    .catch(() => "");
+  const conceptionCorrelation = String(conception?.correlation_id ?? "");
+  record(
+    "the diagnostics dashboard renders readiness and metrics (DOD-037)",
+    dashboard.includes("Readiness:") &&
+      dashboard.includes("Commands recorded:"),
+    dashboard.replace(/\s+/g, " ").slice(0, 200) || "panel absent",
+  );
+  record(
+    "the dashboard shows the commands this run actually executed (DOD-037)",
+    dashboard.includes("record_conception") &&
+      !dashboard.includes("Nothing recorded in this session yet."),
+    `record_conception in panel=${dashboard.includes("record_conception")}; correlation recorded=${Boolean(conceptionCorrelation)}`,
+  );
+  record(
+    "the dashboard ties an outcome to its correlation id (DOD-037)",
+    Boolean(conceptionCorrelation) && dashboard.includes(conceptionCorrelation),
+    conceptionCorrelation
+      ? `expected ${conceptionCorrelation} in the rendered panel`
+      : "the record_conception response carried no correlation id",
+  );
+  record(
+    "the dashboard reports traces from real executions (DOD-037)",
+    /Traces: [1-9]/.test(dashboard),
+    (dashboard.match(/Traces:[^\n]*/) ?? ["Traces line absent"])[0].slice(
+      0,
+      160,
+    ),
+  );
+
   // --- HARD RESTART: kill the process, relaunch, read the state back --------
   //
   // DOD-015 requires "Persistent state survives full process and container

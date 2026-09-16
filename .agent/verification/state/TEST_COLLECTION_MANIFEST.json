@@ -1,6 +1,6 @@
 {
   "_comment": "Expected test-collection manifest for DOD-007. The guard in scripts/test-collection-guard.py fails if the runner collects fewer than expected_min_passed, collects zero, ignores any test, or reports a failure. Regenerate with scripts/update-test-manifest.py; never hand-lower it.",
-  "candidate_commit": "1c6a77b",
+  "candidate_commit": "c8e6246",
   "expected_min_passed": 206,
   "expected_test_binaries": 13,
   "measured_at": "2026-09-16",

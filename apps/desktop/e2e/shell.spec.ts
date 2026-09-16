@@ -459,6 +459,26 @@ test.describe("LINCHPIN desktop shell", () => {
     ).toBeVisible();
   });
 
+  // covers: DOD-037
+  test("exposes the operator diagnostics dashboard and states it honestly", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // DOD-037 names dashboards. The signals existed over IPC and were rendered
+    // nowhere; this lane has no bridge, so it asserts the control exists and
+    // that the missing backend is reported rather than shown as a healthy panel.
+    await expect(
+      page.getByRole("heading", { name: "Operator diagnostics", level: 3 }),
+    ).toBeVisible();
+    const refresh = page.getByRole("button", { name: "Refresh diagnostics" });
+    await expect(refresh).toBeVisible();
+    await refresh.click();
+    await expect(
+      page.getByText("Cannot read diagnostics: desktop backend unavailable."),
+    ).toBeVisible();
+  });
+
   // covers: REQ-SCOPE-001
   test("declares the scope surface and reports it honestly when disconnected", async ({
     page,

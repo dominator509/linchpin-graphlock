@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `67d3d1b6418bd45de7e0ef33a11916e2a11836a7b1f19fc848637bfbd454482d`
-- Candidate commit at generation: `2b0002f`
+- Current epoch digest: `a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2`
+- Candidate commit at generation: `c8e6246`
 - Total tracked inputs: 127
-- Previous epoch digest: `67d3d1b6418bd45de7e0ef33a11916e2a11836a7b1f19fc848637bfbd454482d`
+- Previous epoch digest: `a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -69,8 +69,8 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-008 full functionality
 - invalidates: V-015 usability/accessibility
 
-  - `apps\desktop\e2e\shell.spec.ts` `4e3c376513ef06e7…`
-  - `apps\desktop\src\App.tsx` `07c20e3e913af0d7…`
+  - `apps\desktop\e2e\shell.spec.ts` `d4a08469939173f1…`
+  - `apps\desktop\src\App.tsx` `e7627a6e0f0d627b…`
   - `apps\desktop\src\main.tsx` `bfcf131d8fb04a4d…`
   - `apps\desktop\tests\has-ipc.test.ts` `8f2e208b7f1499e6…`
   - `packages\contracts\src\index.ts` `72fd005dc2fdd303…`
@@ -126,8 +126,8 @@ definition and its PASS status is revoked until rerun.
 
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
-  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `7ad86ede8f877d81…`
-  - `apps\desktop\e2e-artifact.mjs` `8158dece62729450…`
+  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `b1b38d4534b2cc3c…`
+  - `apps\desktop\e2e-artifact.mjs` `f9f914d2e265e9a3…`
   - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
 
 ## Rerun obligations on epoch change

@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "52f75c997e27ecb55150cc12cde5c7ffff9df72c3cc269f90e9cdbe81ff3cafa",
+  "executable_sha256": "0d408af78709e6abc9588e3ad98664db8434a0a6facd88e97fe84f2bef650acf",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a document granting exclusive rights to an invention or process for a period of time, typically up to \""
+      "observed": "\"A patent claim is a legal assertion of a invention's novelty and limitation, usually related to its application, use, or\""
     },
     {
       "name": "metadata names the live model",
@@ -47,7 +47,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"CANARY-mu44g9zm-cy9n6x\""
+      "observed": "\"The answer is no, no.\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "52f75c997e27ecb5 -> 52f75c997e27ecb5"
+      "observed": "0d408af78709e6ab -> 0d408af78709e6ab"
     }
   ],
   "passed": 23,

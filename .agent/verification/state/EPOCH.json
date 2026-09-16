@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "2b0002f",
+  "candidate_commit": "c8e6246",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -38,7 +38,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "f8a5e94169b86d0a297318816760f9ac6723758d1ba0a69764b873839a6b4a5a",
+        "scripts\\build-dod-status.py": "a85eaace8c05d110587d4a307a77dd94b77c758c60f280cc32da3095f3716d0c",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
@@ -66,7 +66,7 @@
         "scripts\\live-fire-local-provider.sh": "dcda08caf50050c3d3ba5167d1dfc638ad9d843692a3652426b6394d49446aeb",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
-        "scripts\\mutation-proof.py": "2840027ac3e43b67a55f7f27c78d9e8ac1678387ea67e9a15d125c62c671c461",
+        "scripts\\mutation-proof.py": "a90b44cb50491cdfe4d76b87339b457373e94d741cda52cd92680843fa3b8219",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
@@ -118,8 +118,8 @@
     "js-source": {
       "count": 9,
       "files": {
-        "apps\\desktop\\e2e\\shell.spec.ts": "4e3c376513ef06e751bcec00ea3f91917807e89bd391cafa9154dac2c8a1fd52",
-        "apps\\desktop\\src\\App.tsx": "07c20e3e913af0d715e874a43bf997a01a9a2e605c3f802d9ef114709b724e81",
+        "apps\\desktop\\e2e\\shell.spec.ts": "d4a08469939173f196d158de33d1c00b91c5ccc9785ac995e4589e3864641eb2",
+        "apps\\desktop\\src\\App.tsx": "e7627a6e0f0d627bd3b85764267e2e907a2d43e9321ca35f1fafa49df4aa24df",
         "apps\\desktop\\src\\main.tsx": "bfcf131d8fb04a4dadcdd633c0bdbefea3f3a7af5bb35d34dc55588991887654",
         "apps\\desktop\\tests\\has-ipc.test.ts": "8f2e208b7f1499e680843f672d5ebe4c6be7dd528740e5ff1f1bf7e8d09ba10c",
         "packages\\contracts\\src\\index.ts": "72fd005dc2fdd303863557b1adf8b594509112d5ea55642b960093676ef8bd06",
@@ -210,8 +210,8 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "7ad86ede8f877d8134fb0be0412787c055557b49a6c57adee742144a30e9d852",
-        "apps\\desktop\\e2e-artifact.mjs": "8158dece62729450329f3f364a6bb1479123c5a8be842ee1cd7b5deb57ee5c6a",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "b1b38d4534b2cc3c6924325dc9de811680960693d429bb762962b4c5d91f4b3c",
+        "apps\\desktop\\e2e-artifact.mjs": "f9f914d2e265e9a37056e971acf38ce5f579348f3714da3b539c0a8d041e8640",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
       },
       "rules": [
@@ -224,8 +224,8 @@
       ]
     }
   },
-  "epoch_digest": "67d3d1b6418bd45de7e0ef33a11916e2a11836a7b1f19fc848637bfbd454482d",
-  "prior_candidate_commit": "2b0002f",
-  "prior_epoch_digest": "67d3d1b6418bd45de7e0ef33a11916e2a11836a7b1f19fc848637bfbd454482d",
+  "epoch_digest": "a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2",
+  "prior_candidate_commit": "c8e6246",
+  "prior_epoch_digest": "a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2",
   "total_inputs": 127
 }

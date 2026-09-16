@@ -1,22 +1,22 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-16T13:36:32Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-16T14:08:38Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
 - Blocking clauses: DOD-001=PARTIAL
-- Candidate commit: `2b0002fe7800c49179a0eb6c5f4c630ccadf3da7` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (7 changed files)
-- Epoch: `67d3d1b6418bd45d` over 127 tracked inputs
+- Candidate commit: `c8e62468609b0d5dad4694b98ddfaf0ff80936fe` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (18 changed files)
+- Epoch: `a684a5673767ec2d` over 127 tracked inputs
 
 ## Verified behavior — executed and observed
 
-- **32 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-036, DOD-040, DOD-041, DOD-042
+- **33 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
 - **484 registry capabilities accounted**, one status each ({'NOT_RUN_BLOCKED_MATERIAL': 473, 'PARTIAL': 10, 'EXTERNAL_REQUIRED': 1})
-- **9 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `8dfe9f0f53812b74…` (12486144 bytes), MSI `2c5c9c2cbf305d04…` (5701632 bytes)
+- **10 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
+- Artifacts bound to this run: executable `03dce1f863074ea5…` (12486656 bytes), MSI `164f371cdbc10373…` (5705728 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -26,14 +26,13 @@ the whole Rust suite in an ephemeral checkout.
 
 ## Partially verified behavior — executed, with the missing half named
 
-**7 clauses**: DOD-001, DOD-008, DOD-014, DOD-017, DOD-023, DOD-037, DOD-038
+**6 clauses**: DOD-001, DOD-008, DOD-014, DOD-017, DOD-023, DOD-038
 
 - **DOD-001**: RE-MEASURED THIS ROUND, because the previous revision of this disposition described a state that no longer exists: 35 of 59 requirements carried executed PASS evidence, and 24 were unbound. Measured now by scripts/bind-requirements.py: 222 collected tests, 59 requirements found, **57 bound to an executed PASS**, 2 unbound. The RULE requires every promised behavior to have a stable requirement ID A…
 - **DOD-008** — Not PASS: Unit tests cover boundaries and invalid inputs for domain, evidence, crash_reporter and provider_transport, with mutation proofs for three of them. Not PASS: no coverage measurement and most registry IDs are unexecuted.…
 - **DOD-014** — Not PASS: Negative cases exist and were mutation-proven: unreachable endpoint yields TransportError::Unreachable rather than fabricated output, and non-loopback endpoints are refused. Not PASS: no wrong-credential or revoked-permission live-fire against a real provider.…
 - **DOD-017** — Not PASS: STALE NOTE CORRECTED. The recorded reason claimed no concurrency run exists -- measured, test_concurrent_writers_preserve_every_successful_insert runs 4 concurrent writers x 25 inserts against file-backed SQLite in WAL mode and asserts the final row count equals the number of successful inserts, proving no silent loss. The engine enforces the primary key, and a failed insert is verified not to mut…
 - **DOD-023** — Not PASS: EXECUTED, not assumed, and the counts now live in the cited evidence file rather than in this sentence -- an earlier revision of this disposition carried '22 executed, 3 FAILED, 1 skipped, 0 missing paths' while the measured numbers had moved on, which is the drift DOD-040 exists to catch. scripts/doc-exec.py extracts every command and referenced file path from the operator-facing documents, runs …
-- **DOD-037**: The clause's signals now EXIST and are PROVEN against injected failures, but its dashboard half does not, so this moves FAIL -> PARTIAL rather than to PASS. EXECUTED: commands::get_diagnostics returns health, readiness, logs, metrics, traces, alerts and correlation ids in one operator view, and readiness is MEASURED by probing the vault directory (absent, read-only, unreadable, writable) instead o…
 - **DOD-038**: PART OF THE CLAUSE IS NOW EXECUTED, AND THE REST IS NOT -- the status moves from FAIL to PARTIAL for that reason, not to PASS. The clause requires 'soak, endurance, fuzz, performance, stress, and recovery durations/workloads' be 'completed at their specified scale', and its OR ELSE is explicit that an abbreviated trial 'is labeled separately' and is 'never PASS for the full requirement'. EXECUTED:…
 
 ## Blocked work

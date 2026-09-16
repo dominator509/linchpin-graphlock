@@ -344,6 +344,33 @@ MUTATIONS = [
         ],
         "expect_test": "test_conception_ledger_reads_durable_state_and_separates_origins",
     },
+    {
+        "id": "MUT-OPS-037-b",
+        "clause": "DOD-018",
+        "covers": "DOD-037",
+        "feature": "command outcomes reach the operator diagnostics log",
+        "changed_behavior": (
+            "record_diagnostic_outcome stops recording anything, so the "
+            "diagnostics surface and its dashboard report a healthy system with "
+            "no history while commands are failing."
+        ),
+        "edits": [
+            {
+                "path": "apps/desktop/src-tauri/src/commands.rs",
+                "old": "    let redacted = diagnostics_redactor().apply(detail);\n",
+                "new": "    let redacted = diagnostics_redactor().apply(detail);\n    if !redacted.is_empty() {\n        return;\n    }\n",
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "linchpin-desktop",
+            "--lib",
+            "test_diagnostics_report_induced_failure_with_correlation_and_redaction",
+        ],
+        "expect_test": "test_diagnostics_report_induced_failure_with_correlation_and_redaction",
+    },
 ]
 
 

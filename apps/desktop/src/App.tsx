@@ -101,6 +101,38 @@ interface ScopeView {
   capabilities: CapabilityView[];
 }
 
+/** Operator diagnostics (DOD-037): signals read from the backend, not recomputed. */
+interface DiagnosticEventView {
+  correlation_id: string;
+  command: string;
+  outcome: string;
+  error_class?: string | null;
+  detail: string;
+  duration_ms: number;
+  at_utc: string;
+}
+
+interface DiagnosticsMetrics {
+  recorded: number;
+  succeeded: number;
+  failed: number;
+  failure_rate: number;
+  p50_duration_ms: number;
+  p95_duration_ms: number;
+}
+
+interface DiagnosticsView {
+  readiness: string;
+  storage_ok: boolean;
+  vault_file: string;
+  metrics: DiagnosticsMetrics;
+  alerts: string[];
+  events: DiagnosticEventView[];
+  traces: string[];
+  redaction_applied: boolean;
+  detail: string;
+}
+
 interface LedgerEventView {
   event_id: string;
   origin: string;
@@ -397,6 +429,8 @@ export default function App() {
     useState<CommandResult<RestoreView> | null>(null);
   const [scopeDeclaration, setScopeDeclaration] =
     useState<CommandResult<ScopeView> | null>(null);
+  const [diagnostics, setDiagnostics] =
+    useState<CommandResult<DiagnosticsView> | null>(null);
 
   const [draft, setDraft] = useState("");
   const [authorIsHuman, setAuthorIsHuman] = useState(true);
@@ -559,6 +593,20 @@ export default function App() {
           "list_conception_events",
           { workspaceId: WORKSPACE },
         ),
+      );
+    } catch (err) {
+      setIpcError(String(err));
+    }
+  }, []);
+
+  const onRefreshDiagnostics = useCallback(async () => {
+    if (!hasIpc()) {
+      setIpcError("Cannot read diagnostics: desktop backend unavailable.");
+      return;
+    }
+    try {
+      setDiagnostics(
+        await invoke<CommandResult<DiagnosticsView>>("get_diagnostics"),
       );
     } catch (err) {
       setIpcError(String(err));
@@ -1743,6 +1791,80 @@ export default function App() {
           <p>
             {scopeDeclaration?.error?.message ??
               "Declared scope not reported by the backend."}
+          </p>
+        )}
+
+        {/* DOD-037: the signals exist over IPC and had NO surface. This is the
+            dashboard: readiness, metrics, alerts, recent outcomes and traces,
+            all read from get_diagnostics rather than recomputed in the UI. */}
+        <h3 id="diagnostics-heading">Operator diagnostics</h3>
+        <button type="button" onClick={() => void onRefreshDiagnostics()}>
+          Refresh diagnostics
+        </button>
+        {diagnostics?.ok && diagnostics.value ? (
+          <div id="diagnostics-panel">
+            <p>
+              Readiness: <strong>{diagnostics.value.readiness}</strong> —{" "}
+              {diagnostics.value.detail}
+            </p>
+            <p>
+              Commands recorded: {diagnostics.value.metrics.recorded} (
+              {diagnostics.value.metrics.succeeded} ok,{" "}
+              {diagnostics.value.metrics.failed} failed, failure rate{" "}
+              {diagnostics.value.metrics.failure_rate}); p50{" "}
+              {diagnostics.value.metrics.p50_duration_ms}ms, p95{" "}
+              {diagnostics.value.metrics.p95_duration_ms}ms
+            </p>
+            <h4>Alerts</h4>
+            {diagnostics.value.alerts.length === 0 ? (
+              <p>No alerts.</p>
+            ) : (
+              <ul>
+                {diagnostics.value.alerts.map((a) => (
+                  <li key={a}>{a}</li>
+                ))}
+              </ul>
+            )}
+            <h4>Recent command outcomes</h4>
+            {diagnostics.value.events.length === 0 ? (
+              <p>Nothing recorded in this session yet.</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Command</th>
+                    <th scope="col">Outcome</th>
+                    <th scope="col">Class</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Correlation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {diagnostics.value.events.map((e) => (
+                    <tr key={`${e.correlation_id}-${e.command}`}>
+                      <td>{e.command}</td>
+                      <td>{e.outcome}</td>
+                      <td>{e.error_class ?? "—"}</td>
+                      <td>{e.duration_ms}ms</td>
+                      <td>{e.correlation_id}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            <p>
+              Traces: {diagnostics.value.traces.length} correlation-tagged
+              span(s)
+              {diagnostics.value.traces.length > 0
+                ? ` — latest ${diagnostics.value.traces[0]}`
+                : ""}
+              ; redaction applied: {String(diagnostics.value.redaction_applied)}
+            </p>
+          </div>
+        ) : (
+          <p>
+            {diagnostics?.error?.message ??
+              "Diagnostics not reported by the backend."}
           </p>
         )}
       </section>
