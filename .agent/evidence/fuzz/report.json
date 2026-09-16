@@ -1,5 +1,5 @@
 {
-  "actual_seconds": 3.12,
+  "actual_seconds": 3.99,
   "adversarial_inputs_per_target": 4634,
   "campaign": "mutation-fuzz",
   "corpus_size": 512,
@@ -23,12 +23,12 @@
   "targets": [
     {
       "iterations": 6634,
-      "seconds": 0.54,
+      "seconds": 0.57,
       "target": "domain::scope::check_claim_text"
     },
     {
       "iterations": 6634,
-      "seconds": 2.46,
+      "seconds": 3.28,
       "target": "crash_reporter::RedactionPolicy::apply"
     },
     {
@@ -48,7 +48,7 @@
     },
     {
       "iterations": 6634,
-      "seconds": 0.0,
+      "seconds": 0.01,
       "target": "patent::PatentLinter::lint_claims"
     },
     {

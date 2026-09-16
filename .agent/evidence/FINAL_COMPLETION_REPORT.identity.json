@@ -7,7 +7,7 @@
   "blocking_clauses": [
     "DOD-001=PARTIAL"
   ],
-  "candidate_commit": "d8e9698eaa7377abc3f74f4e4b86e32916fb0f63",
+  "candidate_commit": "c85e6388c1ee2f89ec469ade2771a547b3bc7941",
   "dod": {
     "DOD-001": "PARTIAL",
     "DOD-002": "PASS",
@@ -73,7 +73,8 @@
   "registry_tally": {
     "EXTERNAL_REQUIRED": 1,
     "NOT_RUN_BLOCKED_MATERIAL": 473,
-    "PARTIAL": 10
+    "PARTIAL": 3,
+    "PASS": 7
   },
   "requirements_bound": [
     "REQ-COM-001",

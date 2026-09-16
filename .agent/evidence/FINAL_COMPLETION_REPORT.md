@@ -1,20 +1,20 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-16T19:59:23Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-16T20:27:06Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
 - Blocking clauses: DOD-001=PARTIAL
-- Candidate commit: `d8e9698eaa7377abc3f74f4e4b86e32916fb0f63` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (7 changed files)
+- Candidate commit: `c85e6388c1ee2f89ec469ade2771a547b3bc7941` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (17 changed files)
 - Epoch: `4b97b0587f9df351` over 128 tracked inputs
 
 ## Verified behavior — executed and observed
 
 - **36 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
-- **484 registry capabilities accounted**, one status each ({'NOT_RUN_BLOCKED_MATERIAL': 473, 'PARTIAL': 10, 'EXTERNAL_REQUIRED': 1})
+- **484 registry capabilities accounted**, one status each ({'NOT_RUN_BLOCKED_MATERIAL': 473, 'PARTIAL': 3, 'PASS': 7, 'EXTERNAL_REQUIRED': 1})
 - **13 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
 - Artifacts bound to this run: executable `6a035fcc2d902544…` (12500992 bytes), MSI `da36a0f0b9291f11…` (5709824 bytes)
 

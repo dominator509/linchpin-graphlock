@@ -94,6 +94,9 @@ struct Shared {
     reads_before_vault_existed: AtomicU64,
     backups: AtomicU64,
     backup_failures: AtomicU64,
+    /// Backups that failed because the database was busy or locked: reported as a
+    /// locking fact, exactly as busy WRITE failures are, rather than as a defect.
+    backup_busy_failures: AtomicU64,
     latencies_us: std::sync::Mutex<Vec<u64>>,
     /// Distinct failure messages, so the evidence says WHY something failed
     /// rather than only how many times.
@@ -221,6 +224,7 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
         reads_before_vault_existed: AtomicU64::new(0),
         backups: AtomicU64::new(0),
         backup_failures: AtomicU64::new(0),
+        backup_busy_failures: AtomicU64::new(0),
         latencies_us: std::sync::Mutex::new(Vec::new()),
         failure_messages: std::sync::Mutex::new(Vec::new()),
     });
@@ -334,18 +338,28 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
                 workspace_id: "ws-stress".to_string(),
             };
             while !shared.stop.load(Ordering::Relaxed) {
-                match backup_vault(
+                let backup = backup_vault(
                     &scope,
                     &shared.backup_path.display().to_string(),
                     &shared.vault_path,
-                )
-                .value
-                {
+                );
+                match backup.value {
                     Some(_) => {
                         shared.backups.fetch_add(1, Ordering::Relaxed);
                     }
                     None => {
-                        shared.backup_failures.fetch_add(1, Ordering::Relaxed);
+                        let message = backup
+                            .error
+                            .as_ref()
+                            .map(|error| error.safe_message().to_string())
+                            .unwrap_or_default();
+                        let lower = message.to_lowercase();
+                        if lower.contains("lock") || lower.contains("busy") {
+                            shared.backup_busy_failures.fetch_add(1, Ordering::Relaxed);
+                        } else {
+                            shared.backup_failures.fetch_add(1, Ordering::Relaxed);
+                        }
+                        note_failure(&shared, format!("backup: {message}"));
                     }
                 }
                 std::thread::sleep(Duration::from_millis(250));
@@ -437,6 +451,9 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
             "reads_before_vault_existed": shared.reads_before_vault_existed.load(Ordering::Relaxed),
             "backups": backups,
             "backup_failures": backup_failures,
+            "backup_failures_reported_busy_or_locked": shared
+                .backup_busy_failures
+                .load(Ordering::Relaxed),
             "hung": hung,
             "sample_failure_messages": shared
                 .failure_messages
