@@ -193,8 +193,13 @@ def refresh_derived_evidence() -> None:
     for label, script in (
         ("accounting", "scripts/build-accounting.py"),
         ("DOD evidence digests", "scripts/build-dod-status.py"),
+        # The coverage gate records the EPOCH it was measured at, so it must run
+        # after the epoch has settled and before the currency checks. It rebuilds
+        # the library crates instrumented, which is why it is listed explicitly
+        # rather than being part of the unit lane.
+        ("coverage measurement", "scripts/coverage-gate.py"),
         # The run manifest and the completion report are derived from the state
-        # the two steps above just refreshed, so they are regenerated HERE rather
+        # the steps above just refreshed, so they are regenerated HERE rather
         # than by hand -- measured: regenerating them after the rerun left their
         # cited digests stale and verify.sh failed two currency lanes that had
         # done nothing wrong. They are not cited by digest (that would be a cycle)

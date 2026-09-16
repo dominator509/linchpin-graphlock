@@ -1,22 +1,22 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-16T14:43:35Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-16T15:40:07Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
 - Blocking clauses: DOD-001=PARTIAL
-- Candidate commit: `1e9f90667e58c131f5630332bb1e7527df4a2d12` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (1 changed files)
-- Epoch: `d3ca029e738fecab` over 127 tracked inputs
+- Candidate commit: `27e5774746d80014f1d133b419e8597cb4dedbfa` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (18 changed files)
+- Epoch: `4f25f790ccb23aec` over 128 tracked inputs
 
 ## Verified behavior — executed and observed
 
-- **34 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
+- **36 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
 - **484 registry capabilities accounted**, one status each ({'NOT_RUN_BLOCKED_MATERIAL': 473, 'PARTIAL': 10, 'EXTERNAL_REQUIRED': 1})
 - **12 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `c030395b4b77fb8c…` (12498432 bytes), MSI `bfc4e4c1ffd71017…` (5709824 bytes)
+- Artifacts bound to this run: executable `1d1dbbd3bce3beed…` (12498432 bytes), MSI `e4eff17e69737927…` (5709824 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -26,12 +26,10 @@ the whole Rust suite in an ephemeral checkout.
 
 ## Partially verified behavior — executed, with the missing half named
 
-**5 clauses**: DOD-001, DOD-008, DOD-014, DOD-023, DOD-038
+**3 clauses**: DOD-001, DOD-014, DOD-038
 
 - **DOD-001**: RE-MEASURED THIS ROUND, because the previous revision of this disposition described a state that no longer exists: 35 of 59 requirements carried executed PASS evidence, and 24 were unbound. Measured now by scripts/bind-requirements.py: 222 collected tests, 59 requirements found, **57 bound to an executed PASS**, 2 unbound. The RULE requires every promised behavior to have a stable requirement ID A…
-- **DOD-008** — Not PASS: Unit tests cover boundaries and invalid inputs for domain, evidence, crash_reporter and provider_transport, with mutation proofs for three of them. Not PASS: no coverage measurement and most registry IDs are unexecuted.…
 - **DOD-014** — Not PASS: Negative cases exist and were mutation-proven: unreachable endpoint yields TransportError::Unreachable rather than fabricated output, and non-loopback endpoints are refused. Not PASS: no wrong-credential or revoked-permission live-fire against a real provider.…
-- **DOD-023** — Not PASS: EXECUTED, not assumed, and the counts now live in the cited evidence file rather than in this sentence -- an earlier revision of this disposition carried '22 executed, 3 FAILED, 1 skipped, 0 missing paths' while the measured numbers had moved on, which is the drift DOD-040 exists to catch. scripts/doc-exec.py extracts every command and referenced file path from the operator-facing documents, runs …
 - **DOD-038**: PART OF THE CLAUSE IS NOW EXECUTED, AND THE REST IS NOT -- the status moves from FAIL to PARTIAL for that reason, not to PASS. The clause requires 'soak, endurance, fuzz, performance, stress, and recovery durations/workloads' be 'completed at their specified scale', and its OR ELSE is explicit that an abbreviated trial 'is labeled separately' and is 'never PASS for the full requirement'. EXECUTED:…
 
 ## Blocked work

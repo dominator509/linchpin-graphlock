@@ -121,6 +121,29 @@ before using it:
   backup's digest is reported as `reconciled: false` rather than assumed to have
   worked.
 
+## Coverage gate (DOD-008)
+
+```sh
+python3 scripts/coverage-gate.py            # measure, enforce floors, write evidence
+python3 scripts/coverage-gate.py --check    # fail if the epoch has moved
+```
+
+Instrumented line/function coverage for the eleven **library** crates, measured
+with the llvm tools that ship **with the compiler** (`llvm-tools-preview`), so no
+repository dependency is added. The desktop application crate is excluded by name
+and is covered at the artifact boundary instead; the exclusion is printed in the
+report rather than implied.
+
+**Environment prerequisite**: `rustup component add llvm-tools-preview`. Without
+it the gate exits 2 naming the component — an environment limitation, never a
+product result. The host LLVM installation is a different patch version from the
+LLVM rustc links and produced a table of `0.00%` from valid profiles, so the gate
+refuses a 0% TOTAL instead of recording it as a measurement of zero.
+
+The report records the **epoch digest** it was measured at, so a source change
+invalidates the number; `verify.sh` enforces that with `--check`, and the settle
+path (`scripts/rerun-invalidated.py`) re-measures it automatically.
+
 ## Live-fire (AGENTS.md section 9)
 
 `sh scripts/live-fire.sh` now runs the real production-path proof suite

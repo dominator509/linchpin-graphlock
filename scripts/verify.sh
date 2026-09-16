@@ -62,6 +62,12 @@ run "evidence index currency" python3 scripts/generate-evidence-index.py --check
 run "run manifest identity" python3 scripts/run-manifest.py --check
 run "completion report" python3 scripts/completion-report.py --check
 
+# DOD-008 evidence currency: the coverage report records the EPOCH it was measured
+# at, so a source change invalidates the number instead of leaving a stale one in
+# place. Re-measure with `python3 scripts/coverage-gate.py` (the settle path does
+# this automatically).
+run "coverage currency" python3 scripts/coverage-gate.py --check
+
 if [ "$status" -eq 0 ]; then
   echo "verify: ok"
 else

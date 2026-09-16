@@ -1,27 +1,27 @@
 {
   "clause": "DOD-029",
   "harness": "scripts/run-manifest.py",
-  "measured_at_utc": "2026-09-16T14:43:34Z",
-  "candidate_commit": "1e9f90667e58c131f5630332bb1e7527df4a2d12",
-  "candidate_commit_short": "1e9f906",
+  "measured_at_utc": "2026-09-16T15:40:06Z",
+  "candidate_commit": "27e5774746d80014f1d133b419e8597cb4dedbfa",
+  "candidate_commit_short": "27e5774",
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "branch": "main",
   "working_tree": {
     "dirty": true,
-    "changed_files": 1,
+    "changed_files": 18,
     "statement": "evidence in this run was produced on a DIRTY tree; the manifest records that rather than implying a frozen revision"
   },
   "epoch": {
-    "digest": "d3ca029e738fecabfb1cd709572fa961f853a2ca2b0453ad9c44d9481a2c0d9d",
-    "total_inputs": 127,
-    "candidate_commit": "60044ae"
+    "digest": "4f25f790ccb23aecd3099f61662b77f55a68ac89cf4a1aecaf57c8069ad44b64",
+    "total_inputs": 128,
+    "candidate_commit": "27e5774"
   },
   "artifacts": {
     "executable": "target\\release\\linchpin-desktop.exe",
-    "executable_sha256": "c030395b4b77fb8ce62a40e850cdab1f26e16bd9941c8bdd8ed841880b9fb835",
+    "executable_sha256": "1d1dbbd3bce3beed97a1e36de02249c8b66e5c5a3fa71b3266304ea446ef05b6",
     "executable_bytes": 12498432,
     "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
-    "msi_sha256": "bfc4e4c1ffd71017d1774e2569d2fe573c02b8b10f654484c7e871c937e132ae",
+    "msi_sha256": "e4eff17e69737927fac2f2ac1a3129a6cdf79ca394ffbb2886c9f69f5c73f857",
     "msi_bytes": 5709824,
     "recorded_in_release_gate": {
       "candidate_commit": "1bca002",
@@ -35,11 +35,11 @@
   },
   "results": {
     "rerun_record": ".agent\\verification\\state\\RERUN_RECORD.json",
-    "rerun_record_sha256": "b632cb382908cb5f7d1c95cd8eaa6b55e51e0c5bbe97dd6d3b276f0541271153",
+    "rerun_record_sha256": "f998b5921a79bfd18da6b1fe5356648784000d457d474387cec0ce8cf538eea4",
     "accounting": ".agent\\verification\\reports\\COMPLETE_TEST_ACCOUNTING.csv",
     "accounting_sha256": "e8282c11d6fd8e1ec47737324fd81f9df403aa35e234ddb67473c57d993efa71",
     "dod_status": ".agent\\verification\\state\\DOD_STATUS.jsonl",
-    "dod_status_sha256": "5808a5d1bdaf7463c29224390fa45ff8c11749564d690fd87b18cc12d93c505c"
+    "dod_status_sha256": "ec614378b12bf18a98b07e8d5f1232aa386788f7752d1b382d81f2804039bfda"
   },
   "lockfiles": {
     "Cargo.lock_sha256": "621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4",
