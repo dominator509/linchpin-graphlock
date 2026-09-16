@@ -1,14 +1,14 @@
 {
   "clause": "DOD-029",
   "harness": "scripts/run-manifest.py",
-  "measured_at_utc": "2026-09-16T16:31:44Z",
-  "candidate_commit": "aa10ac0ec8ef86c30611acad621273cd88f70502",
-  "candidate_commit_short": "aa10ac0",
+  "measured_at_utc": "2026-09-16T16:35:14Z",
+  "candidate_commit": "7276b126b21d896d7b7c23e7158d90b68c2d4fe6",
+  "candidate_commit_short": "7276b12",
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "branch": "main",
   "working_tree": {
     "dirty": true,
-    "changed_files": 16,
+    "changed_files": 1,
     "statement": "evidence in this run was produced on a DIRTY tree; the manifest records that rather than implying a frozen revision"
   },
   "epoch": {
