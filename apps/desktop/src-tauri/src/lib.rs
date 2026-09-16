@@ -210,6 +210,32 @@ fn restore_vault(
     commands::restore_vault(&scope, &source, &vault_file())
 }
 
+/// Build the chain-of-title timeline and readiness verdict (REQ-COM-002).
+#[tauri::command]
+#[allow(clippy::too_many_arguments)]
+fn build_asset_readiness(
+    workspace_id: String,
+    asset_label: String,
+    records: Vec<commands::TitleRecordInput>,
+    remaining_life_years: Option<f64>,
+    remaining_life_basis: String,
+    related_families: Vec<String>,
+    know_how_dependencies: Vec<String>,
+    unresolved_questions: Vec<String>,
+) -> commands::CommandResult<commands::AssetReadinessView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::build_asset_readiness(
+        &scope,
+        &asset_label,
+        &records,
+        remaining_life_years,
+        &remaining_life_basis,
+        &related_families,
+        &know_how_dependencies,
+        &unresolved_questions,
+    )
+}
+
 /// Report the declared scope and the five truth boundaries (REQ-SCOPE-001).
 #[tauri::command]
 fn get_scope_declaration() -> commands::CommandResult<commands::ScopeView> {
@@ -409,6 +435,7 @@ pub fn run() {
             advance_docket,
             draft_office_action_response,
             build_commercialization_package,
+            build_asset_readiness,
             provider_status,
             run_local_inference,
             check_mcp_capability,

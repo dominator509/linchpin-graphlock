@@ -1967,6 +1967,215 @@ pub struct CommercializationView {
     pub payload: String,
 }
 
+/// A chain-of-title record as supplied by the caller (REQ-COM-002).
+///
+/// Every field is required to be honest about provenance: `source` names where
+/// the record came from, and a record with no source is refused by the domain
+/// layer rather than accepted as an unattributed assertion.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TitleRecordInput {
+    /// `INVENTOR_RECORD`, `OWNER_RECORD`, `ASSIGNMENT_EXECUTED`,
+    /// `RECORDATION_EVIDENCE`, `LIEN_OR_SECURITY_INTEREST`, `FILING_EVENT`,
+    /// `GRANT_EVENT`, `LEGAL_STATUS_EVENT` or `MAINTENANCE_DEADLINE`.
+    pub kind: String,
+    pub effective_date: String,
+    pub party_from: Option<String>,
+    pub party_to: Option<String>,
+    pub source: String,
+    pub recordation_id: Option<String>,
+}
+
+/// One dated record in the rendered timeline.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TitleRecordView {
+    pub kind: String,
+    pub effective_date: String,
+    pub party_from: Option<String>,
+    pub party_to: Option<String>,
+    pub source: String,
+}
+
+/// One finding a reader must know before relying on the chain.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TitleFindingView {
+    pub label: String,
+    pub detail: String,
+}
+
+/// A remaining-life estimate and the assumption it rests on.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RemainingLifeView {
+    pub years: f64,
+    pub basis: String,
+    pub assumption: String,
+}
+
+/// Asset readiness as returned to the UI (REQ-COM-002).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AssetReadinessView {
+    pub asset_label: String,
+    pub timeline: Vec<TitleRecordView>,
+    pub findings: Vec<TitleFindingView>,
+    pub remaining_life: Option<RemainingLifeView>,
+    pub related_families: Vec<String>,
+    pub know_how_dependencies: Vec<String>,
+    pub unresolved_questions: Vec<String>,
+    /// Only for a continuous chain with no open ownership, inventorship or
+    /// encumbrance finding and no unresolved question.
+    pub ready_for_transaction: bool,
+    /// Always true. Emitted so no consumer can read a recordation record as a
+    /// legal conclusion, even one that ignores `findings`.
+    pub recordation_is_evidence_not_validation: bool,
+}
+
+fn parse_title_kind(label: &str) -> Option<commercialization::asset_readiness::TitleRecordKind> {
+    use commercialization::asset_readiness::TitleRecordKind as Kind;
+    match label.trim().to_ascii_uppercase().as_str() {
+        "INVENTOR_RECORD" => Some(Kind::InventorRecord),
+        "OWNER_RECORD" => Some(Kind::OwnerRecord),
+        "ASSIGNMENT_EXECUTED" => Some(Kind::AssignmentExecuted),
+        "RECORDATION_EVIDENCE" => Some(Kind::RecordationEvidence),
+        "LIEN_OR_SECURITY_INTEREST" => Some(Kind::LienOrSecurityInterest),
+        "FILING_EVENT" => Some(Kind::FilingEvent),
+        "GRANT_EVENT" => Some(Kind::GrantEvent),
+        "LEGAL_STATUS_EVENT" => Some(Kind::LegalStatusEvent),
+        "MAINTENANCE_DEADLINE" => Some(Kind::MaintenanceDeadline),
+        _ => None,
+    }
+}
+
+/// Build the chain-of-title timeline and the readiness verdict (REQ-COM-002).
+///
+/// The verdict is deliberately conservative: recordation is evidence, a missing
+/// assignment is a GAP rather than an assumption, a lien is never cleared by
+/// this code, and a caller-supplied unresolved question blocks readiness because
+/// the product has no standing to answer it.
+#[allow(clippy::too_many_arguments)]
+pub fn build_asset_readiness(
+    scope: &WorkspaceScope,
+    asset_label: &str,
+    records: &[TitleRecordInput],
+    remaining_life_years: Option<f64>,
+    remaining_life_basis: &str,
+    related_families: &[String],
+    know_how_dependencies: &[String],
+    unresolved_questions: &[String],
+) -> CommandResult<AssetReadinessView> {
+    use commercialization::asset_readiness as title;
+
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+
+    let mut parsed = Vec::with_capacity(records.len());
+    for (index, record) in records.iter().enumerate() {
+        let Some(kind) = parse_title_kind(&record.kind) else {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!(
+                    "record {index} has unknown kind {:?}; expected one of INVENTOR_RECORD, \
+                     OWNER_RECORD, ASSIGNMENT_EXECUTED, RECORDATION_EVIDENCE, \
+                     LIEN_OR_SECURITY_INTEREST, FILING_EVENT, GRANT_EVENT, LEGAL_STATUS_EVENT, \
+                     MAINTENANCE_DEADLINE",
+                    record.kind
+                )),
+            );
+        };
+        parsed.push(title::TitleRecord {
+            kind,
+            effective_date: record.effective_date.clone(),
+            party_from: record.party_from.clone(),
+            party_to: record.party_to.clone(),
+            source: record.source.clone(),
+            recordation_id: record.recordation_id.clone(),
+        });
+    }
+
+    let remaining_life = remaining_life_years.map(|years| title::RemainingLife {
+        years,
+        basis: if remaining_life_basis.trim().is_empty() {
+            "unspecified basis".to_string()
+        } else {
+            remaining_life_basis.trim().to_string()
+        },
+        assumption: "remaining life is a planning assumption, not a legal determination"
+            .to_string(),
+    });
+
+    let readiness = match title::assess_asset_readiness(
+        asset_label,
+        &parsed,
+        remaining_life,
+        related_families,
+        know_how_dependencies,
+        unresolved_questions,
+    ) {
+        Ok(readiness) => readiness,
+        Err(e) => {
+            return CommandResult::failure(correlation, CommandError::validation(e.to_string()))
+        }
+    };
+
+    let timeline = readiness
+        .timeline
+        .iter()
+        .map(|record| TitleRecordView {
+            kind: record.kind.label().to_string(),
+            effective_date: record.effective_date.clone(),
+            party_from: record.party_from.clone(),
+            party_to: record.party_to.clone(),
+            source: record.source.clone(),
+        })
+        .collect();
+
+    let findings = readiness
+        .findings
+        .iter()
+        .map(|finding| {
+            let detail = match finding {
+                title::TitleFinding::Gap { between, detail } => {
+                    format!("{between}: {detail}")
+                }
+                title::TitleFinding::UnresolvedOwnership { detail }
+                | title::TitleFinding::UnresolvedInventorship { detail }
+                | title::TitleFinding::LienWarning { detail } => detail.clone(),
+                title::TitleFinding::RecordationIsEvidenceOnly { recordation_id } => {
+                    format!(
+                        "recordation {recordation_id} is evidence that a document was recorded, \
+                         not legal validation of title"
+                    )
+                }
+            };
+            TitleFindingView {
+                label: finding.label().to_string(),
+                detail,
+            }
+        })
+        .collect();
+
+    CommandResult::success(
+        correlation,
+        AssetReadinessView {
+            asset_label: readiness.asset_label,
+            timeline,
+            findings,
+            remaining_life: readiness.remaining_life.map(|life| RemainingLifeView {
+                years: life.years,
+                basis: life.basis,
+                assumption: life.assumption,
+            }),
+            related_families: readiness.related_families,
+            know_how_dependencies: readiness.know_how_dependencies,
+            unresolved_questions: readiness.unresolved_questions,
+            ready_for_transaction: readiness.ready_for_transaction,
+            recordation_is_evidence_not_validation: readiness
+                .recordation_is_evidence_not_validation,
+        },
+    )
+}
+
 /// Run inference through the local provider lane.
 ///
 /// GraphLock context (DOD-019): `provider_transport::generate` existed but was
@@ -3669,7 +3878,198 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    /// Seed a conception event directly through the vault, for the backup tests.    ///
+    /// covers: REQ-COM-002
+    /// SPEC-009 requires the chain-of-title timeline at the product boundary,
+    /// with recordation represented as evidence and never as legal validation.
+    #[test]
+    fn test_asset_readiness_reports_gaps_and_never_treats_recordation_as_validation() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-title".to_string(),
+        };
+
+        let record =
+            |kind: &str, date: &str, from: Option<&str>, to: Option<&str>, source: &str| {
+                TitleRecordInput {
+                    kind: kind.to_string(),
+                    effective_date: date.to_string(),
+                    party_from: from.map(str::to_string),
+                    party_to: to.map(str::to_string),
+                    source: source.to_string(),
+                    recordation_id: None,
+                }
+            };
+
+        // A continuous chain, with a recordation record present.
+        let mut recordation = record(
+            "RECORDATION_EVIDENCE",
+            "2024-07-01",
+            Some("Dana Inventor"),
+            Some("Linchpin Holdings"),
+            "USPTO Assignment Search",
+        );
+        recordation.recordation_id = Some("REEL/FRAME 1234/0567".to_string());
+
+        let records = vec![
+            record(
+                "INVENTOR_RECORD",
+                "2023-01-15",
+                None,
+                Some("Dana Inventor"),
+                "declaration",
+            ),
+            record(
+                "ASSIGNMENT_EXECUTED",
+                "2024-05-01",
+                Some("Dana Inventor"),
+                Some("Linchpin Holdings"),
+                "executed assignment",
+            ),
+            record(
+                "OWNER_RECORD",
+                "2024-06-01",
+                None,
+                Some("Linchpin Holdings"),
+                "assignment deck",
+            ),
+            recordation,
+        ];
+
+        let ready = build_asset_readiness(
+            &scope,
+            "Self-sealing valve",
+            &records,
+            Some(14.5),
+            "20-year term from filing",
+            &["Family A".to_string()],
+            &["weld procedure".to_string()],
+            &[],
+        );
+        assert!(ready.ok, "readiness failed: {:?}", ready.error);
+        let view = ready.value.unwrap();
+        assert!(view.ready_for_transaction, "findings: {:?}", view.findings);
+        assert!(
+            view.recordation_is_evidence_not_validation,
+            "the output must state that recordation is not validation"
+        );
+        assert!(
+            view.findings
+                .iter()
+                .any(|f| f.label == "RECORDATION_IS_EVIDENCE_ONLY"),
+            "the recordation must be surfaced as evidence: {:?}",
+            view.findings
+        );
+        assert_eq!(
+            view.timeline.first().map(|r| r.effective_date.as_str()),
+            Some("2023-01-15"),
+            "the timeline must be ordered by effective date"
+        );
+        assert_eq!(view.related_families.len(), 1);
+
+        // A missing assignment is a GAP, not an assumption.
+        let broken = vec![
+            record(
+                "INVENTOR_RECORD",
+                "2023-01-15",
+                None,
+                Some("Dana Inventor"),
+                "declaration",
+            ),
+            record(
+                "OWNER_RECORD",
+                "2024-06-01",
+                None,
+                Some("First Assignee"),
+                "assignment deck",
+            ),
+            record(
+                "OWNER_RECORD",
+                "2025-02-01",
+                None,
+                Some("Second Assignee"),
+                "assignment deck",
+            ),
+        ];
+        let gapped = build_asset_readiness(
+            &scope,
+            "Self-sealing valve",
+            &broken,
+            None,
+            "",
+            &[],
+            &[],
+            &[],
+        );
+        assert!(gapped.ok, "{:?}", gapped.error);
+        let gapped = gapped.value.unwrap();
+        assert_eq!(
+            gapped.findings.iter().filter(|f| f.label == "GAP").count(),
+            2,
+            "both transitions lack evidence: {:?}",
+            gapped.findings
+        );
+        assert!(
+            !gapped.ready_for_transaction,
+            "a chain with gaps must not be reported ready"
+        );
+        assert!(
+            gapped
+                .unresolved_questions
+                .iter()
+                .any(|q| q.contains("remaining life was not supplied")),
+            "absent remaining life must be carried as a question, not invented: {:?}",
+            gapped.unresolved_questions
+        );
+
+        // An encumbrance blocks readiness and is never cleared here.
+        let mut encumbered = records.clone();
+        encumbered.push(record(
+            "LIEN_OR_SECURITY_INTEREST",
+            "2025-01-10",
+            Some("Lender"),
+            Some("Linchpin Holdings"),
+            "UCC filing",
+        ));
+        let lien = build_asset_readiness(&scope, "Valve", &encumbered, None, "", &[], &[], &[]);
+        let lien = lien.value.unwrap();
+        assert!(lien.findings.iter().any(|f| f.label == "LIEN_WARNING"));
+        assert!(!lien.ready_for_transaction);
+
+        // A caller-supplied open question blocks readiness too: the product has
+        // no standing to answer it.
+        let open = build_asset_readiness(
+            &scope,
+            "Valve",
+            &records,
+            None,
+            "",
+            &[],
+            &[],
+            &["who owns the 2025 improvement?".to_string()],
+        );
+        assert!(!open.value.unwrap().ready_for_transaction);
+
+        // Invalid input is refused with a named cause rather than defaulted.
+        let bad_date = vec![record(
+            "INVENTOR_RECORD",
+            "15/01/2023",
+            None,
+            Some("Dana Inventor"),
+            "declaration",
+        )];
+        let refused = build_asset_readiness(&scope, "Valve", &bad_date, None, "", &[], &[], &[]);
+        assert!(!refused.ok);
+        assert!(
+            refused.error.expect("cause").safe_message().contains("ISO"),
+            "the refusal must name the date requirement"
+        );
+        let unknown_kind = vec![record("SOMETHING_ELSE", "2023-01-15", None, None, "deck")];
+        assert!(!build_asset_readiness(&scope, "Valve", &unknown_kind, None, "", &[], &[], &[]).ok);
+        let no_source = vec![record("INVENTOR_RECORD", "2023-01-15", None, None, "  ")];
+        assert!(!build_asset_readiness(&scope, "Valve", &no_source, None, "", &[], &[], &[]).ok);
+    }
+
+    /// Seed a conception event directly through the vault, for the backup tests.
+    ///
     /// The workspace is a parameter, not the hardcoded "ws-backup" it used to be:
     /// a helper that silently writes into a different workspace than its caller
     /// names is how a recovery test came to query an empty vault and look like a

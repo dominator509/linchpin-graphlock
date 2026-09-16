@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "291a5cc",
+  "candidate_commit": "6650d0a",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -38,7 +38,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "39643c65cd3d5beb3d0a7b50d3ef86a210d698b5d1168da51c6e2cd5e5e67029",
+        "scripts\\build-dod-status.py": "8886010e2de21091bc0016fda9eedafd9c7ecaf5e210d45095d971cb70ae5246",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
@@ -65,7 +65,7 @@
         "scripts\\live-fire-local-provider.sh": "dcda08caf50050c3d3ba5167d1dfc638ad9d843692a3652426b6394d49446aeb",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
-        "scripts\\mutation-proof.py": "9e072e82d2c5f60173c8244b3a9b946bac53251a967f2afdf1b1660cb25d007e",
+        "scripts\\mutation-proof.py": "c085a970f263100e0cc3a46941ea990959f18d3e6110b5e57489fd212d456cf6",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
@@ -170,16 +170,17 @@
       ]
     },
     "rust-source": {
-      "count": 19,
+      "count": 20,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "0790d0b3563b32c1baf60bb8d1fa09b8c579f7331c6de05f169887463c38a233",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "7164d02983a1f86d6a18c26d849e624419a7f4ea07d88591a79463532fb3c8e9",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "554cb24eef913026a98bdb3605228c8fded8c717c2d74ec74fcd446f745e0b5a",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "32c9e61fc6afd1b912fa6ef171820d95b8064790d92d56a86ce103b2dc215925",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
-        "crates\\commercialization\\src\\lib.rs": "b3cda133f33472b00164b106d3629eceeb701a00d2e14d894e537813646d125a",
+        "crates\\commercialization\\src\\asset_readiness.rs": "f4143f42b1e5da03d8d799362cda0b34d0bd7a4bfff6ff586a9de3ff060cf1fc",
+        "crates\\commercialization\\src\\lib.rs": "74245f9c1dedab433f7ddd6b3e800eb053efa97c03d6c4a1e477b22dbdaeca22",
         "crates\\crash_reporter\\src\\lib.rs": "7d582c24175d920b18f02241e91f7a95e5d3d067b3e5db93bb2b66aefb0864a6",
         "crates\\domain\\src\\lib.rs": "c8f7b0110fbd67f3b3fa9c7222dc6bb207fae2d6324cf6f31599758aa2376730",
-        "crates\\domain\\src\\scope.rs": "2874a501eab7dd4fcc0abb274e06d6f08d6cb49f09b42b82717fdac18d14da2a",
+        "crates\\domain\\src\\scope.rs": "1e1b2b2652534c8974553ee3258105b5119cb7e62ec14a25ebe0228869ffe9c7",
         "crates\\evidence\\src\\lib.rs": "831478be7892eb838c88886cd10dd40ffad85ad2a1a62b04dc2bbd841f02fc2e",
         "crates\\mcp_hub\\src\\lib.rs": "bac47aab7e67b1e81cb3852515b18ca6006f548d69313d5036ee9646ec2222aa",
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
@@ -207,7 +208,7 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "5fcc95f066d01219d94fbd3c52de0ecbccecc91bef5754fc1c6258f0fb274690",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "64baeec11b3c0fd630318b9cdc4d291ed3ea00d413490fc5c16806cd90b5d187",
         "apps\\desktop\\e2e-artifact.mjs": "214482a93088a65202fff627222acd6abe3eb489f32519b8b405b9ae9e32641b",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
       },
@@ -221,8 +222,8 @@
       ]
     }
   },
-  "epoch_digest": "c95a0e3b1d95f362212e05aa954660a0f4aa137eb4ae74fc99d5cb6a67298f9c",
-  "prior_candidate_commit": "291a5cc",
-  "prior_epoch_digest": "c95a0e3b1d95f362212e05aa954660a0f4aa137eb4ae74fc99d5cb6a67298f9c",
-  "total_inputs": 124
+  "epoch_digest": "b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74",
+  "prior_candidate_commit": "6650d0a",
+  "prior_epoch_digest": "b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74",
+  "total_inputs": 125
 }

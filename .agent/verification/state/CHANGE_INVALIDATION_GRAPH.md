@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `c95a0e3b1d95f362212e05aa954660a0f4aa137eb4ae74fc99d5cb6a67298f9c`
-- Candidate commit at generation: `291a5cc`
-- Total tracked inputs: 124
-- Previous epoch digest: `c95a0e3b1d95f362212e05aa954660a0f4aa137eb4ae74fc99d5cb6a67298f9c`
+- Current epoch digest: `b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74`
+- Candidate commit at generation: `6650d0a`
+- Total tracked inputs: 125
+- Previous epoch digest: `b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -98,7 +98,7 @@ definition and its PASS status is revoked until rerun.
   - `crates\crash_reporter\Cargo.toml` `be20a3f1e5b5e0b5…`
   - … and 10 more
 
-### `rust-source` — 19 file(s)
+### `rust-source` — 20 file(s)
 
 - invalidates: V-005 clean build
 - invalidates: V-006 smoke
@@ -108,12 +108,12 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-012 regression/mutation
 - invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `0790d0b3563b32c1…`
-  - `apps\desktop\src-tauri\src\lib.rs` `7164d02983a1f86d…`
+  - `apps\desktop\src-tauri\src\commands.rs` `554cb24eef913026…`
+  - `apps\desktop\src-tauri\src\lib.rs` `32c9e61fc6afd1b9…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
-  - `crates\commercialization\src\lib.rs` `b3cda133f33472b0…`
-  - … and 14 more
+  - `crates\commercialization\src\asset_readiness.rs` `f4143f42b1e5da03…`
+  - … and 15 more
 
 ### `test-oracle` — 5 file(s)
 
@@ -126,7 +126,7 @@ definition and its PASS status is revoked until rerun.
 
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
-  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `5fcc95f066d01219…`
+  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `64baeec11b3c0fd6…`
   - `apps\desktop\e2e-artifact.mjs` `214482a93088a652…`
   - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
 

@@ -110,8 +110,8 @@ pub const SCOPE_MAP: [ScopeEntry; 12] = [
         uo_id: "UO-08",
         title: "commercialization package, targets, valuation scenarios, disclosure-safe outreach",
         state: CapabilityState::Partial,
-        realised_by: "commands::build_commercialization_package, commands::evaluate_valuation",
-        limitation: "packages are redacted before export and valuations are ranges with stated assumptions, but targets are caller-supplied labels rather than sourced organisations, and no outreach is ever sent by the product",
+        realised_by: "commands::build_commercialization_package, commands::evaluate_valuation, commands::build_asset_readiness",
+        limitation: "packages are redacted before export, valuations are ranges with stated assumptions, and the chain-of-title readiness verdict reports gaps rather than assuming them, but targets are caller-supplied labels rather than sourced organisations, no outreach is ever sent by the product, and the title timeline is not yet rendered in the UI",
     },
     ScopeEntry {
         requirement_id: "REQ-SCOPE-009",

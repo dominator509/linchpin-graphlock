@@ -226,6 +226,41 @@ MUTATIONS = [
         ],
         "expect_test": "test_boundary_guard_refuses_promises_and_permits_honest_text",
     },
+    {
+        "id": "MUT-COM-002-a",
+        "clause": "DOD-018",
+        "covers": "REQ-COM-002",
+        "feature": "a missing chain-of-title link is reported as a gap",
+        "changed_behavior": (
+            "the inventor-to-first-owner transition is treated as bridged without "
+            "any assignment or recordation, so a break in the chain of title is "
+            "silently assumed away."
+        ),
+        "edits": [
+            {
+                "path": "crates/commercialization/src/asset_readiness.rs",
+                "old": (
+                    "                        let bridged = timeline.iter().any(|candidate| {\n"
+                    "                            candidate.effective_date <= record.effective_date\n"
+                    "                                && matches!(\n"
+                ),
+                "new": (
+                    "                        let bridged = true || timeline.iter().any(|candidate| {\n"
+                    "                            candidate.effective_date <= record.effective_date\n"
+                    "                                && matches!(\n"
+                ),
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "linchpin-desktop",
+            "--lib",
+            "test_asset_readiness_reports_gaps_and_never_treats_recordation_as_validation",
+        ],
+        "expect_test": "test_asset_readiness_reports_gaps_and_never_treats_recordation_as_validation",
+    },
 ]
 
 

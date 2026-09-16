@@ -1,6 +1,13 @@
 {"collected": false, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-001", "result": "NOT_RUN", "test_id": "default"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-001", "result": "PASS", "test_id": "commercialization_tests::test_data_room_workflow"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-COM-001", "result": "PASS", "test_id": "commands::tests::test_commercialization_package_is_redacted"}
+{"collected": false, "file": "crates/commercialization/src/asset_readiness.rs", "requirement_id": "REQ-COM-002", "result": "NOT_RUN", "test_id": "asset_readiness::tests::record"}
+{"collected": true, "file": "crates/commercialization/src/asset_readiness.rs", "requirement_id": "REQ-COM-002", "result": "PASS", "test_id": "asset_readiness::tests::test_continuous_chain_is_ready_and_ordered"}
+{"collected": true, "file": "crates/commercialization/src/asset_readiness.rs", "requirement_id": "REQ-COM-002", "result": "PASS", "test_id": "asset_readiness::tests::test_missing_assignment_is_a_gap_not_an_assumption"}
+{"collected": true, "file": "crates/commercialization/src/asset_readiness.rs", "requirement_id": "REQ-COM-002", "result": "PASS", "test_id": "asset_readiness::tests::test_recordation_is_evidence_and_never_validation"}
+{"collected": true, "file": "crates/commercialization/src/asset_readiness.rs", "requirement_id": "REQ-COM-002", "result": "PASS", "test_id": "asset_readiness::tests::test_lien_is_surfaced_and_blocks_readiness"}
+{"collected": true, "file": "crates/commercialization/src/asset_readiness.rs", "requirement_id": "REQ-COM-002", "result": "PASS", "test_id": "asset_readiness::tests::test_invalid_records_are_refused_and_questions_block_readiness"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-COM-002", "result": "PASS", "test_id": "commands::tests::test_asset_readiness_reports_gaps_and_never_treats_recordation_as_validation"}
 {"collected": false, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "NOT_RUN", "test_id": "valuation_tests::assumptions"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "valuation_tests::test_valuation_is_a_range_tied_to_explicit_assumptions"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-003", "result": "PASS", "test_id": "valuation_tests::test_valuation_requires_assumptions_and_a_sane_range"}
@@ -31,7 +38,7 @@
 {"collected": false, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "NOT_RUN", "test_id": "default"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "tests::test_domain_entity_lifecycle"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "origin_tests::test_human_vs_ai_origin"}
-{"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-001", "result": "NOT_RUN", "test_id": "commands::sidecar"}
+{"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-001", "result": "NOT_RUN", "test_id": "commands::parse_title_kind"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "commands::tests::test_record_conception_labels_human_origin"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-002", "result": "PASS", "test_id": "origin_tests::test_human_vs_ai_origin"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-002", "result": "PASS", "test_id": "commands::tests::test_record_conception_labels_ai_origin_distinctly"}

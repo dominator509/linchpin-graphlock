@@ -1,3 +1,6 @@
+/// Asset readiness: the chain-of-title timeline (REQ-COM-002, SPEC-009).
+pub mod asset_readiness;
+
 #[derive(Debug, Clone)]
 pub struct TargetCompany {
     pub name: String,
