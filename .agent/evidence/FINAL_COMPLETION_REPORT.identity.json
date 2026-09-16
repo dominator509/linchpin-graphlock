@@ -7,7 +7,7 @@
   "blocking_clauses": [
     "DOD-001=PARTIAL"
   ],
-  "candidate_commit": "c577b982dc5c13cfbbc3d562620566fa5141fbfa",
+  "candidate_commit": "d8e9698eaa7377abc3f74f4e4b86e32916fb0f63",
   "dod": {
     "DOD-001": "PARTIAL",
     "DOD-002": "PASS",

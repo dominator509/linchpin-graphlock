@@ -1,5 +1,5 @@
 {
-  "actual_seconds": 3.05,
+  "actual_seconds": 3.12,
   "adversarial_inputs_per_target": 4634,
   "campaign": "mutation-fuzz",
   "corpus_size": 512,
@@ -23,12 +23,12 @@
   "targets": [
     {
       "iterations": 6634,
-      "seconds": 0.53,
+      "seconds": 0.54,
       "target": "domain::scope::check_claim_text"
     },
     {
       "iterations": 6634,
-      "seconds": 2.39,
+      "seconds": 2.46,
       "target": "crash_reporter::RedactionPolicy::apply"
     },
     {
