@@ -1,14 +1,16 @@
 # DOD-001 — Unbound Requirements: Measured Implementation State
 
 Generated during the DOD-001 audit. Candidate `b511ae9` (base `962e365`).
+**Refreshed at candidate `fbc9a49`** — the counts below moved and are re-measured,
+not carried forward (see "Progress" at the end).
 
 DOD-001 RULE: "Every promised behavior has a stable requirement ID and at least
 one acceptance test before implementation is declared complete."
 
 `scripts/bind-requirements.py` reports 35 of 59 requirements bound to executed
-acceptance tests. The remaining **24** are `NO_BOUND_TEST`. That single status
-conflates two very different situations, and the distinction decides what work
-is actually required:
+acceptance tests at the time of the original audit. The remaining **24** were
+`NO_BOUND_TEST`. That single status conflates two very different situations, and
+the distinction decides what work is actually required:
 
 * **ABSENT behavior** — no acceptance test *can* pass, because the promised
   behavior does not exist. The remedy is implementation, not a test.
@@ -58,12 +60,16 @@ test-writing work.
 
 ## UNASSESSED — explicitly not claimed either way
 
-These remain unmeasured. They are **not** reported as absent, and no probe
-result for them is trusted:
+These were unmeasured at the time of the original audit. They are **not**
+reported as absent, and no probe result for them is trusted:
 
 REQ-COM-002, REQ-COM-003, REQ-DATA-003, REQ-FOUND-001, REQ-FOUND-002,
 REQ-LIC-001, REQ-LIC-002, REQ-LIC-003, REQ-OPS-002, REQ-PLAT-002, REQ-REL-001,
 REQ-REL-002, REQ-REL-004, REQ-REL-005, REQ-SCOPE-001.
+
+All of those except REQ-COM-002, REQ-REL-001, REQ-REL-004 and REQ-SCOPE-001 have
+since been assessed, implemented where they were absent, and bound to executed
+acceptance tests (see "Progress").
 
 ## Binder defect found and fixed
 
@@ -115,3 +121,34 @@ survived — a guard claiming a check it never ran. Both fixed and mutation-prov
 
 Bound requirements therefore move 35 → 37, collected tests 129 → 135, and
 `NO_BOUND_TEST` 24 → 22.
+
+## Progress — refreshed measurement at candidate `fbc9a49`
+
+Re-measured with `python3 scripts/bind-requirements.py`, not carried forward:
+
+| Measure | Original audit | Now |
+| --- | --- | --- |
+| Collected tests | 129 | **207** |
+| Requirements found | 59 | 59 |
+| Requirements bound to an executed PASS | 35 | **55** |
+| `NO_BOUND_TEST` | 24 | **4** |
+
+The four that remain unbound, each with the concrete reason and next action:
+
+| Requirement | Why it is still unbound | Next action |
+| --- | --- | --- |
+| REQ-REL-001 | Demands a **signed virgin clean room** install and boot of the exact final artifact. No clean-room environment exists on this host, and no agent may sign for one. Recorded `EXTERNAL_REQUIRED` under ADR-004 (supported scope Windows 10 or higher). | External: a clean-room operator runs the documented install and records it. |
+| REQ-REL-004 | Demands broad evidence that no automated run can produce: manual assistive-technology validation, human UAT, and long-running fuzz/soak. PF-017/PF-018 are `HUMAN_EXTERNAL` and unmet (ADR-005). | External: named human validators; the long-running half stays `DEFERRED_LONG_RUNNING`. |
+| REQ-COM-002 | Promises an asset-readiness **chain-of-title timeline** built from inventor/owner records, assignments, recordation evidence, liens, legal-status events, maintenance state, remaining-life assumptions, families and unresolved ownership questions (SPEC-009). The behavior does not exist yet, so no test can pass. | Implement the timeline domain model and command, then an acceptance test. |
+| REQ-SCOPE-001 | Promises that `REQ-SCOPE-001..012` map to `UO-01..UO-12` and that product claims preserve the **five truth boundaries** of ARCHITECTURE.md §5 (`TB-1..TB-5`). The mapping and the boundaries exist as prose; nothing asserts them. | Implement a machine-readable scope map plus boundary assertions at the product boundary, then an acceptance test. |
+
+## The one change in this file that is a CORRECTION, not progress
+
+The original audit recorded REQ-REL-005 as `UNASSESSED`. It is now implemented,
+executed and bound: backup/restore at the storage, command, IPC and UI layers,
+five fault-injected recovery cycles with measured RPO/RTO/MTTR, and three
+machine-rerunnable mutation proofs. Two real defects were found while doing it,
+one of which **destroyed data**: a mistyped backup path was accepted because
+`Vault::digest_of` inherited SQLite's open-or-create semantics, so the restore
+replaced the live vault with an empty database. Full record:
+`.agent/evidence/REQ-REL-005-recovery.md`.

@@ -1,19 +1,22 @@
 {
   "_comment": "Expected test-collection manifest for DOD-007. The guard in scripts/test-collection-guard.py fails if the runner collects fewer than expected_min_passed, collects zero, ignores any test, or reports a failure. Regenerate with scripts/update-test-manifest.py; never hand-lower it.",
-  "candidate_commit": "4bce97c",
-  "expected_min_passed": 129,
+  "candidate_commit": "fbc9a49",
+  "expected_min_passed": 188,
   "expected_test_binaries": 13,
-  "measured_at": "2026-09-10",
+  "measured_at": "2026-09-16",
   "rust": {
-    "passed": 129,
+    "passed": 188,
     "failed": 0,
     "ignored": 0,
-    "suites": 26,
+    "suites": 29,
     "test_binaries": 13
   },
   "javascript": {
-    "test_files": 0,
-    "note": "No JS unit test files exist. Playwright E2E (apps/desktop/e2e) is separate and runs via scripts/test-e2e.sh. --passWithNoTests was removed from all package.json test:unit scripts so an empty suite exits 1."
+    "test_files": 3,
+    "tests": 32,
+    "packages_reporting": 3,
+    "lane_exit_code": 0,
+    "note": "Measured by running `pnpm -r test:unit`. Every package invokes vitest with --passWithNoTests=false, so an empty suite exits non-zero. Playwright E2E (apps/desktop/e2e) is separate and runs via scripts/test-e2e.sh."
   },
   "python": {
     "note": "No pyproject.toml / pytest suite exists; test-unit.sh skips this lane."

@@ -15,8 +15,10 @@ Usage: python3 scripts/update-test-manifest.py
 """
 from __future__ import annotations
 
+import datetime
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -26,6 +28,71 @@ RESULT_RE = re.compile(
     r"test result: (?:ok|FAILED)\. (\d+) passed; (\d+) failed; (\d+) ignored"
 )
 BINARY_RE = re.compile(r"Running (?:unittests|tests) .*?\(([^)]+)\)")
+# vitest's default reporter, one block per package:
+#   Test Files  1 passed (1)
+#   Tests  16 passed (16)
+JS_FILES_RE = re.compile(r"Test Files\s+(\d+) passed")
+JS_TESTS_RE = re.compile(r"Tests\s+(\d+) passed")
+JS_FAILED_RE = re.compile(r"Tests\s+.*?(\d+) failed")
+
+
+def _resolve(argv: list[str]) -> list[str]:
+    """Resolve through PATH, since CreateProcess does not apply PATHEXT.
+
+    Passing the bare name `pnpm` raised FileNotFoundError and a real runner was
+    reported missing; `pnpm` installs as `pnpm.cmd`, so it is invoked via cmd /c.
+    """
+    exe = shutil.which(argv[0])
+    if exe is None:
+        raise SystemExit(f"runner not found on PATH: {argv[0]}")
+    if exe.lower().endswith((".cmd", ".bat")):
+        return ["cmd", "/c", exe, *argv[1:]]
+    return [exe, *argv[1:]]
+
+
+def measure_javascript() -> dict:
+    """Run the JS lane and record what it actually collected.
+
+    This used to be a hardcoded `test_files: 0` with a note claiming no JS unit
+    test files exist, while three vitest files with 32 tests were passing. A
+    manifest that under-reports weakens the DOD-007 guard it exists to provide,
+    so the JS lane is now measured like the Rust lane.
+    """
+    if not Path("package.json").exists():
+        return {"test_files": 0, "tests": 0, "note": "no package.json; JS lane absent"}
+    proc = subprocess.run(
+        _resolve(["pnpm", "-r", "test:unit"]),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    out = proc.stdout + proc.stderr
+    files = [int(n) for n in JS_FILES_RE.findall(out)]
+    tests = [int(n) for n in JS_TESTS_RE.findall(out)]
+    failed = [int(n) for n in JS_FAILED_RE.findall(out)]
+    if proc.returncode != 0 or any(failed):
+        raise SystemExit(
+            f"refusing to update manifest: the JS lane failed (exit {proc.returncode}, "
+            f"failed counts {failed})"
+        )
+    if not files or not tests:
+        raise SystemExit(
+            "refusing to update manifest: the JS lane produced no parsable "
+            "collection counts, so a green run would prove nothing (DOD-007)"
+        )
+    return {
+        "test_files": sum(files),
+        "tests": sum(tests),
+        "packages_reporting": len(files),
+        "lane_exit_code": proc.returncode,
+        "note": (
+            "Measured by running `pnpm -r test:unit`. Every package invokes vitest "
+            "with --passWithNoTests=false, so an empty suite exits non-zero. "
+            "Playwright E2E (apps/desktop/e2e) is separate and runs via "
+            "scripts/test-e2e.sh."
+        ),
+    }
 
 
 def main() -> int:
@@ -46,6 +113,8 @@ def main() -> int:
         raise SystemExit(
             f"refusing to update manifest: failed={failed} ignored={ignored}"
         )
+
+    javascript = measure_javascript()
 
     head = subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"],
@@ -83,7 +152,7 @@ def main() -> int:
         "candidate_commit": head,
         "expected_min_passed": passed,
         "expected_test_binaries": binaries,
-        "measured_at": "2026-09-10",
+        "measured_at": datetime.date.today().isoformat(),
         "rust": {
             "passed": passed,
             "failed": failed,
@@ -91,15 +160,7 @@ def main() -> int:
             "suites": len(suites),
             "test_binaries": binaries,
         },
-        "javascript": {
-            "test_files": 0,
-            "note": (
-                "No JS unit test files exist. Playwright E2E (apps/desktop/e2e) "
-                "is separate and runs via scripts/test-e2e.sh. --passWithNoTests "
-                "was removed from all package.json test:unit scripts so an empty "
-                "suite exits 1."
-            ),
-        },
+        "javascript": javascript,
         "python": {
             "note": "No pyproject.toml / pytest suite exists; test-unit.sh skips this lane."
         },

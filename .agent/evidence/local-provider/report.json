@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "e472d322673d26772c39843fb0c7617909e35abea8272acbb422836492276118",
+  "executable_sha256": "d0fb0757a3da50c96bd51a2468a907842e584848ce5775cf481038da99e0856b",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -27,7 +27,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a statement of a person's claim to an invention or a fresh design, typically in the form of a patent.\""
+      "observed": "\"A patent claim is a written description of an invention, set forth in a patent application, that outlines the specific f\""
     },
     {
       "name": "metadata names the live model",
@@ -42,7 +42,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"CANARY-mu3o7lil-3vni88\""
+      "observed": "\"is a legal monopoly\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -90,9 +90,14 @@
       "observed": "range=true dominant=market size"
     },
     {
+      "name": "egress sampler started and polled (harness liveness, REQ-REL-002)",
+      "ok": true,
+      "observed": "ready=true heartbeats=2"
+    },
+    {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",
       "ok": true,
-      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=5/5"
+      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=5 (minimum 5)"
     },
     {
       "name": "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
@@ -107,9 +112,9 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "e472d322673d2677 -> e472d322673d2677"
+      "observed": "d0fb0757a3da50c9 -> d0fb0757a3da50c9"
     }
   ],
-  "passed": 21,
-  "total": 21
+  "passed": 22,
+  "total": 22
 }

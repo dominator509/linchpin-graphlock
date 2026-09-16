@@ -78,10 +78,15 @@ INVALIDATION_RULES: dict[str, list[str]] = {
         "V-009 integration/concurrency",
     ],
     # A test-oracle change invalidates whatever the oracle guards. The registry
-    # and manifest are the oracles for the whole suite, so the suite is rerun.
+    # and manifest are the oracles for the whole suite, so the suite is rerun; the
+    # .mjs drivers are the oracles for the artifact, E2E and provider lanes, so
+    # those lanes are rerun too.
     "test-oracle": [
         "V-008 full functionality",
         "V-012 regression/mutation",
+        "V-013 dynamic security/domain packs",
+        "V-015 usability/accessibility",
+        "V-020 exact artifact",
         "DOD-007 collection guard",
     ],
     "config": ["V-005 clean build", "V-011 configuration matrix"],
@@ -118,6 +123,15 @@ INPUT_GLOBS: dict[str, list[str]] = {
         ".agent/verification/state/TEST_COLLECTION_MANIFEST.json",
         ".agent/verification/MASTER_TEST_REGISTRY.csv",
         ".agent/verification/DOD_REGISTRY.csv",
+        # The exact-artifact and provider drivers are test ORACLES, not
+        # incidental tooling: every assertion in the artifact lane and the
+        # network-egress proof lives in these .mjs files. They were previously in
+        # no class at all, so editing an assertion -- including weakening one --
+        # would not have moved the epoch or invalidated the result it produced.
+        # Measured while fixing exactly that: a sampler-race fix in
+        # e2e-local-provider.mjs changed what the lane could observe, and nothing
+        # in the invalidation graph noticed.
+        "apps/desktop/*.mjs",
     ],
     "config": [
         "apps/desktop/src-tauri/tauri.conf.json",

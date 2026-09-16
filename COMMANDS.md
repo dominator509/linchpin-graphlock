@@ -67,6 +67,60 @@ unrelated project's `vite preview` held 4173, the lane failed on a 404, and it
 passed 14/14 once the port was free. Run the E2E lane on its own; do not run two
 documentation or E2E invocations concurrently.
 
+## Mutation proofs (DOD-018)
+
+```sh
+python3 scripts/mutation-proof.py            # run every declared mutation
+python3 scripts/mutation-proof.py --list     # show what would run
+python3 scripts/mutation-proof.py --only ID  # one mutation by id
+python3 scripts/mutation-proof.py --check    # verify the recorded report
+```
+
+Each mutation is applied as an exact literal edit, the guarding test is run, and
+the file is restored in a `finally` block and verified byte-for-byte before the
+test is rerun green. Outcomes are classified, and only `CAUGHT` is a proof:
+
+| Verdict | Meaning |
+| --- | --- |
+| `CAUGHT` | the mutant compiled, the named test failed, no compile error present |
+| `SURVIVED` | the mutant compiled and the test PASSED — the test does not discriminate; harness exits 1 |
+| `BUILD_ERROR` | the mutant did not compile, so a non-zero exit proves nothing; harness exits 1 |
+| `TIMEOUT` | the mutant hung; harness exits 1 |
+
+An anchor that does not match exactly once is a fatal error rather than a no-op
+mutation, because a no-op would be reported as `SURVIVED` and misread as a weak
+test. The report is written to `.agent/evidence/mutation-proof/REPORT.json`.
+
+## Vault backup and recovery (REQ-REL-005)
+
+Operator path in the product: **Settings → Durable state recovery** — set the
+backup file, *Back up vault*, and *Restore vault from backup* (which requires a
+consequence-specific confirmation, REQ-UI-004).
+
+Command path: `backup_vault(workspace_id, destination)` and
+`restore_vault(workspace_id, source)` over IPC, and in the harness:
+
+```sh
+cargo test -p linchpin-desktop --test recovery_drill -- --nocapture
+```
+
+The drill runs five fault-injected recovery cycles (total loss, in-place
+corruption) and writes measured RPO/RTO/MTTR to
+`.agent/evidence/recovery-drill/report.json`. Recovery semantics worth knowing
+before using it:
+
+* a backup is a **point-in-time snapshot**; work recorded after it is discarded
+  by a restore, and the UI says so;
+* a restore whose **source** does not exist is refused **before** the
+  destination is touched, so a mistyped backup path cannot damage the vault;
+* if the vault **file is gone**, the restore recreates it and reports
+  `destination_recreated`;
+* if the vault is **unreadable**, it is renamed aside (preserved, never deleted)
+  and the path is reported as `destination_quarantined`; it is not repaired;
+* reconciliation is by content digest, so a restore that does not reach the
+  backup's digest is reported as `reconciled: false` rather than assumed to have
+  worked.
+
 ## Live-fire (AGENTS.md section 9)
 
 `sh scripts/live-fire.sh` now runs the real production-path proof suite

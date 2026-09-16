@@ -104,6 +104,34 @@ def main() -> int:
         )
         return 1
 
+    # The manifest used to assert `javascript: {test_files: 0}` with a note
+    # claiming no JS unit test files exist, while three vitest files were
+    # passing. A guard that only reads the Rust runner cannot notice that, so the
+    # JS claim is now checked against the tree: the manifest may not under-report
+    # how many JS test files exist.
+    js_files = [
+        p
+        for p in Path(".").glob("**/*.test.ts")
+        if "node_modules" not in p.parts and "dist" not in p.parts
+    ]
+    recorded = (manifest.get("javascript") or {}).get("test_files")
+    print(f"  javascript: {len(js_files)} test file(s) in the tree, manifest records {recorded}")
+    if js_files and (recorded is None or recorded < len(js_files)):
+        print(
+            "collection guard: FAIL -- the manifest under-reports the JS lane "
+            f"({recorded} recorded vs {len(js_files)} present). Regenerate with "
+            "scripts/update-test-manifest.py.",
+            file=sys.stderr,
+        )
+        return 1
+    if js_files and not (manifest.get("javascript") or {}).get("tests"):
+        print(
+            "collection guard: FAIL -- the manifest records no JS test count while "
+            "JS test files exist.",
+            file=sys.stderr,
+        )
+        return 1
+
     print("collection guard: ok")
     return 0
 

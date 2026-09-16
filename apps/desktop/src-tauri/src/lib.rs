@@ -190,6 +190,26 @@ fn record_claim_evidence(
     commands::record_claim_evidence(&scope, &claim_label, &content_hash, &vault_file())
 }
 
+/// Back up the durable vault (REQ-REL-005).
+#[tauri::command]
+fn backup_vault(
+    workspace_id: String,
+    destination: String,
+) -> commands::CommandResult<commands::BackupView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::backup_vault(&scope, &destination, &vault_file())
+}
+
+/// Restore the durable vault from a backup (REQ-REL-005).
+#[tauri::command]
+fn restore_vault(
+    workspace_id: String,
+    source: String,
+) -> commands::CommandResult<commands::RestoreView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::restore_vault(&scope, &source, &vault_file())
+}
+
 /// Produce a valuation range tied to explicit assumptions (REQ-COM-003).
 #[tauri::command]
 fn evaluate_valuation(
@@ -370,6 +390,8 @@ pub fn run() {
             schedule_docket_deadline,
             check_support_matrix,
             record_claim_evidence,
+            backup_vault,
+            restore_vault,
             evaluate_valuation,
             set_research_coverage,
             complete_research_partial,

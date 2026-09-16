@@ -384,7 +384,11 @@ test.describe("LINCHPIN desktop shell", () => {
     await expect(confirmPanel).toHaveCount(0);
 
     // Every high-impact action offers the same protection.
-    for (const label of ["Build filing package", "Probe local model"]) {
+    for (const label of [
+      "Build filing package",
+      "Probe local model",
+      "Restore vault from backup",
+    ]) {
       await page.getByRole("button", { name: label, exact: true }).click();
       await expect(
         page.getByRole("group", { name: `Confirm ${label}` }),
@@ -394,5 +398,41 @@ test.describe("LINCHPIN desktop shell", () => {
         .getByRole("button", { name: "Cancel" })
         .click();
     }
+  });
+
+  // covers: REQ-REL-005
+  test("exposes backup and recovery and states the point-in-time limit", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // REQ-REL-005: backup/restore must be executable from the product. In a
+    // browser there is no Tauri IPC, so the test asserts the CONTROLS and the
+    // honest statement of what a backup is -- not a fabricated success.
+    await expect(page.getByLabel("Backup file")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Back up vault" }),
+    ).toBeVisible();
+
+    const recovery = page.locator("#recovery-heading").locator("..");
+    await expect(recovery).toContainText("point-in-time snapshot");
+    await expect(recovery).toContainText(
+      "restoring discards work that is not in the backup",
+    );
+
+    // The destructive half must confirm before it acts (REQ-UI-004).
+    const trigger = page.getByRole("button", {
+      name: "Restore vault from backup",
+    });
+    await expect(
+      page.getByRole("group", { name: "Confirm Restore vault from backup" }),
+    ).toHaveCount(0);
+    await trigger.click();
+    const panel = page.getByRole("group", {
+      name: "Confirm Restore vault from backup",
+    });
+    await expect(panel).toBeVisible();
+    await expect(panel).toContainText("discarded");
+    await expect(panel).toContainText("preserved rather than deleted");
   });
 });

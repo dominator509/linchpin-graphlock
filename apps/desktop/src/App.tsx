@@ -54,6 +54,27 @@ interface ConfigurationView {
   warnings: string[];
 }
 
+interface BackupView {
+  destination: string;
+  state_digest: string;
+}
+
+/**
+ * Recovery outcome (REQ-REL-005).
+ *
+ * `destination_recreated` and `destination_quarantined` are surfaced because a
+ * recovery that silently created a vault, or silently moved an unreadable one
+ * aside, would leave the operator unable to tell what happened to their data.
+ */
+interface RestoreView {
+  source: string;
+  digest_before: string;
+  digest_after: string;
+  reconciled: boolean;
+  destination_recreated: boolean;
+  destination_quarantined?: string | null;
+}
+
 interface ConceptionEventView {
   event_id: string;
   content_hash: string;
@@ -322,6 +343,15 @@ export default function App() {
     null,
   );
   const [ipcError, setIpcError] = useState<string | null>(null);
+
+  // Durable state recovery (REQ-REL-005). The backup path is operator-supplied
+  // and defaults to a sibling of the real vault file, so recovery never depends
+  // on a path the product invented.
+  const [backupFile, setBackupFile] = useState("");
+  const [backupResult, setBackupResult] =
+    useState<CommandResult<BackupView> | null>(null);
+  const [restoreResult, setRestoreResult] =
+    useState<CommandResult<RestoreView> | null>(null);
 
   const [draft, setDraft] = useState("");
   const [authorIsHuman, setAuthorIsHuman] = useState(true);
@@ -604,6 +634,47 @@ export default function App() {
       return null;
     }
   }, []);
+
+  // The backup path falls back to a sibling of the configured vault file, so the
+  // control is usable before the operator types anything.
+  const resolvedBackupFile =
+    backupFile || (configuration ? `${configuration.vault_file}.backup` : "");
+
+  const onBackupVault = useCallback(async (): Promise<string | null> => {
+    if (!hasIpc()) {
+      setOpsError("Cannot back up: desktop backend unavailable.");
+      return null;
+    }
+    try {
+      const result = await invoke<CommandResult<BackupView>>("backup_vault", {
+        workspaceId: WORKSPACE,
+        destination: resolvedBackupFile,
+      });
+      setBackupResult(result);
+      return result.ok ? result.correlation_id : null;
+    } catch (err) {
+      setOpsError(String(err));
+      return null;
+    }
+  }, [resolvedBackupFile]);
+
+  const onRestoreVault = useCallback(async (): Promise<string | null> => {
+    if (!hasIpc()) {
+      setOpsError("Cannot restore: desktop backend unavailable.");
+      return null;
+    }
+    try {
+      const result = await invoke<CommandResult<RestoreView>>("restore_vault", {
+        workspaceId: WORKSPACE,
+        source: resolvedBackupFile,
+      });
+      setRestoreResult(result);
+      return result.ok ? result.correlation_id : null;
+    } catch (err) {
+      setOpsError(String(err));
+      return null;
+    }
+  }, [resolvedBackupFile]);
 
   const onLintClaims = useCallback(async () => {
     if (!hasIpc()) {
@@ -1473,6 +1544,55 @@ export default function App() {
           Secret handling: provider subscription auth is owned by the
           first-party provider tool and is never an environment value here.
         </p>
+
+        {/* REQ-REL-005: backup and recovery are operator actions, so they are
+            reachable from the product rather than only from a test harness. */}
+        <h3 id="recovery-heading">Durable state recovery</h3>
+        <p>
+          A backup is a point-in-time snapshot of the vault. Work recorded after
+          the most recent backup is not in it, and restoring discards work that
+          is not in the backup.
+        </p>
+        <label htmlFor="backup-file">Backup file</label>
+        <input
+          id="backup-file"
+          type="text"
+          value={resolvedBackupFile}
+          onChange={(e) => setBackupFile(e.target.value)}
+          style={{ display: "block", width: "100%", maxWidth: "40rem" }}
+        />
+        <button type="button" onClick={() => void onBackupVault()}>
+          Back up vault
+        </button>
+        {backupResult && (
+          <p>
+            {backupResult.ok && backupResult.value
+              ? `Backup written to ${backupResult.value.destination} capturing ${backupResult.value.state_digest}`
+              : `Backup not written: ${backupResult.error?.message ?? "unknown error"}`}
+          </p>
+        )}
+        <ConfirmAction
+          label="Restore vault from backup"
+          consequence="replaces every event and claim in the vault with the snapshot in the backup file, so anything recorded after that backup is discarded; an unreadable vault is moved aside and preserved rather than deleted."
+          confirmLabel="Restore vault"
+          onConfirm={onRestoreVault}
+          onAudit={addAudit}
+        />
+        {restoreResult && (
+          <p>
+            {restoreResult.ok && restoreResult.value
+              ? `Restored from ${restoreResult.value.source}: reconciled ${String(restoreResult.value.reconciled)}; state went from ${restoreResult.value.digest_before} to ${restoreResult.value.digest_after}${
+                  restoreResult.value.destination_recreated
+                    ? "; no vault existed, so it was recreated from the backup"
+                    : ""
+                }${
+                  restoreResult.value.destination_quarantined
+                    ? `; the unreadable vault was preserved at ${restoreResult.value.destination_quarantined}`
+                    : ""
+                }`
+              : `Restore did not run: ${restoreResult.error?.message ?? "unknown error"}`}
+          </p>
+        )}
       </section>
 
       {/* REQ-UI-004: the audit half of consequence-specific confirmation. */}

@@ -5,7 +5,10 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-rusqlite = { version = "0.40.2", features = ["bundled"] }
+# `backup` enables the online-backup API used by REQ-REL-005 ("backup/restart/
+# recovery ... executed against reconciled persistent state"). A file copy is not
+# a backup: it can capture a torn WAL state. Same crate, same pinned version.
+rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
 tantivy = "0.26.2"
 # `v7` is enabled because REQ-DATA-001 requires UUIDv7 identifiers for the
 # canonical tables -- time-ordered ids that index better than v4 and sort by

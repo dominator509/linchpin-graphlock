@@ -147,6 +147,35 @@ def stages_for(classes: list[str]) -> list[str]:
     return stages
 
 
+def refresh_source_derived() -> None:
+    """Refresh derived evidence that depends ONLY on source, BEFORE the stages.
+
+    `reachability.py` classifies the public surface from the Rust sources. It is
+    not a stage output, but `harness-validate.sh` -- which IS a stage, and runs
+    FIRST -- fails when the committed classification is stale. Measured: a round
+    that added functions failed V-000 with 'stale: 199 rows, recomputed 210',
+    which is a self-inflicted ordering failure rather than a product finding. So
+    the source-derived refresh happens before the stages, and the stage-output
+    refresh (accounting, DOD digests, index) still happens after them.
+    """
+    step = subprocess.run(
+        ["python3", "scripts/reachability.py"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        shell=False,
+    )
+    if step.returncode == 0:
+        print(f"rerun: refreshed source-derived reachability")
+    else:
+        print(
+            f"rerun: WARNING -- could not refresh reachability; "
+            f"{(step.stderr or '').strip()[:200]}",
+            file=sys.stderr,
+        )
+
+
 def refresh_derived_evidence() -> None:
     """Refresh derived evidence in dependency order.
 
@@ -267,6 +296,9 @@ def main() -> int:
     print(f"rerun: {len(classes)} changed class(es) -> {len(stages)} stage(s)")
     results: list[dict] = []
     failures = 0
+
+    # Source-derived evidence first: the first stage validates it.
+    refresh_source_derived()
 
     for stage in stages:
         runners = STAGE_RUNNERS.get(stage)

@@ -1,0 +1,63 @@
+{
+  "clause": "DOD-018",
+  "harness": "scripts/mutation-proof.py",
+  "mutations": [
+    {
+      "id": "MUT-REL-005-a",
+      "clause": "DOD-018",
+      "covers": "REQ-REL-005",
+      "feature": "backup reconciliation refuses an absent path",
+      "changed_behavior": "Vault::digest_of reverts to SQLite open-or-create semantics, so a mistyped backup path is CREATED, digested as empty state, and reported as a valid reconciliation target.",
+      "command": "cargo test -p storage --lib test_digest_of_is_read_only_and_refuses_non_vaults",
+      "expect_test": "test_digest_of_is_read_only_and_refuses_non_vaults",
+      "verdict": "CAUGHT",
+      "detail": "test vault::tests::test_digest_of_is_read_only_and_refuses_non_vaults ... FAILED",
+      "mutant_exit_code": 101,
+      "mutant_duration_s": 3.94,
+      "mutant_output_sha256": "sha256:b6f168b02d9d9ea0f6e947a5c72c21f9b65ccd8e2ff01ebf6d5ded579b47bda6",
+      "mutant_output_tail": "---- vault::tests::test_digest_of_is_read_only_and_refuses_non_vaults stdout ----\n\nthread 'vault::tests::test_digest_of_is_read_only_and_refuses_non_vaults' (23852) panicked at crates\\storage\\src\\vault.rs:1359:9:\nassertion failed: matches!(Vault::digest_of(&absent), Err(VaultError::BackupMissing(_)))\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    vault::tests::test_digest_of_is_read_only_and_refuses_non_vaults\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 0.06s\n\n   Compiling storage v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\storage)\nwarning: unused import: `OpenFlags`\n  --> crates\\storage\\src\\vault.rs:21:28\n   |\n21 | use rusqlite::{Connection, OpenFlags, OptionalExtension};\n   |                            ^^^^^^^^^\n   |\n   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `storage` (lib test) generated 1 warning (run `cargo fix --lib -p storage --tests` to apply 1 suggestion)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.17s\n     Running unittests src\\lib.rs (target\\debug\\deps\\storage-a69518d2cc058371.exe)\nerror: test failed, to rerun pass `-p storage --lib`",
+      "restored": true,
+      "green_exit_code": 0,
+      "green_duration_s": 3.63,
+      "green_ok": true
+    },
+    {
+      "id": "MUT-REL-005-b",
+      "clause": "DOD-018",
+      "covers": "REQ-REL-005",
+      "feature": "restore replaces content with the snapshot",
+      "changed_behavior": "Vault::restore_from reports success without copying any page, so a restore silently does nothing and post-backup work survives.",
+      "command": "cargo test -p storage --lib test_backup_and_restore_reconcile_to_the_snapshot",
+      "expect_test": "test_backup_and_restore_reconcile_to_the_snapshot",
+      "verdict": "CAUGHT",
+      "detail": "test vault::tests::test_backup_and_restore_reconcile_to_the_snapshot ... FAILED",
+      "mutant_exit_code": 101,
+      "mutant_duration_s": 3.6,
+      "mutant_output_sha256": "sha256:573fdf6be7c5ec4dee330d91899332970b6ff4038e5a0e4e89605f54313ded1f",
+      "mutant_output_tail": "\nrunning 1 test\ntest vault::tests::test_backup_and_restore_reconcile_to_the_snapshot ... FAILED\n\nfailures:\n\n---- vault::tests::test_backup_and_restore_reconcile_to_the_snapshot stdout ----\n\nthread 'vault::tests::test_backup_and_restore_reconcile_to_the_snapshot' (14680) panicked at crates\\storage\\src\\vault.rs:1297:9:\nassertion `left == right` failed: restored state does not reconcile with the backup digest\n  left: \"sha256:8c62d6b90209e615db020994fcb333460e72e388b5acdebdc9f9b9e918596d21\"\n right: \"sha256:f775b72ae4b900eb1e70e35bcc3e027de557020a6c318aa7e6a1b6206ae66f44\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    vault::tests::test_backup_and_restore_reconcile_to_the_snapshot\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 0.04s\n\n   Compiling storage v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\storage)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.89s\n     Running unittests src\\lib.rs (target\\debug\\deps\\storage-a69518d2cc058371.exe)\nerror: test failed, to rerun pass `-p storage --lib`",
+      "restored": true,
+      "green_exit_code": 0,
+      "green_duration_s": 3.53,
+      "green_ok": true
+    },
+    {
+      "id": "MUT-REL-005-c",
+      "clause": "DOD-018",
+      "covers": "REQ-REL-005",
+      "feature": "the destructive product command fails closed on a bad source",
+      "changed_behavior": "Both guards between an operator's mistyped path and the destructive restore step are removed, reproducing the measured defect in which restore_vault was ACCEPTED and replaced the live vault with an empty database.",
+      "command": "cargo test -p linchpin-desktop --lib test_backup_and_restore_commands_reconcile",
+      "expect_test": "test_backup_and_restore_commands_reconcile",
+      "verdict": "CAUGHT",
+      "detail": "test commands::tests::test_backup_and_restore_commands_reconcile ... FAILED",
+      "mutant_exit_code": 101,
+      "mutant_duration_s": 7.12,
+      "mutant_output_sha256": "sha256:eb3de43fc5e2741906dc303d5e96310c6fb6b722b7e7947103f2eea430f01760",
+      "mutant_output_tail": "thread 'commands::tests::test_backup_and_restore_commands_reconcile' (8280) panicked at apps\\desktop\\src-tauri\\src\\commands.rs:3250:9:\nrestoring from a missing backup was accepted\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    commands::tests::test_backup_and_restore_commands_reconcile\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 46 filtered out; finished in 0.09s\n\n   Compiling storage v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\storage)\nwarning: unused import: `OpenFlags`\n  --> crates\\storage\\src\\vault.rs:21:28\n   |\n21 | use rusqlite::{Connection, OpenFlags, OptionalExtension};\n   |                            ^^^^^^^^^\n   |\n   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\n   Compiling application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)\nwarning: `storage` (lib) generated 1 warning (run `cargo fix --lib -p storage` to apply 1 suggestion)\n   Compiling linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.39s\n     Running unittests src\\lib.rs (target\\debug\\deps\\linchpin_desktop_lib-dcc7a64f58b5dbed.exe)\nerror: test failed, to rerun pass `-p linchpin-desktop --lib`",
+      "restored": true,
+      "green_exit_code": 0,
+      "green_duration_s": 6.83,
+      "green_ok": true
+    }
+  ]
+}

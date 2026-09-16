@@ -325,27 +325,44 @@ try {
   // than reading configuration and assuming, ask the OS which remote endpoints
   // this process actually holds open.
   //
-  // The sampler must ALSO be proven to work, or its silence proves nothing. Two
+  // The sampler must ALSO be proven to work, or its silence proves nothing. Three
   // measured failures shaped this:
   //   1. A single sample taken AFTER the inference returned reported "sampled 0
   //      endpoint(s)" -- it passed while demonstrating nothing.
   //   2. Polling by spawning PowerShell per sample was still useless: process
   //      start-up (~300ms) dwarfs a localhost connection that lasts tens of ms,
   //      so the positive control observed nothing while inference succeeded.
-  // One long-running PowerShell now polls internally at ~20ms, and several real
-  // inference calls run during the window. The assertion requires BOTH: at least
-  // one loopback endpoint observed (positive control) and zero non-loopback
+  //   3. Even ONE long-running sampler lost the race on a loaded machine: the
+  //      whole 5-call burst finished before Windows PowerShell finished starting,
+  //      so the run reported `observed=[] live_calls=5/5` -- correctly failing the
+  //      gate, but for a harness reason that looked like a product result.
+  // So the sampler now ANNOUNCES that it is polling and the inference calls wait
+  // for that announcement, the calls repeat (bounded) until a loopback endpoint is
+  // actually seen, and the sampler emits heartbeats so "observed nothing" can
+  // never be confused with "never ran". The assertion still requires BOTH: at
+  // least one loopback endpoint observed (positive control) and zero non-loopback
   // endpoints (the requirement).
   const observed = new Set();
+  let samplerReady = false;
+  let heartbeats = 0;
   const sampler = spawn(
     "powershell",
     [
       "-NoProfile",
       "-Command",
-      `$deadline = (Get-Date).AddSeconds(75)
+      // A heartbeat per poll, not every fifth: each poll costs a
+      // Get-NetTCPConnection call, so a short window can complete fewer than
+      // five iterations, and a liveness check that cannot observe a genuinely
+      // working sampler is a false failure. Measured: every fifth poll reported
+      // heartbeats=0 while the sampler had already observed two real endpoints.
+      `$deadline = (Get-Date).AddSeconds(180)
+$polls = 0
+Write-Output "READY"
 while ((Get-Date) -lt $deadline) {
+  $polls++
   Get-NetTCPConnection -OwningProcess ${app.pid} -ErrorAction SilentlyContinue |
     ForEach-Object { $_.RemoteAddress }
+  Write-Output "HEARTBEAT $polls"
   Start-Sleep -Milliseconds 20
 }`,
     ],
@@ -354,20 +371,34 @@ while ((Get-Date) -lt $deadline) {
   sampler.stdout.on("data", (buf) => {
     for (const line of String(buf).split(/\r?\n/)) {
       const addr = line.trim();
-      if (addr) observed.add(addr);
+      if (!addr) continue;
+      if (addr === "READY") samplerReady = true;
+      else if (addr.startsWith("HEARTBEAT")) heartbeats += 1;
+      else observed.add(addr);
     }
   });
 
-  // Several real inference calls, so the loopback connection exists repeatedly
-  // inside the sampling window.
+  // Wait (bounded) for the sampler to prove it is polling BEFORE generating the
+  // connections it is supposed to see.
+  const readyDeadline = Date.now() + 30000;
+  while (!samplerReady && Date.now() < readyDeadline) await sleep(50);
+
+  // Several real inference calls, repeated until the loopback connection is
+  // actually observed rather than hoped for.
   let liveCalls = 0;
-  for (let i = 0; i < 5; i += 1) {
+  const observeDeadline = Date.now() + 60000;
+  for (let i = 0; i < 25; i += 1) {
     const r = await invoke("run_local_inference", {
       endpoint: ENDPOINT,
       modelId: MODEL,
       prompt: `Name one property of a valve, in three words. ${canary()}`,
     });
     if (r?.value?.live === true) liveCalls += 1;
+    const seenLoopback = [...observed].some(
+      (a) => a === "127.0.0.1" || a === "::1" || a.startsWith("127."),
+    );
+    if (i >= 4 && seenLoopback) break;
+    if (Date.now() > observeDeadline) break;
   }
   await sleep(300);
   sampler.kill();
@@ -390,10 +421,17 @@ while ((Get-Date) -lt $deadline) {
     (a) => a === "127.0.0.1" || a === "::1" || a.startsWith("127."),
   );
 
+  // Liveness of the harness itself, recorded separately so a sampler that never
+  // started is never reported as a product finding.
+  record(
+    "egress sampler started and polled (harness liveness, REQ-REL-002)",
+    samplerReady && heartbeats > 0,
+    `ready=${samplerReady} heartbeats=${heartbeats}`,
+  );
   record(
     "egress sampler observes connections (positive control, REQ-REL-002)",
-    sawLoopback && liveCalls > 0,
-    `observed=[${addrs.join(",")}] live_calls=${liveCalls}/5`,
+    sawLoopback && liveCalls >= 5,
+    `observed=[${addrs.join(",")}] live_calls=${liveCalls} (minimum 5)`,
   );
   record(
     "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",

@@ -31,7 +31,7 @@
 {"collected": false, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "NOT_RUN", "test_id": "default"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "tests::test_domain_entity_lifecycle"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "origin_tests::test_human_vs_ai_origin"}
-{"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-001", "result": "NOT_RUN", "test_id": "commands::fmt"}
+{"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-001", "result": "NOT_RUN", "test_id": "commands::sidecar"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "commands::tests::test_record_conception_labels_human_origin"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-002", "result": "PASS", "test_id": "origin_tests::test_human_vs_ai_origin"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DOM-002", "result": "PASS", "test_id": "commands::tests::test_record_conception_labels_ai_origin_distinctly"}
@@ -105,6 +105,7 @@
 {"collected": true, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "tests::test_transient_failure_is_retried_up_to_the_bound"}
 {"collected": true, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "tests::test_non_transient_failure_is_not_retried"}
 {"collected": true, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "tests::test_retry_policy_rejects_an_unbounded_or_zero_bound"}
+{"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-OPS-002", "result": "NOT_RUN", "test_id": "commands::tests::commands_put_event"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-OPS-002", "result": "PASS", "test_id": "commands::tests::test_research_coverage_and_partial_completion_at_the_boundary"}
 {"collected": false, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-003", "result": "NOT_RUN", "test_id": "sandbox_tests::default"}
 {"collected": true, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-003", "result": "PASS", "test_id": "soak_tests::test_soak_measures_real_memory_growth"}
@@ -159,6 +160,13 @@
 {"collected": false, "file": "crates/platform_windows/tests/local_first.rs", "requirement_id": "REQ-REL-002", "result": "NOT_RUN", "test_id": "report"}
 {"collected": true, "file": "crates/platform_windows/tests/local_first.rs", "requirement_id": "REQ-REL-002", "result": "PASS", "test_id": "test_local_first_core_works_with_a_local_model_and_no_network"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-REL-003", "result": "PASS", "test_id": "commands::tests::test_filing_handoff_reports_blockers_and_never_automates"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-REL-005", "result": "PASS", "test_id": "vault::tests::test_backup_and_restore_reconcile_to_the_snapshot"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-REL-005", "result": "PASS", "test_id": "vault::tests::test_digest_of_is_read_only_and_refuses_non_vaults"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-REL-005", "result": "PASS", "test_id": "vault::tests::test_recovered_state_survives_a_hard_restart"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-REL-005", "result": "PASS", "test_id": "vault::tests::test_state_digest_observes_content_not_layout"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-REL-005", "result": "PASS", "test_id": "commands::tests::test_backup_and_restore_commands_reconcile"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-REL-005", "result": "PASS", "test_id": "commands::tests::test_restore_recovers_from_a_lost_and_from_a_corrupt_vault"}
+{"collected": true, "file": "apps/desktop/e2e/shell.spec.ts", "requirement_id": "REQ-REL-005", "result": "PASS", "test_id": "e2e::exposes backup and recovery and states the point-in-time limit"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_redaction_actually_removes_invention_content"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_flag_alone_is_not_sufficient"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_token_shaped_secrets_are_scrubbed_without_registration"}

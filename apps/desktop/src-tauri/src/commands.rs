@@ -1263,6 +1263,272 @@ pub struct ClaimEvidenceView {
     pub still_unsupported: bool,
 }
 
+/// Outcome of a vault backup (REQ-REL-005).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BackupView {
+    pub destination: String,
+    /// Digest of the state the backup captured, so it can be reconciled later.
+    pub state_digest: String,
+}
+
+/// Outcome of a vault restore (REQ-REL-005).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RestoreView {
+    pub source: String,
+    /// State digest BEFORE the restore: what was discarded.
+    pub digest_before: String,
+    /// State digest AFTER the restore: what is now held.
+    pub digest_after: String,
+    /// True when the restored state matches the backup exactly.
+    pub reconciled: bool,
+    /// True when no vault existed at the destination and the restore created it.
+    /// Disaster recovery is exactly this case, so it is REPORTED rather than
+    /// hidden behind an identical success response.
+    pub destination_recreated: bool,
+    /// Where an unreadable destination was moved before recovery, if one was.
+    /// Recovery from a corrupt vault must not begin by deleting the evidence.
+    pub destination_quarantined: Option<String>,
+}
+
+/// Write a consistent backup of the durable vault (REQ-REL-005).
+///
+/// Uses SQLite's online-backup API, not a file copy: a copy can capture a torn
+/// write-ahead log, and a backup that silently restores to a corrupt state is
+/// worse than no backup at all.
+pub fn backup_vault(
+    scope: &WorkspaceScope,
+    destination: &str,
+    vault_path: &std::path::Path,
+) -> CommandResult<BackupView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if destination.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("destination is required"),
+        );
+    }
+    if !vault_path.exists() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::policy(format!("no vault at {}", vault_path.display())),
+        );
+    }
+
+    let vault = match storage::vault::Vault::open(vault_path) {
+        Ok(v) => v,
+        Err(e) => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::policy(format!("cannot open vault: {e}")),
+            )
+        }
+    };
+    let digest = match vault.state_digest() {
+        Ok(d) => d,
+        Err(e) => return CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    };
+    let dest = std::path::PathBuf::from(destination);
+    if let Err(e) = vault.backup_to(&dest) {
+        return CommandResult::failure(correlation, CommandError::policy(e.to_string()));
+    }
+
+    CommandResult::success(
+        correlation,
+        BackupView {
+            destination: dest.display().to_string(),
+            state_digest: digest,
+        },
+    )
+}
+
+/// Restore the durable vault from a backup, reporting the reconciliation
+/// (REQ-REL-005).
+///
+/// Destructive by design: the current content is replaced. The digest is read
+/// BEFORE and AFTER and both are returned, so the caller can see what was
+/// discarded rather than being told only that a restore happened.
+pub fn restore_vault(
+    scope: &WorkspaceScope,
+    source: &str,
+    vault_path: &std::path::Path,
+) -> CommandResult<RestoreView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if source.trim().is_empty() {
+        return CommandResult::failure(correlation, CommandError::validation("source is required"));
+    }
+
+    let src = std::path::PathBuf::from(source);
+    // Defence in depth: `digest_of` also refuses an absent path, but a restore
+    // whose SOURCE does not exist must never reach the destructive step, so the
+    // check is repeated at the boundary that would discard the live vault. The
+    // order matters: the SOURCE is validated before the destination is touched
+    // at all, so a mistyped backup leaves a corrupt vault exactly where it was.
+    if !src.exists() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::policy(format!("no backup at {}", src.display())),
+        );
+    }
+    let backup_digest = match storage::vault::Vault::digest_of(&src) {
+        Ok(d) => d,
+        Err(e) => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::policy(format!("cannot read backup {}: {e}", src.display())),
+            )
+        }
+    };
+
+    // RECOVERY, not merely restore. This command is what an operator runs after
+    // a hard failure, so it must cope with the two states a disaster leaves
+    // behind -- and an earlier revision coped with NEITHER:
+    //   * the vault FILE is gone (wiped profile, deleted file, disk loss): the
+    //     command refused with "no vault at ...", so recovery was impossible
+    //     through the product. It now recreates the destination from the backup
+    //     and says so.
+    //   * the vault file exists but is UNREADABLE (torn write, bit rot): the
+    //     command refused with "cannot open vault". It now moves the unreadable
+    //     file aside -- preserved, never deleted -- and recovers into a fresh
+    //     vault, reporting where the original went.
+    let destination_existed = vault_path.exists();
+    let mut destination_quarantined = None;
+    if let Some(parent) = vault_path.parent() {
+        if !parent.as_os_str().is_empty() {
+            if let Err(e) = std::fs::create_dir_all(parent) {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::policy(format!("cannot prepare {}: {e}", parent.display())),
+                );
+            }
+        }
+    }
+
+    let (mut vault, before) = match open_for_recovery(vault_path) {
+        Ok(pair) => pair,
+        Err(first_error) => {
+            if !vault_path.exists() {
+                // The destination could not be CREATED: absent path under an
+                // unwritable or uncreatable parent. That is a real failure, not
+                // a disaster to recover from, so it is reported as one.
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::policy(format!(
+                        "cannot create a vault at {}: {first_error}",
+                        vault_path.display()
+                    )),
+                );
+            }
+            let quarantine = quarantine_path(vault_path);
+            if let Err(e) = quarantine_unreadable(vault_path, &quarantine) {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::policy(format!(
+                        "vault {} is unreadable ({first_error}) and could not be moved aside: {e}",
+                        vault_path.display()
+                    )),
+                );
+            }
+            destination_quarantined = Some(quarantine.display().to_string());
+            match open_for_recovery(vault_path) {
+                Ok(pair) => pair,
+                Err(e) => {
+                    return CommandResult::failure(
+                        correlation,
+                        CommandError::policy(format!(
+                            "cannot create a recovery vault at {}: {e}",
+                            vault_path.display()
+                        )),
+                    )
+                }
+            }
+        }
+    };
+    if let Err(e) = vault.restore_from(&src) {
+        return CommandResult::failure(correlation, CommandError::policy(e.to_string()));
+    }
+    let after = match vault.state_digest() {
+        Ok(d) => d,
+        Err(e) => return CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    };
+
+    CommandResult::success(
+        correlation,
+        RestoreView {
+            source: src.display().to_string(),
+            reconciled: after == backup_digest,
+            digest_before: before,
+            digest_after: after,
+            destination_recreated: !destination_existed,
+            destination_quarantined,
+        },
+    )
+}
+
+/// Open a vault AND read its state in one step, so an unreadable vault is
+/// detected even when the file happens to open.
+///
+/// A corrupt database can pass `Vault::open` -- journal-mode and migration
+/// statements may not touch the damaged page -- and only fail when the content
+/// is queried. Treating "opens" as "readable" would leave recovery refusing to
+/// run on exactly the vault that needs it.
+fn open_for_recovery(
+    vault_path: &std::path::Path,
+) -> Result<(storage::vault::Vault, String), String> {
+    let vault = storage::vault::Vault::open(vault_path).map_err(|e| e.to_string())?;
+    let digest = vault.state_digest().map_err(|e| e.to_string())?;
+    Ok((vault, digest))
+}
+
+/// Where an unreadable vault is preserved during recovery.
+/// A sibling path, so the move is a rename on one volume and cannot fail for
+/// cross-device reasons, and never the same name twice because the timestamp is
+/// seconds since the epoch.
+fn quarantine_path(vault_path: &std::path::Path) -> std::path::PathBuf {
+    let stamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let mut name = vault_path
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_else(|| "vault.db".to_string());
+    name.push_str(&format!(".unreadable-{stamp}"));
+    vault_path.with_file_name(name)
+}
+
+/// Move a vault and its write-ahead-log siblings aside, without deleting them.
+fn quarantine_unreadable(
+    vault_path: &std::path::Path,
+    quarantine: &std::path::Path,
+) -> Result<(), std::io::Error> {
+    std::fs::rename(vault_path, quarantine)?;
+    for suffix in ["-wal", "-shm"] {
+        let from = sidecar(vault_path, suffix);
+        if from.exists() {
+            std::fs::rename(&from, sidecar(quarantine, suffix))?;
+        }
+    }
+    Ok(())
+}
+
+/// `<vault>` + `-wal` / `-shm`, matching SQLite's own sidecar naming.
+fn sidecar(vault_path: &std::path::Path, suffix: &str) -> std::path::PathBuf {
+    let mut name = vault_path
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_else(|| "vault.db".to_string());
+    name.push_str(suffix);
+    vault_path.with_file_name(name)
+}
+
 /// Resolved runtime configuration as reported to the UI (REQ-FOUND-002).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ConfigurationView {
@@ -2909,6 +3175,278 @@ mod tests {
         assert!(!record_claim_evidence(&no_scope, "a self-sealing valve", &hash, &vault_path).ok);
 
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-REL-005
+    /// Backup and restore must reconcile at the production boundary, reporting
+    /// what was discarded rather than only that a restore happened.
+    #[test]
+    fn test_backup_and_restore_commands_reconcile() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-cmd-backup-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+        let backup_path = dir.join("backup.db");
+
+        // Establish a vault with content through the real command path.
+        let scope = WorkspaceScope {
+            workspace_id: "ws-backup".to_string(),
+        };
+        let recorded = commands_put_event(&vault_path, "ws-backup", "ev-1", "first conception");
+        assert!(recorded, "could not seed the vault");
+
+        let backup = backup_vault(&scope, backup_path.to_str().unwrap(), &vault_path);
+        assert!(backup.ok, "backup failed: {:?}", backup.error);
+        let bview = backup.value.unwrap();
+        assert!(
+            bview.state_digest.starts_with("sha256:"),
+            "backup must report a state digest"
+        );
+        assert!(backup_path.exists());
+
+        // Diverge after the backup.
+        assert!(commands_put_event(
+            &vault_path,
+            "ws-backup",
+            "ev-2",
+            "second conception"
+        ));
+
+        let restore = restore_vault(&scope, backup_path.to_str().unwrap(), &vault_path);
+        assert!(restore.ok, "restore failed: {:?}", restore.error);
+        let rview = restore.value.unwrap();
+        assert!(
+            rview.reconciled,
+            "the restored state does not match the backup: {} vs {}",
+            rview.digest_after, rview.digest_before
+        );
+        assert_eq!(
+            rview.digest_after, bview.state_digest,
+            "restored digest must equal the digest the backup captured"
+        );
+        assert_ne!(
+            rview.digest_before, rview.digest_after,
+            "test premise: the vault had diverged before the restore"
+        );
+
+        // The post-backup work is gone.
+        let vault = storage::vault::Vault::open(&vault_path).unwrap();
+        let events = vault.list_conception_events("ws-backup").unwrap();
+        assert_eq!(events.len(), 1, "post-backup work survived the restore");
+        assert_eq!(events[0].content, "first conception");
+
+        // Errors are reported, not silently ignored.
+        assert!(!backup_vault(&scope, "  ", &vault_path).ok);
+        assert!(!restore_vault(&scope, "  ", &vault_path).ok);
+
+        // A refused restore must leave the vault EXACTLY as it was. Fail-closed
+        // means no side effect, not merely a non-ok response.
+        let survived = storage::vault::Vault::open(&vault_path)
+            .unwrap()
+            .state_digest()
+            .unwrap();
+        let absent = dir.join("absent.db");
+        let missing = restore_vault(&scope, absent.to_str().unwrap(), &vault_path);
+        assert!(!missing.ok, "restoring from a missing backup was accepted");
+        // The defect this guards against: opening a mistyped path CREATED an
+        // empty database there, so the phantom must not exist either.
+        assert!(
+            !absent.exists(),
+            "a refused restore created {} as a side effect",
+            absent.display()
+        );
+        // A file that is not a vault is refused, not given a schema.
+        let foreign = dir.join("notes.txt");
+        std::fs::write(&foreign, "not a database").unwrap();
+        let garbage = restore_vault(&scope, foreign.to_str().unwrap(), &vault_path);
+        assert!(
+            !garbage.ok,
+            "restoring from a non-vault file was accepted: {:?}",
+            garbage.value
+        );
+        // Reconciliation measures the backup; it must not change it.
+        let backup_after = storage::vault::Vault::digest_of(&backup_path).unwrap();
+        assert_eq!(
+            backup_after, bview.state_digest,
+            "reconciliation mutated the backup it measured"
+        );
+        let after_refusals = storage::vault::Vault::open(&vault_path)
+            .unwrap()
+            .state_digest()
+            .unwrap();
+        assert_eq!(
+            after_refusals, survived,
+            "a refused restore changed the live vault"
+        );
+
+        let no_scope = WorkspaceScope {
+            workspace_id: String::new(),
+        };
+        assert!(!backup_vault(&no_scope, backup_path.to_str().unwrap(), &vault_path).ok);
+        assert!(!backup_vault(&scope, backup_path.to_str().unwrap(), &dir.join("none.db")).ok);
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-REL-005
+    /// Disaster recovery at the product boundary. A recovery command is run
+    /// precisely when the destination is already broken, so the two states a
+    /// hard failure leaves behind are the two that must work -- and the earlier
+    /// revision refused BOTH: a deleted vault hit "no vault at ...", and a
+    /// corrupt vault hit "cannot open vault", so recovery was impossible through
+    /// the product exactly when it was needed.
+    #[test]
+    fn test_restore_recovers_from_a_lost_and_from_a_corrupt_vault() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-recovery-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+        let backup_path = dir.join("backup.db");
+        let scope = WorkspaceScope {
+            workspace_id: "ws-recovery".to_string(),
+        };
+
+        assert!(commands_put_event(
+            &vault_path,
+            "ws-recovery",
+            "ev-1",
+            "precious work"
+        ));
+        let backup = backup_vault(&scope, backup_path.to_str().unwrap(), &vault_path);
+        assert!(backup.ok, "backup failed: {:?}", backup.error);
+        let captured = backup.value.unwrap().state_digest;
+
+        // F1 -- TOTAL LOSS: the vault file is gone.
+        std::fs::remove_file(&vault_path).expect("remove vault");
+        assert!(!vault_path.exists());
+        let lost = restore_vault(&scope, backup_path.to_str().unwrap(), &vault_path);
+        assert!(
+            lost.ok,
+            "recovery from a lost vault failed: {:?}",
+            lost.error
+        );
+        let lview = lost.value.unwrap();
+        assert!(
+            lview.destination_recreated,
+            "recovery silently created the vault instead of reporting it"
+        );
+        assert!(
+            lview.reconciled && lview.digest_after == captured,
+            "recovered state does not reconcile with the backup"
+        );
+        assert!(lview.destination_quarantined.is_none());
+        let events = storage::vault::Vault::open(&vault_path)
+            .unwrap()
+            .list_conception_events("ws-recovery")
+            .unwrap();
+        assert_eq!(
+            events.len(),
+            1,
+            "the recovered vault does not hold the backed-up work"
+        );
+        assert_eq!(events[0].content, "precious work");
+
+        // F2 -- CORRUPTION: the file exists but cannot be read.
+        for suffix in ["-wal", "-shm"] {
+            let side = dir.join(format!("vault.db{suffix}"));
+            std::fs::remove_file(side).ok();
+        }
+        std::fs::write(&vault_path, vec![0x41u8; 4096]).expect("corrupt the vault");
+        assert!(
+            storage::vault::Vault::open(&vault_path)
+                .and_then(|v| v.state_digest())
+                .is_err(),
+            "test premise: the corrupted vault must be unreadable"
+        );
+
+        let corrupt = restore_vault(&scope, backup_path.to_str().unwrap(), &vault_path);
+        assert!(
+            corrupt.ok,
+            "recovery from a corrupt vault failed: {:?}",
+            corrupt.error
+        );
+        let cview = corrupt.value.unwrap();
+        let quarantine = cview
+            .destination_quarantined
+            .as_ref()
+            .expect("the unreadable vault must be preserved, not overwritten");
+        let quarantined_bytes =
+            std::fs::read(quarantine).expect("the quarantined original must still exist");
+        assert_eq!(
+            quarantined_bytes.len(),
+            4096,
+            "the quarantined file is not the vault that was there"
+        );
+        assert!(cview.reconciled && cview.digest_after == captured);
+        assert!(
+            !cview.destination_recreated,
+            "the destination existed, so it was not recreated"
+        );
+
+        // F3 -- NO SIDE EFFECT ON A REFUSED RECOVERY. A bad source must leave a
+        // broken destination exactly where it is: quarantining it would destroy
+        // the only copy an operator still has.
+        std::fs::write(&vault_path, vec![0x42u8; 4096]).expect("corrupt the vault again");
+        let before_bytes = std::fs::read(&vault_path).unwrap();
+        let refused = restore_vault(&scope, dir.join("absent.db").to_str().unwrap(), &vault_path);
+        assert!(!refused.ok, "a missing source was accepted");
+        assert_eq!(
+            std::fs::read(&vault_path).unwrap(),
+            before_bytes,
+            "a refused recovery disturbed the destination"
+        );
+        assert_eq!(
+            quarantine_count(&dir),
+            1,
+            "a refused recovery quarantined the destination"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// How many quarantined vaults exist in `dir`, for the no-side-effect check.
+    fn quarantine_count(dir: &std::path::Path) -> usize {
+        std::fs::read_dir(dir)
+            .map(|entries| {
+                entries
+                    .filter_map(|e| e.ok())
+                    .filter(|e| e.file_name().to_string_lossy().contains(".unreadable-"))
+                    .count()
+            })
+            .unwrap_or(0)
+    }
+
+    /// Seed a conception event directly through the vault, for the backup tests.
+    ///
+    /// The workspace is a parameter, not the hardcoded "ws-backup" it used to be:
+    /// a helper that silently writes into a different workspace than its caller
+    /// names is how a recovery test came to query an empty vault and look like a
+    /// product defect.
+    fn commands_put_event(
+        vault_path: &std::path::Path,
+        workspace_id: &str,
+        event_id: &str,
+        content: &str,
+    ) -> bool {
+        let Ok(vault) = storage::vault::Vault::open(vault_path) else {
+            return false;
+        };
+        vault.create_workspace(workspace_id).is_ok()
+            && vault
+                .put_conception_event(workspace_id, event_id, "HumanConception", content)
+                .is_ok()
     }
 
     /// covers: REQ-OPS-002

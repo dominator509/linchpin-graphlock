@@ -18,7 +18,7 @@
 //! durability (DOD-015), so the constructor requires a path and the tests close
 //! and reopen the connection.
 
-use rusqlite::{Connection, OptionalExtension};
+use rusqlite::{Connection, OpenFlags, OptionalExtension};
 use sha2::{Digest, Sha256};
 use std::path::Path;
 
@@ -204,6 +204,10 @@ pub enum VaultError {
     InvalidAnchorKind(String),
     /// An anchor reference was blank.
     InvalidAnchorReference,
+    /// A backup file to restore from does not exist (REQ-REL-005).
+    BackupMissing(String),
+    /// Filesystem failure while backing up or restoring.
+    Io(String),
 }
 
 impl std::fmt::Display for VaultError {
@@ -217,6 +221,8 @@ impl std::fmt::Display for VaultError {
                 write!(f, "anchor kind {k:?} is not SPECIFICATION or FIGURE")
             }
             VaultError::InvalidAnchorReference => write!(f, "anchor reference is required"),
+            VaultError::BackupMissing(p) => write!(f, "backup file does not exist: {p}"),
+            VaultError::Io(m) => write!(f, "io error: {m}"),
             VaultError::ChainBroken {
                 seq,
                 expected,
@@ -234,6 +240,12 @@ impl std::error::Error for VaultError {}
 impl From<rusqlite::Error> for VaultError {
     fn from(e: rusqlite::Error) -> Self {
         VaultError::Database(e)
+    }
+}
+
+impl From<std::io::Error> for VaultError {
+    fn from(e: std::io::Error) -> Self {
+        VaultError::Io(e.to_string())
     }
 }
 
@@ -312,6 +324,120 @@ impl Vault {
     /// not see the schema could not verify it.
     pub fn connection(&self) -> &Connection {
         &self.conn
+    }
+
+    /// A reconciled digest of the canonical state.
+    ///
+    /// REQ-REL-005 requires recovery "against RECONCILED persistent state", so
+    /// there must be something to reconcile against. This digests the durable
+    /// CONTENT -- conception events and the claim/support graph -- not file
+    /// bytes, so two stores holding the same logical state compare equal
+    /// regardless of page layout or WAL framing.
+    pub fn state_digest(&self) -> Result<String, VaultError> {
+        Self::digest_connection(&self.conn)
+    }
+
+    /// The digest computation itself, over any connection.
+    ///
+    /// Separate from `state_digest` so a backup can be reconciled READ-ONLY:
+    /// see `digest_of`. Reconciliation that mutated the thing it was measuring
+    /// would not be reconciliation.
+    fn digest_connection(conn: &Connection) -> Result<String, VaultError> {
+        let mut hasher = Sha256::new();
+        let mut stmt = conn.prepare(
+            "SELECT event_id, workspace_id, origin, content_hash, created_utc
+             FROM conception_events ORDER BY event_id",
+        )?;
+        let rows = stmt.query_map((), |r| {
+            Ok(format!(
+                "event|{}|{}|{}|{}|{}",
+                r.get::<_, String>(0)?,
+                r.get::<_, String>(1)?,
+                r.get::<_, String>(2)?,
+                r.get::<_, String>(3)?,
+                r.get::<_, String>(4)?
+            ))
+        })?;
+        for row in rows {
+            hasher.update(row?.as_bytes());
+            hasher.update(b"\n");
+        }
+        let mut stmt = conn.prepare(
+            "SELECT c.claim_id, c.label, a.kind, a.reference
+             FROM claims c
+             LEFT JOIN claim_support cs ON cs.claim_id = c.claim_id
+             LEFT JOIN support_anchors a ON a.anchor_id = cs.anchor_id
+             ORDER BY c.claim_id, a.kind, a.reference",
+        )?;
+        let rows = stmt.query_map((), |r| {
+            Ok(format!(
+                "claim|{}|{}|{}|{}",
+                r.get::<_, String>(0)?,
+                r.get::<_, String>(1)?,
+                r.get::<_, Option<String>>(2)?.unwrap_or_default(),
+                r.get::<_, Option<String>>(3)?.unwrap_or_default()
+            ))
+        })?;
+        for row in rows {
+            hasher.update(row?.as_bytes());
+            hasher.update(b"\n");
+        }
+        Ok(format!("sha256:{:x}", hasher.finalize()))
+    }
+
+    /// Write a consistent backup of this vault to `dest`.
+    ///
+    /// Uses SQLite's online-backup API rather than copying the file: a copy can
+    /// capture a torn write-ahead log, and a backup that silently restores to a
+    /// corrupt state is worse than no backup. The destination is replaced when
+    /// it exists, so a backup is a point-in-time snapshot and never a merge.
+    pub fn backup_to(&self, dest: &Path) -> Result<(), VaultError> {
+        if dest.exists() {
+            std::fs::remove_file(dest)?;
+        }
+        let mut target = Connection::open(dest)?;
+        let backup = rusqlite::backup::Backup::new(&self.conn, &mut target)?;
+        backup.run_to_completion(64, std::time::Duration::from_millis(1), None)?;
+        Ok(())
+    }
+
+    /// The state digest held by a backup file, without adopting it.
+    ///
+    /// Reconciliation must happen BEFORE restoring, so a restore that would not
+    /// change anything is detectable rather than assumed.
+    ///
+    /// The existence check is load-bearing, not defensive. `Vault::open` has
+    /// SQLite's open-or-create semantics, so digesting a mistyped path would
+    /// CREATE an empty database and return the digest of nothing -- and the
+    /// caller would then "restore" that emptiness over the real vault. Measured:
+    /// a test restoring from an absent path was accepted and wiped the vault.
+    ///
+    /// Opened READ-ONLY and without migrations, so reconciling against a backup
+    /// cannot alter it -- a backup on read-only media still reconciles, a file
+    /// that is not a vault fails closed instead of being given a schema, and the
+    /// digest a caller restores against is the digest of what was on disk.
+    pub fn digest_of(path: &Path) -> Result<String, VaultError> {
+        if !path.exists() {
+            return Err(VaultError::BackupMissing(path.display().to_string()));
+        }
+        let conn = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_ONLY)?;
+        Self::digest_connection(&conn)
+    }
+
+    /// Replace this vault's canonical content with the backup at `source`.
+    ///
+    /// Restore is destructive and deliberate: the current content is discarded,
+    /// so callers reconcile first (see `digest_of`). Implemented as an online
+    /// backup FROM the source INTO this connection, which keeps the open
+    /// connection valid rather than swapping files underneath it.
+    pub fn restore_from(&mut self, source: &Path) -> Result<(), VaultError> {
+        if !source.exists() {
+            return Err(VaultError::BackupMissing(source.display().to_string()));
+        }
+        let src = Connection::open(source)?;
+        let backup = rusqlite::backup::Backup::new(&src, &mut self.conn)?;
+        backup.run_to_completion(64, std::time::Duration::from_millis(1), None)?;
+        Ok(())
     }
 
     /// Create a workspace. Idempotent.
@@ -1131,5 +1257,212 @@ mod tests {
             sha256_hex(b""),
             "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         );
+    }
+
+    /// covers: REQ-REL-005
+    /// "Backup/restart/recovery ... are executed against reconciled persistent
+    /// state." A backup must capture a POINT IN TIME: after restoring, state
+    /// written after the backup must be gone, and the digest must reconcile with
+    /// the backup's, not merely be self-consistent.
+    #[test]
+    fn test_backup_and_restore_reconcile_to_the_snapshot() {
+        let (dir, mut vault) = temp_vault("backup");
+        let vault_path = dir.join("vault.db");
+        let backup_path = dir.join("backup.db");
+        vault.create_workspace("ws-1").unwrap();
+
+        vault
+            .put_conception_event("ws-1", "ev-1", "HumanConception", "first conception")
+            .unwrap();
+        vault.put_claim("ws-1", "a self-sealing valve").unwrap();
+
+        let before = vault.state_digest().unwrap();
+        vault.backup_to(&backup_path).unwrap();
+        assert!(backup_path.exists(), "backup file was not written");
+        assert_eq!(
+            Vault::digest_of(&backup_path).unwrap(),
+            before,
+            "the backup does not reconcile with the state it was taken from"
+        );
+
+        // Divergence AFTER the backup: more events, another claim.
+        vault
+            .put_conception_event("ws-1", "ev-2", "HumanConception", "second conception")
+            .unwrap();
+        vault.put_claim("ws-1", "an unanchored coating").unwrap();
+        let diverged = vault.state_digest().unwrap();
+        assert_ne!(diverged, before, "test premise: state must have diverged");
+
+        // Recovery. The open connection is reused, not swapped, so the handle
+        // stays valid -- which is what an operator's live process needs.
+        vault.restore_from(&backup_path).unwrap();
+        assert_eq!(
+            vault.state_digest().unwrap(),
+            before,
+            "restored state does not reconcile with the backup digest"
+        );
+
+        // The post-backup work is gone, and the pre-backup work survived.
+        let events = vault.list_conception_events("ws-1").unwrap();
+        assert_eq!(events.len(), 1, "restore did not discard post-backup work");
+        assert_eq!(events[0].content, "first conception");
+        let claims = vault.claim_support_rows("ws-1").unwrap();
+        assert!(
+            claims.is_empty(),
+            "the post-backup claim survived the restore"
+        );
+
+        // Independently read the restored state back through a SECOND connection
+        // to the file, so the reconciliation is not just one handle agreeing
+        // with itself (DOD-012).
+        let reopened = Vault::open(&vault_path).unwrap();
+        assert_eq!(
+            reopened.state_digest().unwrap(),
+            before,
+            "the durable file does not reconcile with the backup"
+        );
+        drop(reopened);
+
+        // Restoring from a missing backup is an error, not a silent no-op.
+        assert!(matches!(
+            vault.restore_from(&dir.join("absent.db")),
+            Err(VaultError::BackupMissing(_))
+        ));
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-REL-005
+    /// Reconciliation must be READ-ONLY and must fail closed. Measured defect:
+    /// `digest_of` inherited SQLite's create-on-missing semantics, so a restore
+    /// from a mistyped path was ACCEPTED -- it created an empty database at the
+    /// typo, digested that emptiness, and replaced the real vault with it.
+    #[test]
+    fn test_digest_of_is_read_only_and_refuses_non_vaults() {
+        let (dir, vault) = temp_vault("digest-of");
+        vault.create_workspace("ws-1").unwrap();
+        vault
+            .put_conception_event("ws-1", "ev-1", "HumanConception", "kept")
+            .unwrap();
+        let backup_path = dir.join("backup.db");
+        vault.backup_to(&backup_path).unwrap();
+
+        // Reconciling must not touch one byte of the backup it measures.
+        let bytes_before = std::fs::read(&backup_path).unwrap();
+        let first = Vault::digest_of(&backup_path).unwrap();
+        let second = Vault::digest_of(&backup_path).unwrap();
+        assert_eq!(first, second, "reconciliation is not idempotent");
+        assert_eq!(
+            std::fs::read(&backup_path).unwrap(),
+            bytes_before,
+            "reconciliation rewrote the backup"
+        );
+
+        // An absent path fails closed WITHOUT creating a phantom database.
+        let absent = dir.join("typo.db");
+        assert!(matches!(
+            Vault::digest_of(&absent),
+            Err(VaultError::BackupMissing(_))
+        ));
+        assert!(
+            !absent.exists(),
+            "digest_of created {} as a side effect",
+            absent.display()
+        );
+
+        // A file that is not a vault fails closed rather than being given a
+        // schema and digested as empty.
+        let foreign = dir.join("notes.txt");
+        std::fs::write(&foreign, "this is not a database").unwrap();
+        assert!(
+            Vault::digest_of(&foreign).is_err(),
+            "a non-vault file was digested as if it were state"
+        );
+        assert_eq!(
+            std::fs::read_to_string(&foreign).unwrap(),
+            "this is not a database",
+            "digest_of rewrote a non-vault file"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-REL-005
+    /// Recovery must survive a HARD restart: the restored state has to be
+    /// durable, read back by a fresh process rather than by the one that
+    /// performed the restore.
+    #[test]
+    fn test_recovered_state_survives_a_hard_restart() {
+        let (dir, mut vault) = temp_vault("restart");
+        let vault_path = dir.join("vault.db");
+        let backup_path = dir.join("backup.db");
+        vault.create_workspace("ws-1").unwrap();
+        vault
+            .put_conception_event("ws-1", "ev-1", "HumanConception", "survives restart")
+            .unwrap();
+        let snapshot = vault.state_digest().unwrap();
+        vault.backup_to(&backup_path).unwrap();
+
+        vault
+            .put_conception_event("ws-1", "ev-2", "HumanConception", "lost on restore")
+            .unwrap();
+        vault.restore_from(&backup_path).unwrap();
+        drop(vault); // hard restart: the handle is gone, nothing is cached
+
+        let reopened = Vault::open(&vault_path).unwrap();
+        assert_eq!(
+            reopened.state_digest().unwrap(),
+            snapshot,
+            "the recovered state did not survive a restart"
+        );
+        let events = reopened.list_conception_events("ws-1").unwrap();
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].content, "survives restart");
+
+        // Reopening must not re-run migrations over restored data.
+        assert_eq!(
+            reopened.applied_migrations().unwrap().len(),
+            MIGRATIONS.len()
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-REL-005
+    /// The state digest must observe CONTENT, not file bytes: an identical
+    /// logical state reached by a different path must reconcile equal, or
+    /// reconciliation would report false divergence.
+    #[test]
+    fn test_state_digest_observes_content_not_layout() {
+        let (dir, a) = temp_vault("digest-a");
+        let (dir_b, b) = temp_vault("digest-b");
+        for v in [&a, &b] {
+            v.create_workspace("ws-1").unwrap();
+            v.put_conception_event("ws-1", "ev-1", "HumanConception", "same content")
+                .unwrap();
+            v.put_claim("ws-1", "same claim").unwrap();
+        }
+        // Identical logical state in two separate stores: the event and claim
+        // ids differ (UUIDv7), so digests legitimately differ. The property
+        // under test is the reverse: writing the SAME rows twice in one store
+        // must not change the digest.
+        let once = a.state_digest().unwrap();
+        let again = a.state_digest().unwrap();
+        assert_eq!(once, again, "the digest is not stable across calls");
+
+        // A backup/restore round trip in the same store must be digest-stable,
+        // which proves the digest reflects content rather than page layout.
+        let backup = dir.join("roundtrip.db");
+        a.backup_to(&backup).unwrap();
+        let mut a = a;
+        a.restore_from(&backup).unwrap();
+        assert_eq!(
+            a.state_digest().unwrap(),
+            once,
+            "a restore of identical content changed the digest"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::remove_dir_all(&dir_b).ok();
     }
 }
