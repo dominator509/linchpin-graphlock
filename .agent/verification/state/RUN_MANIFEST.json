@@ -1,20 +1,20 @@
 {
   "clause": "DOD-029",
   "harness": "scripts/run-manifest.py",
-  "measured_at_utc": "2026-09-16T22:52:26Z",
-  "candidate_commit": "da087899d6dfe51ca76069c7ea09a6d1e487f5d7",
-  "candidate_commit_short": "da08789",
+  "measured_at_utc": "2026-09-16T23:00:58Z",
+  "candidate_commit": "225761fa3e2e2b2a328df8513a82c23ba670d965",
+  "candidate_commit_short": "225761f",
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "branch": "main",
   "working_tree": {
     "dirty": true,
-    "changed_files": 31,
+    "changed_files": 4,
     "statement": "evidence in this run was produced on a DIRTY tree; the manifest records that rather than implying a frozen revision"
   },
   "epoch": {
     "digest": "1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3",
     "total_inputs": 141,
-    "candidate_commit": "da08789"
+    "candidate_commit": "225761f"
   },
   "artifacts": {
     "executable": "target\\release\\linchpin-desktop.exe",
@@ -35,11 +35,11 @@
   },
   "results": {
     "rerun_record": ".agent\\verification\\state\\RERUN_RECORD.json",
-    "rerun_record_sha256": "a07aa87b77ed880eb05a5ae084d41acb53baa261804c5b8f6b03cc80e06edb9c",
+    "rerun_record_sha256": "3fcd9f5ff12e65c0d53d54fdce8d1e63361815ba2ba8d43cdcdf65e3d91ff823",
     "accounting": ".agent\\verification\\reports\\COMPLETE_TEST_ACCOUNTING.csv",
     "accounting_sha256": "0153eccfe1f16310b8f69dd82cc110a93fd0cb9d206abcd1f6254b58c7adec3c",
     "dod_status": ".agent\\verification\\state\\DOD_STATUS.jsonl",
-    "dod_status_sha256": "697240e468f01809cea4c6acb9078f11856d4af37b207af06372888e07b3a558"
+    "dod_status_sha256": "408204829d952177be3146428c50a5b0ef7c64175c5b7f67009055f2054a97af"
   },
   "lockfiles": {
     "Cargo.lock_sha256": "621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4",

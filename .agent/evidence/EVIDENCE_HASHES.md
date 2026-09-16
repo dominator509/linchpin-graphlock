@@ -54,7 +54,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
 | DOD-038 | PARTIAL | `.agent/evidence/stress/STATUS.md` | `0eb9becc48617460` | 5605 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `a07aa87b77ed880e` | 5131 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `3fcd9f5ff12e65c0` | 187 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `b398fe2ef2f93175` | 144224 |
 | DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `5a16e0175755a5fb` | 1364 |
 
