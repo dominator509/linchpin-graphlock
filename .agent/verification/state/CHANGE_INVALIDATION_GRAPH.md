@@ -10,10 +10,10 @@ definition and its PASS status is revoked until rerun.
 ## Epoch identity
 
 - Current epoch digest: `827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76`
-- Candidate commit at generation: `cf52216`
+- Candidate commit at generation: `ba35739`
 - Total tracked inputs: 118
-- Previous epoch digest: `9bc88bf4fa9d2fc48efbe9f9717b7895f4e620c1fe55c8677302060580a480ce`
-- **Changed input classes since that epoch: rust-source, js-source**
+- Previous epoch digest: `827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76`
+- Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
 
