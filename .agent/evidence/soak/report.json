@@ -1,0 +1,103 @@
+{
+  "actual_seconds": 600,
+  "covers": [
+    "DOD-038"
+  ],
+  "epoch_digest": "4f25f790ccb23aecd3099f61662b77f55a68ac89cf4a1aecaf57c8069ad44b64",
+  "finished_unix": 1789575018,
+  "harness": "apps/desktop/src-tauri/tests/soak_abbreviated.rs",
+  "heartbeat_interval_s": 60,
+  "heartbeats": [
+    {
+      "cycles": 3177,
+      "elapsed_s": 60,
+      "errors": 0,
+      "vault_bytes": 1892352,
+      "working_set_bytes": 11661312
+    },
+    {
+      "cycles": 5650,
+      "elapsed_s": 121,
+      "errors": 0,
+      "vault_bytes": 3272704,
+      "working_set_bytes": 13643776
+    },
+    {
+      "cycles": 7600,
+      "elapsed_s": 181,
+      "errors": 0,
+      "vault_bytes": 4358144,
+      "working_set_bytes": 13373440
+    },
+    {
+      "cycles": 9400,
+      "elapsed_s": 241,
+      "errors": 0,
+      "vault_bytes": 5357568,
+      "working_set_bytes": 13324288
+    },
+    {
+      "cycles": 11150,
+      "elapsed_s": 303,
+      "errors": 0,
+      "vault_bytes": 6352896,
+      "working_set_bytes": 13488128
+    },
+    {
+      "cycles": 12500,
+      "elapsed_s": 363,
+      "errors": 0,
+      "vault_bytes": 7094272,
+      "working_set_bytes": 13967360
+    },
+    {
+      "cycles": 13800,
+      "elapsed_s": 424,
+      "errors": 0,
+      "vault_bytes": 7823360,
+      "working_set_bytes": 13250560
+    },
+    {
+      "cycles": 14900,
+      "elapsed_s": 486,
+      "errors": 0,
+      "vault_bytes": 8437760,
+      "working_set_bytes": 13508608
+    },
+    {
+      "cycles": 16097,
+      "elapsed_s": 546,
+      "errors": 0,
+      "vault_bytes": 9101312,
+      "working_set_bytes": 14143488
+    }
+  ],
+  "label_reason": "ran the requested 600s, which is above the 300s floor for an abbreviated trial; the repository specifies NO soak duration or workload, so the full-scale requirement has no value to complete",
+  "not_claimed": "this run does NOT satisfy DOD-038 for the full requirement and DOD-038 remains PARTIAL",
+  "outcomes": {
+    "bytes_per_event": 564,
+    "errors": 0,
+    "events_stored": 17050,
+    "final_vault_bytes": 9629696,
+    "working_set_first_bytes": 11661312,
+    "working_set_growth_bytes": 2482176,
+    "working_set_last_bytes": 14143488
+  },
+  "requested_seconds": 600,
+  "specification_gap": "no soak, endurance, fuzz or stress duration/workload is specified anywhere in the repository, so 'their specified scale' has no defined value to complete; this trial is labeled separately as the clause requires",
+  "started_unix": 1789574418,
+  "thresholds": {
+    "errors_allowed": 0,
+    "max_bytes_per_event": 65536
+  },
+  "trial": "ABBREVIATED",
+  "workload": {
+    "cycles": 17050,
+    "operation": "record_conception_keyed (production command) on one vault",
+    "periodic_backup_fault_restore_every": 50,
+    "periodic_ledger_readback_every": 20,
+    "read_backs": 852,
+    "recoveries_under_load": 341,
+    "unexpected_replays": 0
+  }
+}

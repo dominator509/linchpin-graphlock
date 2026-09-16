@@ -121,6 +121,31 @@ before using it:
   backup's digest is reported as `reconciled: false` rather than assumed to have
   worked.
 
+## Abbreviated endurance trial (DOD-038)
+
+```sh
+LINCHPIN_SOAK_SECONDS=600 cargo test -p linchpin-desktop --test soak_abbreviated -- --nocapture
+```
+
+A bounded trial against the real write, read and **recovery** paths: every cycle
+writes through `record_conception_keyed` under one client key (so a duplicate is
+caught rather than accumulated), every 20th cycle reads the whole ledger back
+through the product's own read path and checks the count, and every 50th cycle
+backs the vault up, **destroys the file**, restores it and asserts reconciliation —
+so recovery runs under load rather than only in a quiet drill. Resource use is
+sampled by an external observer (PowerShell working set), not self-reported.
+
+**The run labels itself.** Below 300 seconds it is reported as `SMOKE_SUBSET` and
+does **not** write evidence, so the ordinary unit lane (default 30 s) can never
+overwrite an abbreviated trial's report. At or above the floor it is labeled
+`ABBREVIATED` and writes `.agent/evidence/soak/report.json` with heartbeats,
+cycles, errors, vault growth, working-set growth and the epoch it ran against.
+
+**No duration or workload for a full soak is specified anywhere in this
+repository**, so the full-scale requirement has no value to complete; DOD-038
+remains PARTIAL and this trial does not claim it. Fuzzing is still absent
+(GEN-027 records that no mutation-based fuzzing engine is configured).
+
 ## Coverage gate (DOD-008)
 
 ```sh

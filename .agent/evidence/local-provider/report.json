@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "4022b801856a7d34b2d6c7ec965ab723f97f2215459b36b8e6b4075c25bb8411",
+  "executable_sha256": "c56620d787240548796cec0a6be8926ad1ed911b54825208a70ffb1b1ebbc1d4",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a statement asserting the inventor's control over a new or previously patented invention, with the int\""
+      "observed": "\"A patent claim is a detailed statement of an invention, including its description, scope, and any related claims.\""
     },
     {
       "name": "metadata names the live model",
@@ -47,7 +47,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"A patent is a legal monopoly.\""
+      "observed": "\"CANARY-mu4b9gf7-9ce7st\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -97,7 +97,7 @@
     {
       "name": "egress sampler started and polled (harness liveness, REQ-REL-002)",
       "ok": true,
-      "observed": "ready=true heartbeats=2"
+      "observed": "ready=true heartbeats=15"
     },
     {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "4022b801856a7d34 -> 4022b801856a7d34"
+      "observed": "c56620d787240548 -> c56620d787240548"
     }
   ],
   "passed": 23,

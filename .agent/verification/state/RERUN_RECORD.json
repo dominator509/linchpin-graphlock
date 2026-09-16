@@ -3,14 +3,14 @@
     "gate-script",
     "test-oracle"
   ],
-  "epoch_digest": "4f25f790ccb23aecd3099f61662b77f55a68ac89cf4a1aecaf57c8069ad44b64",
+  "epoch_digest": "74e8511d02e58c80f84c627c1d29335be1f5c0efacad3fbbf589d3a00885af42",
   "failures": 0,
   "results": [
     {
       "command": "sh scripts/harness-validate.sh",
-      "duration_s": 157.55,
+      "duration_s": 154.99,
       "exit_code": 0,
-      "output_sha256": "02057058b7acceea14872bcbe87dd69aeefb2653774246b4a1ef2c750d3a4fb1",
+      "output_sha256": "4a0eaf70f30731c605cae3a77adb5654ec1034f23c69f2a3a2b3c79c47f7d163",
       "output_tail": [
         "reachability check: ok (239 public fns, 33 entry points, 0 unreachable)",
         "trailing-and check: ok (no trailing &&-test lanes)",
@@ -21,9 +21,9 @@
     },
     {
       "command": "sh scripts/build.sh",
-      "duration_s": 233.23,
+      "duration_s": 124.06,
       "exit_code": 0,
-      "output_sha256": "9078afefdd1eb31bfccc00344bc89353002b50801b2c0a3506e2bc896621122e",
+      "output_sha256": "8abf8bf51282205b2a65fb118ee66a3de619d0dd4472ec4a82dfffb08e5bca43",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -34,9 +34,9 @@
     },
     {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 49.65,
+      "duration_s": 105.24,
       "exit_code": 0,
-      "output_sha256": "81e9358944b67fa22bbc9de8c6536646e663b52373d7162013bf2253f7c8fa60",
+      "output_sha256": "9e8ad9301683fb213179e44d1f25467b0afba6b1867b6346a451dd9bdf7b8ea5",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -47,12 +47,12 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 3.1,
+      "duration_s": 5.8,
       "exit_code": 0,
-      "output_sha256": "abe92ff36fe74e67fba2574e0f62c5faa2c698fc24bc0c2b3dc5b86819feb877",
+      "output_sha256": "b254ab7bad840e5486021a665627da026b4282db781e6b2ecedf5e334a35e8b5",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.95s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.65s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-3f399f149925d619.exe)"
       ],
       "stage": "V-009 integration/concurrency",
@@ -60,22 +60,22 @@
     },
     {
       "command": "sh scripts/lint.sh",
-      "duration_s": 21.02,
+      "duration_s": 11.58,
       "exit_code": 0,
-      "output_sha256": "7f9ee57180215ec9ab43293d52ee9f4a3b6bc868eca17c3f4903eb2018b9a5b4",
+      "output_sha256": "7d62c66b93609e087a6697219ea644648f018c80788e7aac7e62d0dd2a399030",
       "output_tail": [
         "    Checking application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)",
         "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.41s"
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.73s"
       ],
       "stage": "V-012 regression/mutation",
       "status": "PASS"
     },
     {
       "command": "sh scripts/live-fire-local-provider.sh",
-      "duration_s": 299.69,
+      "duration_s": 250.97,
       "exit_code": 0,
-      "output_sha256": "169ab735a8a8d8b60b8af261ab9e8c6919988ff0443be60e1d7cca5e42b28d9b",
+      "output_sha256": "6fb348b709e07cac384c21ca86021f72637de99bccc40c6807814b4f7586dd38",
       "output_tail": [
         "local-provider: restored the production artifact",
         "local-provider: rebuilding the production artifact from the committed config",
@@ -86,12 +86,12 @@
     },
     {
       "command": "sh scripts/test-e2e.sh",
-      "duration_s": 182.14,
+      "duration_s": 165.52,
       "exit_code": 0,
-      "output_sha256": "b8ddadd1d5f9d2a3df393d9129ced49f103010f825deb8c39638d9a7b1c52a88",
+      "output_sha256": "f2c2ec218dba371955c9d299c98a3d6ce366d1f9e84bff8b10b51740a84585b9",
       "output_tail": [
         "(Use `node --trace-warnings ...` to show where the warning was created)",
-        "(node:35272) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(node:34288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
         "(Use `node --trace-warnings ...` to show where the warning was created)"
       ],
       "stage": "V-015 usability/accessibility",
@@ -99,11 +99,11 @@
     },
     {
       "command": "sh scripts/artifact-e2e.sh",
-      "duration_s": 134.11,
+      "duration_s": 123.65,
       "exit_code": 0,
-      "output_sha256": "0b8ae3c6c1019998d65236519e3fb619060928740c91b974f2e459221034a290",
+      "output_sha256": "04efccd725c0fbaff1137cd7367caab637c0b42c08b4d4893f49a221449b89b0",
       "output_tail": [
-        "  PASS: artifact digest unchanged across the run -- bb014f4a857ad684",
+        "  PASS: artifact digest unchanged across the run -- 2f83e93c5af10a46",
         "artifact-e2e: wrote .agent/evidence/artifact-e2e/STATUS.md",
         "artifact-e2e: ok"
       ],
@@ -112,11 +112,11 @@
     },
     {
       "command": "python3 scripts/test-collection-guard.py --check",
-      "duration_s": 0.15,
+      "duration_s": 0.1,
       "exit_code": 0,
-      "output_sha256": "9728c291f00f21f7230260cf12fdbff2d1a230b79ca3e94f1d6f43f19cb1a29a",
+      "output_sha256": "efe70402ad6343fb53e0dea7d11cacd89e2404b96315d633f4400d49740d23c2",
       "output_tail": [
-        "collection guard manifest: ok (min 209 passed)"
+        "collection guard manifest: ok (min 210 passed)"
       ],
       "stage": "DOD-007 collection guard",
       "status": "PASS"

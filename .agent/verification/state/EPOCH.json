@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "97ce5f0",
+  "candidate_commit": "aa10ac0",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -38,7 +38,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "770b1f3f58abc3a397c2eda416ab4cb09697cac539a9cbe08d48919aca1ac6cf",
+        "scripts\\build-dod-status.py": "192f75c92e0755fa475e0d2e18c370ab19a540962e04a1bc1551c2b5adac043a",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
@@ -211,7 +211,7 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "c1ebdade73535c15d17c8f0f8a2102148436a7c67cd323fd7fe908c484cae0d2",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "c1212ffdf82c8697c2e1f4ad24a48f9a8855cf51ba151055c48fb0224d9c272f",
         "apps\\desktop\\e2e-artifact.mjs": "9d2d096495635d89e0c6d9ea198b5ae900c3034cab0e18275e3e6ac67af3b625",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
       },
@@ -225,8 +225,8 @@
       ]
     }
   },
-  "epoch_digest": "4f25f790ccb23aecd3099f61662b77f55a68ac89cf4a1aecaf57c8069ad44b64",
-  "prior_candidate_commit": "27e5774",
-  "prior_epoch_digest": "4f25f790ccb23aecd3099f61662b77f55a68ac89cf4a1aecaf57c8069ad44b64",
+  "epoch_digest": "74e8511d02e58c80f84c627c1d29335be1f5c0efacad3fbbf589d3a00885af42",
+  "prior_candidate_commit": "aa10ac0",
+  "prior_epoch_digest": "74e8511d02e58c80f84c627c1d29335be1f5c0efacad3fbbf589d3a00885af42",
   "total_inputs": 128
 }
