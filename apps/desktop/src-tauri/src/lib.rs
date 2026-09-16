@@ -174,7 +174,20 @@ fn check_support_matrix(
     anchors: Vec<(String, String, String)>,
 ) -> commands::CommandResult<commands::SupportMatrixView> {
     let scope = commands::WorkspaceScope { workspace_id };
-    commands::check_support_matrix(&scope, &exportable, &anchors)
+    // The support relationship is persisted in the canonical store
+    // (REQ-DATA-003), so the vault path is always supplied in production.
+    commands::check_support_matrix(&scope, &exportable, &anchors, Some(&vault_file()))
+}
+
+/// Record that evidence supports a claim (REQ-DATA-003).
+#[tauri::command]
+fn record_claim_evidence(
+    workspace_id: String,
+    claim_label: String,
+    content_hash: String,
+) -> commands::CommandResult<commands::ClaimEvidenceView> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    commands::record_claim_evidence(&scope, &claim_label, &content_hash, &vault_file())
 }
 
 /// Produce a valuation range tied to explicit assumptions (REQ-COM-003).
@@ -356,6 +369,7 @@ pub fn run() {
             classify_research_claim,
             schedule_docket_deadline,
             check_support_matrix,
+            record_claim_evidence,
             evaluate_valuation,
             set_research_coverage,
             complete_research_partial,

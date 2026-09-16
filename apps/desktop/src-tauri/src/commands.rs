@@ -1027,6 +1027,9 @@ pub struct SupportMatrixView {
     /// True only when every exportable limitation is anchored.
     pub exportable: bool,
     pub anchor_count: usize,
+    /// Support links read back from the canonical store's junction table after
+    /// this call persisted them (REQ-DATA-003). Zero when no vault was supplied.
+    pub persisted_links: usize,
 }
 
 /// Check that every exportable limitation has a spec/figure anchor
@@ -1044,6 +1047,7 @@ pub fn check_support_matrix(
     scope: &WorkspaceScope,
     exportable: &[String],
     anchors: &[(String, String, String)],
+    vault_path: Option<&std::path::Path>,
 ) -> CommandResult<SupportMatrixView> {
     let correlation = CorrelationId::new();
 
@@ -1106,14 +1110,157 @@ pub fn check_support_matrix(
         .collect();
 
     let exportable_ok = matrix.assert_exportable(&exportable_ids).is_ok();
+
+    // REQ-DATA-003: the claim/support relationship is PERSISTED in the canonical
+    // store's junction tables, not only computed in memory. Without this the
+    // normalized schema would exist but nothing would ever write to it.
+    let mut persisted_links = 0usize;
+    if let Some(path) = vault_path {
+        let vault = match storage::vault::Vault::open(path) {
+            Ok(v) => v,
+            Err(e) => {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::policy(format!("cannot open vault: {e}")),
+                )
+            }
+        };
+        if let Err(e) = vault.create_workspace(scope.workspace_id.as_str()) {
+            return CommandResult::failure(correlation, CommandError::policy(e.to_string()));
+        }
+        for (label, _) in &ids {
+            let claim_id = match vault.put_claim(scope.workspace_id.as_str(), label) {
+                Ok(id) => id,
+                Err(e) => {
+                    return CommandResult::failure(correlation, CommandError::policy(e.to_string()))
+                }
+            };
+            for (a_label, kind, reference) in anchors {
+                if a_label != label {
+                    continue;
+                }
+                let anchor_id =
+                    match vault.put_support_anchor(scope.workspace_id.as_str(), kind, reference) {
+                        Ok(id) => id,
+                        Err(e) => {
+                            return CommandResult::failure(
+                                correlation,
+                                CommandError::policy(e.to_string()),
+                            )
+                        }
+                    };
+                if let Err(e) = vault.link_claim_support(&claim_id, &anchor_id) {
+                    return CommandResult::failure(
+                        correlation,
+                        CommandError::policy(e.to_string()),
+                    );
+                }
+            }
+        }
+        persisted_links = match vault.claim_support_rows(scope.workspace_id.as_str()) {
+            Ok(rows) => rows.len(),
+            Err(e) => {
+                return CommandResult::failure(correlation, CommandError::policy(e.to_string()))
+            }
+        };
+    }
+
     CommandResult::success(
         correlation,
         SupportMatrixView {
             unsupported,
             exportable: exportable_ok,
             anchor_count: matrix.anchor_count(),
+            persisted_links,
         },
     )
+}
+
+/// Record that a piece of evidence supports a claim (REQ-DATA-003).
+///
+/// The claim/evidence relationship lives in the `claim_evidence` junction table,
+/// keyed on both sides. Recording the same pair twice is a no-op rather than a
+/// duplicate row, and the linked content addresses are read back through a join
+/// so the caller sees what the store actually holds.
+pub fn record_claim_evidence(
+    scope: &WorkspaceScope,
+    claim_label: &str,
+    content_hash: &str,
+    vault_path: &std::path::Path,
+) -> CommandResult<ClaimEvidenceView> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if claim_label.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("claim_label is required"),
+        );
+    }
+    if !content_hash.starts_with("sha256:") || content_hash.len() != "sha256:".len() + 64 {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation(
+                "content_hash must be a sha256: content address (REQ-DATA-002)",
+            ),
+        );
+    }
+
+    let vault = match storage::vault::Vault::open(vault_path) {
+        Ok(v) => v,
+        Err(e) => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::policy(format!("cannot open vault: {e}")),
+            )
+        }
+    };
+    if let Err(e) = vault.create_workspace(scope.workspace_id.as_str()) {
+        return CommandResult::failure(correlation, CommandError::policy(e.to_string()));
+    }
+
+    let claim_id = match vault.put_claim(scope.workspace_id.as_str(), claim_label) {
+        Ok(id) => id,
+        Err(e) => return CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    };
+    let evidence_id = match vault.put_evidence_record(scope.workspace_id.as_str(), content_hash) {
+        Ok(id) => id,
+        Err(e) => return CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    };
+    if let Err(e) = vault.link_claim_evidence(&claim_id, &evidence_id) {
+        return CommandResult::failure(correlation, CommandError::policy(e.to_string()));
+    }
+
+    let linked = match vault.claim_evidence_hashes(&claim_id) {
+        Ok(h) => h,
+        Err(e) => return CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    };
+    let still_unsupported = match vault.unsupported_claims(scope.workspace_id.as_str()) {
+        Ok(u) => u.iter().any(|c| c.claim_id == claim_id),
+        Err(e) => return CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    };
+
+    CommandResult::success(
+        correlation,
+        ClaimEvidenceView {
+            claim_label: claim_label.to_string(),
+            linked_hashes: linked,
+            still_unsupported,
+        },
+    )
+}
+
+/// Result of linking evidence to a claim (REQ-DATA-003).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ClaimEvidenceView {
+    pub claim_label: String,
+    /// Content addresses linked to the claim, read back through the junction.
+    pub linked_hashes: Vec<String>,
+    /// True when the claim has no SUPPORT anchor yet. Evidence alone does not
+    /// satisfy the support matrix; the two relationships are independent.
+    pub still_unsupported: bool,
 }
 
 /// Resolved runtime configuration as reported to the UI (REQ-FOUND-002).
@@ -2589,7 +2736,7 @@ mod tests {
             "SPECIFICATION".to_string(),
             "[0042]".to_string(),
         )];
-        let partial = check_support_matrix(&scope, &exportable, &anchors);
+        let partial = check_support_matrix(&scope, &exportable, &anchors, None);
         assert!(partial.ok, "check failed: {:?}", partial.error);
         let view = partial.value.unwrap();
         assert!(
@@ -2616,7 +2763,7 @@ mod tests {
                 "FIG. 7".to_string(),
             ),
         ];
-        let complete = check_support_matrix(&scope, &exportable, &both);
+        let complete = check_support_matrix(&scope, &exportable, &both, None);
         assert!(complete.ok);
         let cview = complete.value.unwrap();
         assert!(cview.exportable, "a fully anchored set was not exportable");
@@ -2630,7 +2777,7 @@ mod tests {
             "FIGURE".to_string(),
             "FIG. 1".to_string(),
         )];
-        assert!(!check_support_matrix(&scope, &exportable, &stray).ok);
+        assert!(!check_support_matrix(&scope, &exportable, &stray, None).ok);
 
         // Unknown anchor kinds and blank references are rejected.
         let bad_kind = vec![(
@@ -2638,20 +2785,130 @@ mod tests {
             "DRAWING".to_string(),
             "FIG. 1".to_string(),
         )];
-        assert!(!check_support_matrix(&scope, &exportable, &bad_kind).ok);
+        assert!(!check_support_matrix(&scope, &exportable, &bad_kind, None).ok);
         let blank_ref = vec![(
             "a self-sealing valve".to_string(),
             "FIGURE".to_string(),
             "   ".to_string(),
         )];
-        assert!(!check_support_matrix(&scope, &exportable, &blank_ref).ok);
+        assert!(!check_support_matrix(&scope, &exportable, &blank_ref, None).ok);
 
         // Empty labels and empty workspaces are rejected.
-        assert!(!check_support_matrix(&scope, &["  ".to_string()], &[]).ok);
+        assert!(!check_support_matrix(&scope, &["  ".to_string()], &[], None).ok);
         let no_scope = WorkspaceScope {
             workspace_id: String::new(),
         };
-        assert!(!check_support_matrix(&no_scope, &exportable, &both).ok);
+        assert!(!check_support_matrix(&no_scope, &exportable, &both, None).ok);
+    }
+
+    /// covers: REQ-DATA-003
+    /// The support relationship must reach the canonical store's junction
+    /// tables through the production command, not only exist in the schema.
+    #[test]
+    fn test_support_matrix_persists_into_junction_tables() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-cmd-junction-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+
+        let scope = WorkspaceScope {
+            workspace_id: "ws-junction".to_string(),
+        };
+        let exportable = vec![
+            "a self-sealing valve".to_string(),
+            "an unanchored coating".to_string(),
+        ];
+        let anchors = vec![(
+            "a self-sealing valve".to_string(),
+            "SPECIFICATION".to_string(),
+            "[0042]".to_string(),
+        )];
+
+        let result = check_support_matrix(&scope, &exportable, &anchors, Some(&vault_path));
+        assert!(result.ok, "command failed: {:?}", result.error);
+        let view = result.value.unwrap();
+        assert_eq!(
+            view.persisted_links, 1,
+            "exactly one support link should be stored"
+        );
+        assert_eq!(
+            view.unsupported,
+            vec!["an unanchored coating".to_string()],
+            "the unanchored limitation must still be reported"
+        );
+
+        // Independently read the store back: the relationship lives in the
+        // junction table, and an orphaned claim is found by anti-join.
+        let vault = storage::vault::Vault::open(&vault_path).unwrap();
+        let rows = vault.claim_support_rows("ws-junction").unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].claim_label, "a self-sealing valve");
+        assert_eq!(rows[0].anchor_reference, "[0042]");
+        assert_eq!(rows[0].anchor_kind, "SPECIFICATION");
+        let unsupported = vault.unsupported_claims("ws-junction").unwrap();
+        assert_eq!(unsupported.len(), 1);
+        assert_eq!(unsupported[0].label, "an unanchored coating");
+
+        // Re-running is idempotent: the same pair must not duplicate.
+        let again = check_support_matrix(&scope, &exportable, &anchors, Some(&vault_path));
+        assert_eq!(
+            again.value.unwrap().persisted_links,
+            1,
+            "re-linking duplicated the relationship"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-DATA-003
+    /// Evidence is linked to a claim through the `claim_evidence` junction, and
+    /// that link is independent of the support relationship.
+    #[test]
+    fn test_claim_evidence_link_is_persisted_and_independent() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-cmd-evidence-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+
+        let scope = WorkspaceScope {
+            workspace_id: "ws-ev".to_string(),
+        };
+        let hash = format!("sha256:{}", "a".repeat(64));
+
+        let linked = record_claim_evidence(&scope, "a self-sealing valve", &hash, &vault_path);
+        assert!(linked.ok, "link failed: {:?}", linked.error);
+        let view = linked.value.unwrap();
+        assert_eq!(view.linked_hashes, vec![hash.clone()]);
+        assert!(
+            view.still_unsupported,
+            "evidence alone must not satisfy the support matrix"
+        );
+
+        // Idempotent.
+        let again = record_claim_evidence(&scope, "a self-sealing valve", &hash, &vault_path);
+        assert_eq!(again.value.unwrap().linked_hashes, vec![hash.clone()]);
+
+        // A malformed content address is refused (REQ-DATA-002 shape).
+        assert!(!record_claim_evidence(&scope, "a self-sealing valve", "deadbeef", &vault_path).ok);
+        assert!(!record_claim_evidence(&scope, "  ", &hash, &vault_path).ok);
+        let no_scope = WorkspaceScope {
+            workspace_id: String::new(),
+        };
+        assert!(!record_claim_evidence(&no_scope, "a self-sealing valve", &hash, &vault_path).ok);
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     /// covers: REQ-OPS-002

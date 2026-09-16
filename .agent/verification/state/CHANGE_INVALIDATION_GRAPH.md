@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76`
-- Candidate commit at generation: `ba35739`
+- Current epoch digest: `314d331e56740198789bc4b71c9e0db67b9422cda83b959164bfff1e2026df4a`
+- Candidate commit at generation: `bd8fdf7`
 - Total tracked inputs: 118
 - Previous epoch digest: `827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76`
-- Changed input classes since that epoch: none
+- **Changed input classes since that epoch: rust-source, rust-manifest**
 
 ## Input classes and what a change invalidates
 
@@ -108,8 +108,8 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-012 regression/mutation
 - invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `0426b2f934759c18…`
-  - `apps\desktop\src-tauri\src\lib.rs` `3caaedc99872a98f…`
+  - `apps\desktop\src-tauri\src\commands.rs` `aad59cd291440817…`
+  - `apps\desktop\src-tauri\src\lib.rs` `45a293fe3f943f5e…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
   - `crates\commercialization\src\lib.rs` `b3cda133f33472b0…`

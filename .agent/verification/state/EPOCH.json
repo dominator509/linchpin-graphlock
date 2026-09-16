@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "ba35739",
+  "candidate_commit": "bd8fdf7",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -156,7 +156,7 @@
         "crates\\platform_windows\\Cargo.toml": "7093b1a68c8424b6a2a617bfd6c4f357a6c03348bf244c0d87d378bdf1924012",
         "crates\\provider_transport\\Cargo.toml": "c373ec6b9be27b1f7f2bb83425ddb3444dd4bce6294644ed5d3acf5e528b4937",
         "crates\\research\\Cargo.toml": "231cd899881a14253d8caf831a95fe6dd7bd1184b3abbe6d9204c495f95bfd10",
-        "crates\\storage\\Cargo.toml": "3efd2a85bbc12a11cdeb0990ce88c717e78a46ef405a5502e73319d21a1a05cf",
+        "crates\\storage\\Cargo.toml": "4f8604f13c396479c2c8b2a37821a0249eaea60bf376a7bdc74ae7012bb91c52",
         "deny.toml": "280e8e73e6e7d076b955bdc21f3c4d564971343275bbf4141427603d380ff569",
         "rust-toolchain.toml": "89d9c3c3266967c0be43405f082a94cda8eab9b2cfdf28538eda48fa5e08c398"
       },
@@ -169,8 +169,8 @@
     "rust-source": {
       "count": 18,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "0426b2f934759c18da19b87de748ee4970808026249205eeb64177b2177b4d08",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "3caaedc99872a98f1c3c2b7a511487f686f89764877e3e5adf98d7e1986237af",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "aad59cd29144081775c965f40ba5ec9f61feb9792d4c32cc17e4837f77a96654",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "45a293fe3f943f5e35f65ed72117816ab0df6aefb2fbd286ff4bffc41eb67095",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
         "crates\\commercialization\\src\\lib.rs": "b3cda133f33472b00164b106d3629eceeb701a00d2e14d894e537813646d125a",
@@ -185,7 +185,7 @@
         "crates\\provider_transport\\src\\lib.rs": "a62348a0bfcf96e67c141cc8f3c593d45a80e6ca1939873c1df6c7a1b9c59813",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
-        "crates\\storage\\src\\vault.rs": "7a93a336d709e6dea982296c038742d4785e3fedc095b947cd9f4b250091feab",
+        "crates\\storage\\src\\vault.rs": "f15de8f692f6a94d83c2ca444474b4f46c4bc662a7878d6bfdb1916baede50e1",
         "crates\\storage\\tests\\integration_real_dependencies.rs": "f1a3c433b86e22cdddfaaa95d1658e76b1c2a81414a06bd33299da73f7d51539"
       },
       "rules": [
@@ -212,8 +212,8 @@
       ]
     }
   },
-  "epoch_digest": "827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76",
-  "prior_candidate_commit": "cf52216",
+  "epoch_digest": "314d331e56740198789bc4b71c9e0db67b9422cda83b959164bfff1e2026df4a",
+  "prior_candidate_commit": "ba35739",
   "prior_epoch_digest": "827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76",
   "total_inputs": 118
 }

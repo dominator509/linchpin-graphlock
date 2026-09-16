@@ -22,6 +22,11 @@
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-002", "result": "PASS", "test_id": "vault::tests::test_sha256_known_vector"}
 {"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-002", "result": "NOT_RUN", "test_id": "commands::tests::temp_db"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-002", "result": "PASS", "test_id": "commands::tests::test_record_conception_persists_through_the_vault"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-003", "result": "PASS", "test_id": "vault::tests::test_claim_support_evidence_uses_normalized_junction_tables"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-003", "result": "PASS", "test_id": "vault::tests::test_claim_relationships_round_trip_through_junctions"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-003", "result": "PASS", "test_id": "vault::tests::test_junction_foreign_keys_are_enforced"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-003", "result": "PASS", "test_id": "commands::tests::test_support_matrix_persists_into_junction_tables"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-003", "result": "PASS", "test_id": "commands::tests::test_claim_evidence_link_is_persisted_and_independent"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "vault::tests::test_conception_event_survives_reopen"}
 {"collected": false, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "NOT_RUN", "test_id": "default"}
 {"collected": true, "file": "crates/domain/src/lib.rs", "requirement_id": "REQ-DOM-001", "result": "PASS", "test_id": "tests::test_domain_entity_lifecycle"}

@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "d1ec4edda5ae29efefe02a9d2c57502be8f84c32b68925e3f640876648ca6467",
+  "executable_sha256": "e472d322673d26772c39843fb0c7617909e35abea8272acbb422836492276118",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -27,7 +27,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a patent filing that outlines a claim that an inventor seeks to protect a unique product or process fr\""
+      "observed": "\"A patent claim is a statement of a person's claim to an invention or a fresh design, typically in the form of a patent.\""
     },
     {
       "name": "metadata names the live model",
@@ -42,7 +42,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"Is a patent a legal monopoly?\""
+      "observed": "\"CANARY-mu3o7lil-3vni88\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -102,12 +102,12 @@
     {
       "name": "core: user evidence persists to a device-local vault file (REQ-PLAT-002)",
       "ok": true,
-      "observed": "C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\linchpin-vault.db (49152)"
+      "observed": "C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\linchpin-vault.db (131072)"
     },
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "d1ec4edda5ae29ef -> d1ec4edda5ae29ef"
+      "observed": "e472d322673d2677 -> e472d322673d2677"
     }
   ],
   "passed": 21,

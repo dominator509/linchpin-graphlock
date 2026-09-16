@@ -71,7 +71,95 @@ pub const MIGRATIONS: &[(&str, &str)] = &[
             created_utc  TEXT NOT NULL
         );",
     ),
+    // REQ-DATA-003: "Claim/support/evidence relationships use normalized junction
+    // tables." Each table holds ONE fact about one entity; the many-to-many
+    // relationships live in junction tables keyed on both sides, so a claim is
+    // never recorded with a delimited list of anchors or evidence in a column.
+    //
+    // Appended rather than editing an earlier migration: REQ-RES-002 freezes
+    // released migration ids.
+    (
+        "0005_claim_support_evidence",
+        "CREATE TABLE IF NOT EXISTS claims (
+            claim_id     TEXT PRIMARY KEY,
+            workspace_id TEXT NOT NULL,
+            label        TEXT NOT NULL,
+            created_utc  TEXT NOT NULL,
+            version      INTEGER NOT NULL DEFAULT 1,
+            deleted      INTEGER NOT NULL DEFAULT 0,
+            UNIQUE (workspace_id, label),
+            FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id)
+        );
+        CREATE TABLE IF NOT EXISTS support_anchors (
+            anchor_id    TEXT PRIMARY KEY,
+            workspace_id TEXT NOT NULL,
+            kind         TEXT NOT NULL CHECK (kind IN ('SPECIFICATION','FIGURE')),
+            reference    TEXT NOT NULL,
+            created_utc  TEXT NOT NULL,
+            UNIQUE (workspace_id, kind, reference),
+            FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id)
+        );
+        CREATE TABLE IF NOT EXISTS evidence_records (
+            evidence_id  TEXT PRIMARY KEY,
+            workspace_id TEXT NOT NULL,
+            content_hash TEXT NOT NULL,
+            created_utc  TEXT NOT NULL,
+            UNIQUE (workspace_id, content_hash),
+            FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id)
+        );
+        CREATE TABLE IF NOT EXISTS claim_support (
+            claim_id     TEXT NOT NULL,
+            anchor_id    TEXT NOT NULL,
+            linked_utc   TEXT NOT NULL,
+            PRIMARY KEY (claim_id, anchor_id),
+            FOREIGN KEY (claim_id)  REFERENCES claims(claim_id),
+            FOREIGN KEY (anchor_id) REFERENCES support_anchors(anchor_id)
+        );
+        CREATE TABLE IF NOT EXISTS claim_evidence (
+            claim_id     TEXT NOT NULL,
+            evidence_id  TEXT NOT NULL,
+            linked_utc   TEXT NOT NULL,
+            PRIMARY KEY (claim_id, evidence_id),
+            FOREIGN KEY (claim_id)    REFERENCES claims(claim_id),
+            FOREIGN KEY (evidence_id) REFERENCES evidence_records(evidence_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_claims_workspace
+            ON claims(workspace_id);
+        CREATE INDEX IF NOT EXISTS idx_anchors_workspace
+            ON support_anchors(workspace_id);
+        CREATE INDEX IF NOT EXISTS idx_evidence_workspace
+            ON evidence_records(workspace_id);
+        CREATE INDEX IF NOT EXISTS idx_claim_support_anchor
+            ON claim_support(anchor_id);
+        CREATE INDEX IF NOT EXISTS idx_claim_evidence_evidence
+            ON claim_evidence(evidence_id);",
+    ),
 ];
+
+/// A claim row from the canonical store (REQ-DATA-003).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StoredClaim {
+    pub claim_id: String,
+    pub workspace_id: String,
+    pub label: String,
+}
+
+/// One row of the claim/support/evidence relationship, read back through a join
+/// rather than from denormalized columns.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ClaimSupportRow {
+    pub claim_id: String,
+    pub claim_label: String,
+    pub anchor_kind: String,
+    pub anchor_reference: String,
+}
+
+/// A claim with no supporting anchor at all.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UnsupportedClaim {
+    pub claim_id: String,
+    pub label: String,
+}
 
 /// SHA-256 content address, hex-encoded.
 ///
@@ -112,6 +200,10 @@ pub enum VaultError {
         expected: String,
         found: String,
     },
+    /// An anchor kind outside the closed set (REQ-DATA-003).
+    InvalidAnchorKind(String),
+    /// An anchor reference was blank.
+    InvalidAnchorReference,
 }
 
 impl std::fmt::Display for VaultError {
@@ -121,6 +213,10 @@ impl std::fmt::Display for VaultError {
             VaultError::InvalidWorkspace => write!(f, "workspace_id is required"),
             VaultError::InvalidContent => write!(f, "content is required"),
             VaultError::Database(e) => write!(f, "database error: {e}"),
+            VaultError::InvalidAnchorKind(k) => {
+                write!(f, "anchor kind {k:?} is not SPECIFICATION or FIGURE")
+            }
+            VaultError::InvalidAnchorReference => write!(f, "anchor reference is required"),
             VaultError::ChainBroken {
                 seq,
                 expected,
@@ -208,6 +304,16 @@ impl Vault {
         Ok(rows.collect::<Result<Vec<_>, _>>()?)
     }
 
+    /// The underlying connection, for schema-level assertions.
+    ///
+    /// Exposed so tests can inspect the SHAPE of the data model (composite keys,
+    /// foreign keys, CHECK constraints) rather than only exercising the public
+    /// API. REQ-DATA-003 is a statement about the schema, so a test that could
+    /// not see the schema could not verify it.
+    pub fn connection(&self) -> &Connection {
+        &self.conn
+    }
+
     /// Create a workspace. Idempotent.
     pub fn create_workspace(&self, workspace_id: &str) -> Result<(), VaultError> {
         if workspace_id.trim().is_empty() {
@@ -218,6 +324,177 @@ impl Vault {
             (workspace_id, now_utc()),
         )?;
         Ok(())
+    }
+
+    /// Record (or find) a claim by its label. Idempotent per workspace.
+    ///
+    /// REQ-DATA-001: UUIDv7 ids, `workspace_id` on every workspace-owned row. A
+    /// v7 id is time-ordered, so the primary key sorts by creation.
+    pub fn put_claim(&self, workspace_id: &str, label: &str) -> Result<String, VaultError> {
+        if workspace_id.trim().is_empty() {
+            return Err(VaultError::InvalidWorkspace);
+        }
+        if label.trim().is_empty() {
+            return Err(VaultError::InvalidWorkspace);
+        }
+        if let Ok(existing) = self.conn.query_row(
+            "SELECT claim_id FROM claims WHERE workspace_id = ?1 AND label = ?2",
+            (workspace_id, label),
+            |r| r.get::<_, String>(0),
+        ) {
+            return Ok(existing);
+        }
+        let claim_id = format!("claim:{}", uuid::Uuid::now_v7());
+        self.conn.execute(
+            "INSERT INTO claims (claim_id, workspace_id, label, created_utc)
+             VALUES (?1, ?2, ?3, ?4)",
+            (claim_id.as_str(), workspace_id, label, now_utc()),
+        )?;
+        Ok(claim_id)
+    }
+
+    /// Record (or find) a support anchor. Idempotent per workspace/kind/ref.
+    pub fn put_support_anchor(
+        &self,
+        workspace_id: &str,
+        kind: &str,
+        reference: &str,
+    ) -> Result<String, VaultError> {
+        if workspace_id.trim().is_empty() {
+            return Err(VaultError::InvalidWorkspace);
+        }
+        if !matches!(kind, "SPECIFICATION" | "FIGURE") {
+            return Err(VaultError::InvalidAnchorKind(kind.to_string()));
+        }
+        if reference.trim().is_empty() {
+            return Err(VaultError::InvalidAnchorReference);
+        }
+        if let Ok(existing) = self.conn.query_row(
+            "SELECT anchor_id FROM support_anchors
+             WHERE workspace_id = ?1 AND kind = ?2 AND reference = ?3",
+            (workspace_id, kind, reference),
+            |r| r.get::<_, String>(0),
+        ) {
+            return Ok(existing);
+        }
+        let anchor_id = format!("anchor:{}", uuid::Uuid::now_v7());
+        self.conn.execute(
+            "INSERT INTO support_anchors (anchor_id, workspace_id, kind, reference, created_utc)
+             VALUES (?1, ?2, ?3, ?4, ?5)",
+            (anchor_id.as_str(), workspace_id, kind, reference, now_utc()),
+        )?;
+        Ok(anchor_id)
+    }
+
+    /// Record (or find) an evidence record by its content address.
+    pub fn put_evidence_record(
+        &self,
+        workspace_id: &str,
+        content_hash: &str,
+    ) -> Result<String, VaultError> {
+        if workspace_id.trim().is_empty() {
+            return Err(VaultError::InvalidWorkspace);
+        }
+        if content_hash.trim().is_empty() {
+            return Err(VaultError::InvalidAnchorReference);
+        }
+        if let Ok(existing) = self.conn.query_row(
+            "SELECT evidence_id FROM evidence_records
+             WHERE workspace_id = ?1 AND content_hash = ?2",
+            (workspace_id, content_hash),
+            |r| r.get::<_, String>(0),
+        ) {
+            return Ok(existing);
+        }
+        let evidence_id = format!("evidence:{}", uuid::Uuid::now_v7());
+        self.conn.execute(
+            "INSERT INTO evidence_records (evidence_id, workspace_id, content_hash, created_utc)
+             VALUES (?1, ?2, ?3, ?4)",
+            (evidence_id.as_str(), workspace_id, content_hash, now_utc()),
+        )?;
+        Ok(evidence_id)
+    }
+
+    /// Link a claim to a support anchor. Idempotent: re-linking is a no-op, not a
+    /// duplicate row.
+    pub fn link_claim_support(&self, claim_id: &str, anchor_id: &str) -> Result<(), VaultError> {
+        self.conn.execute(
+            "INSERT OR IGNORE INTO claim_support (claim_id, anchor_id, linked_utc)
+             VALUES (?1, ?2, ?3)",
+            (claim_id, anchor_id, now_utc()),
+        )?;
+        Ok(())
+    }
+
+    /// Link a claim to an evidence record. Idempotent.
+    pub fn link_claim_evidence(&self, claim_id: &str, evidence_id: &str) -> Result<(), VaultError> {
+        self.conn.execute(
+            "INSERT OR IGNORE INTO claim_evidence (claim_id, evidence_id, linked_utc)
+             VALUES (?1, ?2, ?3)",
+            (claim_id, evidence_id, now_utc()),
+        )?;
+        Ok(())
+    }
+
+    /// The support matrix, read back through a JOIN across the junction table.
+    ///
+    /// Deliberately not a denormalized read: the relationship exists only in
+    /// `claim_support`, which is what REQ-DATA-003 requires.
+    pub fn claim_support_rows(
+        &self,
+        workspace_id: &str,
+    ) -> Result<Vec<ClaimSupportRow>, VaultError> {
+        let mut stmt = self.conn.prepare(
+            "SELECT c.claim_id, c.label, a.kind, a.reference
+             FROM claim_support cs
+             JOIN claims c          ON c.claim_id = cs.claim_id
+             JOIN support_anchors a ON a.anchor_id = cs.anchor_id
+             WHERE c.workspace_id = ?1
+             ORDER BY c.label, a.kind, a.reference",
+        )?;
+        let rows = stmt.query_map((workspace_id,), |r| {
+            Ok(ClaimSupportRow {
+                claim_id: r.get(0)?,
+                claim_label: r.get(1)?,
+                anchor_kind: r.get(2)?,
+                anchor_reference: r.get(3)?,
+            })
+        })?;
+        Ok(rows.collect::<Result<Vec<_>, _>>()?)
+    }
+
+    /// Claims with no supporting anchor at all, derived by an anti-join.
+    pub fn unsupported_claims(
+        &self,
+        workspace_id: &str,
+    ) -> Result<Vec<UnsupportedClaim>, VaultError> {
+        let mut stmt = self.conn.prepare(
+            "SELECT c.claim_id, c.label
+             FROM claims c
+             LEFT JOIN claim_support cs ON cs.claim_id = c.claim_id
+             WHERE c.workspace_id = ?1 AND c.deleted = 0 AND cs.claim_id IS NULL
+             ORDER BY c.label",
+        )?;
+        let rows = stmt.query_map((workspace_id,), |r| {
+            Ok(UnsupportedClaim {
+                claim_id: r.get(0)?,
+                label: r.get(1)?,
+            })
+        })?;
+        Ok(rows.collect::<Result<Vec<_>, _>>()?)
+    }
+
+    /// The evidence linked to a claim, through the junction table.
+    pub fn claim_evidence_hashes(&self, claim_id: &str) -> Result<Vec<String>, VaultError> {
+        let mut stmt = self.conn.prepare(
+            "SELECT e.content_hash
+             FROM claim_evidence ce
+             JOIN evidence_records e ON e.evidence_id = ce.evidence_id
+             WHERE ce.claim_id = ?1
+             ORDER BY e.content_hash",
+        )?;
+        let rows = stmt.query_map((claim_id,), |r| r.get::<_, String>(0))?;
+        Ok(rows.collect::<Result<Vec<_>, _>>()?)
     }
 
     /// Store and durably commit a conception event.
@@ -519,6 +796,190 @@ mod tests {
             MIGRATIONS.len(),
             "re-running migrations duplicated entries"
         );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-DATA-003
+    /// "Claim/support/evidence relationships use normalized junction tables."
+    ///
+    /// The test asserts the SHAPE, not merely that rows round-trip: the
+    /// relationships must live in junction tables keyed on both sides, with
+    /// foreign keys to the entity tables. A denormalized design (an anchor list
+    /// in a column on `claims`) would satisfy a round-trip test while violating
+    /// the requirement, so the schema itself is inspected.
+    #[test]
+    fn test_claim_support_evidence_uses_normalized_junction_tables() {
+        let (dir, vault) = temp_vault("junction");
+        vault.create_workspace("ws-1").unwrap();
+        let conn = vault.connection();
+
+        for table in [
+            "claims",
+            "support_anchors",
+            "evidence_records",
+            "claim_support",
+            "claim_evidence",
+        ] {
+            let found: i64 = conn
+                .query_row(
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?1",
+                    (table,),
+                    |r| r.get(0),
+                )
+                .unwrap();
+            assert_eq!(found, 1, "missing table {table}");
+        }
+
+        // Junction tables are keyed on BOTH sides, which is what makes them
+        // normalized many-to-many tables rather than child tables.
+        for (table, left, right) in [
+            ("claim_support", "claim_id", "anchor_id"),
+            ("claim_evidence", "claim_id", "evidence_id"),
+        ] {
+            let mut stmt = conn
+                .prepare(&format!("PRAGMA table_info({table})"))
+                .unwrap();
+            let pk: Vec<String> = stmt
+                .query_map((), |r| Ok((r.get::<_, i64>(5)?, r.get::<_, String>(1)?)))
+                .unwrap()
+                .filter_map(|r| r.ok())
+                .filter(|(pk, _)| *pk > 0)
+                .map(|(_, name)| name)
+                .collect();
+            assert_eq!(
+                pk,
+                vec![left.to_string(), right.to_string()],
+                "{table} must be keyed on both sides"
+            );
+        }
+
+        // Both sides carry a foreign key, so an orphan link cannot exist.
+        for (table, expected_targets) in [
+            ("claim_support", vec!["claims", "support_anchors"]),
+            ("claim_evidence", vec!["claims", "evidence_records"]),
+        ] {
+            let ddl: String = conn
+                .query_row(
+                    "SELECT sql FROM sqlite_master WHERE type='table' AND name=?1",
+                    (table,),
+                    |r| r.get(0),
+                )
+                .unwrap();
+            for target in expected_targets {
+                assert!(
+                    ddl.contains(&format!("REFERENCES {target}")),
+                    "{table} must reference {target}: {ddl}"
+                );
+            }
+        }
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-DATA-003
+    /// A claim linked to two anchors and one evidence record reads back through
+    /// JOINs, and re-linking is idempotent rather than duplicating rows.
+    #[test]
+    fn test_claim_relationships_round_trip_through_junctions() {
+        let (dir, vault) = temp_vault("junction-rt");
+        vault.create_workspace("ws-1").unwrap();
+
+        let claim = vault.put_claim("ws-1", "a self-sealing valve").unwrap();
+        let spec = vault
+            .put_support_anchor("ws-1", "SPECIFICATION", "[0042]")
+            .unwrap();
+        let fig = vault
+            .put_support_anchor("ws-1", "FIGURE", "FIG. 3")
+            .unwrap();
+        let evidence = vault
+            .put_evidence_record("ws-1", "sha256:deadbeef")
+            .unwrap();
+
+        vault.link_claim_support(&claim, &spec).unwrap();
+        vault.link_claim_support(&claim, &fig).unwrap();
+        vault.link_claim_evidence(&claim, &evidence).unwrap();
+
+        // Idempotent: linking again must not duplicate the relationship.
+        vault.link_claim_support(&claim, &spec).unwrap();
+        vault.link_claim_evidence(&claim, &evidence).unwrap();
+
+        let rows = vault.claim_support_rows("ws-1").unwrap();
+        assert_eq!(
+            rows.len(),
+            2,
+            "expected exactly two support links: {rows:?}"
+        );
+        assert_eq!(rows[0].anchor_kind, "FIGURE");
+        assert_eq!(rows[0].anchor_reference, "FIG. 3");
+        assert_eq!(rows[1].anchor_kind, "SPECIFICATION");
+        assert_eq!(rows[1].claim_label, "a self-sealing valve");
+
+        let hashes = vault.claim_evidence_hashes(&claim).unwrap();
+        assert_eq!(hashes, vec!["sha256:deadbeef".to_string()]);
+
+        // An unsupported claim is found by anti-join, not by a null column.
+        let other = vault.put_claim("ws-1", "an unanchored coating").unwrap();
+        let unsupported = vault.unsupported_claims("ws-1").unwrap();
+        assert_eq!(unsupported.len(), 1);
+        assert_eq!(unsupported[0].claim_id, other);
+        assert_eq!(unsupported[0].label, "an unanchored coating");
+
+        // Identifiers are prefixed and time-ordered (REQ-DATA-001 uses UUIDv7).
+        assert!(claim.starts_with("claim:"), "claim id shape: {claim}");
+        assert!(spec.starts_with("anchor:"), "anchor id shape: {spec}");
+        assert!(
+            evidence.starts_with("evidence:"),
+            "evidence id shape: {evidence}"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-DATA-003
+    /// The junction foreign keys must be ENFORCED, not merely declared: an
+    /// orphan link is refused by the database.
+    #[test]
+    fn test_junction_foreign_keys_are_enforced() {
+        let (dir, vault) = temp_vault("junction-fk");
+        vault.create_workspace("ws-1").unwrap();
+        let conn = vault.connection();
+
+        let orphan = conn.execute(
+            "INSERT INTO claim_support (claim_id, anchor_id, linked_utc)
+             VALUES ('claim:missing', 'anchor:missing', '2026-01-01T00:00:00Z')",
+            (),
+        );
+        assert!(
+            orphan.is_err(),
+            "an orphan claim_support row was accepted: the foreign keys are not enforced"
+        );
+
+        // Anchor kinds are constrained to the closed set at the schema level too.
+        let bad_kind = conn.execute(
+            "INSERT INTO support_anchors (anchor_id, workspace_id, kind, reference, created_utc)
+             VALUES ('anchor:x', 'ws-1', 'DRAWING', 'FIG. 1', '2026-01-01T00:00:00Z')",
+            (),
+        );
+        assert!(bad_kind.is_err(), "an unlisted anchor kind was accepted");
+
+        // Blank references and unlisted kinds are refused by the API as well.
+        // `matches!` rather than `assert_eq!`: VaultError wraps rusqlite::Error,
+        // which is not PartialEq, so the Result cannot be compared directly.
+        assert!(
+            matches!(
+                vault.put_support_anchor("ws-1", "FIGURE", "   "),
+                Err(VaultError::InvalidAnchorReference)
+            ),
+            "a blank anchor reference must be refused"
+        );
+        assert!(
+            matches!(
+                vault.put_support_anchor("ws-1", "DRAWING", "FIG. 1"),
+                Err(VaultError::InvalidAnchorKind(ref k)) if k == "DRAWING"
+            ),
+            "an unlisted anchor kind must be refused"
+        );
+
         std::fs::remove_dir_all(&dir).ok();
     }
 

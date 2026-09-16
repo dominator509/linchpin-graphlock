@@ -7,7 +7,10 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 tantivy = "0.26.2"
-uuid = { version = "1.26.0", features = ["v4"] }
+# `v7` is enabled because REQ-DATA-001 requires UUIDv7 identifiers for the
+# canonical tables -- time-ordered ids that index better than v4 and sort by
+# creation. Same crate, same locked version; only a feature is added.
+uuid = { version = "1.26.0", features = ["v4", "v7"] }
 # Already in the workspace Cargo.lock (sha2 0.10.9). Required by REQ-DATA-002:
 # "Evidence blobs are content-addressed SHA-256". No new transitive package.
 sha2 = "0.10.9"
