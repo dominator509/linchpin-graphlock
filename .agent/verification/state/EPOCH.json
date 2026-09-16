@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "7276b12",
+  "candidate_commit": "d3addcd",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -38,7 +38,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "192f75c92e0755fa475e0d2e18c370ab19a540962e04a1bc1551c2b5adac043a",
+        "scripts\\build-dod-status.py": "30a70d918e0fee134c5a49b37d78c5e73c0b5f54d4033fe4f913ba6a7a0e1f43",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
@@ -67,7 +67,7 @@
         "scripts\\live-fire-local-provider.sh": "dcda08caf50050c3d3ba5167d1dfc638ad9d843692a3652426b6394d49446aeb",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
-        "scripts\\mutation-proof.py": "3a182687a039c2a6b921c3049d57956e2b53bbd000cf17289ad55363b5fa3377",
+        "scripts\\mutation-proof.py": "746e40b3f1ba192e39150df1109f6d4e708fea8daac5b3c4f06aeb115d68f7c5",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
@@ -181,9 +181,9 @@
         "crates\\application\\src\\lib.rs": "9e8dd477b8dcd22d4df981cd4d50b79068c8f30a58f80f76523a2979f01e567d",
         "crates\\commercialization\\src\\asset_readiness.rs": "f4143f42b1e5da03d8d799362cda0b34d0bd7a4bfff6ff586a9de3ff060cf1fc",
         "crates\\commercialization\\src\\lib.rs": "74245f9c1dedab433f7ddd6b3e800eb053efa97c03d6c4a1e477b22dbdaeca22",
-        "crates\\crash_reporter\\src\\lib.rs": "a9c59034478136bfcf22f2342d98df103d6e9362676f27a3fa06a794c82d78c5",
+        "crates\\crash_reporter\\src\\lib.rs": "e03bc23959d44daad6013a5a372155f6267fe7993b8700a270f83e59d620b659",
         "crates\\domain\\src\\lib.rs": "c8f7b0110fbd67f3b3fa9c7222dc6bb207fae2d6324cf6f31599758aa2376730",
-        "crates\\domain\\src\\scope.rs": "1e1b2b2652534c8974553ee3258105b5119cb7e62ec14a25ebe0228869ffe9c7",
+        "crates\\domain\\src\\scope.rs": "f0157f09d84c891665b4fd25a3fed870330aa338e5403a3209def2dae47e813e",
         "crates\\evidence\\src\\lib.rs": "831478be7892eb838c88886cd10dd40ffad85ad2a1a62b04dc2bbd841f02fc2e",
         "crates\\mcp_hub\\src\\lib.rs": "bac47aab7e67b1e81cb3852515b18ca6006f548d69313d5036ee9646ec2222aa",
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
@@ -211,7 +211,7 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "c1212ffdf82c8697c2e1f4ad24a48f9a8855cf51ba151055c48fb0224d9c272f",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "15e66ed3ff52131483a7e1407704e3dc0954cdfec474de77c49e4f5f06a8a7ba",
         "apps\\desktop\\e2e-artifact.mjs": "9d2d096495635d89e0c6d9ea198b5ae900c3034cab0e18275e3e6ac67af3b625",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
       },
@@ -225,8 +225,8 @@
       ]
     }
   },
-  "epoch_digest": "74e8511d02e58c80f84c627c1d29335be1f5c0efacad3fbbf589d3a00885af42",
-  "prior_candidate_commit": "aa10ac0",
-  "prior_epoch_digest": "74e8511d02e58c80f84c627c1d29335be1f5c0efacad3fbbf589d3a00885af42",
+  "epoch_digest": "62ad316d3f311905375997f4c73275f25de9896e5ca071eb9c42a27687bacf4a",
+  "prior_candidate_commit": "d3addcd",
+  "prior_epoch_digest": "62ad316d3f311905375997f4c73275f25de9896e5ca071eb9c42a27687bacf4a",
   "total_inputs": 128
 }

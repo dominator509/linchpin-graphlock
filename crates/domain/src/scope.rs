@@ -237,10 +237,17 @@ const PROHIBITED: [(&str, &str); 14] = [
 ///
 /// Returns the first violation found, so a caller that refuses on `Err` names a
 /// boundary and the phrase that crossed it rather than reporting a vague refusal.
+///
+/// The search runs on the ORIGINAL text with ASCII case folding rather than on a
+/// lowercased copy. Measured defect in the shared pattern this used to follow:
+/// `to_lowercase()` is not length-preserving (`İ` is 2 bytes and lowercases to 3,
+/// `K` is 3 and lowercases to 1), so offsets found in the copy do not address the
+/// original -- the sibling implementation in `crash_reporter` PANICKED on exactly
+/// that input (`start byte index 2 is not a char boundary`). Every prohibited
+/// phrase is ASCII, so folding ASCII in place loses nothing and cannot shift.
 pub fn check_claim_text(text: &str) -> Result<(), ScopeViolation> {
-    let haystack = text.to_lowercase();
     for (boundary_id, phrase) in PROHIBITED {
-        if contains_phrase(&haystack, phrase) {
+        if contains_phrase(text, phrase) {
             return Err(ScopeViolation {
                 boundary_id,
                 phrase: phrase.to_string(),
@@ -250,12 +257,22 @@ pub fn check_claim_text(text: &str) -> Result<(), ScopeViolation> {
     Ok(())
 }
 
-/// Whole-phrase containment with non-alphanumeric boundaries on both sides.
+/// Whole-phrase containment with non-alphanumeric boundaries on both sides,
+/// ignoring ASCII case, without altering the haystack.
 fn contains_phrase(haystack: &str, phrase: &str) -> bool {
-    let mut from = 0usize;
-    while let Some(offset) = haystack[from..].find(phrase) {
-        let start = from + offset;
-        let end = start + phrase.len();
+    let hay = haystack.as_bytes();
+    let needle = phrase.as_bytes();
+    if needle.is_empty() || hay.len() < needle.len() {
+        return false;
+    }
+    for start in 0..=hay.len() - needle.len() {
+        if !haystack.is_char_boundary(start) || !haystack.is_char_boundary(start + needle.len()) {
+            continue;
+        }
+        if !hay[start..start + needle.len()].eq_ignore_ascii_case(needle) {
+            continue;
+        }
+        let end = start + needle.len();
         let before_ok = haystack[..start]
             .chars()
             .next_back()
@@ -267,7 +284,6 @@ fn contains_phrase(haystack: &str, phrase: &str) -> bool {
         if before_ok && after_ok {
             return true;
         }
-        from = start + phrase.len();
     }
     false
 }

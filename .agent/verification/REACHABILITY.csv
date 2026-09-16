@@ -91,6 +91,7 @@ fetch_official_record,storage,crates/storage/src/lib.rs,REACHABLE,named from cra
 figure,domain,crates/domain/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\domain\src\lib.rs"
 file_application,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 filter_export,evidence,crates/evidence/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
+find_ascii_case_insensitive,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from crates\crash_reporter\src\lib.rs
 find_conception_event,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
 fmt,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\commercialization\src\asset_readiness.rs, crates\commercialization\src\lib.rs"
 from,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\application\src\lib.rs"
@@ -205,7 +206,7 @@ sanitize_path,evidence,crates/evidence/src/lib.rs,REACHABLE,"named from apps\des
 sanitize_prompt_injection,mcp_hub,crates/mcp_hub/src/lib.rs,TEST_ONLY,named only from tests: crates\mcp_hub\src\lib.rs
 save_record,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests: crates\storage\src\lib.rs
 schedule_docket_deadline,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
-search,storage,crates/storage/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\domain\src\scope.rs, crates\storage\src\lib.rs"
+search,storage,crates/storage/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\crash_reporter\src\lib.rs, crates\domain\src\scope.rs"
 secret_count,evidence,crates/evidence/src/lib.rs,REACHABLE,named from crates\evidence\src\lib.rs
 sensitivity,commercialization,crates/commercialization/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\commercialization\src\lib.rs"
 set_fee_paid,patent,crates/patent/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs

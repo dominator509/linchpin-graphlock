@@ -241,6 +241,37 @@ fn is_value_delimiter(c: char) -> bool {
     c.is_whitespace() || matches!(c, '&' | ';' | ',' | '}' | ']' | ')' | '\'' | '"')
 }
 
+/// Find `needle` at or after byte `from`, ignoring ASCII case, WITHOUT building a
+/// lowercased copy.
+///
+/// Measured defect this closes: the search used to run over `input.to_lowercase()`
+/// and then index the ORIGINAL string with the offsets it found. Lowercasing is
+/// not length-preserving -- `İ` (2 bytes) lowercases to `i̇` (3 bytes), `K` (3) to
+/// `k` (1) -- so every offset after such a character shifted, and the subsequent
+/// slicing PANICKED:
+///
+/// ```text
+/// policy.apply("İapi_key=secretvalue")
+///   -> start byte index 2 is not a char boundary; it is inside '\u{307}'
+/// ```
+///
+/// That input is a normal log line in any language that uses dotted capitals, and
+/// the failure was in the credential-redaction path, so it could crash the
+/// incident reporter exactly when it was needed. Comparing in place keeps every
+/// offset a property of the string being indexed.
+fn find_ascii_case_insensitive(input: &str, needle: &str, from: usize) -> Option<usize> {
+    let hay = input.as_bytes();
+    let needle = needle.as_bytes();
+    if needle.is_empty() || hay.len() < needle.len() || from > hay.len() {
+        return None;
+    }
+    (from..=hay.len() - needle.len()).find(|start| {
+        input.is_char_boundary(*start)
+            && input.is_char_boundary(start + needle.len())
+            && hay[*start..*start + needle.len()].eq_ignore_ascii_case(needle)
+    })
+}
+
 /// Span of the VALUE that follows `key` at or after `from`, if this occurrence is
 /// a credential assignment.
 ///
@@ -249,9 +280,8 @@ fn is_value_delimiter(c: char) -> bool {
 /// quote BEFORE the separator, which an earlier version missed -- measured:
 /// `{"token":"abc123"}` came back untouched because the character following the
 /// key was `"`, not `:`.
-fn key_value_span(lower: &str, input: &str, from: usize, key: &str) -> Option<(usize, usize)> {
-    let offset = lower[from..].find(key)?;
-    let start = from + offset;
+fn key_value_span(input: &str, from: usize, key: &str) -> Option<(usize, usize)> {
+    let start = find_ascii_case_insensitive(input, key, from)?;
     if input[..start]
         .chars()
         .next_back()
@@ -290,14 +320,13 @@ fn key_value_span(lower: &str, input: &str, from: usize, key: &str) -> Option<(u
 /// Only a key followed by a separator is treated as a credential, so ordinary
 /// prose such as "the token was refreshed" is left untouched.
 fn redact_key_values(input: &str) -> String {
-    let lower = input.to_lowercase();
     let mut out = String::with_capacity(input.len());
     let mut cursor = 0usize;
 
     while cursor < input.len() {
         let mut matched: Option<(usize, usize)> = None;
         for key in SECRET_KEYS {
-            if let Some((start, end)) = key_value_span(&lower, input, cursor, key) {
+            if let Some((start, end)) = key_value_span(input, cursor, key) {
                 matched = Some((start, end));
                 break;
             }
@@ -598,5 +627,45 @@ mod capsule_tests {
         // The original token-shape coverage still holds.
         let shaped = policy.apply("Authorization: Bearer sk-live-ABC123xyz");
         assert!(!shaped.contains("sk-live-ABC123xyz"), "{shaped}");
+    }
+
+    /// covers: REQ-DOM-010, DOD-037, DOD-038
+    /// Text that lowercases to a DIFFERENT BYTE LENGTH must not panic the
+    /// redactor, and the credential must still be redacted.
+    ///
+    /// Measured: the search ran over `input.to_lowercase()` and indexed the
+    /// original with the offsets it found, so `"İapi_key=secretvalue"` panicked
+    /// with "start byte index 2 is not a char boundary; it is inside '\u{307}'"
+    /// -- in the credential-redaction path, on a log line a Turkish keyboard
+    /// produces routinely. Found by a mutation-fuzz campaign, not by inspection.
+    #[test]
+    fn test_redaction_survives_case_folding_characters() {
+        let policy = RedactionPolicy::new();
+        let cases = [
+            ("İapi_key=secretvalue", "secretvalue"),
+            ("İ api_key=secretvalue", "secretvalue"),
+            ("İtoken=abc123", "abc123"),
+            ("ß password=hunter2", "hunter2"),
+            ("I\u{0307}api_key=secretvalue", "secretvalue"),
+        ];
+        for (input, secret) in cases {
+            let redacted = policy.apply(input);
+            assert!(
+                !redacted.contains(secret),
+                "a credential survived redaction: {input:?} -> {redacted:?}"
+            );
+            assert!(
+                redacted.contains("[REDACTED]"),
+                "nothing was redacted in {input:?} -> {redacted:?}"
+            );
+        }
+
+        // A key that is part of a longer identifier is still not a credential
+        // assignment: the boundary rule must survive the rewrite.
+        assert_eq!(
+            policy.apply("Kapi_key=secretvalue"),
+            "Kapi_key=secretvalue",
+            "a key inside a longer identifier must not be treated as a credential"
+        );
     }
 }

@@ -213,8 +213,8 @@ MUTATIONS = [
         "edits": [
             {
                 "path": "crates/domain/src/scope.rs",
-                "old": "    let haystack = text.to_lowercase();\n",
-                "new": "    let haystack = text.to_lowercase();\n    if !haystack.is_empty() {\n        return Ok(());\n    }\n",
+                "old": "        if contains_phrase(text, phrase) {\n",
+                "new": "        if false && contains_phrase(text, phrase) {\n",
             }
         ],
         "command": [
@@ -430,6 +430,61 @@ MUTATIONS = [
             "test_keyed_recording_reports_replays_and_refuses_key_reuse",
         ],
         "expect_test": "test_keyed_recording_reports_replays_and_refuses_key_reuse",
+    },
+    {
+        "id": "MUT-FUZZ-001",
+        "clause": "DOD-018",
+        "covers": "DOD-038, GEN-027",
+        "feature": "the fuzz campaign actually detects panics (it must not be a green no-op)",
+        "changed_behavior": (
+            "the credential search reverts to lowercasing the input and indexing "
+            "the ORIGINAL string with the offsets it finds, which panics on text "
+            "that lowercases to a different byte length."
+        ),
+        "edits": [
+            {
+                "path": "crates/crash_reporter/src/lib.rs",
+                "old": (
+                    "fn key_value_span(input: &str, from: usize, key: &str) -> Option<(usize, usize)> {\n"
+                    "    let start = find_ascii_case_insensitive(input, key, from)?;\n"
+                ),
+                "new": (
+                    "fn key_value_span(lower: &str, input: &str, from: usize, key: &str) -> Option<(usize, usize)> {\n"
+                    "    let offset = lower[from..].find(key)?;\n"
+                    "    let start = from + offset;\n"
+                ),
+            },
+            {
+                "path": "crates/crash_reporter/src/lib.rs",
+                "old": (
+                    "fn redact_key_values(input: &str) -> String {\n"
+                    "    let mut out = String::with_capacity(input.len());\n"
+                    "    let mut cursor = 0usize;\n"
+                ),
+                "new": (
+                    "fn redact_key_values(input: &str) -> String {\n"
+                    "    let lower = input.to_lowercase();\n"
+                    "    let mut out = String::with_capacity(input.len());\n"
+                    "    let mut cursor = 0usize;\n"
+                ),
+            },
+            {
+                "path": "crates/crash_reporter/src/lib.rs",
+                "old": "            if let Some((start, end)) = key_value_span(input, cursor, key) {\n",
+                "new": "            if let Some((start, end)) = key_value_span(&lower, input, cursor, key) {\n",
+            },
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "linchpin-desktop",
+            "--test",
+            "fuzz_campaign",
+            "--",
+            "--nocapture",
+        ],
+        "expect_test": "mutation_fuzz_campaign_finds_no_panics_in_parsing_paths",
     },
 ]
 

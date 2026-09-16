@@ -80,6 +80,7 @@
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_export_guard_rejects_surviving_registered_secret"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_export_guard_accepts_a_fully_redacted_capsule"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_redaction_covers_key_values_not_only_token_shapes"}
+{"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_redaction_survives_case_folding_characters"}
 {"collected": true, "file": "crates/platform_windows/tests/licensing_policy.rs", "requirement_id": "REQ-FOUND-001", "result": "PASS", "test_id": "test_workspace_membership_and_tauri_2x_foundation"}
 {"collected": true, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-FOUND-002", "result": "PASS", "test_id": "tests::test_config_parses_environment_once_into_typed_values"}
 {"collected": true, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-FOUND-002", "result": "PASS", "test_id": "tests::test_missing_required_value_is_an_error_not_a_fallback"}

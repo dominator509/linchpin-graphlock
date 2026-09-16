@@ -1,22 +1,22 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-16T16:35:15Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-16T17:24:02Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
 - Blocking clauses: DOD-001=PARTIAL
-- Candidate commit: `7276b126b21d896d7b7c23e7158d90b68c2d4fe6` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (1 changed files)
-- Epoch: `74e8511d02e58c80` over 128 tracked inputs
+- Candidate commit: `d3addcdaf4ab78f7694c04a3afa726bb5f6ef1ae` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (24 changed files)
+- Epoch: `62ad316d3f311905` over 128 tracked inputs
 
 ## Verified behavior — executed and observed
 
 - **36 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
 - **484 registry capabilities accounted**, one status each ({'NOT_RUN_BLOCKED_MATERIAL': 473, 'PARTIAL': 10, 'EXTERNAL_REQUIRED': 1})
-- **12 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `ebedd46a08f97237…` (12498432 bytes), MSI `d4367ade7e3beb00…` (5709824 bytes)
+- **13 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
+- Artifacts bound to this run: executable `d49ffd5b599df454…` (12495872 bytes), MSI `70038d4c4ad8c372…` (5705728 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -30,7 +30,7 @@ the whole Rust suite in an ephemeral checkout.
 
 - **DOD-001**: RE-MEASURED THIS ROUND, because the previous revision of this disposition described a state that no longer exists: 35 of 59 requirements carried executed PASS evidence, and 24 were unbound. Measured now by scripts/bind-requirements.py: 222 collected tests, 59 requirements found, **57 bound to an executed PASS**, 2 unbound. The RULE requires every promised behavior to have a stable requirement ID A…
 - **DOD-014**: STATUS KEPT AT PARTIAL, with the gap described precisely instead of broadly. EXECUTED AND MUTATION-PROVEN: an unreachable loopback endpoint yields TransportError::Unreachable with live=false and text=null rather than fabricated output (a real transport failure, not a simulated one); a non-loopback endpoint is refused with a POLICY error and NO ATTEMPT is made, which is the SPEC-005 confidentiality…
-- **DOD-038**: STATUS DELIBERATELY UNCHANGED AT PARTIAL: the clause's own OR ELSE says an abbreviated trial 'is labeled separately' and is 'never PASS for the full requirement', so this round EXECUTED the trial and updated the evidence instead of the label. EXECUTED BY apps/desktop/src-tauri/tests/soak_abbreviated.rs: a bounded endurance trial against the real write, read and RECOVERY paths -- each cycle writes …
+- **DOD-038**: STATUS DELIBERATELY UNCHANGED AT PARTIAL: the clause's own OR ELSE says an abbreviated trial 'is labeled separately' and is 'never PASS for the full requirement', so this round EXECUTED two of the six named trial classes and updated the evidence instead of the label. (1) ENDURANCE, executed by apps/desktop/src-tauri/tests/soak_abbreviated.rs: a 600-second bounded trial against the real write, read…
 
 ## Blocked work
 
