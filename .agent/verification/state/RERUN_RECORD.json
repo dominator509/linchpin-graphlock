@@ -1,18 +1,17 @@
 {
   "changed_classes": [
-    "gate-script",
-    "test-oracle"
+    "gate-script"
   ],
-  "epoch_digest": "e254d2cbf7981750041bacbedfdb3999bc2de836ec7fd6e51711ed16d7512b08",
+  "epoch_digest": "e0ddeec55ab1fc803211e7fd7a2c8d6c31dea690e25287e9875b33505dcc63b4",
   "failures": 0,
   "results": [
     {
       "command": "sh scripts/harness-validate.sh",
-      "duration_s": 58.65,
+      "duration_s": 59.14,
       "exit_code": 0,
-      "output_sha256": "97f201c7514cc0457a08b2b76facd7ae864d59822a7d226febabd51a2661ec63",
+      "output_sha256": "7145c6ded4be9eb21f2defdee7f2fa9de42a40b41a77311223922bab38798526",
       "output_tail": [
-        "reachability check: ok (220 public fns, 30 entry points, 0 unreachable)",
+        "reachability check: ok (230 public fns, 31 entry points, 0 unreachable)",
         "trailing-and check: ok (no trailing &&-test lanes)",
         "harness-validate: ok"
       ],
@@ -21,9 +20,9 @@
     },
     {
       "command": "sh scripts/build.sh",
-      "duration_s": 103.1,
+      "duration_s": 109.73,
       "exit_code": 0,
-      "output_sha256": "36bb825b632f2bf26217249b3677db981bc6b7f9d0552cbdb7875537c0a4aa26",
+      "output_sha256": "858e7612eeb7ceb56646a813a385ea05bf1c498788104cf9a206e7678dcc0feb",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -34,9 +33,9 @@
     },
     {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 33.09,
+      "duration_s": 38.77,
       "exit_code": 0,
-      "output_sha256": "5fdb3409e44aea09f31cfc723e0ac8e7783a3612747e940a11fb89d8082c5e41",
+      "output_sha256": "da69b21d433d580d8a15c68aa125a63bbf143f564a789ab5315b5d8ab6e3961c",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -47,78 +46,15 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 1.83,
+      "duration_s": 2.04,
       "exit_code": 0,
-      "output_sha256": "482c26f8d9e3f5fb8e3287e11e11517142a7a1e00bc46011b63f7111cf130711",
+      "output_sha256": "70f9bc926973c25bbead705ac05f1cc0c07120b723f5ada764c604cb8cec1854",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.70s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.65s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-3f399f149925d619.exe)"
       ],
       "stage": "V-009 integration/concurrency",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/lint.sh",
-      "duration_s": 23.62,
-      "exit_code": 0,
-      "output_sha256": "325242382566f8584f51b83a4b31151ed924aa435f201a53c2c7e93517e4d7a7",
-      "output_tail": [
-        "packages/contracts lint: Done",
-        "apps/desktop lint: Done",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.35s"
-      ],
-      "stage": "V-012 regression/mutation",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/live-fire-local-provider.sh",
-      "duration_s": 208.32,
-      "exit_code": 0,
-      "output_sha256": "a399422958504196dd78ecb5e3f1066955c2e5fe35f4d562f66cd3867bcb0f76",
-      "output_tail": [
-        "local-provider: restored the production artifact",
-        "local-provider: rebuilding the production artifact from the committed config",
-        "assert-no-debug-port: ok -- target/release/linchpin-desktop.exe opens no port 9222"
-      ],
-      "stage": "V-013 dynamic security/domain packs",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/test-e2e.sh",
-      "duration_s": 116.22,
-      "exit_code": 0,
-      "output_sha256": "175fe5c3d063b4d6e5e9737c8ed40f4e4082174233c4c884af13313e91bedae9",
-      "output_tail": [
-        "(Use `node --trace-warnings ...` to show where the warning was created)",
-        "(node:10236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
-        "(Use `node --trace-warnings ...` to show where the warning was created)"
-      ],
-      "stage": "V-015 usability/accessibility",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/artifact-e2e.sh",
-      "duration_s": 94.13,
-      "exit_code": 0,
-      "output_sha256": "cace19246155b48d056420118042050325f5c9afe08b37e2cffaa06f1ceebbd6",
-      "output_tail": [
-        "  PASS: artifact digest unchanged across the run -- 5cf39f81ed002dab",
-        "artifact-e2e: wrote .agent/evidence/artifact-e2e/STATUS.md",
-        "artifact-e2e: ok"
-      ],
-      "stage": "V-020 exact artifact",
-      "status": "PASS"
-    },
-    {
-      "command": "python3 scripts/test-collection-guard.py --check",
-      "duration_s": 0.09,
-      "exit_code": 0,
-      "output_sha256": "0a675540bd7c0f15a0e37564ea46b0d7cc992d76b2439066ed33ddc2160fac26",
-      "output_tail": [
-        "collection guard manifest: ok (min 201 passed)"
-      ],
-      "stage": "DOD-007 collection guard",
       "status": "PASS"
     }
   ],
@@ -126,11 +62,6 @@
     "V-000 harness validation",
     "V-005 clean build",
     "V-008 full functionality",
-    "V-009 integration/concurrency",
-    "V-012 regression/mutation",
-    "V-013 dynamic security/domain packs",
-    "V-015 usability/accessibility",
-    "V-020 exact artifact",
-    "DOD-007 collection guard"
+    "V-009 integration/concurrency"
   ]
 }

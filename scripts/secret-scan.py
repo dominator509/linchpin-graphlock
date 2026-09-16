@@ -105,6 +105,11 @@ ALLOWLIST_VALUES = {
     "master_key",
     "PROVISIONAL-CLAIM-1",
     "TOKEN-abc",
+    # AWS's own published documentation example access key id, used as a
+    # redaction FIXTURE in crates/crash_reporter's key-value redaction test. It is
+    # not a credential, and removing it would remove the test case for a
+    # credential shape the redactor must catch.
+    "AKIAIOSFODNN7EXAMPLE",
 }
 
 # Files whose whole purpose is to document or test credential handling.

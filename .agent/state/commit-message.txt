@@ -1,0 +1,40 @@
+feat(DOD-037): operator diagnostics with induced-failure mapping and real redaction
+
+DOD-037 moves FAIL -> PARTIAL: every signal the clause names except dashboards now
+exists and is proven against injected failures.
+
+- commands::get_diagnostics returns health, readiness, logs, metrics, traces,
+  alerts and correlation ids in one view. Readiness is MEASURED by probing the
+  vault directory (absent, read-only, unreadable, writable), never a constant.
+- Recording happens at the IPC boundary in lib.rs for record_conception,
+  backup_vault, restore_vault and run_local_inference, so durations are
+  end-to-end. Traces are real: a span per execution through the telemetry
+  pipeline, rendered as <correlation>:<command>. An earlier draft exposed an
+  always-empty traces field -- the 'surface asserting a state the product does
+  not have' defect this run has already found twice -- so it was wired instead.
+- Alerts derive from the same measurements: storage unavailable, three or more of
+  the last five failed, most recent failure named with command and correlation id.
+- Induced failures mapped to signals in test: absent storage directory gives
+  DEGRADED plus an alert; restore from a missing backup gives a FAILED entry with
+  POLICY class, measured duration, timestamp, correlation id, alert and trace.
+
+Three real redaction defects found and fixed in the SHARED policy, so they also
+affected the Repair Capsule path:
+- registering key NAMES as secrets replaced the name and exposed the value
+  (api_key=abcdef became [REDACTED]=abcdef);
+- short or opaque credentials were never redacted at all, since only registered
+  literals and token shapes were covered, so password=hunter2, a quoted JSON
+  token field and an Authorization Basic header passed in the clear. Values
+  following a credential-shaped key are now redacted across key=value, key: value,
+  quoted JSON and trailing-semicolon forms, while ordinary prose is untouched;
+- the quoted-key form was itself missed at first because the character after the
+  key is a quote, not a colon.
+
+MUT-OPS-037-a proves the guard discriminates. AWS's published example access key
+used as the redaction fixture is allowlisted in the secret scanner with its
+reason recorded, rather than deleting the test case.
+
+Still PARTIAL because the clause also names dashboards: the signals are reachable
+over IPC and rendered nowhere. DoD tally: FAIL 2 -> 1 (DOD-035 alone, which needs
+a second released version). Requirements 57/59 bound. Seven controlled defects are
+now caught and restored by scripts/mutation-proof.py. Verify: ok.

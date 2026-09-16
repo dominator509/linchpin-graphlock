@@ -261,6 +261,31 @@ MUTATIONS = [
         ],
         "expect_test": "test_asset_readiness_reports_gaps_and_never_treats_recordation_as_validation",
     },
+    {
+        "id": "MUT-OPS-037-a",
+        "clause": "DOD-018",
+        "covers": "REQ-OPS-010, DOD-037",
+        "feature": "credential values are redacted before they are logged",
+        "changed_behavior": (
+            "the diagnostics log stops redacting credential values, so a token or "
+            "password recorded in a command message is stored in the clear."
+        ),
+        "edits": [
+            {
+                "path": "crates/crash_reporter/src/lib.rs",
+                "old": "        out = redact_key_values(&out);\n",
+                "new": "",
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "crash_reporter",
+            "test_redaction_covers_key_values_not_only_token_shapes",
+        ],
+        "expect_test": "test_redaction_covers_key_values_not_only_token_shapes",
+    },
 ]
 
 

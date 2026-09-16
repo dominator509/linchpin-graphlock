@@ -73,6 +73,7 @@
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_punctuation_wrapped_tokens_are_scrubbed_before_export"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_export_guard_rejects_surviving_registered_secret"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_export_guard_accepts_a_fully_redacted_capsule"}
+{"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-DOM-010", "result": "PASS", "test_id": "capsule_tests::test_redaction_covers_key_values_not_only_token_shapes"}
 {"collected": true, "file": "crates/platform_windows/tests/licensing_policy.rs", "requirement_id": "REQ-FOUND-001", "result": "PASS", "test_id": "test_workspace_membership_and_tauri_2x_foundation"}
 {"collected": true, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-FOUND-002", "result": "PASS", "test_id": "tests::test_config_parses_environment_once_into_typed_values"}
 {"collected": true, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-FOUND-002", "result": "PASS", "test_id": "tests::test_missing_required_value_is_an_error_not_a_fallback"}
@@ -124,6 +125,7 @@
 {"collected": true, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-010", "result": "PASS", "test_id": "tests::test_health_rejects_file_as_storage_path"}
 {"collected": true, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-010", "result": "PASS", "test_id": "tests::test_health_with_no_probes_is_not_ok"}
 {"collected": true, "file": "crates/application/src/lib.rs", "requirement_id": "REQ-OPS-010", "result": "PASS", "test_id": "tests::test_health_against_real_app_data_path"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-OPS-010", "result": "PASS", "test_id": "commands::tests::test_diagnostics_report_induced_failure_with_correlation_and_redaction"}
 {"collected": false, "file": "apps/desktop/src-tauri/src/lib.rs", "requirement_id": "REQ-OPS-010", "result": "NOT_RUN", "test_id": "export_evidence"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/lib.rs", "requirement_id": "REQ-OPS-010", "result": "PASS", "test_id": "tests::test_health_reflects_missing_storage_directory"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/lib.rs", "requirement_id": "REQ-OPS-010", "result": "PASS", "test_id": "tests::test_health_reports_ok_for_writable_root"}
@@ -180,7 +182,7 @@
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_empty_secret_is_not_registered"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "commands::tests::test_repair_capsule_redacts_secrets"}
 {"collected": true, "file": "crates/evidence/src/lib.rs", "requirement_id": "REQ-REPAIR-002", "result": "PASS", "test_id": "redaction_tests::test_redaction_report_evidences_the_pass"}
-{"collected": false, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-002", "result": "NOT_RUN", "test_id": "incident_tests::redact_token_like"}
+{"collected": false, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-002", "result": "NOT_RUN", "test_id": "incident_tests::redact_key_values"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-002", "result": "PASS", "test_id": "capsule_tests::test_sanitized_repair_capsule"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-RES-001", "result": "PASS", "test_id": "commands::tests::test_research_lifecycle_happy_path"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-RES-001", "result": "PASS", "test_id": "commands::tests::test_research_rejects_illegal_transition"}

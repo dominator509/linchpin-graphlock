@@ -64,7 +64,10 @@ fn record_conception(
 ) -> commands::CommandResult<commands::RecordConceptionOutcome> {
     let scope = commands::WorkspaceScope { workspace_id };
     let vault_path = vault_file();
-    commands::record_conception(&scope, &content, author_is_human, Some(&vault_path))
+    let started = std::time::Instant::now();
+    let result = commands::record_conception(&scope, &content, author_is_human, Some(&vault_path));
+    record_outcome("record_conception", started, &result);
+    result
 }
 
 /// Path to the durable vault database.
@@ -73,6 +76,35 @@ fn vault_file() -> PathBuf {
     // The vault directory must exist before SQLite can create the file.
     let _ = std::fs::create_dir_all(&root);
     root.join("linchpin-vault.db")
+}
+
+/// Record a command outcome for the operator diagnostics surface (DOD-037).
+///
+/// This runs at the IPC boundary, which is where an operator's latency and
+/// failures actually happen, and it is applied to the state-changing and
+/// provider commands rather than to every read.
+fn record_outcome<T>(
+    command: &str,
+    started: std::time::Instant,
+    result: &commands::CommandResult<T>,
+) {
+    commands::record_diagnostic_outcome(
+        command,
+        &result.correlation_id,
+        result.error.as_ref(),
+        &result
+            .error
+            .as_ref()
+            .map(|e| e.safe_message().to_string())
+            .unwrap_or_else(|| "ok".to_string()),
+        started.elapsed(),
+    );
+}
+
+/// Health, readiness, logs, metrics and alerts (DOD-037).
+#[tauri::command]
+fn get_diagnostics() -> commands::CommandResult<commands::DiagnosticsView> {
+    commands::get_diagnostics(&vault_file())
 }
 
 /// Report SPEC-003 namespace coverage.
@@ -197,7 +229,10 @@ fn backup_vault(
     destination: String,
 ) -> commands::CommandResult<commands::BackupView> {
     let scope = commands::WorkspaceScope { workspace_id };
-    commands::backup_vault(&scope, &destination, &vault_file())
+    let started = std::time::Instant::now();
+    let result = commands::backup_vault(&scope, &destination, &vault_file());
+    record_outcome("backup_vault", started, &result);
+    result
 }
 
 /// Restore the durable vault from a backup (REQ-REL-005).
@@ -207,7 +242,10 @@ fn restore_vault(
     source: String,
 ) -> commands::CommandResult<commands::RestoreView> {
     let scope = commands::WorkspaceScope { workspace_id };
-    commands::restore_vault(&scope, &source, &vault_file())
+    let started = std::time::Instant::now();
+    let result = commands::restore_vault(&scope, &source, &vault_file());
+    record_outcome("restore_vault", started, &result);
+    result
 }
 
 /// Build the chain-of-title timeline and readiness verdict (REQ-COM-002).
@@ -374,7 +412,10 @@ async fn run_local_inference(
     model_id: String,
     prompt: String,
 ) -> commands::CommandResult<commands::InferenceOutcome> {
-    commands::run_local_inference(&endpoint, &model_id, &prompt).await
+    let started = std::time::Instant::now();
+    let result = commands::run_local_inference(&endpoint, &model_id, &prompt).await;
+    record_outcome("run_local_inference", started, &result);
+    result
 }
 
 /// Check an MCP capability grant (SPEC-005).
@@ -415,6 +456,7 @@ pub fn run() {
             record_conception,
             get_namespace_status,
             get_configuration,
+            get_diagnostics,
             get_scope_declaration,
             apply_research_action,
             evaluate_export,

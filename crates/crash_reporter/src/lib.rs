@@ -144,13 +144,15 @@ impl RedactionPolicy {
         self
     }
 
-    /// Replace every registered secret with a fixed placeholder and drop
-    /// anything that looks like a bearer token or a long hex key.
+    /// Replace every registered secret with a fixed placeholder, redact the
+    /// VALUE of any credential-shaped key, and drop anything that looks like a
+    /// bearer token or a long hex key.
     pub fn apply(&self, raw: &str) -> String {
         let mut out = raw.to_string();
         for secret in &self.secrets {
             out = out.replace(secret.as_str(), "[REDACTED]");
         }
+        out = redact_key_values(&out);
         out = redact_token_like(&out);
         out
     }
@@ -211,6 +213,108 @@ fn redact_token_like(input: &str) -> String {
         }
     }
     push_scrubbed(&mut out, &run);
+    out
+}
+
+/// Keys whose VALUES must never leave the device boundary.
+///
+/// Measured defect this closes: the policy redacted only REGISTERED literals and
+/// token-shaped values (`sk-`, `ghp_`, 32+ hex), so a short or opaque credential
+/// written as `password=hunter2` or `{"api_key":"abcdef"}` survived in cleartext
+/// -- and registering the KEY NAME as a secret made it worse, replacing the name
+/// and leaving the value exposed (`[REDACTED]=abcdef`). Both the Repair Capsule
+/// and the operator diagnostics log go through this function.
+const SECRET_KEYS: [&str; 9] = [
+    "api_key",
+    "apikey",
+    "api-key",
+    "access_key",
+    "password",
+    "passwd",
+    "secret",
+    "token",
+    "authorization",
+];
+
+/// Characters that end a credential value.
+fn is_value_delimiter(c: char) -> bool {
+    c.is_whitespace() || matches!(c, '&' | ';' | ',' | '}' | ']' | ')' | '\'' | '"')
+}
+
+/// Span of the VALUE that follows `key` at or after `from`, if this occurrence is
+/// a credential assignment.
+///
+/// Handles the shapes that actually appear: `key=value`, `key: value`,
+/// `"key":"value"` (JSON) and `key=value;`. A key wrapped in quotes has a closing
+/// quote BEFORE the separator, which an earlier version missed -- measured:
+/// `{"token":"abc123"}` came back untouched because the character following the
+/// key was `"`, not `:`.
+fn key_value_span(lower: &str, input: &str, from: usize, key: &str) -> Option<(usize, usize)> {
+    let offset = lower[from..].find(key)?;
+    let start = from + offset;
+    if input[..start]
+        .chars()
+        .next_back()
+        .is_some_and(|c| c.is_ascii_alphanumeric() || c == '_')
+    {
+        return None;
+    }
+
+    let mut cursor = start + key.len();
+    if input[cursor..].starts_with('"') || input[cursor..].starts_with('\'') {
+        cursor += 1;
+    }
+    let tail = input[cursor..].trim_start();
+    cursor = input.len() - tail.len();
+    if !(tail.starts_with('=') || tail.starts_with(':')) {
+        return None;
+    }
+    cursor += 1;
+    let after_separator = input[cursor..].trim_start();
+    cursor = input.len() - after_separator.len();
+    if input[cursor..].starts_with('"') || input[cursor..].starts_with('\'') {
+        cursor += 1;
+    }
+    let end = input[cursor..]
+        .find(is_value_delimiter)
+        .map(|i| cursor + i)
+        .unwrap_or(input.len());
+    if end <= cursor {
+        return None;
+    }
+    Some((cursor, end))
+}
+
+/// Redact the value that follows a credential-shaped key.
+///
+/// Only a key followed by a separator is treated as a credential, so ordinary
+/// prose such as "the token was refreshed" is left untouched.
+fn redact_key_values(input: &str) -> String {
+    let lower = input.to_lowercase();
+    let mut out = String::with_capacity(input.len());
+    let mut cursor = 0usize;
+
+    while cursor < input.len() {
+        let mut matched: Option<(usize, usize)> = None;
+        for key in SECRET_KEYS {
+            if let Some((start, end)) = key_value_span(&lower, input, cursor, key) {
+                matched = Some((start, end));
+                break;
+            }
+        }
+        match matched {
+            Some((start, end)) => {
+                out.push_str(&input[cursor..start]);
+                out.push_str("[REDACTED]");
+                cursor = end;
+            }
+            None => {
+                let ch = input[cursor..].chars().next().unwrap_or_default();
+                out.push(ch);
+                cursor += ch.len_utf8();
+            }
+        }
+    }
     out
 }
 
@@ -447,5 +551,52 @@ mod capsule_tests {
             capsule.is_safe_for_export(),
             "a fully redacted capsule must be exportable"
         );
+    }
+
+    /// covers: REQ-DOM-010, DOD-037
+    /// A short or opaque credential written after a credential-shaped key must be
+    /// redacted, while ordinary prose about tokens must survive intact.
+    #[test]
+    fn test_redaction_covers_key_values_not_only_token_shapes() {
+        let policy = RedactionPolicy::new();
+
+        let cases = [
+            ("password=hunter2", "hunter2"),
+            ("password: hunter2", "hunter2"),
+            ("api_key=abcdef", "abcdef"),
+            ("apikey=short", "short"),
+            ("access_key=AKIAIOSFODNN7EXAMPLE", "AKIAIOSFODNN7EXAMPLE"),
+            ("{\"token\":\"abc123\"}", "abc123"),
+            ("Authorization: Basic-dXNlcjpwYXNz", "dXNlcjpwYXNz"),
+            ("secret=s3cr3t;", "s3cr3t"),
+        ];
+        for (raw, secret) in cases {
+            let redacted = policy.apply(raw);
+            assert!(
+                !redacted.contains(secret),
+                "credential value survived redaction: {raw:?} -> {redacted:?}"
+            );
+            assert!(
+                redacted.contains("[REDACTED]"),
+                "nothing was redacted in {raw:?} -> {redacted:?}"
+            );
+        }
+
+        // Honest prose must not be mangled by a key-name search.
+        for honest in [
+            "the token was refreshed",
+            "password policy is documented in SECURITY.md",
+            "a secret is never logged",
+        ] {
+            assert_eq!(
+                policy.apply(honest),
+                honest,
+                "ordinary text was altered: {honest:?}"
+            );
+        }
+
+        // The original token-shape coverage still holds.
+        let shaped = policy.apply("Authorization: Bearer sk-live-ABC123xyz");
+        assert!(!shaped.contains("sk-live-ABC123xyz"), "{shaped}");
     }
 }

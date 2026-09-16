@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "77bec6c5e79ca9bd7f10f357c8da527abbb2b54dc4b5999d6d3cf5ee288fdc6d",
+  "executable_sha256": "1b4e864949cc11ea9e1adabee65703144a764ad7a3834faccde14fc988ef7e58",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a legal document outlining a specific invention, typically detailing its purpose, mechanisms, and pote\""
+      "observed": "\"A patent claim is a formal document that protects an invention by a company, allowing it to avoid being copied and sold \""
     },
     {
       "name": "metadata names the live model",
@@ -97,12 +97,12 @@
     {
       "name": "egress sampler started and polled (harness liveness, REQ-REL-002)",
       "ok": true,
-      "observed": "ready=true heartbeats=44"
+      "observed": "ready=true heartbeats=1"
     },
     {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",
       "ok": true,
-      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=11 (minimum 5)"
+      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=21 (minimum 5)"
     },
     {
       "name": "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "77bec6c5e79ca9bd -> 77bec6c5e79ca9bd"
+      "observed": "1b4e864949cc11ea -> 1b4e864949cc11ea"
     }
   ],
   "passed": 23,

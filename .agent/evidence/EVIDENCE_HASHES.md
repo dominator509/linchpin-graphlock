@@ -18,13 +18,13 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-001 | PARTIAL | `.agent/evidence/DOD-001-unbound-requirements.md` | `560eb8391930b7bb` | 10716 |
 | DOD-002 | PASS | `.agent/evidence/clean-build/STATUS.md` | `c2a15dfd459315e9` | 2093 |
 | DOD-003 | PASS | `.agent/evidence/sbom/linchpin.cdx.json` | `4c68dff3ae720d1f` | 467090 |
-| DOD-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `8281581b4a65f6c3` | 3648 |
+| DOD-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `ebaedc6858e1653a` | 3648 |
 | DOD-005 | PASS | `.agent/evidence/clean-build/ENVIRONMENT.json` | `b600f03bc797581a` | 3755 |
 | DOD-006 | PASS | `.agent/verification/reports/TEST_COLLECTION_SKIP_REPORT.md` | `1a39d097092d002e` | 553 |
-| DOD-007 | PASS | `.agent/verification/state/TEST_COLLECTION_MANIFEST.json` | `5d1eff52d9bffc61` | 1009 |
+| DOD-007 | PASS | `.agent/verification/state/TEST_COLLECTION_MANIFEST.json` | `f0c6f073837071db` | 1009 |
 | DOD-008 | PARTIAL | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `e8282c11d6fd8e1e` | 163134 |
 | DOD-009 | PARTIAL | `crates/storage/tests/integration_real_dependencies.rs` | `f1a3c433b86e22cd` | 7993 |
-| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `0469ce768797e834` | 3573 |
+| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `c3c95f1899824e7a` | 3572 |
 | DOD-011 | PARTIAL | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` | 3804 |
 | DOD-012 | PARTIAL | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` | 3804 |
 | DOD-013 | PASS | `.agent/evidence/DOD-013-canary-propagation.md` | `8e3512be92a45f01` | 5163 |
@@ -32,14 +32,14 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-015 | PARTIAL | `crates/storage/src/vault.rs` | `44e9b25427507577` | 56627 |
 | DOD-016 | PARTIAL | `crates/storage/src/vault.rs` | `44e9b25427507577` | 56627 |
 | DOD-017 | PARTIAL | `crates/storage/tests/integration_real_dependencies.rs` | `f1a3c433b86e22cd` | 7993 |
-| DOD-018 | PASS | `.agent/evidence/mutation-proof/REPORT.json` | `fc8ad8af7873adec` | 13868 |
-| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `0469ce768797e834` | 3573 |
+| DOD-018 | PASS | `.agent/evidence/mutation-proof/REPORT.json` | `dcafaff18c3547db` | 15806 |
+| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `c3c95f1899824e7a` | 3572 |
 | DOD-020 | PARTIAL | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
 | DOD-021 | PASS | `.agent/verification/reports/TEST_COLLECTION_SKIP_REPORT.md` | `1a39d097092d002e` | 553 |
 | DOD-022 | PASS | `.agent/evidence/DOD-022-performance-thresholds.md` | `79df98d7a63ba85b` | 3175 |
 | DOD-023 | PARTIAL | `.agent/evidence/documentation/STATUS.md` | `d75870928e10570f` | 5867 |
 | DOD-024 | PASS | `.agent/evidence/EP-009/M1/STATUS.md` | `cb2ae00ad9d40d1a` | 6756 |
-| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `dfb8da12136bc018` | 201686 |
+| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `bb7f0a92475c4ea1` | 201686 |
 | DOD-026 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
 | DOD-027 | PASS | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
 | DOD-028 | PARTIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
@@ -51,10 +51,10 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-034 | EXTERNAL_REQUIRED | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` | 3804 |
 | DOD-035 | FAIL | `.agent/evidence/EP-009/M4/STATUS.md` | `3fa1fa072aaf33e2` | 4524 |
 | DOD-036 | PASS | `.agent/evidence/REQ-REL-005-recovery.md` | `24d4f6896f35d596` | 9014 |
-| DOD-037 | FAIL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` | 3851 |
+| DOD-037 | PARTIAL | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
 | DOD-038 | PARTIAL | `.agent/evidence/REQ-REL-005-recovery.md` | `24d4f6896f35d596` | 9014 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `7b5e499ca7ae1d7e` | 5066 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `244de0a7b5a98f65` | 2379 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `abddfe3185eca5a2` | 144894 |
 | DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `2c6447b7ea76c408` | 1365 |
 
@@ -518,7 +518,7 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | E2E-001 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
 | E2E-002 | PARTIAL | `.agent/evidence/ADR-004-playwright-dependency.md` | `d21ff54e4b4d702e` |
 | E2E-003 | PARTIAL | `apps/desktop/e2e/shell.spec.ts` | `5867ef8ba1001ee7` |
-| E2E-004 | PARTIAL | `apps/desktop/src-tauri/src/commands.rs` | `554cb24eef913026` |
+| E2E-004 | PARTIAL | `apps/desktop/src-tauri/src/commands.rs` | `d61a3c83ba435815` |
 | E2E-005 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
 | E2E-006 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
 | E2E-007 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
@@ -535,7 +535,7 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | E2E-018 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
 | E2E-019 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
 | E2E-020 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
-| SUP-001 | PARTIAL | `apps/desktop/src-tauri/src/commands.rs` | `554cb24eef913026` |
+| SUP-001 | PARTIAL | `apps/desktop/src-tauri/src/commands.rs` | `d61a3c83ba435815` |
 | SUP-002 | NOT_RUN_BLOCKED_MATERIAL | `.agent/verification/state/ACCOUNTING_STATUS.md` | `80079276e4cd5ec0` |
 | SUP-003 | PARTIAL | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` |
 | SUP-004 | PARTIAL | `.agent/evidence/EP-009/M2/SUP-004-reproducible-build.md` | `e0b2fc7d243ff215` |

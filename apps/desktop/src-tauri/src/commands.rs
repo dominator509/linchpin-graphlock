@@ -78,7 +78,17 @@ impl CommandError {
         }
     }
 
-    /// Safe, user-facing text. Never contains internal paths or secrets.
+    /// Safe, user-facing text.
+    ///
+    /// POLICY, corrected after this comment was found to be FALSE: it read
+    /// "Never contains internal paths or secrets", while several messages name a
+    /// LOCAL path ("no backup at C:\\...", "the unreadable vault was preserved
+    /// at ..."). Naming the path is deliberate rather than a leak: the path is on
+    /// the user's own device, it never leaves the device, and an operator told
+    /// only that "recovery failed" cannot recover. What this text must never
+    /// contain is a SECRET -- no provider token, no subscription credential, no
+    /// invention body. The redaction tests assert that, and the diagnostics
+    /// surface (DOD-037) applies the same policy to everything it records.
     pub fn safe_message(&self) -> &str {
         match self {
             CommandError::Validation { message } | CommandError::Policy { message } => message,
@@ -1957,6 +1967,266 @@ pub fn build_commercialization_package(
         }
         Err(e) => CommandResult::failure(correlation, CommandError::policy(e)),
     }
+}
+
+/// One recorded command outcome, for operator diagnostics (DOD-037).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DiagnosticEventView {
+    pub correlation_id: String,
+    pub command: String,
+    /// `OK` or `FAILED`.
+    pub outcome: String,
+    pub error_class: Option<String>,
+    /// Redacted before storage: the recorded detail is never the raw input.
+    pub detail: String,
+    pub duration_ms: u64,
+    pub at_utc: String,
+}
+
+/// Derived metrics over the recorded window (DOD-037).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DiagnosticsMetrics {
+    pub recorded: usize,
+    pub succeeded: usize,
+    pub failed: usize,
+    pub failure_rate: f64,
+    pub p50_duration_ms: u64,
+    pub p95_duration_ms: u64,
+}
+
+/// Health, readiness, logs, traces, metrics and alerts in one operator view.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DiagnosticsView {
+    /// `OK` or `DEGRADED`, measured rather than asserted.
+    pub readiness: String,
+    pub storage_ok: bool,
+    pub vault_file: String,
+    pub metrics: DiagnosticsMetrics,
+    /// Conditions an operator must act on. Derived from measured state.
+    pub alerts: Vec<String>,
+    pub events: Vec<DiagnosticEventView>,
+    /// Correlation-tagged spans recorded through the local telemetry pipeline.
+    pub traces: Vec<String>,
+    pub redaction_applied: bool,
+    pub detail: String,
+}
+
+/// How many outcomes the in-process diagnostics window keeps.
+const DIAGNOSTIC_WINDOW: usize = 200;
+
+/// Seconds since the epoch, as the diagnostics log's timestamp.
+///
+/// Deliberately not a formatted calendar date: this crate has no date library,
+/// and inventing one here would be a bigger claim than the log needs. The
+/// ordering and the interval are what an operator reads.
+fn diagnostic_timestamp() -> String {
+    let seconds = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    format!("epoch:{seconds}")
+}
+
+fn diagnostic_window() -> &'static std::sync::Mutex<std::collections::VecDeque<DiagnosticEventView>>
+{
+    static WINDOW: std::sync::OnceLock<
+        std::sync::Mutex<std::collections::VecDeque<DiagnosticEventView>>,
+    > = std::sync::OnceLock::new();
+    WINDOW.get_or_init(|| std::sync::Mutex::new(std::collections::VecDeque::new()))
+}
+
+/// Redaction policy for everything this surface records.
+///
+/// The recorded detail is the command's own message plus any caller-supplied
+/// label the operator already saw; it is passed through the same redactor the
+/// Repair Capsule uses, so a credential that reaches a message cannot reach the
+/// diagnostics log in the clear.
+///
+/// KEY NAMES ARE NOT REGISTERED HERE, and that is the correction of a measured
+/// defect rather than a preference: registering "api_key" as a secret replaced
+/// the NAME and left the value exposed (`api_key=abcdef` became
+/// `[REDACTED]=abcdef`, caught by this surface's own test). Value redaction
+/// belongs in the policy, which now redacts the value following a
+/// credential-shaped key.
+fn diagnostics_redactor() -> crash_reporter::RedactionPolicy {
+    crash_reporter::RedactionPolicy::new()
+}
+
+/// Correlation-tagged spans recorded through the local telemetry pipeline.
+///
+/// The pipeline is the one `crash_reporter` already provides; this surface feeds
+/// it, so the `traces` field an operator reads is populated by real command
+/// executions rather than being a placeholder. An always-empty traces field
+/// would be the "surface asserting a state the product does not have" defect
+/// this run has already found twice.
+fn diagnostics_pipeline() -> &'static crash_reporter::LocalTelemetryPipeline {
+    static PIPELINE: std::sync::OnceLock<crash_reporter::LocalTelemetryPipeline> =
+        std::sync::OnceLock::new();
+    PIPELINE.get_or_init(crash_reporter::LocalTelemetryPipeline::new)
+}
+
+/// Record one command outcome for the operator diagnostics surface (DOD-037).
+///
+/// Called from the IPC boundary, which is where an operator's latency and
+/// failures actually occur, so the recorded duration is end-to-end rather than
+/// an inner measurement.
+pub fn record_diagnostic_outcome(
+    command: &str,
+    correlation_id: &str,
+    error: Option<&CommandError>,
+    detail: &str,
+    duration: std::time::Duration,
+) {
+    // A span first, so a trace exists even if the window lock is contended.
+    diagnostics_pipeline()
+        .record_span(
+            crash_reporter::CorrelationId(correlation_id.to_string()),
+            command,
+        )
+        .ok();
+
+    let redacted = diagnostics_redactor().apply(detail);
+    let event = DiagnosticEventView {
+        correlation_id: correlation_id.to_string(),
+        command: command.to_string(),
+        outcome: if error.is_some() { "FAILED" } else { "OK" }.to_string(),
+        error_class: error.map(|e| match e {
+            CommandError::Validation { .. } => "VALIDATION".to_string(),
+            CommandError::Policy { .. } => "POLICY".to_string(),
+        }),
+        detail: redacted,
+        duration_ms: duration.as_millis() as u64,
+        at_utc: diagnostic_timestamp(),
+    };
+    if let Ok(mut window) = diagnostic_window().lock() {
+        if window.len() == DIAGNOSTIC_WINDOW {
+            window.pop_front();
+        }
+        window.push_back(event);
+    }
+}
+
+/// Health, readiness, logs, traces, metrics and alerts (DOD-037).
+///
+/// Readiness is MEASURED: the vault directory is probed and the app reports
+/// DEGRADED when it is missing or unwritable, rather than returning a constant.
+/// Alerts are derived from the same measurement plus the recorded outcomes, so a
+/// known failure (storage gone, repeated failures) produces a signal an operator
+/// can act on instead of a green status.
+pub fn get_diagnostics(vault_path: &std::path::Path) -> CommandResult<DiagnosticsView> {
+    let correlation = CorrelationId::new();
+
+    let parent = vault_path.parent();
+    let (storage_ok, storage_detail) = match parent {
+        Some(dir) if dir.as_os_str().is_empty() => {
+            (true, "vault path has no directory".to_string())
+        }
+        Some(dir) if !dir.exists() => (
+            false,
+            format!("storage directory {} does not exist", dir.display()),
+        ),
+        Some(dir) => match std::fs::metadata(dir) {
+            Ok(meta) if meta.permissions().readonly() => (
+                false,
+                format!("storage directory {} is read-only", dir.display()),
+            ),
+            Ok(_) => (
+                true,
+                format!("storage directory {} is writable", dir.display()),
+            ),
+            Err(e) => (
+                false,
+                format!("storage directory {} is unreadable: {e}", dir.display()),
+            ),
+        },
+        None => (false, "vault path has no parent directory".to_string()),
+    };
+
+    let events: Vec<DiagnosticEventView> = diagnostic_window()
+        .lock()
+        .map(|window| window.iter().cloned().collect())
+        .unwrap_or_default();
+
+    let recorded = events.len();
+    let failed = events.iter().filter(|e| e.outcome == "FAILED").count();
+    let succeeded = recorded - failed;
+    let mut durations: Vec<u64> = events.iter().map(|e| e.duration_ms).collect();
+    durations.sort_unstable();
+    let percentile = |fraction: f64| -> u64 {
+        if durations.is_empty() {
+            return 0;
+        }
+        let index = ((durations.len() as f64 - 1.0) * fraction).round() as usize;
+        durations[index.min(durations.len() - 1)]
+    };
+
+    let mut alerts: Vec<String> = Vec::new();
+    if !storage_ok {
+        alerts.push(format!("storage unavailable: {storage_detail}"));
+    }
+    let recent_failures = events
+        .iter()
+        .rev()
+        .take(5)
+        .filter(|e| e.outcome == "FAILED")
+        .count();
+    if recent_failures >= 3 {
+        alerts.push(format!(
+            "{recent_failures} of the last 5 recorded commands failed"
+        ));
+    }
+    if let Some(last) = events.iter().rev().find(|e| e.outcome == "FAILED") {
+        alerts.push(format!(
+            "last failure: {} ({}) correlation {}",
+            last.command,
+            last.error_class
+                .clone()
+                .unwrap_or_else(|| "UNKNOWN".to_string()),
+            last.correlation_id
+        ));
+    }
+
+    let readiness = if storage_ok { "OK" } else { "DEGRADED" };
+    let detail = format!(
+        "readiness {readiness}; {recorded} command outcome(s) recorded, {failed} failed; \
+         {storage_detail}"
+    );
+
+    // The most recent 20 outcomes, newest first, and the same window rendered as
+    // correlation-tagged traces.
+    let traces: Vec<String> = events
+        .iter()
+        .rev()
+        .take(20)
+        .map(|event| format!("{}:{}", event.correlation_id, event.command))
+        .collect();
+    let recent: Vec<DiagnosticEventView> = events.into_iter().rev().take(20).collect();
+
+    CommandResult::success(
+        correlation,
+        DiagnosticsView {
+            readiness: readiness.to_string(),
+            storage_ok,
+            vault_file: vault_path.display().to_string(),
+            metrics: DiagnosticsMetrics {
+                recorded,
+                succeeded,
+                failed,
+                failure_rate: if recorded == 0 {
+                    0.0
+                } else {
+                    (failed as f64 / recorded as f64 * 1000.0).round() / 1000.0
+                },
+                p50_duration_ms: percentile(0.50),
+                p95_duration_ms: percentile(0.95),
+            },
+            alerts,
+            events: recent,
+            traces,
+            redaction_applied: true,
+            detail,
+        },
+    )
 }
 
 /// A commercialization package as returned to the UI.
@@ -4066,6 +4336,132 @@ mod tests {
         assert!(!build_asset_readiness(&scope, "Valve", &unknown_kind, None, "", &[], &[], &[]).ok);
         let no_source = vec![record("INVENTOR_RECORD", "2023-01-15", None, None, "  ")];
         assert!(!build_asset_readiness(&scope, "Valve", &no_source, None, "", &[], &[], &[]).ok);
+    }
+
+    /// covers: REQ-OPS-010, DOD-037
+    /// The operator diagnostics surface must describe induced failures
+    /// truthfully, correlate them, and never record a secret in the clear.
+    #[test]
+    fn test_diagnostics_report_induced_failure_with_correlation_and_redaction() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-diag-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+
+        // --- healthy state -------------------------------------------------
+        let healthy = get_diagnostics(&vault_path);
+        assert!(healthy.ok);
+        let healthy = healthy.value.unwrap();
+        assert_eq!(healthy.readiness, "OK", "{}", healthy.detail);
+        assert!(healthy.storage_ok);
+        assert!(healthy.alerts.is_empty(), "{:?}", healthy.alerts);
+
+        // --- INDICATED FAILURE 1: the storage directory is gone ------------
+        let missing_dir = dir.join("not-created");
+        let degraded = get_diagnostics(&missing_dir.join("vault.db"));
+        assert!(degraded.ok);
+        let degraded = degraded.value.unwrap();
+        assert_eq!(degraded.readiness, "DEGRADED");
+        assert!(!degraded.storage_ok);
+        assert!(
+            degraded
+                .alerts
+                .iter()
+                .any(|alert| alert.contains("storage unavailable")),
+            "a missing storage directory must raise an alert: {:?}",
+            degraded.alerts
+        );
+
+        // --- a real failing command is recorded with its correlation id ----
+        let scope = WorkspaceScope {
+            workspace_id: "ws-diag".to_string(),
+        };
+        let failed = restore_vault(&scope, dir.join("absent.db").to_str().unwrap(), &vault_path);
+        assert!(!failed.ok);
+        let correlation = failed.correlation_id.clone();
+        record_diagnostic_outcome(
+            "restore_vault",
+            &correlation,
+            failed.error.as_ref(),
+            failed
+                .error
+                .as_ref()
+                .map(|e| e.safe_message().to_string())
+                .unwrap_or_default()
+                .as_str(),
+            std::time::Duration::from_millis(7),
+        );
+
+        // --- REDACTION: a planted credential must not survive --------------
+        record_diagnostic_outcome(
+            "restore_vault",
+            "cid-secret",
+            Some(&CommandError::policy(
+                "provider call failed with Authorization: Bearer sk-live-1234567890 and api_key=abcdef",
+            )),
+            "provider call failed with Authorization: Bearer sk-live-1234567890 and api_key=abcdef",
+            std::time::Duration::from_millis(3),
+        );
+
+        let view = get_diagnostics(&vault_path).value.unwrap();
+        assert!(view.redaction_applied);
+        let recorded = view
+            .events
+            .iter()
+            .find(|event| event.correlation_id == correlation)
+            .expect("the failed restore must appear in the diagnostics log");
+        assert_eq!(recorded.command, "restore_vault");
+        assert_eq!(recorded.outcome, "FAILED");
+        assert_eq!(recorded.error_class.as_deref(), Some("POLICY"));
+        assert_eq!(recorded.duration_ms, 7, "the measured duration is recorded");
+        assert!(
+            recorded.at_utc.starts_with("epoch:"),
+            "the timestamp must be the recorded form: {}",
+            recorded.at_utc
+        );
+        assert!(
+            view.alerts
+                .iter()
+                .any(|alert| alert.contains("last failure")
+                    && alert.contains("restore_vault")
+                    && alert.contains("correlation")),
+            "the alert must name the failing command and its correlation id so an operator \
+             can find the log line: {:?}",
+            view.alerts
+        );
+        assert!(view.metrics.recorded >= 2);
+        assert!(view.metrics.failed >= 2);
+
+        let secrets: String = view
+            .events
+            .iter()
+            .map(|event| event.detail.clone())
+            .collect::<Vec<_>>()
+            .join("\n");
+        assert!(
+            !secrets.contains("sk-live-1234567890"),
+            "a credential reached the diagnostics log: {secrets}"
+        );
+        assert!(
+            !secrets.contains("abcdef"),
+            "a credential reached the diagnostics log: {secrets}"
+        );
+        // The traces field must be populated by real executions, not empty.
+        assert!(
+            view.traces
+                .iter()
+                .any(|trace| trace.contains(&correlation) && trace.contains("restore_vault")),
+            "the recorded command must appear as a correlation-tagged trace: {:?}",
+            view.traces
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     /// Seed a conception event directly through the vault, for the backup tests.
