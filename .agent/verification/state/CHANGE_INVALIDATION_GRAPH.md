@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2`
-- Candidate commit at generation: `377fad2`
+- Current epoch digest: `d3ca029e738fecabfb1cd709572fa961f853a2ca2b0453ad9c44d9481a2c0d9d`
+- Candidate commit at generation: `60044ae`
 - Total tracked inputs: 127
-- Previous epoch digest: `a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2`
+- Previous epoch digest: `d3ca029e738fecabfb1cd709572fa961f853a2ca2b0453ad9c44d9481a2c0d9d`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -108,8 +108,8 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-012 regression/mutation
 - invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `6897ce998fafb06e…`
-  - `apps\desktop\src-tauri\src\lib.rs` `7e69fd84b4f59d28…`
+  - `apps\desktop\src-tauri\src\commands.rs` `85b994d390d6eda8…`
+  - `apps\desktop\src-tauri\src\lib.rs` `1ae6665c78653d4e…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `9e8dd477b8dcd22d…`
   - `crates\commercialization\src\asset_readiness.rs` `f4143f42b1e5da03…`
@@ -126,8 +126,8 @@ definition and its PASS status is revoked until rerun.
 
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
-  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `b1b38d4534b2cc3c…`
-  - `apps\desktop\e2e-artifact.mjs` `f9f914d2e265e9a3…`
+  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `99019b06478daebd…`
+  - `apps\desktop\e2e-artifact.mjs` `9d2d096495635d89…`
   - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
 
 ## Rerun obligations on epoch change

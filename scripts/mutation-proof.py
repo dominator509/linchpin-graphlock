@@ -371,6 +371,66 @@ MUTATIONS = [
         ],
         "expect_test": "test_diagnostics_report_induced_failure_with_correlation_and_redaction",
     },
+    {
+        "id": "MUT-DOD-017-a",
+        "clause": "DOD-018",
+        "covers": "DOD-017",
+        "feature": "a keyed retry is reported as a replay, not as new work",
+        "changed_behavior": (
+            "classify_replay reports every keyed write as freshly recorded, so a "
+            "retry looks like new work even though nothing was written."
+        ),
+        "edits": [
+            {
+                "path": "crates/storage/src/vault.rs",
+                "old": (
+                    "        if existing.content_hash == content_hash {\n"
+                    "            Ok(IdempotentWrite::Replayed(existing))\n"
+                    "        } else {\n"
+                ),
+                "new": (
+                    "        if existing.content_hash == content_hash {\n"
+                    "            Ok(IdempotentWrite::Recorded(existing))\n"
+                    "        } else {\n"
+                ),
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "storage",
+            "test_keyed_writes_are_idempotent_and_conflicts_are_refused",
+        ],
+        "expect_test": "test_keyed_writes_are_idempotent_and_conflicts_are_refused",
+    },
+    {
+        "id": "MUT-DOD-017-b",
+        "clause": "DOD-018",
+        "covers": "DOD-017",
+        "feature": "one key never maps to two different payloads",
+        "changed_behavior": (
+            "a key replayed with DIFFERENT content is accepted as a replay, so the "
+            "key silently identifies two different payloads and reconciliation "
+            "against it is worthless."
+        ),
+        "edits": [
+            {
+                "path": "crates/storage/src/vault.rs",
+                "old": "        if existing.content_hash == content_hash {\n",
+                "new": "        if true || existing.content_hash == content_hash {\n",
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "linchpin-desktop",
+            "--lib",
+            "test_keyed_recording_reports_replays_and_refuses_key_reuse",
+        ],
+        "expect_test": "test_keyed_recording_reports_replays_and_refuses_key_reuse",
+    },
 ]
 
 

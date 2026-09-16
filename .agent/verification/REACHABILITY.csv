@@ -47,6 +47,7 @@ check_system_health_with,application,crates/application/src/lib.rs,REACHABLE,nam
 cite_art,patent,crates/patent/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 claim_evidence_hashes,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 claim_support_rows,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
+classify_replay,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
 classify_research_claim,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 complete,research,crates/research/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\commercialization\src\lib.rs, crates\research\src\lib.rs"
 complete_partial,research,crates/research/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\research\src\lib.rs"
@@ -78,6 +79,7 @@ evaluate_action,evidence,crates/evidence/src/lib.rs,TEST_ONLY,named only from te
 evaluate_export,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 evaluate_opportunity,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 evaluate_valuation,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
+event,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\commercialization\src\asset_readiness.rs"
 execute_independent_runs,research,crates/research/src/lib.rs,REACHABLE,named from crates\research\src\lib.rs
 export_evidence,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 export_pitch_deck,commercialization,crates/commercialization/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
@@ -89,6 +91,7 @@ fetch_official_record,storage,crates/storage/src/lib.rs,REACHABLE,named from cra
 figure,domain,crates/domain/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\domain\src\lib.rs"
 file_application,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 filter_export,evidence,crates/evidence/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
+find_conception_event,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
 fmt,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\commercialization\src\asset_readiness.rs, crates\commercialization\src\lib.rs"
 from,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\application\src\lib.rs"
 from_env,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\platform_windows\src\lib.rs"
@@ -123,6 +126,7 @@ is_authoritative,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\deskt
 is_empty,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\application\src\lib.rs, crates\commercialization\src\asset_readiness.rs"
 is_external_transient,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\provider_transport\src\lib.rs"
 is_live,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,named from crates\provider_transport\src\lib.rs
+is_replay,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 is_safe_for_export,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 is_token_char,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from crates\crash_reporter\src\lib.rs
 is_value_delimiter,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from crates\crash_reporter\src\lib.rs
@@ -163,7 +167,8 @@ public_export,domain,crates/domain/src/lib.rs,TEST_ONLY,named only from tests: c
 push_scrubbed,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from crates\crash_reporter\src\lib.rs
 put_blob,storage,crates/storage/src/vault.rs,TEST_ONLY,named only from tests: crates\storage\src\vault.rs
 put_claim,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
-put_conception_event,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
+put_conception_event,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\storage\src\vault.rs"
+put_conception_event_keyed,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 put_evidence_record,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 put_support_anchor,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 quarantine_path,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
@@ -171,6 +176,7 @@ quarantine_unreadable,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,n
 reason,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\domain\src\lib.rs"
 record_claim_evidence,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 record_conception,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
+record_conception_keyed,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 record_coverage,research,crates/research/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 record_diagnostic_outcome,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs
 record_outcome,desktop,apps/desktop/src-tauri/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs

@@ -212,6 +212,30 @@ pub struct StoredConceptionEvent {
     pub version: i64,
 }
 
+/// Outcome of a keyed write: a fresh commit, or a recognised replay (DOD-017).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum IdempotentWrite {
+    /// The key had not been used; this call stored the event.
+    Recorded(StoredConceptionEvent),
+    /// The key had been used with the same content; nothing was written and the
+    /// event the FIRST attempt stored is returned.
+    Replayed(StoredConceptionEvent),
+}
+
+impl IdempotentWrite {
+    /// The event this write refers to, whether it was recorded now or earlier.
+    pub fn event(&self) -> &StoredConceptionEvent {
+        match self {
+            IdempotentWrite::Recorded(event) | IdempotentWrite::Replayed(event) => event,
+        }
+    }
+
+    /// True when this call recognised a replay rather than storing anything.
+    pub fn is_replay(&self) -> bool {
+        matches!(self, IdempotentWrite::Replayed(_))
+    }
+}
+
 /// Failure modes for vault operations.
 #[derive(Debug)]
 pub enum VaultError {
@@ -237,6 +261,14 @@ pub enum VaultError {
     BackupMissing(String),
     /// Filesystem failure while backing up or restoring.
     Io(String),
+    /// A client-supplied event key was blank (DOD-017).
+    InvalidEventKey,
+    /// A key was replayed with a different payload under the same identity.
+    IdempotencyConflict {
+        event_key: String,
+        expected: String,
+        found: String,
+    },
     /// A migration is recorded but the objects it creates are absent, so the
     /// vault would fail later at a random write instead of at open (DOD-016).
     SchemaIncomplete(String),
@@ -255,6 +287,16 @@ impl std::fmt::Display for VaultError {
             VaultError::InvalidAnchorReference => write!(f, "anchor reference is required"),
             VaultError::BackupMissing(p) => write!(f, "backup file does not exist: {p}"),
             VaultError::Io(m) => write!(f, "io error: {m}"),
+            VaultError::InvalidEventKey => write!(f, "event key is required"),
+            VaultError::IdempotencyConflict {
+                event_key,
+                expected,
+                found,
+            } => write!(
+                f,
+                "event key {event_key} was already used for different content \
+                 (stored {expected}, submitted {found}); a key must identify one payload"
+            ),
             VaultError::SchemaIncomplete(m) => write!(
                 f,
                 "migration state is inconsistent: {m}. The vault records migrations whose \
@@ -688,6 +730,102 @@ impl Vault {
         )?;
         let rows = stmt.query_map((claim_id,), |r| r.get::<_, String>(0))?;
         Ok(rows.collect::<Result<Vec<_>, _>>()?)
+    }
+
+    /// Store and durably commit a conception event under a CLIENT-CHOSEN key.
+    ///
+    /// REQ-REL-005's sibling requirement in SPEC-001 (DOD-017) is about delivery
+    /// semantics: a retried, reordered, delayed or concurrent submission must not
+    /// duplicate work, and the caller must be able to tell a fresh write from a
+    /// replay. Measured defect this closes: `record_conception` mints a new UUID
+    /// per call, so a transport-level retry -- the client never learned whether
+    /// the first attempt landed -- stored the SAME invention text TWICE, with two
+    /// ids and two audit entries, and nothing in the response said so.
+    ///
+    /// Semantics, deliberately explicit:
+    ///   * a key never seen before is recorded and reported as `Recorded`;
+    ///   * a key replayed with the SAME content is a no-op reported as
+    ///     `Replayed`, carrying the id the first attempt stored;
+    ///   * a key replayed with DIFFERENT content is refused as a conflict. A key
+    ///     that silently maps to two different payloads is worse than a duplicate:
+    ///     it makes the id meaningless for reconciliation.
+    pub fn put_conception_event_keyed(
+        &self,
+        workspace_id: &str,
+        event_key: &str,
+        origin: &str,
+        content: &str,
+    ) -> Result<IdempotentWrite, VaultError> {
+        if event_key.trim().is_empty() {
+            return Err(VaultError::InvalidEventKey);
+        }
+        let content_hash = sha256_hex(content.as_bytes());
+
+        // The read and the write are separate statements, and that is why
+        // concurrency is tested rather than assumed: the primary key is what
+        // actually prevents a duplicate, and the INSERT is retried as a replay
+        // when it loses that race.
+        if let Some(existing) = self.find_conception_event(event_key)? {
+            return self.classify_replay(existing, &content_hash);
+        }
+
+        match self.put_conception_event(workspace_id, event_key, origin, content) {
+            Ok(stored) => Ok(IdempotentWrite::Recorded(stored)),
+            Err(VaultError::Database(e)) => {
+                // Another writer won the race between the lookup and the insert.
+                // Re-read and classify instead of reporting a hard failure for a
+                // key that is now durably present.
+                match self.find_conception_event(event_key)? {
+                    Some(existing) => self.classify_replay(existing, &content_hash),
+                    None => Err(VaultError::Database(e)),
+                }
+            }
+            Err(other) => Err(other),
+        }
+    }
+
+    /// Compare a stored event against the submitted payload.
+    fn classify_replay(
+        &self,
+        existing: StoredConceptionEvent,
+        content_hash: &str,
+    ) -> Result<IdempotentWrite, VaultError> {
+        if existing.content_hash == content_hash {
+            Ok(IdempotentWrite::Replayed(existing))
+        } else {
+            Err(VaultError::IdempotencyConflict {
+                event_key: existing.event_id,
+                expected: existing.content_hash,
+                found: content_hash.to_string(),
+            })
+        }
+    }
+
+    /// The event stored under this id, if any.
+    pub fn find_conception_event(
+        &self,
+        event_id: &str,
+    ) -> Result<Option<StoredConceptionEvent>, VaultError> {
+        let row = self
+            .conn
+            .query_row(
+                "SELECT event_id, workspace_id, origin, content_hash, content, created_utc, version
+                 FROM conception_events WHERE event_id = ?1 AND deleted = 0",
+                [event_id],
+                |r| {
+                    Ok(StoredConceptionEvent {
+                        event_id: r.get(0)?,
+                        workspace_id: r.get(1)?,
+                        origin: r.get(2)?,
+                        content_hash: r.get(3)?,
+                        content: r.get(4)?,
+                        created_utc: r.get(5)?,
+                        version: r.get(6)?,
+                    })
+                },
+            )
+            .optional()?;
+        Ok(row)
     }
 
     /// Store and durably commit a conception event.
@@ -1189,6 +1327,167 @@ mod tests {
                  at whichever write touches the missing table"
             ),
         }
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-DATA-001, DOD-017
+    /// A retried, reordered, delayed or concurrent submission under one client
+    /// key must not duplicate work, and a key must never silently map to two
+    /// different payloads.
+    #[test]
+    fn test_keyed_writes_are_idempotent_and_conflicts_are_refused() {
+        let (dir, vault) = temp_vault("keyed");
+        vault.create_workspace("ws-keyed").unwrap();
+
+        // RETRY: the client never learned whether the first attempt landed, so it
+        // resends. One event, and the second call says it was a replay.
+        let first = vault
+            .put_conception_event_keyed("ws-keyed", "key-a", "HumanConception", "the invention")
+            .expect("first write");
+        assert!(!first.is_replay(), "the first write is not a replay");
+        let replay = vault
+            .put_conception_event_keyed("ws-keyed", "key-a", "HumanConception", "the invention")
+            .expect("retry");
+        assert!(
+            replay.is_replay(),
+            "the retry must be recognised as a replay"
+        );
+        assert_eq!(
+            replay.event().event_id,
+            first.event().event_id,
+            "the replay must name the event the first attempt stored"
+        );
+        assert_eq!(
+            replay.event().created_utc,
+            first.event().created_utc,
+            "a replay must not restamp the event as new work"
+        );
+
+        // CONFLICT: the same key with different content is refused, because a key
+        // that maps to two payloads cannot be used for reconciliation.
+        match vault.put_conception_event_keyed(
+            "ws-keyed",
+            "key-a",
+            "HumanConception",
+            "a different invention",
+        ) {
+            Err(VaultError::IdempotencyConflict {
+                event_key,
+                expected,
+                found,
+            }) => {
+                assert_eq!(event_key, "key-a");
+                assert_ne!(expected, found, "the conflict must name both payloads");
+            }
+            other => panic!("a conflicting payload was accepted: {other:?}"),
+        }
+
+        // REORDER + DELAYED: keys arriving out of order, and one arriving after
+        // other work, each land exactly once.
+        vault
+            .put_conception_event_keyed("ws-keyed", "key-c", "HumanConception", "third idea")
+            .unwrap();
+        vault
+            .put_conception_event_keyed("ws-keyed", "key-b", "HumanConception", "second idea")
+            .unwrap();
+        let delayed = vault
+            .put_conception_event_keyed("ws-keyed", "key-b", "HumanConception", "second idea")
+            .unwrap();
+        assert!(delayed.is_replay(), "a delayed duplicate must be a replay");
+
+        let events = vault.list_conception_events("ws-keyed").unwrap();
+        assert_eq!(
+            events.len(),
+            3,
+            "three distinct keys must produce exactly three events, got {:?}",
+            events.iter().map(|e| &e.event_id).collect::<Vec<_>>()
+        );
+
+        // COMMIT/ACK FAULT: a write that fails before committing leaves nothing
+        // behind, and the same key can then be used successfully.
+        let refused = vault.put_conception_event_keyed(
+            "ws-unknown",
+            "key-d",
+            "HumanConception",
+            "into a workspace that does not exist",
+        );
+        assert!(refused.is_err(), "an unknown workspace must be refused");
+        assert!(
+            vault.find_conception_event("key-d").unwrap().is_none(),
+            "a refused write left a row behind"
+        );
+        let retry_after_failure = vault
+            .put_conception_event_keyed("ws-keyed", "key-d", "HumanConception", "retried")
+            .expect("the key is still usable after a failed attempt");
+        assert!(!retry_after_failure.is_replay());
+
+        // A blank key is refused rather than silently defaulted.
+        assert!(matches!(
+            vault.put_conception_event_keyed("ws-keyed", "  ", "HumanConception", "x"),
+            Err(VaultError::InvalidEventKey)
+        ));
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: DOD-017
+    /// CONCURRENT duplicates: several writers submitting the same key at once
+    /// must produce exactly one event, and every caller must be told which one.
+    #[test]
+    fn test_concurrent_same_key_produces_one_event() {
+        let (dir, vault) = temp_vault("keyed-concurrent");
+        vault.create_workspace("ws-race").unwrap();
+        let path = dir.join("vault.db");
+        drop(vault);
+
+        let writers = 4;
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(writers));
+        let handles: Vec<_> = (0..writers)
+            .map(|_| {
+                let barrier = barrier.clone();
+                let path = path.clone();
+                std::thread::spawn(move || {
+                    let vault = Vault::open(&path).expect("open");
+                    barrier.wait();
+                    vault.put_conception_event_keyed(
+                        "ws-race",
+                        "race-key",
+                        "HumanConception",
+                        "one payload, many submitters",
+                    )
+                })
+            })
+            .collect();
+
+        let mut ids = std::collections::BTreeSet::new();
+        let mut replays = 0;
+        for handle in handles {
+            let outcome = handle.join().expect("thread").expect("write");
+            if outcome.is_replay() {
+                replays += 1;
+            }
+            ids.insert(outcome.event().event_id.clone());
+        }
+
+        assert_eq!(
+            ids.len(),
+            1,
+            "concurrent submitters of one key must all name the same event: {ids:?}"
+        );
+        assert!(
+            replays < writers,
+            "at least one submitter must have recorded the event, saw {replays} replays of {writers}"
+        );
+
+        let vault = Vault::open(&path).unwrap();
+        let events = vault.list_conception_events("ws-race").unwrap();
+        assert_eq!(
+            events.len(),
+            1,
+            "the race produced {} events for one key",
+            events.len()
+        );
 
         std::fs::remove_dir_all(&dir).ok();
     }

@@ -173,6 +173,107 @@ pub struct RecordConceptionOutcome {
     /// Honest statement of what was persisted, so the UI cannot over-claim.
     pub persisted: bool,
     pub storage_detail: String,
+    /// True when a client-supplied key had already stored this payload, so this
+    /// call wrote nothing (DOD-017). A caller that cannot tell a fresh write from
+    /// a replay will double-count work.
+    #[serde(default)]
+    pub replayed: bool,
+}
+
+/// Record a conception event under a CLIENT-CHOSEN key (DOD-017).
+///
+/// The same command semantics as [`record_conception`], except the identity of
+/// the event is supplied by the caller instead of minted here. That is what makes
+/// a retry safe: a transport failure leaves the client unsure whether the write
+/// landed, and resending the same key with the same content is recognised as a
+/// replay rather than storing the invention twice. The same key with different
+/// content is refused, because a key that maps to two payloads cannot be used for
+/// reconciliation.
+pub fn record_conception_keyed(
+    scope: &WorkspaceScope,
+    event_key: &str,
+    content: &str,
+    author_is_human: bool,
+    vault_path: Option<&std::path::Path>,
+) -> CommandResult<RecordConceptionOutcome> {
+    let correlation = CorrelationId::new();
+
+    if let Err(err) = scope.validate() {
+        return CommandResult::failure(correlation, err);
+    }
+    if content.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("conception content cannot be empty"),
+        );
+    }
+    if event_key.trim().is_empty() {
+        return CommandResult::failure(
+            correlation,
+            CommandError::validation("event key is required for a keyed recording"),
+        );
+    }
+
+    let block = if author_is_human {
+        domain::ContentBlock::new_human(content.to_string(), uuid::Uuid::new_v4())
+    } else {
+        domain::ContentBlock::new_ai(content.to_string(), uuid::Uuid::new_v4())
+    };
+    let origin = match &block.origin {
+        domain::AuthorOrigin::HumanConception(_) => "HumanConception",
+        domain::AuthorOrigin::AiSuggestion(_) => "AiSuggestion",
+    };
+
+    let Some(path) = vault_path else {
+        return CommandResult::failure(
+            correlation,
+            CommandError::policy(
+                "a keyed recording requires a vault: without durable state a replay cannot be \
+                 distinguished from a first attempt",
+            ),
+        );
+    };
+
+    let vault = match storage::Vault::open(path) {
+        Ok(vault) => vault,
+        Err(e) => {
+            return CommandResult::failure(
+                correlation,
+                CommandError::validation(format!("vault open failed: {e}")),
+            )
+        }
+    };
+    if let Err(e) = vault.create_workspace(&scope.workspace_id) {
+        return CommandResult::failure(correlation, CommandError::validation(e.to_string()));
+    }
+
+    match vault.put_conception_event_keyed(&scope.workspace_id, event_key, origin, content) {
+        Ok(write) => {
+            let replayed = write.is_replay();
+            let stored = write.event().clone();
+            CommandResult::success(
+                correlation,
+                RecordConceptionOutcome {
+                    event: ConceptionEventView {
+                        event_id: stored.event_id,
+                        content_hash: stored.content_hash,
+                        content_bytes: stored.content.len(),
+                        origin: stored.origin,
+                    },
+                    persisted: true,
+                    storage_detail: if replayed {
+                        format!(
+                            "replay: key {event_key} already stored this payload; nothing written"
+                        )
+                    } else {
+                        format!("committed under client key {event_key}")
+                    },
+                    replayed,
+                },
+            )
+        }
+        Err(e) => CommandResult::failure(correlation, CommandError::policy(e.to_string())),
+    }
 }
 
 /// Record a human conception event.
@@ -268,6 +369,7 @@ pub fn record_conception(
         },
         persisted,
         storage_detail,
+        replayed: false,
     };
 
     CommandResult::success(correlation, outcome)
@@ -4684,6 +4786,96 @@ mod tests {
             !other_view.ok || other_view.value.unwrap().count == 0,
             "the ledger leaked across workspaces"
         );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: REQ-DATA-001, DOD-017
+    /// At the product boundary the keyed recording must report a replay HONESTLY
+    /// and must never store the same payload twice.
+    #[test]
+    fn test_keyed_recording_reports_replays_and_refuses_key_reuse() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-keyed-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+        let scope = WorkspaceScope {
+            workspace_id: "ws-keyed".to_string(),
+        };
+
+        // First attempt.
+        let first = record_conception_keyed(
+            &scope,
+            "submit-1",
+            "the inventor's disclosure",
+            true,
+            Some(&vault_path),
+        );
+        assert!(first.ok, "{:?}", first.error);
+        let first = first.value.unwrap();
+        assert!(first.persisted && !first.replayed);
+        assert!(
+            first.storage_detail.contains("committed under client key"),
+            "{}",
+            first.storage_detail
+        );
+
+        // The client's retry: same key, same payload.
+        let retry = record_conception_keyed(
+            &scope,
+            "submit-1",
+            "the inventor's disclosure",
+            true,
+            Some(&vault_path),
+        );
+        assert!(retry.ok, "{:?}", retry.error);
+        let retry = retry.value.unwrap();
+        assert!(retry.replayed, "the retry must be reported as a replay");
+        assert_eq!(
+            retry.event.event_id, first.event.event_id,
+            "the replay must name the event the first attempt stored"
+        );
+        assert!(
+            retry.storage_detail.contains("nothing written"),
+            "{}",
+            retry.storage_detail
+        );
+
+        // Key reuse with a different payload is refused, and the refusal names
+        // the key rather than reporting a generic failure.
+        let conflict = record_conception_keyed(
+            &scope,
+            "submit-1",
+            "a completely different disclosure",
+            true,
+            Some(&vault_path),
+        );
+        assert!(!conflict.ok, "a key reuse with new content was accepted");
+        let message = conflict.error.expect("cause").safe_message().to_string();
+        assert!(
+            message.contains("submit-1") && message.contains("different content"),
+            "the refusal must name the key: {message}"
+        );
+
+        // Exactly one event exists despite three submissions of that key.
+        let ledger = list_conception_events(&scope, &vault_path).value.unwrap();
+        assert_eq!(ledger.count, 1, "the retry duplicated the event");
+
+        // A keyed write without a vault cannot detect a replay, so it is refused
+        // rather than pretending to be idempotent.
+        let no_vault = record_conception_keyed(&scope, "submit-2", "text", true, None);
+        assert!(!no_vault.ok);
+        assert!(no_vault
+            .error
+            .expect("cause")
+            .safe_message()
+            .contains("requires a vault"));
 
         std::fs::remove_dir_all(&dir).ok();
     }

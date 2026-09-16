@@ -18,12 +18,14 @@
 {"collected": false, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-004", "result": "NOT_RUN", "test_id": "default"}
 {"collected": true, "file": "crates/commercialization/src/lib.rs", "requirement_id": "REQ-COM-004", "result": "PASS", "test_id": "commercialization_tests::test_data_room_workflow"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-COM-004", "result": "PASS", "test_id": "commands::tests::test_commercialization_package_is_redacted"}
+{"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "vault::tests::test_keyed_writes_are_idempotent_and_conflicts_are_refused"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "vault::tests::test_conception_event_survives_reopen"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "vault::tests::test_unknown_workspace_is_refused"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "vault::tests::test_events_are_workspace_scoped"}
 {"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-001", "result": "NOT_RUN", "test_id": "commands::tests::temp_db"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "commands::tests::test_record_conception_persists_through_the_vault"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "commands::tests::test_conception_ledger_reads_durable_state_and_separates_origins"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "commands::tests::test_keyed_recording_reports_replays_and_refuses_key_reuse"}
 {"collected": true, "file": "apps/desktop/e2e/shell.spec.ts", "requirement_id": "REQ-DATA-001", "result": "PASS", "test_id": "e2e::exposes the Human Conception Ledger read path and states it honestly"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-002", "result": "PASS", "test_id": "vault::tests::test_blobs_are_content_addressed"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-DATA-002", "result": "PASS", "test_id": "vault::tests::test_audit_chain_verifies_and_detects_tampering"}

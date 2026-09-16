@@ -101,6 +101,32 @@ fn record_outcome<T>(
     );
 }
 
+/// Record a conception event under a client-chosen key (DOD-017).
+///
+/// The keyed variant exists so a caller that cannot tell whether a write landed
+/// can safely resend it; the UI uses the auto-keyed command and the keyed path is
+/// exercised over IPC by the exact-artifact lane.
+#[tauri::command]
+fn record_conception_keyed(
+    workspace_id: String,
+    event_key: String,
+    content: String,
+    author_is_human: bool,
+) -> commands::CommandResult<commands::RecordConceptionOutcome> {
+    let scope = commands::WorkspaceScope { workspace_id };
+    let vault_path = vault_file();
+    let started = std::time::Instant::now();
+    let result = commands::record_conception_keyed(
+        &scope,
+        &event_key,
+        &content,
+        author_is_human,
+        Some(&vault_path),
+    );
+    record_outcome("record_conception_keyed", started, &result);
+    result
+}
+
 /// Read the Human Conception Ledger back (UO-01, REQ-DATA-001).
 #[tauri::command]
 fn list_conception_events(
@@ -478,6 +504,7 @@ pub fn run() {
             get_configuration,
             get_diagnostics,
             list_conception_events,
+            record_conception_keyed,
             get_scope_declaration,
             apply_research_action,
             evaluate_export,

@@ -464,6 +464,113 @@ try {
     );
   }
 
+  // IDEMPOTENCY ACROSS THE IPC BOUNDARY (DOD-017): the client submits the same
+  // key twice, as a retry after an unknown outcome. The second call must report a
+  // replay, name the first event, and leave the ledger unchanged.
+  const keyedArgs = {
+    workspaceId: "e2e-workspace",
+    eventKey: `e2e-key-${canary}`,
+    content: `keyed retry probe ${canary}`,
+    authorIsHuman: true,
+  };
+  const keyedFirst = await page.evaluate(async (args) => {
+    try {
+      return await window.__TAURI_INTERNALS__.invoke(
+        "record_conception_keyed",
+        args,
+      );
+    } catch (e) {
+      return { __error: String(e) };
+    }
+  }, keyedArgs);
+  const keyedFirstOk = keyedFirst && keyedFirst.ok === true;
+  record(
+    "keyed recording over IPC (DOD-017)",
+    keyedFirstOk && keyedFirst.value?.replayed === false,
+    keyedFirstOk
+      ? `id=${String(keyedFirst.value.event.event_id).slice(0, 8)} replayed=${keyedFirst.value.replayed}`
+      : String(keyedFirst?.__error ?? JSON.stringify(keyedFirst)),
+  );
+
+  if (keyedFirstOk) {
+    const ledgerBefore = await page.evaluate(async (workspaceId) => {
+      try {
+        return await window.__TAURI_INTERNALS__.invoke(
+          "list_conception_events",
+          { workspaceId },
+        );
+      } catch (e) {
+        return { __error: String(e) };
+      }
+    }, "e2e-workspace");
+    const before = ledgerBefore?.value?.count ?? -1;
+
+    const keyedRetry = await page.evaluate(async (args) => {
+      try {
+        return await window.__TAURI_INTERNALS__.invoke(
+          "record_conception_keyed",
+          args,
+        );
+      } catch (e) {
+        return { __error: String(e) };
+      }
+    }, keyedArgs);
+    const retryOk = keyedRetry && keyedRetry.ok === true;
+    const sameEvent =
+      retryOk &&
+      keyedRetry.value?.event?.event_id === keyedFirst.value.event.event_id;
+    record(
+      "a retried submission is reported as a replay (DOD-017)",
+      retryOk && keyedRetry.value?.replayed === true && sameEvent,
+      retryOk
+        ? `replayed=${keyedRetry.value.replayed} same_event=${sameEvent}`
+        : String(keyedRetry?.__error ?? JSON.stringify(keyedRetry)),
+    );
+
+    const ledgerAfter = await page.evaluate(async (workspaceId) => {
+      try {
+        return await window.__TAURI_INTERNALS__.invoke(
+          "list_conception_events",
+          { workspaceId },
+        );
+      } catch (e) {
+        return { __error: String(e) };
+      }
+    }, "e2e-workspace");
+    const after = ledgerAfter?.value?.count ?? -2;
+    record(
+      "the retry left the ledger unchanged (DOD-017)",
+      before >= 0 && after === before,
+      `ledger ${before} -> ${after}`,
+    );
+
+    // Reusing the key with different content must be refused, not silently
+    // stored under the same identity.
+    const keyedConflict = await page.evaluate(
+      async (args) => {
+        try {
+          return await window.__TAURI_INTERNALS__.invoke(
+            "record_conception_keyed",
+            args,
+          );
+        } catch (e) {
+          return { __error: String(e) };
+        }
+      },
+      {
+        ...keyedArgs,
+        content: `a DIFFERENT payload under the same key ${canary}`,
+      },
+    );
+    record(
+      "reusing a key with different content is refused (DOD-017)",
+      keyedConflict && keyedConflict.ok === false,
+      String(
+        keyedConflict?.error?.message ?? JSON.stringify(keyedConflict),
+      ).slice(0, 140),
+    );
+  }
+
   // DASHBOARD (DOD-037): the signals must reach a USER, not only an IPC client.
   // This runs AFTER commands have actually executed, so the panel has something
   // true to show: the button is clicked, the RENDERED panel is read back, and it

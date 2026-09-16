@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "377fad2",
+  "candidate_commit": "60044ae",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -38,7 +38,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "a85eaace8c05d110587d4a307a77dd94b77c758c60f280cc32da3095f3716d0c",
+        "scripts\\build-dod-status.py": "ad9f38f559fd51c48c4712d52b43d0f4c903bf7b3c2759789d2e7e68c55c7b6f",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
@@ -66,7 +66,7 @@
         "scripts\\live-fire-local-provider.sh": "dcda08caf50050c3d3ba5167d1dfc638ad9d843692a3652426b6394d49446aeb",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
-        "scripts\\mutation-proof.py": "a90b44cb50491cdfe4d76b87339b457373e94d741cda52cd92680843fa3b8219",
+        "scripts\\mutation-proof.py": "3a182687a039c2a6b921c3049d57956e2b53bbd000cf17289ad55363b5fa3377",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
@@ -174,8 +174,8 @@
     "rust-source": {
       "count": 20,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "6897ce998fafb06e5ae220f8503a0f4de3ab1302fc59c45b3e91069ed2de3464",
-        "apps\\desktop\\src-tauri\\src\\lib.rs": "7e69fd84b4f59d281ef2af78ffeeba66acafae6052e2f25a50c784883509239a",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "85b994d390d6eda8ed2736d87328d540e1d6f7202f402609afc0fef03eea6461",
+        "apps\\desktop\\src-tauri\\src\\lib.rs": "1ae6665c78653d4e5fa430b33e9d8dd70d65b46874c884c0524ea8c0198d9fe2",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "9e8dd477b8dcd22d4df981cd4d50b79068c8f30a58f80f76523a2979f01e567d",
         "crates\\commercialization\\src\\asset_readiness.rs": "f4143f42b1e5da03d8d799362cda0b34d0bd7a4bfff6ff586a9de3ff060cf1fc",
@@ -192,7 +192,7 @@
         "crates\\provider_transport\\src\\lib.rs": "a62348a0bfcf96e67c141cc8f3c593d45a80e6ca1939873c1df6c7a1b9c59813",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
-        "crates\\storage\\src\\vault.rs": "30fe3dda1b90fd03110532a3084d3a6c9ff32fef14b10a112722558e8d399002",
+        "crates\\storage\\src\\vault.rs": "bb738373a608e405b01fa3acad4009c3d43ba0ea19b325baaa2c7c395c6ab393",
         "crates\\storage\\tests\\integration_real_dependencies.rs": "f1a3c433b86e22cdddfaaa95d1658e76b1c2a81414a06bd33299da73f7d51539"
       },
       "rules": [
@@ -210,8 +210,8 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "b1b38d4534b2cc3c6924325dc9de811680960693d429bb762962b4c5d91f4b3c",
-        "apps\\desktop\\e2e-artifact.mjs": "f9f914d2e265e9a37056e971acf38ce5f579348f3714da3b539c0a8d041e8640",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "99019b06478daebdb1a531f1f58516da2eef48f1a5716964e12948f7de71c825",
+        "apps\\desktop\\e2e-artifact.mjs": "9d2d096495635d89e0c6d9ea198b5ae900c3034cab0e18275e3e6ac67af3b625",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
       },
       "rules": [
@@ -224,8 +224,8 @@
       ]
     }
   },
-  "epoch_digest": "a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2",
-  "prior_candidate_commit": "c8e6246",
-  "prior_epoch_digest": "a684a5673767ec2d8ee99f31162a2c0597676c78f320af7d01f4b3d25bec3ae2",
+  "epoch_digest": "d3ca029e738fecabfb1cd709572fa961f853a2ca2b0453ad9c44d9481a2c0d9d",
+  "prior_candidate_commit": "60044ae",
+  "prior_epoch_digest": "d3ca029e738fecabfb1cd709572fa961f853a2ca2b0453ad9c44d9481a2c0d9d",
   "total_inputs": 127
 }
