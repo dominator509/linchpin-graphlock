@@ -43,7 +43,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-026 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `25082f24c8bdb4bb` | 6552 |
 | DOD-027 | PASS | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
 | DOD-028 | PASS | `scripts/completion-report.py` | `9ae9d8f20106772a` | 14749 |
-| DOD-029 | PASS | `scripts/run-manifest.py` | `9cbcd264b06362b4` | 8110 |
+| DOD-029 | PASS | `scripts/run-manifest.py` | `13d30cf245e8b778` | 10086 |
 | DOD-030 | PASS | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `0153eccfe1f16310` | 244777 |
 | DOD-031 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `25082f24c8bdb4bb` | 6552 |
 | DOD-032 | PASS | `.agent/verification/state/CASE_RESULTS.json` | `bff26dfcaa29848f` | 56517 |
@@ -54,7 +54,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
 | DOD-038 | PARTIAL | `.agent/evidence/stress/STATUS.md` | `0eb9becc48617460` | 5605 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `3fcd9f5ff12e65c0` | 187 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `07c7848b2abf7596` | 2381 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `b398fe2ef2f93175` | 144224 |
 | DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `5a16e0175755a5fb` | 1364 |
 

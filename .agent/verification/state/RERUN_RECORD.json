@@ -1,6 +1,67 @@
 {
-  "epoch_digest": "1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3",
-  "changed_classes": [],
-  "results": [],
-  "note": "no epoch change; no rerun obligation"
+  "changed_classes": [
+    "gate-script"
+  ],
+  "epoch_digest": "5fa99bff0476cf08edf41d0317f4e3dff555d5f0c77dcfb8677cf9f546597d48",
+  "failures": 0,
+  "results": [
+    {
+      "command": "sh scripts/harness-validate.sh",
+      "duration_s": 172.79,
+      "exit_code": 0,
+      "output_sha256": "c33265b4a77b4189fdf110a2503fe0e2a00883d4242d12e14025574879144dc8",
+      "output_tail": [
+        "reachability check: ok (242 public fns, 33 entry points, 0 unreachable)",
+        "trailing-and check: ok (no trailing &&-test lanes)",
+        "harness-validate: ok"
+      ],
+      "stage": "V-000 harness validation",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/build.sh",
+      "duration_s": 161.04,
+      "exit_code": 0,
+      "output_sha256": "5f428c7229f5396e24cff7dae3af4894d68a9308e336b19b2eb4bf20ea7b4cd6",
+      "output_tail": [
+        "    Finished 2 bundles at:",
+        "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
+        "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe"
+      ],
+      "stage": "V-005 clean build",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/test-unit.sh",
+      "duration_s": 165.43,
+      "exit_code": 0,
+      "output_sha256": "a62249962728ae72cb1311b96c66fd068fb7853b2db2ed3c78a4df9af394cf29",
+      "output_tail": [
+        "   Doc-tests provider_transport",
+        "   Doc-tests research",
+        "   Doc-tests storage"
+      ],
+      "stage": "V-008 full functionality",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/test-integration.sh",
+      "duration_s": 2.92,
+      "exit_code": 0,
+      "output_sha256": "1e7be119996218e291afc2ae616e178077a57c5ad70c71df1b9402e19ae36f7a",
+      "output_tail": [
+        "integration: ok (5 real-dependency tests)",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.09s",
+        "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-3f399f149925d619.exe)"
+      ],
+      "stage": "V-009 integration/concurrency",
+      "status": "PASS"
+    }
+  ],
+  "stages": [
+    "V-000 harness validation",
+    "V-005 clean build",
+    "V-008 full functionality",
+    "V-009 integration/concurrency"
+  ]
 }

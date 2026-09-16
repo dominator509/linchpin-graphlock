@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3`
-- Candidate commit at generation: `225761f`
+- Current epoch digest: `5fa99bff0476cf08edf41d0317f4e3dff555d5f0c77dcfb8677cf9f546597d48`
+- Candidate commit at generation: `721d0d5`
 - Total tracked inputs: 141
-- Previous epoch digest: `1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3`
+- Previous epoch digest: `5fa99bff0476cf08edf41d0317f4e3dff555d5f0c77dcfb8677cf9f546597d48`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates

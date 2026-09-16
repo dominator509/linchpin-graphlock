@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "225761f",
+  "candidate_commit": "721d0d5",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -76,7 +76,7 @@
         "scripts\\rerun-invalidated.py": "b995fd21884152a164aa641e899c9eff49a2a38ec6fcd0468a12b2b6a13902a5",
         "scripts\\run-integration-real.sh": "a1f218daae2ab710aa9fc1ffd4df4b399bfa55c3212a8e9a909548d4a030d685",
         "scripts\\run-live-fire-real.sh": "b3641eed140c03789261aac8c5b371fe3c35616f9a03844b5c85a721c9f69e31",
-        "scripts\\run-manifest.py": "9cbcd264b06362b4b93cdca9daac9e502f442485dea67ab385c00132636faf6e",
+        "scripts\\run-manifest.py": "13d30cf245e8b7782e6c547951b07567e7767fd5fd7173946f744daeb844f208",
         "scripts\\secret-scan.py": "f1e753e9eab570336274b4f645192ed8346a9645856173c9f8729e7f21edfece",
         "scripts\\security-check.sh": "e4d605f8caa76b7142962ad975c871ba60617cc6916f553f822048b1cd322529",
         "scripts\\ship-gate.py": "c7650a1f78b9b256dfe7ca7e968cfedc129b50aaa374494a790f9961e465f5cc",
@@ -238,8 +238,8 @@
       ]
     }
   },
-  "epoch_digest": "1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3",
-  "prior_candidate_commit": "225761f",
-  "prior_epoch_digest": "1c8eecedfeb7a4adc10c1928eebd1466ee89b4fd111e435b5c56a94e894e77a3",
+  "epoch_digest": "5fa99bff0476cf08edf41d0317f4e3dff555d5f0c77dcfb8677cf9f546597d48",
+  "prior_candidate_commit": "721d0d5",
+  "prior_epoch_digest": "5fa99bff0476cf08edf41d0317f4e3dff555d5f0c77dcfb8677cf9f546597d48",
   "total_inputs": 141
 }

@@ -19,10 +19,22 @@ the same revision.
 This script writes ONE file that does, and `--check` FAILS when the manifest no
 longer describes the tree it is read against:
 
-  * the candidate commit moved (HEAD != recorded),
+  * the candidate commit moved in a way that is not a settle commit (see below),
   * an artifact digest changed or an artifact disappeared,
   * the epoch digest changed,
   * the working tree became dirty after the manifest was written.
+
+THE SETTLE-COMMIT CASE, measured rather than papered over. This harness commits
+the work, verifies it, and then commits the DERIVED verification state -- so the
+commit that contains the manifest is necessarily one commit AFTER the commit the
+manifest pins, and a strict `HEAD == candidate` rule can never hold on a settled
+tree (it failed exactly that way at candidate 225761f / settle 721d0d5). The rule
+is therefore: the recorded candidate must be an ANCESTOR of HEAD, and everything
+else this check asserts -- epoch digest, artifact digests, working-tree state --
+must still match. That is not a relaxation of the identity requirement: a commit
+between the candidate and HEAD that touched ANY tracked input moves the epoch
+digest and still fails this lane. A candidate that is not an ancestor is still a
+hard failure.
 
 It deliberately does NOT pretend a dirty tree is clean: the working-tree state is
 recorded as measured, with the file count, so a run whose evidence was produced
@@ -143,6 +155,16 @@ def build_manifest() -> dict:
     }
 
 
+def is_ancestor(older: str, newer: str) -> bool:
+    """True when `older` is an ancestor of `newer` in this repository."""
+    proc = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", older, newer],
+        capture_output=True,
+        text=True,
+    )
+    return proc.returncode == 0
+
+
 def check() -> int:
     if not MANIFEST.exists():
         print(f"run-manifest: FAIL -- no manifest at {MANIFEST}", file=sys.stderr)
@@ -150,12 +172,20 @@ def check() -> int:
     recorded = json.loads(MANIFEST.read_text(encoding="utf-8"))
     current = build_manifest()
     problems: list[str] = []
+    settled: list[str] = []
 
     if recorded["candidate_commit"] != current["candidate_commit"]:
-        problems.append(
-            f"candidate commit moved: recorded {recorded['candidate_commit_short']}, "
-            f"HEAD {current['candidate_commit_short']}"
-        )
+        if is_ancestor(recorded["candidate_commit"], current["candidate_commit"]):
+            # A settle commit: HEAD advanced past the verified candidate without
+            # touching a tracked input (any such change moves the epoch, asserted
+            # below). Recorded and reported rather than hidden.
+            settled.append(recorded["candidate_commit_short"])
+        else:
+            problems.append(
+                f"candidate commit moved: recorded {recorded['candidate_commit_short']}, "
+                f"HEAD {current['candidate_commit_short']} (and the recorded candidate "
+                "is not an ancestor of HEAD, so this is not a settle commit)"
+            )
     if recorded["base_revision"] != current["base_revision"]:
         problems.append("base revision changed")
     if recorded["epoch"]["digest"] != current["epoch"]["digest"]:
@@ -181,6 +211,13 @@ def check() -> int:
     print(
         f"run-manifest: ok (candidate {current['candidate_commit_short']}, "
         f"epoch {str(current['epoch']['digest'])[:16]}, exe {str(current['artifacts']['executable_sha256'])[:16]})"
+        + (
+            f" -- HEAD {current['candidate_commit_short']} carries settle commits on top of "
+            f"verified candidate {settled[0]}; epoch and artifact digests unchanged, so no "
+            "tracked input moved"
+            if settled
+            else ""
+        )
     )
     return 0
 
