@@ -1,17 +1,29 @@
 {
   "changed_classes": [
-    "rust-source",
     "gate-script",
     "test-oracle"
   ],
-  "epoch_digest": "b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74",
+  "epoch_digest": "e254d2cbf7981750041bacbedfdb3999bc2de836ec7fd6e51711ed16d7512b08",
   "failures": 0,
   "results": [
     {
-      "command": "sh scripts/build.sh",
-      "duration_s": 131.7,
+      "command": "sh scripts/harness-validate.sh",
+      "duration_s": 58.65,
       "exit_code": 0,
-      "output_sha256": "310c56e10bec31d50142c853a302561742782032b4d55043b4ff424c84b4ea93",
+      "output_sha256": "97f201c7514cc0457a08b2b76facd7ae864d59822a7d226febabd51a2661ec63",
+      "output_tail": [
+        "reachability check: ok (220 public fns, 30 entry points, 0 unreachable)",
+        "trailing-and check: ok (no trailing &&-test lanes)",
+        "harness-validate: ok"
+      ],
+      "stage": "V-000 harness validation",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/build.sh",
+      "duration_s": 103.1,
+      "exit_code": 0,
+      "output_sha256": "36bb825b632f2bf26217249b3677db981bc6b7f9d0552cbdb7875537c0a4aa26",
       "output_tail": [
         "    Finished 2 bundles at:",
         "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
@@ -21,36 +33,10 @@
       "status": "PASS"
     },
     {
-      "command": "sh scripts/smoke-test.sh",
-      "duration_s": 16.0,
-      "exit_code": 0,
-      "output_sha256": "0e090d24cb23c16a6ee36adc99d45429b6e35f87e8b5f456484b540599229967",
-      "output_tail": [
-        "smoke: verifying removal",
-        "smoke: clean removal confirmed",
-        "smoke: ok (artifact d744021e578015f646ac7211bcb600216e2698966f76197088feb706ec1ee448 verified through install/launch/uninstall)"
-      ],
-      "stage": "V-006 smoke",
-      "status": "PASS"
-    },
-    {
-      "command": "sh scripts/typecheck.sh",
-      "duration_s": 13.5,
-      "exit_code": 0,
-      "output_sha256": "3a24f0b2d383d0c0ae420543cbfa98ae8a4b74bae2a46aee30b4b67b77fbf786",
-      "output_tail": [
-        "    Checking commercialization v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\commercialization)",
-        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.67s"
-      ],
-      "stage": "V-007 sanity",
-      "status": "PASS"
-    },
-    {
       "command": "sh scripts/test-unit.sh",
-      "duration_s": 40.75,
+      "duration_s": 33.09,
       "exit_code": 0,
-      "output_sha256": "94c78630ad0db9d3312031608254739e75610a13e14346a6f10b441ad9771bf6",
+      "output_sha256": "5fdb3409e44aea09f31cfc723e0ac8e7783a3612747e940a11fb89d8082c5e41",
       "output_tail": [
         "   Doc-tests provider_transport",
         "   Doc-tests research",
@@ -61,12 +47,12 @@
     },
     {
       "command": "sh scripts/test-integration.sh",
-      "duration_s": 4.65,
+      "duration_s": 1.83,
       "exit_code": 0,
-      "output_sha256": "b3fbf97c936b6963185c5585dae5a6aa9b49f468c338fb2bcb39687d4722beb8",
+      "output_sha256": "482c26f8d9e3f5fb8e3287e11e11517142a7a1e00bc46011b63f7111cf130711",
       "output_tail": [
         "integration: ok (5 real-dependency tests)",
-        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.72s",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.70s",
         "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-3f399f149925d619.exe)"
       ],
       "stage": "V-009 integration/concurrency",
@@ -74,22 +60,22 @@
     },
     {
       "command": "sh scripts/lint.sh",
-      "duration_s": 18.81,
+      "duration_s": 23.62,
       "exit_code": 0,
-      "output_sha256": "6dbb1a60fd02269179f024976e22c8d60f035d71ca6e8f8c69abb49eafa7ea8b",
+      "output_sha256": "325242382566f8584f51b83a4b31151ed924aa435f201a53c2c7e93517e4d7a7",
       "output_tail": [
-        "    Checking commercialization v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\commercialization)",
-        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
-        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.40s"
+        "packages/contracts lint: Done",
+        "apps/desktop lint: Done",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.35s"
       ],
       "stage": "V-012 regression/mutation",
       "status": "PASS"
     },
     {
       "command": "sh scripts/live-fire-local-provider.sh",
-      "duration_s": 304.19,
+      "duration_s": 208.32,
       "exit_code": 0,
-      "output_sha256": "21710d1f80f317ba075bbcbaa40685fe2900c956e6f9e8374b0965ef68797c76",
+      "output_sha256": "a399422958504196dd78ecb5e3f1066955c2e5fe35f4d562f66cd3867bcb0f76",
       "output_tail": [
         "local-provider: restored the production artifact",
         "local-provider: rebuilding the production artifact from the committed config",
@@ -99,26 +85,13 @@
       "status": "PASS"
     },
     {
-      "command": "sh scripts/harness-validate.sh",
-      "duration_s": 51.18,
-      "exit_code": 0,
-      "output_sha256": "b4ae802c2a22f790324bf5a9bcad975e074f0a429de5178096d9dd197aec237c",
-      "output_tail": [
-        "reachability check: ok (220 public fns, 30 entry points, 0 unreachable)",
-        "trailing-and check: ok (no trailing &&-test lanes)",
-        "harness-validate: ok"
-      ],
-      "stage": "V-000 harness validation",
-      "status": "PASS"
-    },
-    {
       "command": "sh scripts/test-e2e.sh",
-      "duration_s": 108.62,
+      "duration_s": 116.22,
       "exit_code": 0,
-      "output_sha256": "180761153c7adcf1cf258daac9756fe2c9d315cd0dd4f203ce0f54a77a489d1b",
+      "output_sha256": "175fe5c3d063b4d6e5e9737c8ed40f4e4082174233c4c884af13313e91bedae9",
       "output_tail": [
         "(Use `node --trace-warnings ...` to show where the warning was created)",
-        "(node:32356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(node:10236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
         "(Use `node --trace-warnings ...` to show where the warning was created)"
       ],
       "stage": "V-015 usability/accessibility",
@@ -126,11 +99,11 @@
     },
     {
       "command": "sh scripts/artifact-e2e.sh",
-      "duration_s": 92.9,
+      "duration_s": 94.13,
       "exit_code": 0,
-      "output_sha256": "5e3cb27770cdc545081c7afec6bd5f3c69232512081f605707a2642592ad207f",
+      "output_sha256": "cace19246155b48d056420118042050325f5c9afe08b37e2cffaa06f1ceebbd6",
       "output_tail": [
-        "  PASS: artifact digest unchanged across the run -- 5de27903a95e052a",
+        "  PASS: artifact digest unchanged across the run -- 5cf39f81ed002dab",
         "artifact-e2e: wrote .agent/evidence/artifact-e2e/STATUS.md",
         "artifact-e2e: ok"
       ],
@@ -141,23 +114,21 @@
       "command": "python3 scripts/test-collection-guard.py --check",
       "duration_s": 0.09,
       "exit_code": 0,
-      "output_sha256": "826f19cd5d5acc8c26234e18d005e9e39cb7ab6aab638f7ec2ce91e0c67b1ee6",
+      "output_sha256": "0a675540bd7c0f15a0e37564ea46b0d7cc992d76b2439066ed33ddc2160fac26",
       "output_tail": [
-        "collection guard manifest: ok (min 200 passed)"
+        "collection guard manifest: ok (min 201 passed)"
       ],
       "stage": "DOD-007 collection guard",
       "status": "PASS"
     }
   ],
   "stages": [
+    "V-000 harness validation",
     "V-005 clean build",
-    "V-006 smoke",
-    "V-007 sanity",
     "V-008 full functionality",
     "V-009 integration/concurrency",
     "V-012 regression/mutation",
     "V-013 dynamic security/domain packs",
-    "V-000 harness validation",
     "V-015 usability/accessibility",
     "V-020 exact artifact",
     "DOD-007 collection guard"

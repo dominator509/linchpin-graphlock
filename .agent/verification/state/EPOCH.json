@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "6650d0a",
+  "candidate_commit": "00e0dac",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -38,11 +38,11 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "8886010e2de21091bc0016fda9eedafd9c7ecaf5e210d45095d971cb70ae5246",
+        "scripts\\build-dod-status.py": "54aa351c2d2ed600ed4ee5a150614f83805c25cb70b8e5f41348d6e70011b9b9",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
-        "scripts\\clean-build.sh": "4507f635f02652766b18f987a00fbdc79377340cd23d1b2e1ebe93f48a4bb963",
+        "scripts\\clean-build.sh": "b262d0333310aab42dc803355d856a1099686f981d6f3f891fd058ecbcf9dde6",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
         "scripts\\dependency-audit.sh": "508cc370daf842ab1ea1535a658196adf677566088ca9928d3ca7d498fc9d1eb",
         "scripts\\doc-exec.py": "2e47017bc04b74b76decd60905f110280798b7668810803f1741b9857e61d516",
@@ -208,8 +208,8 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "64baeec11b3c0fd630318b9cdc4d291ed3ea00d413490fc5c16806cd90b5d187",
-        "apps\\desktop\\e2e-artifact.mjs": "214482a93088a65202fff627222acd6abe3eb489f32519b8b405b9ae9e32641b",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "5d1eff52d9bffc61e825c0303f00c39539cedd670fe760b15da98dfa2f1da78f",
+        "apps\\desktop\\e2e-artifact.mjs": "2c6bf4d43f738464eede1195d7b5ff6fc56de35f89816e778bfb8818a50883d3",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
       },
       "rules": [
@@ -222,8 +222,8 @@
       ]
     }
   },
-  "epoch_digest": "b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74",
-  "prior_candidate_commit": "6650d0a",
-  "prior_epoch_digest": "b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74",
+  "epoch_digest": "e254d2cbf7981750041bacbedfdb3999bc2de836ec7fd6e51711ed16d7512b08",
+  "prior_candidate_commit": "00e0dac",
+  "prior_epoch_digest": "e254d2cbf7981750041bacbedfdb3999bc2de836ec7fd6e51711ed16d7512b08",
   "total_inputs": 125
 }

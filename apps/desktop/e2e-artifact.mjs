@@ -2,7 +2,7 @@ import { chromium } from "@playwright/test";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname } from "node:path";
 
 /**
@@ -64,6 +64,21 @@ const digestBefore = sha256(EXE);
 const size = readFileSync(EXE).length;
 const app = spawn(EXE, [], { stdio: "ignore" });
 
+/**
+ * Unpredictable per-run marker (DOD-013).
+ *
+ * The state-changing proof used to write the static literal "e2e artifact
+ * probe", which a canned response, a cached write or a hard-coded success could
+ * satisfy. The canary is generated at runtime, carried into the app through the
+ * real command, and then looked for OUTSIDE the app in the durable files, so the
+ * observation does not depend on the product telling the truth about itself.
+ */
+const canary = `ARTIFACT-CANARY-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e9).toString(36)}`;
+
+/** Encoded startup bound in milliseconds (DOD-022). */
+const STARTUP_BOUND_MS = 45000;
+const spawnAt = Date.now();
+
 const checks = [];
 const record = (name, ok, observed) => checks.push({ name, ok, observed });
 
@@ -110,6 +125,18 @@ try {
 
   const title = await page.title();
   record("document title", title.includes("LINCHPIN"), JSON.stringify(title));
+
+  // Startup SLO on the EXACT artifact (DOD-022): measured from process spawn to
+  // the moment the page reports itself complete, and ENFORCED rather than
+  // merely reported. The bound is deliberately generous because this lane runs
+  // on a loaded developer host; it exists to fail a change that makes the app
+  // take minutes to become usable, not to promise a boot time to a customer.
+  const startupMs = Date.now() - spawnAt;
+  record(
+    "startup within the encoded bound (DOD-022)",
+    startupMs <= STARTUP_BOUND_MS,
+    `${startupMs}ms (bound ${STARTUP_BOUND_MS}ms)`,
+  );
 
   const h1 =
     (await page
@@ -236,18 +263,20 @@ try {
   }
 
   // A conception event round-trips through the vault, proving a state-changing
-  // command works against the packaged artifact rather than only a read.
-  const conception = await page.evaluate(async () => {
+  // command works against the packaged artifact rather than only a read. The
+  // content carries the runtime canary, and the canary is then searched for in
+  // the durable files by this harness -- a channel the product does not control.
+  const conception = await page.evaluate(async (content) => {
     try {
       return await window.__TAURI_INTERNALS__.invoke("record_conception", {
         workspaceId: "e2e-workspace",
-        content: "e2e artifact probe",
+        content,
         authorIsHuman: true,
       });
     } catch (e) {
       return { __error: String(e) };
     }
-  });
+  }, `artifact probe ${canary}`);
   const conceptionOk = conception && conception.ok === true;
   record(
     "record_conception round-trip (state-changing)",
@@ -271,6 +300,37 @@ try {
       "human origin labelled (REQ-DOM-002)",
       conception.value?.event?.origin === "HumanConception",
       String(conception.value?.event?.origin),
+    );
+
+    // Independent observation (DOD-012) of an unpredictable value (DOD-013):
+    // read the product's own vault file from OUTSIDE the product and look for the
+    // canary. A command that reported success without writing anything cannot
+    // satisfy this, and neither can a fixture: the value did not exist until this
+    // run.
+    const config = await page.evaluate(async () => {
+      try {
+        return await window.__TAURI_INTERNALS__.invoke("get_configuration");
+      } catch (e) {
+        return { __error: String(e) };
+      }
+    });
+    const vaultFile = config?.value?.vault_file ?? "";
+    let found = false;
+    let searched = "";
+    if (vaultFile) {
+      const candidates = [vaultFile, `${vaultFile}-wal`];
+      for (const path of candidates) {
+        if (!existsSync(path)) continue;
+        searched += `${searched ? ", " : ""}${path}`;
+        if (readFileSync(path, "latin1").includes(canary)) found = true;
+      }
+    }
+    record(
+      "canary found in the durable vault by an independent channel (DOD-012, DOD-013)",
+      found,
+      found
+        ? `${canary} present in ${searched}`
+        : `canary absent from ${searched || "no vault path reported"}`,
     );
   }
 

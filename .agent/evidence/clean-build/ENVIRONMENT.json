@@ -1,0 +1,94 @@
+{
+  "clause": "DOD-005",
+  "harness": "scripts/clean-build.sh",
+  "baseline": {
+    "commit": "00e0daccb90b194a015d998024b7b6535bde2a4e",
+    "ephemeral_checkout": "C:/tmp/tmp.Go8pPcLt32",
+    "working_tree_mode": "DIRTY (working tree copied)",
+    "note": "the baseline is the committed revision plus the toolchain below; no VM image exists, so no image digest is claimed"
+  },
+  "os": {
+    "caption": "Microsoft Windows 10 Home",
+    "version": "10.0.19045",
+    "build": "19045",
+    "architecture": "AMD64",
+    "python": "3.14.4",
+    "cpu_count": 8
+  },
+  "runtime_prerequisites": {
+    "webview2": "153.0.4234.32"
+  },
+  "toolchain": {
+    "rust_toolchain_pin": "see rust-toolchain.toml",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "rustc_path": "C:\\dev\\ScriptureForgeAI\\.tools\\cargo\\bin\\rustc.EXE",
+    "cargo_path": "C:\\dev\\ScriptureForgeAI\\.tools\\cargo\\bin\\cargo.EXE",
+    "node": "v24.14.1",
+    "node_path": "C:\\Program Files\\nodejs\\node.EXE",
+    "pnpm": "10.30.3",
+    "pnpm_path": "C:\\Program Files\\nodejs\\pnpm.CMD"
+  },
+  "cache_policy": {
+    "absent_in_checkout": {
+      "target_dir": "no",
+      "node_modules_dir": "no",
+      "untracked_files": "n/a (working-tree copy)"
+    },
+    "shared_on_this_host": [
+      "the cargo registry cache (CARGO_HOME)",
+      "the pnpm content-addressable store"
+    ],
+    "statement": "build output and installed packages are absent from the checkout, which is the hidden state this gate removes; the dependency DOWNLOAD caches are shared with the host, so this is not a claim of a hermetic, cache-free or offline build. Version resolution is pinned by the committed lockfiles and enforced with --locked."
+  },
+  "provisioning": [
+    {
+      "step": "materialise checkout",
+      "detail": "clone from HEAD, or copy the working tree excluding target/, node_modules/, dist/ and gen/",
+      "exit_code": 0
+    },
+    {
+      "step": "verify checkout cleanliness",
+      "detail": "target=no node_modules=no untracked=n/a (working-tree copy)",
+      "exit_code": 0
+    },
+    {
+      "step": "cargo build --workspace --locked",
+      "detail": "in the ephemeral checkout",
+      "exit_code": 0
+    },
+    {
+      "step": "cargo test --workspace --locked",
+      "detail": "in the ephemeral checkout; ok suites=30 failed suites=0",
+      "exit_code": 0
+    }
+  ],
+  "tests_in_clean_environment": {
+    "rust_lanes": "executed in the ephemeral checkout (cargo test --workspace --locked)",
+    "javascript_lanes": "NOT executed here; vitest, Playwright and the artifact/installer lanes run on the documented persistent host below",
+    "exit_code": 0,
+    "ok_suites": 30,
+    "failed_suites": 0
+  },
+  "lockfiles": {
+    "Cargo.lock_sha256": "621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4",
+    "pnpm-lock.yaml_sha256": "45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf"
+  },
+  "build_sentinel": {
+    "path": "target/debug/linchpin-desktop.exe",
+    "sha256": "eec155b4511ef5c528f8b0a6a43c7bf21258ae92f8cc3fde6cf616c6765085d9"
+  },
+  "resources": {
+    "disk_free_bytes": 56839176192
+  },
+  "teardown": {
+    "ephemeral_dir": "C:/tmp/tmp.Go8pPcLt32",
+    "state_after_teardown": "absent",
+    "proof": "the directory is removed and its absence is checked after removal"
+  },
+  "limits": [
+    "clean CHECKOUT, not a clean MACHINE: same OS, toolchain installation and architecture",
+    "dependency download caches (cargo registry, pnpm store) are shared with the host",
+    "no VM image exists, so no image digest is claimed; DOD-034 clean-room install remains EXTERNAL_REQUIRED"
+  ]
+}

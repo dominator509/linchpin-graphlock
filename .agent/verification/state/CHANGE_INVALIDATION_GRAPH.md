@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74`
-- Candidate commit at generation: `6650d0a`
+- Current epoch digest: `e254d2cbf7981750041bacbedfdb3999bc2de836ec7fd6e51711ed16d7512b08`
+- Candidate commit at generation: `00e0dac`
 - Total tracked inputs: 125
-- Previous epoch digest: `b299c18b3df5bbd67b0a401ea83148f5aae8e92a90d56c4c2ea78c7cfbd20b74`
+- Previous epoch digest: `e254d2cbf7981750041bacbedfdb3999bc2de836ec7fd6e51711ed16d7512b08`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -126,8 +126,8 @@ definition and its PASS status is revoked until rerun.
 
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
-  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `64baeec11b3c0fd6…`
-  - `apps\desktop\e2e-artifact.mjs` `214482a93088a652…`
+  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `5d1eff52d9bffc61…`
+  - `apps\desktop\e2e-artifact.mjs` `2c6bf4d43f738464…`
   - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
 
 ## Rerun obligations on epoch change

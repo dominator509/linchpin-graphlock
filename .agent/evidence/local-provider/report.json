@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "e575676e1ba44e638d101e9c1a5302c5dc210ed74c593f98f47bf86393b33cdd",
+  "executable_sha256": "77bec6c5e79ca9bd7f10f357c8da527abbb2b54dc4b5999d6d3cf5ee288fdc6d",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a legally-binding representation that a company or inventor can use to protect its new or innovative p\""
+      "observed": "\"A patent claim is a legal document outlining a specific invention, typically detailing its purpose, mechanisms, and pote\""
     },
     {
       "name": "metadata names the live model",
@@ -47,7 +47,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"CANARY-mu3x61jh-2570l1\""
+      "observed": "\"Is a patent a legal monopoly?\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -97,12 +97,12 @@
     {
       "name": "egress sampler started and polled (harness liveness, REQ-REL-002)",
       "ok": true,
-      "observed": "ready=true heartbeats=10"
+      "observed": "ready=true heartbeats=44"
     },
     {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",
       "ok": true,
-      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=7 (minimum 5)"
+      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=11 (minimum 5)"
     },
     {
       "name": "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "e575676e1ba44e63 -> e575676e1ba44e63"
+      "observed": "77bec6c5e79ca9bd -> 77bec6c5e79ca9bd"
     }
   ],
   "passed": 23,
