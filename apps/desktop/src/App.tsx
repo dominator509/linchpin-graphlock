@@ -75,13 +75,38 @@ interface RestoreView {
   destination_quarantined?: string | null;
 }
 
+/**
+ * Declared scope and truth boundaries (REQ-SCOPE-001).
+ *
+ * Rendered from the backend declaration rather than a copy in the UI, so the
+ * promise the user reads and the promise the code enforces cannot drift.
+ */
+interface BoundaryView {
+  id: string;
+  statement: string;
+  enforced_by: string;
+}
+
+interface CapabilityView {
+  requirement_id: string;
+  uo_id: string;
+  title: string;
+  state: string;
+  realised_by: string;
+  limitation: string;
+}
+
+interface ScopeView {
+  boundaries: BoundaryView[];
+  capabilities: CapabilityView[];
+}
+
 interface ConceptionEventView {
   event_id: string;
   content_hash: string;
   content_bytes: number;
   origin: string;
 }
-
 interface RecordConceptionOutcome {
   event: ConceptionEventView;
   persisted: boolean;
@@ -352,6 +377,8 @@ export default function App() {
     useState<CommandResult<BackupView> | null>(null);
   const [restoreResult, setRestoreResult] =
     useState<CommandResult<RestoreView> | null>(null);
+  const [scopeDeclaration, setScopeDeclaration] =
+    useState<CommandResult<ScopeView> | null>(null);
 
   const [draft, setDraft] = useState("");
   const [authorIsHuman, setAuthorIsHuman] = useState(true);
@@ -464,15 +491,17 @@ export default function App() {
     let cancelled = false;
     void (async () => {
       try {
-        const [h, ns, cfg] = await Promise.all([
+        const [h, ns, cfg, declared] = await Promise.all([
           invoke<SystemHealth>("get_system_health"),
           invoke<NamespaceStatus[]>("get_namespace_status"),
           invoke<CommandResult<ConfigurationView>>("get_configuration"),
+          invoke<CommandResult<ScopeView>>("get_scope_declaration"),
         ]);
         if (cancelled) return;
         setHealth(h);
         setNamespaces(ns);
         if (cfg.ok && cfg.value) setConfiguration(cfg.value);
+        setScopeDeclaration(declared);
       } catch (err) {
         if (cancelled) return;
         setIpcError(String(err));
@@ -1591,6 +1620,55 @@ export default function App() {
                     : ""
                 }`
               : `Restore did not run: ${restoreResult.error?.message ?? "unknown error"}`}
+          </p>
+        )}
+
+        {/* REQ-SCOPE-001: the declared scope and the five truth boundaries are
+            rendered from the backend declaration, including what is only PARTIAL
+            and why. A surface showing twelve ticks would be the over-claim the
+            boundaries exist to prevent. */}
+        <h3 id="scope-heading">Declared scope and truth boundaries</h3>
+        {scopeDeclaration?.ok && scopeDeclaration.value ? (
+          <>
+            <ul>
+              {scopeDeclaration.value.boundaries.map((b) => (
+                <li key={b.id}>
+                  <strong>{b.id}</strong>: {b.statement} (enforced by{" "}
+                  {b.enforced_by})
+                </li>
+              ))}
+            </ul>
+            <table>
+              <caption>
+                Promised outcomes and their measured state, including
+                limitations
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Requirement</th>
+                  <th scope="col">Outcome</th>
+                  <th scope="col">State</th>
+                  <th scope="col">Limitation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scopeDeclaration.value.capabilities.map((c) => (
+                  <tr key={c.requirement_id}>
+                    <td>
+                      {c.requirement_id} ({c.uo_id})
+                    </td>
+                    <td>{c.title}</td>
+                    <td>{c.state}</td>
+                    <td>{c.limitation || "none stated"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        ) : (
+          <p>
+            {scopeDeclaration?.error?.message ??
+              "Declared scope not reported by the backend."}
           </p>
         )}
       </section>

@@ -165,6 +165,67 @@ MUTATIONS = [
         ],
         "expect_test": "test_backup_and_restore_commands_reconcile",
     },
+    {
+        "id": "MUT-SCOPE-001-a",
+        "clause": "DOD-018",
+        "covers": "REQ-SCOPE-001",
+        "feature": "the truth-boundary guard is applied to exported copy",
+        "changed_behavior": (
+            "build_commercialization_package exports its payload without running "
+            "the truth-boundary guard, so a package whose text promises an "
+            "outcome reaches a third party."
+        ),
+        "edits": [
+            {
+                "path": "apps/desktop/src-tauri/src/commands.rs",
+                "old": (
+                    "            if let Err(violation) = domain::scope::check_claim_text(&payload) {\n"
+                    "                return CommandResult::failure(\n"
+                    "                    correlation,\n"
+                    "                    CommandError::policy(format!(\n"
+                    "                        \"commercialization package crosses a truth boundary: {violation}\"\n"
+                    "                    )),\n"
+                    "                );\n"
+                    "            }\n"
+                ),
+                "new": "",
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "linchpin-desktop",
+            "--lib",
+            "test_scope_map_and_five_truth_boundaries_hold_at_the_product_boundary",
+        ],
+        "expect_test": "test_scope_map_and_five_truth_boundaries_hold_at_the_product_boundary",
+    },
+    {
+        "id": "MUT-SCOPE-001-b",
+        "clause": "DOD-018",
+        "covers": "REQ-SCOPE-001",
+        "feature": "the boundary guard refuses outcome promises",
+        "changed_behavior": (
+            "check_claim_text accepts every string, so the guard is a permanently "
+            "green check while promises flow through it."
+        ),
+        "edits": [
+            {
+                "path": "crates/domain/src/scope.rs",
+                "old": "    let haystack = text.to_lowercase();\n",
+                "new": "    let haystack = text.to_lowercase();\n    if !haystack.is_empty() {\n        return Ok(());\n    }\n",
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "domain",
+            "test_boundary_guard_refuses_promises_and_permits_honest_text",
+        ],
+        "expect_test": "test_boundary_guard_refuses_promises_and_permits_honest_text",
+    },
 ]
 
 

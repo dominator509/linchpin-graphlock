@@ -49,9 +49,9 @@ now exists and the gate passes.
 **Ordering caveat for `sh scripts/verify.sh`.** It ends with the change-
 invalidation and rerun-obligation checks, so it legitimately FAILS if it is run
 after something that changed a tracked input in the same sequence — including
-`sh scripts/build.sh`, which `doc-exec.py` executes earlier in its list. That is
-DOD-040 working, not a defect. Run `scripts/change-invalidation.py` and
-`scripts/rerun-invalidated.py` to settle first, then `verify.sh` passes.
+`sh scripts/build.sh`, which `scripts/doc-exec.py` executes earlier in its list.
+That is DOD-040 working, not a defect. Run `scripts/change-invalidation.py` and
+`scripts/rerun-invalidated.py` to settle first, then `scripts/verify.sh` passes.
 
 `pnpm audit` reports 2 moderate advisories (GHSA-82fw-gwwq-j7x9 in `vitest` and
 `@vitest/mocker`, fixed in >= 4.1.11; this repository pins 3.2.7). The enforced

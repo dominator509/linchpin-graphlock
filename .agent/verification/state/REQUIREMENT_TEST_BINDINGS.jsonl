@@ -180,6 +180,14 @@
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-RES-001", "result": "PASS", "test_id": "commands::tests::test_research_citation_accumulates_and_is_refused_when_finished"}
 {"collected": false, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-RES-002", "result": "NOT_RUN", "test_id": "vault::tests::temp_vault"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-RES-002", "result": "PASS", "test_id": "vault::tests::test_migrations_are_recorded_and_idempotent"}
+{"collected": false, "file": "crates/domain/src/scope.rs", "requirement_id": "REQ-SCOPE-001", "result": "NOT_RUN", "test_id": "scope::contains_phrase"}
+{"collected": true, "file": "crates/domain/src/scope.rs", "requirement_id": "REQ-SCOPE-001", "result": "PASS", "test_id": "scope::tests::test_scope_map_is_complete_and_one_to_one"}
+{"collected": true, "file": "crates/domain/src/scope.rs", "requirement_id": "REQ-SCOPE-001", "result": "PASS", "test_id": "scope::tests::test_scope_map_does_not_over_claim"}
+{"collected": true, "file": "crates/domain/src/scope.rs", "requirement_id": "REQ-SCOPE-001", "result": "PASS", "test_id": "scope::tests::test_five_truth_boundaries_are_declared_and_enforced"}
+{"collected": true, "file": "crates/domain/src/scope.rs", "requirement_id": "REQ-SCOPE-001", "result": "PASS", "test_id": "scope::tests::test_boundary_guard_refuses_promises_and_permits_honest_text"}
+{"collected": false, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-SCOPE-001", "result": "NOT_RUN", "test_id": "commands::tests::quarantine_count"}
+{"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-SCOPE-001", "result": "PASS", "test_id": "commands::tests::test_scope_map_and_five_truth_boundaries_hold_at_the_product_boundary"}
+{"collected": true, "file": "apps/desktop/e2e/shell.spec.ts", "requirement_id": "REQ-SCOPE-001", "result": "PASS", "test_id": "e2e::declares the scope surface and reports it honestly when disconnected"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-SEC-001", "result": "PASS", "test_id": "vault::tests::test_unknown_workspace_is_refused"}
 {"collected": true, "file": "crates/storage/src/vault.rs", "requirement_id": "REQ-SEC-001", "result": "PASS", "test_id": "vault::tests::test_events_are_workspace_scoped"}
 {"collected": false, "file": "crates/provider_transport/src/lib.rs", "requirement_id": "REQ-SEC-001", "result": "NOT_RUN", "test_id": "is_live"}

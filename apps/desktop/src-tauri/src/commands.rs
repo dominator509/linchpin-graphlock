@@ -1472,6 +1472,77 @@ pub fn restore_vault(
     )
 }
 
+/// One of the five product truth boundaries, as returned to the UI.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BoundaryView {
+    pub id: String,
+    pub statement: String,
+    pub enforced_by: String,
+}
+
+/// One promised capability, including what is honestly missing.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CapabilityView {
+    pub requirement_id: String,
+    pub uo_id: String,
+    pub title: String,
+    /// `IMPLEMENTED`, `PARTIAL` or `ABSENT`.
+    pub state: String,
+    pub realised_by: String,
+    pub limitation: String,
+}
+
+/// The declared scope and truth boundaries (REQ-SCOPE-001, SPEC-000).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ScopeView {
+    pub boundaries: Vec<BoundaryView>,
+    pub capabilities: Vec<CapabilityView>,
+}
+
+/// Report the declared product scope and the five truth boundaries.
+///
+/// The UI renders this rather than hard-coding its own copy, so the promise the
+/// user reads and the promise the code enforces cannot drift apart. Partial
+/// capabilities are reported WITH their limitation: a scope surface that showed
+/// twelve ticks would be the over-claim the boundary exists to prevent.
+pub fn get_scope_declaration() -> CommandResult<ScopeView> {
+    let correlation = CorrelationId::new();
+
+    let boundaries = domain::scope::TRUTH_BOUNDARIES
+        .iter()
+        .map(|boundary| BoundaryView {
+            id: boundary.id.to_string(),
+            statement: boundary.statement.to_string(),
+            enforced_by: boundary.enforced_by.to_string(),
+        })
+        .collect();
+
+    let capabilities = domain::scope::SCOPE_MAP
+        .iter()
+        .map(|entry| CapabilityView {
+            requirement_id: entry.requirement_id.to_string(),
+            uo_id: entry.uo_id.to_string(),
+            title: entry.title.to_string(),
+            state: match entry.state {
+                domain::scope::CapabilityState::Implemented => "IMPLEMENTED",
+                domain::scope::CapabilityState::Partial => "PARTIAL",
+                domain::scope::CapabilityState::Absent => "ABSENT",
+            }
+            .to_string(),
+            realised_by: entry.realised_by.to_string(),
+            limitation: entry.limitation.to_string(),
+        })
+        .collect();
+
+    CommandResult::success(
+        correlation,
+        ScopeView {
+            boundaries,
+            capabilities,
+        },
+    )
+}
+
 /// Open a vault AND read its state in one step, so an unreadable vault is
 /// detected even when the file happens to open.
 ///
@@ -1862,14 +1933,28 @@ pub fn build_commercialization_package(
     room.redact_for_non_confidential_export();
 
     match room.export_pitch_deck() {
-        Ok(payload) => CommandResult::success(
-            correlation,
-            CommercializationView {
-                target_count: target_names.len(),
-                redacted: true,
-                payload,
-            },
-        ),
+        Ok(payload) => {
+            // REQ-SCOPE-001 / TB-4: the package is text the inventor sends to
+            // third parties, so it is the place a promise would do real damage.
+            // The truth-boundary guard runs on the ACTUAL payload rather than on
+            // the inputs, because the export path is what composes the copy.
+            if let Err(violation) = domain::scope::check_claim_text(&payload) {
+                return CommandResult::failure(
+                    correlation,
+                    CommandError::policy(format!(
+                        "commercialization package crosses a truth boundary: {violation}"
+                    )),
+                );
+            }
+            CommandResult::success(
+                correlation,
+                CommercializationView {
+                    target_count: target_names.len(),
+                    redacted: true,
+                    payload,
+                },
+            )
+        }
         Err(e) => CommandResult::failure(correlation, CommandError::policy(e)),
     }
 }
@@ -3428,8 +3513,163 @@ mod tests {
             .unwrap_or(0)
     }
 
-    /// Seed a conception event directly through the vault, for the backup tests.
-    ///
+    /// covers: REQ-SCOPE-001
+    /// SPEC-000 promises that REQ-SCOPE-001..012 are UO-01..UO-12 and that
+    /// "product claims must preserve five truth boundaries". Both halves are
+    /// asserted here at the PRODUCT boundary, because the promise is about what
+    /// the commands do, not about a document that says they should.
+    #[test]
+    fn test_scope_map_and_five_truth_boundaries_hold_at_the_product_boundary() {
+        let scope = WorkspaceScope {
+            workspace_id: "ws-scope".to_string(),
+        };
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-scope-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let vault_path = dir.join("vault.db");
+
+        // The mapping is complete, ordered and one-to-one, and no entry may
+        // claim more than it can show.
+        assert_eq!(domain::scope::SCOPE_MAP.len(), 12);
+        assert_eq!(domain::scope::TRUTH_BOUNDARIES.len(), 5);
+        for (index, entry) in domain::scope::SCOPE_MAP.iter().enumerate() {
+            assert_eq!(entry.uo_id, format!("UO-{:02}", index + 1));
+            assert_eq!(entry.requirement_id, format!("REQ-SCOPE-{:03}", index + 1));
+            assert_eq!(
+                domain::scope::entry_for_requirement(entry.requirement_id)
+                    .map(|e| e.uo_id)
+                    .unwrap_or(""),
+                entry.uo_id
+            );
+        }
+
+        // TB-1: opportunity output carries axes and stated uncertainty, and its
+        // own screening copy passes the boundary guard.
+        let opportunity = evaluate_opportunity(
+            &scope,
+            "a self-sealing valve",
+            0.7,
+            0.6,
+            0.3,
+            "Medium",
+            &["https://example.invalid/evidence/1".to_string()],
+        );
+        assert!(
+            opportunity.ok,
+            "opportunity failed: {:?}",
+            opportunity.error
+        );
+        let view = opportunity.value.unwrap();
+        assert!(
+            domain::scope::check_claim_text(&view.screen_note).is_ok(),
+            "the screening note crosses a truth boundary: {}",
+            view.screen_note
+        );
+        assert!(
+            !view.screen_note.to_lowercase().contains("patentab"),
+            "screening copy must not present patentability: {}",
+            view.screen_note
+        );
+
+        // TB-2: the claim linter is advisory. It reports findings and never a
+        // clearance conclusion, and its findings pass the guard.
+        let lint = lint_claims("1. A device comprising a valve seat.");
+        assert!(lint.ok, "lint failed: {:?}", lint.error);
+        for finding in &lint.value.unwrap().findings {
+            assert!(
+                domain::scope::check_claim_text(finding).is_ok(),
+                "a lint finding asserts a legal conclusion: {finding}"
+            );
+        }
+
+        // TB-3: a draft package is never FILED, and the handoff stays a human
+        // step that cannot be satisfied by the product alone.
+        let package = build_filing_package(
+            "1. A device comprising a valve seat.",
+            "A device with a valve seat that seals under pressure.",
+        );
+        assert!(package.ok, "package failed: {:?}", package.error);
+        let handoff = check_filing_handoff(&["Ads".to_string()], false);
+        assert!(handoff.ok, "handoff failed: {:?}", handoff.error);
+        let readiness = handoff.value.unwrap();
+        assert!(
+            !readiness.ready_for_human_submission,
+            "handoff declared submission-ready without a paid fee: {readiness:?}"
+        );
+        assert!(
+            !readiness.blockers.is_empty(),
+            "an unready handoff must name why: {readiness:?}"
+        );
+
+        // TB-4: the commercialization payload is redacted, passes the guard, and
+        // the guard is APPLIED on that path rather than merely available -- a
+        // target name that promises an outcome is refused by the real command.
+        let package = build_commercialization_package(&scope, &["MegaCorp".to_string()]);
+        assert!(package.ok, "package failed: {:?}", package.error);
+        let payload = package.value.unwrap().payload;
+        assert!(payload.contains("MegaCorp"), "the payload names the target");
+        assert!(
+            domain::scope::check_claim_text(&payload).is_ok(),
+            "commercialization payload crosses a boundary: {payload}"
+        );
+        let promising =
+            build_commercialization_package(&scope, &["guaranteed revenue partner".to_string()]);
+        assert!(
+            !promising.ok,
+            "a package promising an outcome was exported: {:?}",
+            promising.value
+        );
+        // The refusal must name the boundary it crossed, so the operator learns
+        // which promise was refused rather than only that something failed.
+        let refusal = promising.error.expect("a refusal must carry a cause");
+        assert!(
+            refusal.safe_message().contains("TB-4"),
+            "the refusal does not name the boundary it crossed: {refusal}"
+        );
+        assert!(
+            refusal.safe_message().contains("truth boundary"),
+            "{refusal}"
+        );
+
+        // TB-5: AI assistance never becomes human conception.
+        let ai = record_conception(
+            &scope,
+            "an idea suggested by a model",
+            false,
+            Some(&vault_path),
+        );
+        assert!(ai.ok, "record failed: {:?}", ai.error);
+        let ai_value = ai.value.unwrap();
+        assert_eq!(ai_value.event.origin, "AiSuggestion");
+        assert!(ai_value.persisted, "the AI-sourced event was not persisted");
+        let human = record_conception(
+            &scope,
+            "the inventor's own conception",
+            true,
+            Some(&vault_path),
+        );
+        assert!(human.ok);
+        assert_eq!(human.value.unwrap().event.origin, "HumanConception");
+        let events = storage::vault::Vault::open(&vault_path)
+            .unwrap()
+            .list_conception_events("ws-scope")
+            .unwrap();
+        assert_eq!(events.len(), 2, "origins must be stored separately");
+        assert!(
+            events.iter().any(|e| e.origin == "AiSuggestion"),
+            "the AI origin was lost in storage"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// Seed a conception event directly through the vault, for the backup tests.    ///
     /// The workspace is a parameter, not the hardcoded "ws-backup" it used to be:
     /// a helper that silently writes into a different workspace than its caller
     /// names is how a recovery test came to query an empty vault and look like a

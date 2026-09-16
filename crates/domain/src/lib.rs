@@ -1,6 +1,9 @@
 use std::time::SystemTime;
 use uuid::Uuid;
 
+/// Product scope and the five truth boundaries (REQ-SCOPE-001, SPEC-000).
+pub mod scope;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventId(pub Uuid);
 

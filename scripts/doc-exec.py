@@ -65,6 +65,15 @@ EXCLUDED_PATTERNS = [
     # Self-reference guard. Measured: documenting this gate by its own command
     # made it execute itself, recursing until the per-command timeout fired.
     (r"\bdoc-exec\.py\b", "self-reference: a documentation gate must not re-invoke itself"),
+    # The mutation harness is DELIBERATELY destructive: it edits tracked source
+    # files, runs the guarding test, and restores the bytes. Documenting it in
+    # COMMANDS.md is required (that file is the only legal command source), but a
+    # documentation gate must not start mutating the tree it is verifying.
+    # `--list` and `--check` are read-only and are NOT excluded.
+    (
+        r"mutation-proof\.py(?!\s+--(?:list|check))",
+        "injects controlled defects into tracked source files; run deliberately",
+    ),
 ]
 
 

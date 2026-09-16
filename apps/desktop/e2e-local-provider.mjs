@@ -91,6 +91,32 @@ try {
     })
     .catch(() => {});
 
+  // DOM-ready is NOT bridge-ready. Measured on a loaded machine (the rerun runs
+  // this lane straight after a full tauri build and a lint pass): the page
+  // loaded, the document reported `complete`, and the first invoke still threw
+  // "Cannot read properties of undefined (reading 'invoke')" because Tauri had
+  // not injected `window.__TAURI_INTERNALS__` yet. That looked like a provider
+  // failure and was a harness race, so the bridge is now awaited explicitly and
+  // its absence is reported as its own check.
+  const ipcDeadline = Date.now() + 30000;
+  let ipcReady = false;
+  while (!ipcReady && Date.now() < ipcDeadline) {
+    ipcReady = await page
+      .evaluate(() => typeof window.__TAURI_INTERNALS__ !== "undefined")
+      .catch(() => false);
+    if (!ipcReady) await sleep(100);
+  }
+  record(
+    "Tauri IPC bridge injected (harness liveness)",
+    ipcReady,
+    `ready=${ipcReady}`,
+  );
+  if (!ipcReady) {
+    throw new Error(
+      "the Tauri IPC bridge never appeared; every command assertion would be unrunnable",
+    );
+  }
+
   const invoke = (cmd, args) =>
     page.evaluate(
       ([c, a]) => window.__TAURI_INTERNALS__.invoke(c, a),
@@ -355,14 +381,21 @@ try {
       // five iterations, and a liveness check that cannot observe a genuinely
       // working sampler is a false failure. Measured: every fifth poll reported
       // heartbeats=0 while the sampler had already observed two real endpoints.
+      //
+      // The explicit flush matters for the same reason: without it PowerShell's
+      // redirected stdout is buffered, so observations reached the caller in
+      // late bursts and the inference loop ran its full 25-call cap before the
+      // loopback connection it was waiting for appeared.
       `$deadline = (Get-Date).AddSeconds(180)
 $polls = 0
 Write-Output "READY"
+[Console]::Out.Flush()
 while ((Get-Date) -lt $deadline) {
   $polls++
   Get-NetTCPConnection -OwningProcess ${app.pid} -ErrorAction SilentlyContinue |
     ForEach-Object { $_.RemoteAddress }
   Write-Output "HEARTBEAT $polls"
+  [Console]::Out.Flush()
   Start-Sleep -Milliseconds 20
 }`,
     ],

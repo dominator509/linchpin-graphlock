@@ -122,25 +122,30 @@ survived — a guard claiming a check it never ran. Both fixed and mutation-prov
 Bound requirements therefore move 35 → 37, collected tests 129 → 135, and
 `NO_BOUND_TEST` 24 → 22.
 
-## Progress — refreshed measurement at candidate `fbc9a49`
+## Progress — refreshed measurement at candidate `291a5cc`
 
 Re-measured with `python3 scripts/bind-requirements.py`, not carried forward:
 
 | Measure | Original audit | Now |
 | --- | --- | --- |
-| Collected tests | 129 | **207** |
+| Collected tests | 129 | **214** |
 | Requirements found | 59 | 59 |
-| Requirements bound to an executed PASS | 35 | **55** |
-| `NO_BOUND_TEST` | 24 | **4** |
+| Requirements bound to an executed PASS | 35 | **56** |
+| `NO_BOUND_TEST` | 24 | **3** |
 
-The four that remain unbound, each with the concrete reason and next action:
+The three that remain unbound, each with the concrete reason and next action:
 
 | Requirement | Why it is still unbound | Next action |
 | --- | --- | --- |
 | REQ-REL-001 | Demands a **signed virgin clean room** install and boot of the exact final artifact. No clean-room environment exists on this host, and no agent may sign for one. Recorded `EXTERNAL_REQUIRED` under ADR-004 (supported scope Windows 10 or higher). | External: a clean-room operator runs the documented install and records it. |
 | REQ-REL-004 | Demands broad evidence that no automated run can produce: manual assistive-technology validation, human UAT, and long-running fuzz/soak. PF-017/PF-018 are `HUMAN_EXTERNAL` and unmet (ADR-005). | External: named human validators; the long-running half stays `DEFERRED_LONG_RUNNING`. |
 | REQ-COM-002 | Promises an asset-readiness **chain-of-title timeline** built from inventor/owner records, assignments, recordation evidence, liens, legal-status events, maintenance state, remaining-life assumptions, families and unresolved ownership questions (SPEC-009). The behavior does not exist yet, so no test can pass. | Implement the timeline domain model and command, then an acceptance test. |
-| REQ-SCOPE-001 | Promises that `REQ-SCOPE-001..012` map to `UO-01..UO-12` and that product claims preserve the **five truth boundaries** of ARCHITECTURE.md §5 (`TB-1..TB-5`). The mapping and the boundaries exist as prose; nothing asserts them. | Implement a machine-readable scope map plus boundary assertions at the product boundary, then an acceptance test. |
+
+REQ-SCOPE-001 was in this table last round and is now closed: the UO-01..12
+mapping and the five truth boundaries are declared in code
+(`crates/domain/src/scope.rs`), served over IPC, rendered in Settings, and
+asserted at the product boundary and against the packaged executable. Evidence:
+`.agent/evidence/REQ-SCOPE-001-scope-and-truth-boundaries.md`.
 
 ## The one change in this file that is a CORRECTION, not progress
 

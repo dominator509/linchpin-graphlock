@@ -86,30 +86,11 @@ fi
 # Prove the restored production binary does NOT open a debug port. Without this
 # check the script could silently leave a debug-enabled binary at the production
 # path, which is a confidentiality regression rather than a test failure.
-python3 - "$PROD_EXE" <<'PY'
-import subprocess, sys, time, socket
-exe = sys.argv[1]
-proc = subprocess.Popen([exe], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-try:
-    opened = False
-    for _ in range(20):
-        time.sleep(0.25)
-        with socket.socket() as s:
-            s.settimeout(0.2)
-            if s.connect_ex(("127.0.0.1", 9222)) == 0:
-                opened = True
-                break
-    if opened:
-        print("artifact-e2e: FAIL -- the production artifact opens a debug port", file=sys.stderr)
-        sys.exit(1)
-    print("artifact-e2e: production artifact correctly opens no debug port")
-finally:
-    proc.terminate()
-    try:
-        proc.wait(timeout=5)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-PY
+#
+# The check lives in its own script because the inline version had no baseline and
+# no attribution: a leftover debug build still holding 9222 made this gate accuse
+# the honest production binary. See scripts/assert-no-debug-port.py.
+python3 scripts/assert-no-debug-port.py "$PROD_EXE" "$PORT"
 
 echo "artifact-e2e: driving $E2E_EXE over CDP"
 node apps/desktop/e2e-artifact.mjs "$E2E_EXE" "$REPORT_DIR/STATUS.md"

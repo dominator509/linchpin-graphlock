@@ -210,6 +210,12 @@ fn restore_vault(
     commands::restore_vault(&scope, &source, &vault_file())
 }
 
+/// Report the declared scope and the five truth boundaries (REQ-SCOPE-001).
+#[tauri::command]
+fn get_scope_declaration() -> commands::CommandResult<commands::ScopeView> {
+    commands::get_scope_declaration()
+}
+
 /// Produce a valuation range tied to explicit assumptions (REQ-COM-003).
 #[tauri::command]
 fn evaluate_valuation(
@@ -383,6 +389,7 @@ pub fn run() {
             record_conception,
             get_namespace_status,
             get_configuration,
+            get_scope_declaration,
             apply_research_action,
             evaluate_export,
             lint_claims,

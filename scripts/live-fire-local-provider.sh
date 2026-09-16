@@ -122,30 +122,9 @@ sh scripts/build.sh > "$REPORT_DIR/prod-build.log" 2>&1 || {
   exit 1
 }
 
-python3 - <<'PY'
-import subprocess, sys, time, urllib.request
-exe = r"target\release\linchpin-desktop.exe"
-proc = subprocess.Popen([exe], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-opened = False
-try:
-    for _ in range(28):  # ~7s, past the measured 3-6s port window
-        time.sleep(0.25)
-        try:
-            urllib.request.urlopen("http://127.0.0.1:9222/json", timeout=0.5)
-            opened = True
-            break
-        except Exception:
-            continue
-finally:
-    proc.terminate()
-    try:
-        proc.wait(timeout=10)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-if opened:
-    print("local-provider: FAIL -- the production artifact opened a debug port", file=sys.stderr)
-    raise SystemExit(1)
-print("local-provider: production artifact correctly opens no debug port")
-PY
+# The inline version of this check had no baseline and no attribution: anything
+# else already holding 9222 (a leftover devtools build from an interrupted run)
+# made the gate accuse the honest production artifact of opening a debug port.
+python3 scripts/assert-no-debug-port.py "target/release/linchpin-desktop.exe" 9222
 
 exit "$STATUS"

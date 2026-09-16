@@ -130,6 +130,58 @@ try {
     body.includes("Local-First Confidentiality") ? "present" : "MISSING",
   );
 
+  // REQ-SCOPE-001: the declared scope and the five truth boundaries must be
+  // visible in the PRODUCT, read from the backend declaration rather than a
+  // copy in the UI. This is the only lane where the IPC bridge is real, so it is
+  // the only lane that can prove the declaration reaches a user.
+  const declared = await page.evaluate(async () => {
+    try {
+      return await window.__TAURI_INTERNALS__.invoke("get_scope_declaration");
+    } catch (e) {
+      return { __error: String(e) };
+    }
+  });
+  const declaredOk = declared && !declared.__error && declared.ok === true;
+  record(
+    "get_scope_declaration round-trip (REQ-SCOPE-001)",
+    declaredOk,
+    declaredOk
+      ? `${declared.value.boundaries.length} boundaries, ${declared.value.capabilities.length} capabilities`
+      : String(declared?.__error ?? JSON.stringify(declared)),
+  );
+  if (declaredOk) {
+    const boundaryIds = declared.value.boundaries.map((b) => b.id);
+    record(
+      "all five truth boundaries declared",
+      ["TB-1", "TB-2", "TB-3", "TB-4", "TB-5"].every((id) =>
+        boundaryIds.includes(id),
+      ),
+      `ids=${boundaryIds.join(",")}`,
+    );
+    record(
+      "twelve promised outcomes accounted, none over-claimed",
+      declared.value.capabilities.length === 12 &&
+        declared.value.capabilities.every(
+          (c) =>
+            c.state === "IMPLEMENTED" ||
+            (c.limitation && c.limitation.trim().length > 0),
+        ),
+      declared.value.capabilities.map((c) => `${c.uo_id}=${c.state}`).join(","),
+    );
+    // And the rendered surface must show them, not only the IPC payload.
+    const scopeText = await page
+      .locator("#scope-heading")
+      .locator("..")
+      .innerText();
+    record(
+      "declared boundaries render in the Settings surface",
+      ["TB-1", "TB-2", "TB-3", "TB-4", "TB-5"].every((id) =>
+        scopeText.includes(id),
+      ) && scopeText.includes("UO-01"),
+      scopeText.includes("TB-5") ? "TB-1..TB-5 rendered" : "boundaries MISSING",
+    );
+  }
+
   const hasIpc = await page.evaluate(
     () => typeof window.__TAURI_INTERNALS__ !== "undefined",
   );

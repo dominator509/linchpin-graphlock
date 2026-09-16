@@ -435,4 +435,25 @@ test.describe("LINCHPIN desktop shell", () => {
     await expect(panel).toContainText("discarded");
     await expect(panel).toContainText("preserved rather than deleted");
   });
+
+  // covers: REQ-SCOPE-001
+  test("declares the scope surface and reports it honestly when disconnected", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // SPEC-000 requires the promised scope and the five truth boundaries to be
+    // preserved. This lane runs WITHOUT the Tauri bridge, so it asserts the
+    // surface exists and states its absence honestly; the exact-artifact lane
+    // asserts the declared CONTENT, because only there is the IPC bridge real.
+    await expect(
+      page.getByRole("heading", {
+        name: "Declared scope and truth boundaries",
+        level: 3,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Declared scope not reported by the backend."),
+    ).toBeVisible();
+  });
 });
