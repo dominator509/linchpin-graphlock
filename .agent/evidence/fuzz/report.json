@@ -1,5 +1,5 @@
 {
-  "actual_seconds": 6.06,
+  "actual_seconds": 3.18,
   "adversarial_inputs_per_target": 4634,
   "campaign": "mutation-fuzz",
   "corpus_size": 512,
@@ -23,12 +23,12 @@
   "targets": [
     {
       "iterations": 6634,
-      "seconds": 1.05,
+      "seconds": 0.54,
       "target": "domain::scope::check_claim_text"
     },
     {
       "iterations": 6634,
-      "seconds": 4.79,
+      "seconds": 2.52,
       "target": "crash_reporter::RedactionPolicy::apply"
     },
     {
@@ -43,12 +43,12 @@
     },
     {
       "iterations": 6634,
-      "seconds": 0.08,
+      "seconds": 0.05,
       "target": "evidence::LogRedactor::redact_with_report"
     },
     {
       "iterations": 6634,
-      "seconds": 0.02,
+      "seconds": 0.0,
       "target": "patent::PatentLinter::lint_claims"
     },
     {
@@ -58,17 +58,17 @@
     },
     {
       "iterations": 6634,
-      "seconds": 0.03,
+      "seconds": 0.02,
       "target": "patent::PackageBuilder::build_docx"
     },
     {
       "iterations": 6634,
-      "seconds": 0.02,
+      "seconds": 0.01,
       "target": "domain::RuleSetAuthority::new"
     },
     {
       "iterations": 6634,
-      "seconds": 0.02,
+      "seconds": 0.01,
       "target": "commercialization::asset_readiness date validation"
     }
   ]
