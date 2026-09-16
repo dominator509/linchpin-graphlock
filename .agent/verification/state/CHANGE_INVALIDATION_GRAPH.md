@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `62ad316d3f311905375997f4c73275f25de9896e5ca071eb9c42a27687bacf4a`
-- Candidate commit at generation: `aaf3ecd`
+- Current epoch digest: `4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf`
+- Candidate commit at generation: `74721cf`
 - Total tracked inputs: 128
-- Previous epoch digest: `62ad316d3f311905375997f4c73275f25de9896e5ca071eb9c42a27687bacf4a`
+- Previous epoch digest: `4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -126,7 +126,7 @@ definition and its PASS status is revoked until rerun.
 
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
-  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `15e66ed3ff521314…`
+  - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `1c34dc60b47ef1ee…`
   - `apps\desktop\e2e-artifact.mjs` `9d2d096495635d89…`
   - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
 

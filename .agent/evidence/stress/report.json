@@ -1,0 +1,53 @@
+{
+  "covers": [
+    "DOD-038",
+    "DOD-017"
+  ],
+  "harness": "apps/desktop/src-tauri/tests/stress_concurrency.rs",
+  "limits": [
+    "one machine, one disk, threads rather than separate processes or hosts",
+    "busy/locked failures are reported as a locking fact only if the message says so; every other failure fails the trial",
+    "throughput figures are a regression bound on this host, not a capacity claim"
+  ],
+  "outcomes": {
+    "backup_failures": 0,
+    "backups": 58,
+    "events_in_ledger": 2000,
+    "events_lost": 0,
+    "hung": false,
+    "read_backs": 1589,
+    "read_failures": 0,
+    "reads_before_vault_existed": 4,
+    "replays": 0,
+    "sample_failure_messages": [],
+    "write_failures": 0,
+    "write_failures_reported_busy_or_locked": 0,
+    "writes_ok": 2000
+  },
+  "performance": {
+    "bytes_per_event": 643,
+    "elapsed_s": 18.75,
+    "final_vault_bytes": 1286144,
+    "peak_working_set_bytes": 19767296,
+    "throughput_events_per_s": 106.65,
+    "write_max_ms": 1981.33,
+    "write_p50_ms": 21.45,
+    "write_p95_ms": 264.27
+  },
+  "specification_gap": "no stress concurrency level, duration or throughput target is specified anywhere in the repository, so 'their specified scale' has no defined value to complete; this trial defines a workload, labels itself ABBREVIATED and does not claim DOD-038",
+  "thresholds": {
+    "events_lost_allowed": 0,
+    "hung_allowed": false,
+    "min_throughput_events_per_s": 5.0,
+    "p95_write_ms": 2000.0
+  },
+  "trial": "ABBREVIATED",
+  "workload": {
+    "backup_thread": 1,
+    "events_per_writer": 250,
+    "expected_submissions": 2000,
+    "max_seconds": 300,
+    "readers": 4,
+    "writers": 8
+  }
+}

@@ -328,6 +328,22 @@ impl From<std::io::Error> for VaultError {
     }
 }
 
+/// Whether an engine error is a locking collision rather than a real failure.
+///
+/// SQLITE_BUSY and SQLITE_LOCKED are scheduling facts: another connection holds
+/// the lock, or is expected to release it. They are worth waiting on; anything
+/// else is not.
+fn is_lock_error(error: &rusqlite::Error) -> bool {
+    matches!(
+        error,
+        rusqlite::Error::SqliteFailure(code, _)
+            if matches!(
+                code.code,
+                rusqlite::ErrorCode::DatabaseBusy | rusqlite::ErrorCode::DatabaseLocked
+            )
+    )
+}
+
 /// File-backed vault implementing the SPEC-002 data model.
 pub struct Vault {
     conn: Connection,
@@ -337,10 +353,45 @@ impl Vault {
     /// Open (or create) a vault at `path` and run migrations.
     pub fn open(path: &Path) -> Result<Self, VaultError> {
         let conn = Connection::open(path)?;
+        // Query the mode first and only switch when it differs.
+        //
+        // MEASURED: switching the journal mode takes a brief EXCLUSIVE lock and
+        // does NOT honour `busy_timeout` the way ordinary lock acquisition does,
+        // so concurrent FIRST opens of a new vault collide: with four writers and
+        // two readers starting together, two submissions failed with "database is
+        // locked" while the file was still being created, and the same error
+        // surfaced to the caller as "vault open failed". The switch is therefore
+        // retried a bounded number of times, and only the mode switch needs it --
+        // once a vault is in WAL the mode is a property of the file and there is
+        // nothing to switch.
+        let mode: String = conn.query_row("PRAGMA journal_mode", [], |row| row.get(0))?;
+        if !mode.eq_ignore_ascii_case("wal") {
+            let mut attempts = 0;
+            loop {
+                match conn.pragma_update(None, "journal_mode", "WAL") {
+                    Ok(()) => break,
+                    Err(error) if is_lock_error(&error) && attempts < 50 => {
+                        attempts += 1;
+                        std::thread::sleep(std::time::Duration::from_millis(20));
+                    }
+                    Err(error) => return Err(VaultError::Database(error)),
+                }
+            }
+        }
         // Durability and integrity: WAL for concurrent readers alongside a
         // writer, and foreign keys enforced by the engine.
-        conn.pragma_update(None, "journal_mode", "WAL")?;
         conn.pragma_update(None, "foreign_keys", "ON")?;
+        // Wait for a competing writer instead of failing on the first collision.
+        //
+        // MEASURED DEFECT this closes: the abbreviated stress trial ran four
+        // writers and two readers against one vault; every write succeeded and
+        // none was lost, and TWO CONCURRENT LEDGER READS FAILED. Each product
+        // command opens its own connection and runs migrations, so a read can
+        // collide with a writer's lock and receive SQLITE_BUSY -- which the UI
+        // would report as a broken vault while the vault is perfectly healthy. A
+        // busy database is a scheduling fact, not a fault, and five seconds is far
+        // longer than any single write in this product takes.
+        conn.busy_timeout(std::time::Duration::from_secs(5))?;
         let vault = Vault { conn };
         vault.run_migrations()?;
         Ok(vault)
@@ -368,11 +419,22 @@ impl Vault {
             }
             // The DDL and the bookkeeping row commit together, so a crash cannot
             // record a migration that did not run.
+            //
+            // `OR IGNORE` matters under concurrency, not just for tidiness.
+            // MEASURED by the abbreviated stress trial: two connections opening a
+            // FRESH vault at the same time both see the migration as unapplied,
+            // both run the (idempotent) DDL, and the second INSERT hit
+            // "UNIQUE constraint failed: schema_migrations.migration_id" -- which
+            // surfaced to the caller as "cannot open vault" on a vault that was
+            // being created correctly. Losing that race means another writer
+            // applied the same migration, which is exactly the state this row
+            // records, so the loser proceeds.
             self.conn.execute_batch("BEGIN")?;
             match self.conn.execute_batch(sql) {
                 Ok(()) => {
                     self.conn.execute(
-                        "INSERT INTO schema_migrations (migration_id, applied_utc) VALUES (?1, ?2)",
+                        "INSERT OR IGNORE INTO schema_migrations (migration_id, applied_utc)
+                         VALUES (?1, ?2)",
                         (id, now_utc()),
                     )?;
                     self.conn.execute_batch("COMMIT")?;
@@ -500,7 +562,34 @@ impl Vault {
     /// capture a torn write-ahead log, and a backup that silently restores to a
     /// corrupt state is worse than no backup. The destination is replaced when
     /// it exists, so a backup is a point-in-time snapshot and never a merge.
+    ///
+    /// A copy is RESTARTED when a concurrent writer invalidates the source
+    /// mid-copy. That is the API's documented contract -- a modified source
+    /// reports SQLITE_BUSY and the caller restarts -- but it was not implemented,
+    /// and the abbreviated stress trial measured the consequence: with four
+    /// writers active, one backup in six failed with "database is locked" and the
+    /// operator was told the backup could not be taken while the vault was
+    /// perfectly healthy. Restarting is safe because the destination is rebuilt
+    /// from scratch on each attempt.
     pub fn backup_to(&self, dest: &Path) -> Result<(), VaultError> {
+        let mut attempts = 0;
+        loop {
+            match self.backup_once(dest) {
+                Ok(()) => return Ok(()),
+                Err(error) if attempts < 20 => match &error {
+                    VaultError::Database(inner) if is_lock_error(inner) => {
+                        attempts += 1;
+                        std::thread::sleep(std::time::Duration::from_millis(25));
+                    }
+                    _ => return Err(error),
+                },
+                Err(error) => return Err(error),
+            }
+        }
+    }
+
+    /// One attempt at the online copy, rebuilding the destination first.
+    fn backup_once(&self, dest: &Path) -> Result<(), VaultError> {
         if dest.exists() {
             std::fs::remove_file(dest)?;
         }
@@ -1487,6 +1576,132 @@ mod tests {
             1,
             "the race produced {} events for one key",
             events.len()
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: DOD-038, DOD-016
+    /// Several connections may open a BRAND-NEW vault at the same time without
+    /// any of them failing.
+    ///
+    /// Measured by the abbreviated stress trial: two simultaneous first opens both
+    /// saw migration 0001 as unapplied, both ran the idempotent DDL, and the
+    /// second bookkeeping INSERT failed with "UNIQUE constraint failed:
+    /// schema_migrations.migration_id" -- surfacing as "cannot open vault" on a
+    /// vault that was being created correctly. Losing that race means the other
+    /// writer applied the same migration, so the loser must proceed.
+    #[test]
+    fn test_concurrent_first_open_of_a_fresh_vault_succeeds() {
+        let dir = std::env::temp_dir().join(format!(
+            "linchpin-first-open-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let path = dir.join("fresh.db");
+
+        let openers = 8;
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(openers));
+        let handles: Vec<_> = (0..openers)
+            .map(|_| {
+                let barrier = barrier.clone();
+                let path = path.clone();
+                std::thread::spawn(move || {
+                    barrier.wait();
+                    Vault::open(&path)
+                })
+            })
+            .collect();
+
+        for handle in handles {
+            match handle.join().expect("thread") {
+                Ok(vault) => assert_eq!(
+                    vault.applied_migrations().unwrap().len(),
+                    MIGRATIONS.len(),
+                    "a concurrent opener saw an incomplete migration set"
+                ),
+                Err(error) => panic!("a concurrent first open failed: {error}"),
+            }
+        }
+
+        let vault = Vault::open(&path).unwrap();
+        assert_eq!(vault.applied_migrations().unwrap().len(), MIGRATIONS.len());
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// covers: DOD-036, DOD-038
+    /// A backup taken WHILE other connections are writing must succeed, because
+    /// the online-backup API's contract is to restart when its source changes.
+    ///
+    /// Measured by the abbreviated stress trial: with four writers active, one
+    /// backup in six failed with "database is locked", so an operator was told the
+    /// backup could not be taken while the vault was healthy. The pressure here is
+    /// four writers and thirty backup attempts on purpose -- an earlier version of
+    /// this test used ONE writer and twelve attempts and passed against a mutant
+    /// with the retry removed, which made it non-discriminating.
+    #[test]
+    fn test_backup_succeeds_while_another_connection_writes() {
+        let (dir, vault) = temp_vault("backup-under-write");
+        vault.create_workspace("ws-busy").unwrap();
+        let path = dir.join("vault.db");
+        let backup_path = dir.join("busy-backup.db");
+        drop(vault);
+
+        let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let writers: Vec<_> = (0..4)
+            .map(|writer_id| {
+                let stop = stop.clone();
+                let path = path.clone();
+                std::thread::spawn(move || {
+                    let vault = Vault::open(&path).expect("writer open");
+                    let mut written = 0u64;
+                    while !stop.load(std::sync::atomic::Ordering::Relaxed) {
+                        written += 1;
+                        let key = format!("busy-{writer_id}-{written}");
+                        if vault
+                            .put_conception_event_keyed(
+                                "ws-busy",
+                                &key,
+                                "HumanConception",
+                                &format!("payload {key}"),
+                            )
+                            .is_err()
+                        {
+                            break;
+                        }
+                    }
+                    written
+                })
+            })
+            .collect();
+
+        let reader = Vault::open(&path).unwrap();
+        let mut backups = 0;
+        for _ in 0..30 {
+            reader
+                .backup_to(&backup_path)
+                .expect("a backup under concurrent writes must succeed");
+            backups += 1;
+            std::thread::sleep(std::time::Duration::from_millis(15));
+        }
+        stop.store(true, std::sync::atomic::Ordering::Relaxed);
+        let written: u64 = writers
+            .into_iter()
+            .map(|handle| handle.join().expect("writer thread"))
+            .sum();
+        assert!(written > 0, "the writer threads wrote nothing");
+        assert_eq!(backups, 30);
+        assert!(backup_path.exists());
+
+        // The last backup is a usable vault, not a torn copy.
+        let restored = Vault::open(&backup_path).unwrap();
+        assert_eq!(
+            restored.applied_migrations().unwrap().len(),
+            MIGRATIONS.len()
         );
 
         std::fs::remove_dir_all(&dir).ok();

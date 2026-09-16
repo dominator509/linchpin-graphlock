@@ -70,6 +70,7 @@ def main() -> int:
 
     manifest = json.loads(MANIFEST.read_text("utf-8")) if MANIFEST.exists() else {}
     expected = manifest.get("expected_min_passed", 0)
+    expected_binaries = manifest.get("expected_test_binaries", 0)
 
     print(f"collection guard: {len(suites)} result lines, {binaries} test binaries")
     print(f"  passed={passed} failed={failed} ignored={ignored} (manifest min={expected})")
@@ -78,6 +79,22 @@ def main() -> int:
         print(
             "collection guard: FAIL -- zero tests collected. DOD-007 forbids "
             "treating this as a pass.",
+            file=sys.stderr,
+        )
+        return 1
+    # A partial collection means the runner did not report on every test binary.
+    # MEASURED: running this guard while another `cargo test --workspace` held the
+    # target directory produced "collected 130 below manifest 216" -- a scary
+    # message for an artifact of contention, and one that would be indistinguishable
+    # from a genuinely shrinking suite. The binary count separates the two, so the
+    # diagnosis names which one it is instead of guessing.
+    if expected_binaries and binaries < expected_binaries:
+        print(
+            f"collection guard: FAIL -- the runner reported on only {binaries} test "
+            f"binary/binaries while the manifest expects {expected_binaries}, so this "
+            f"collection is PARTIAL ({passed} tests seen) rather than a smaller suite. "
+            "Most likely another cargo run held the target directory; rerun this guard "
+            "with nothing else building.",
             file=sys.stderr,
         )
         return 1

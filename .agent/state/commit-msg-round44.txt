@@ -1,0 +1,52 @@
+feat(DOD-038): abbreviated stress trial; two concurrency defects fixed, one recorded unproven
+
+Third DOD-038 trial class executed and labeled. DOD-038 stays PARTIAL (the clause's
+own OR ELSE forbids PASS for an abbreviated trial) but now records endurance,
+fuzzing and STRESS as executed.
+
+apps/desktop/src-tauri/tests/stress_concurrency.rs: 8 writer threads x 250 events
+plus 4 readers and a backup thread against one vault, with encoded floors that FAIL
+the trial (no lost events, zero read/backup failures, no hang, p95 <= 2000ms,
+>= 5 events/s). Measured: 2000 submissions, 0 failures, 0 lost, ledger exactly
+2000, zero read or backup failures, 106 events/s.
+
+Concurrency defects the trial found:
+- "database is locked" on concurrent first open (two of 100 submissions, and two
+  concurrent LEDGER READS, which the UI would have reported as a broken vault):
+  every command opens its own connection and ran an unconditional journal-mode
+  switch, which takes a brief exclusive lock and ignores busy_timeout. Fixed with a
+  busy timeout, a mode query so the switch happens only on a non-WAL file, and a
+  bounded retry.
+- "UNIQUE constraint failed: schema_migrations.migration_id" when two connections
+  opened a brand-new vault at once: the loser's open failed and the caller was told
+  "cannot open vault" on a vault being created correctly. Fixed with INSERT OR
+  IGNORE, which is correct because losing that race means another writer applied the
+  same idempotent IF NOT EXISTS DDL.
+- a backup failed with "database is locked" while writers were active; the copy is
+  now restarted on a lock error per the online-backup API's documented contract.
+
+PROVENANCE, not blurred: the migration race was observed ONCE before the fix, and
+two attempts to build a deterministic regression test (eight threads opening a fresh
+vault; eight threads writing into one) did NOT reproduce the interleaving, so
+MUT-STRESS-001 was WITHDRAWN from the mutation manifest rather than left failing or
+claimed as caught. MUT-STRESS-002 (removing the backup restart) SURVIVED four
+writers and thirty backups, so that restart is recorded as a documented defensive
+measure, not a proven fix. Thirteen controlled defects still run.
+
+A fourth defect was in the trial itself: readers start before the first write
+commits, so a read is legitimately refused with "no vault at ..."; counting that as
+a concurrency defect accused the product of doing the right thing, and
+re-classifying by re-checking exists() still raced. Classification is now by error
+message.
+
+Also hardened: the DOD-007 collection guard now distinguishes a PARTIAL collection
+(fewer test binaries reported than the manifest expects) from a genuinely shrinking
+suite. Measured: running it while another cargo run held the target directory
+produced "collected 130 below manifest 216" -- a false alarm indistinguishable from
+a real regression.
+
+verification: full stage ladder green (harness-validate, build, smoke, typecheck,
+unit 216 tests, integration, lint, provider live-fire, e2e, exact artifact,
+collection guard), verify.sh ok. DoD PASS 36, PARTIAL 3, FAIL 1,
+EXTERNAL_REQUIRED 2; requirements 57/59 bound; coverage line 93.37% at epoch
+4b97b0587f9df351.

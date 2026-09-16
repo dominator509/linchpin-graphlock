@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "aaf3ecd",
+  "candidate_commit": "74721cf",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -38,7 +38,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "ceabee9258b3e9d93e75c8126dc6640804aa359482fab7708fcc1c295cf9d464",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "30a70d918e0fee134c5a49b37d78c5e73c0b5f54d4033fe4f913ba6a7a0e1f43",
+        "scripts\\build-dod-status.py": "248551647dfabd569181db338c6c61473f1fc82acc1bed5284e0cdbd5ecaee71",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "60abc989644f7e84426ca32c6a494c31d938ab1a04207478a222d9ebc5f5964e",
@@ -67,7 +67,7 @@
         "scripts\\live-fire-local-provider.sh": "dcda08caf50050c3d3ba5167d1dfc638ad9d843692a3652426b6394d49446aeb",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
-        "scripts\\mutation-proof.py": "746e40b3f1ba192e39150df1109f6d4e708fea8daac5b3c4f06aeb115d68f7c5",
+        "scripts\\mutation-proof.py": "3e50b6a198df37d831ad66501710f2a79f76d1ba1826c6c6b1ee1ac4302e6ca6",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
@@ -81,7 +81,7 @@
         "scripts\\ship-gate.py": "c7650a1f78b9b256dfe7ca7e968cfedc129b50aaa374494a790f9961e465f5cc",
         "scripts\\smoke-installed-artifact.sh": "71de10b34c0a69e915773b1bcc92a8a08d4757b9c7a4e5dd963a343a4f4448ac",
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
-        "scripts\\test-collection-guard.py": "72d801af2b5871fdf40cde1641311a73eb6937dbf08265175f2015ec372abb74",
+        "scripts\\test-collection-guard.py": "bfc4722f587b03e19aab38605f402e5846e475b668bb195132814555129d3044",
         "scripts\\test-collection-guard.sh": "82c46b21641211877d13314c012fc40f3a8bc7f06930a513b9a7b32a83200958",
         "scripts\\test-e2e.sh": "44b03fcbb9dbfc41c9b355393e07e3a546b203a1536c3b3c86ca83a9cd75d880",
         "scripts\\test-integration.sh": "2acaa6c1f4f01d9b4c6f498bbf2a08cfd4b4797674624c5dc2277b71629fcbad",
@@ -193,7 +193,7 @@
         "crates\\provider_transport\\src\\lib.rs": "a62348a0bfcf96e67c141cc8f3c593d45a80e6ca1939873c1df6c7a1b9c59813",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
-        "crates\\storage\\src\\vault.rs": "bb738373a608e405b01fa3acad4009c3d43ba0ea19b325baaa2c7c395c6ab393",
+        "crates\\storage\\src\\vault.rs": "091cbf4bc51a43e26bd28436f1aa37690c78d717b0fda21e6c0359679b538675",
         "crates\\storage\\tests\\integration_real_dependencies.rs": "f1a3c433b86e22cdddfaaa95d1658e76b1c2a81414a06bd33299da73f7d51539"
       },
       "rules": [
@@ -211,7 +211,7 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "15e66ed3ff52131483a7e1407704e3dc0954cdfec474de77c49e4f5f06a8a7ba",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "1c34dc60b47ef1ee021d24098541929373da34f484d717a19e56aa3a955dd432",
         "apps\\desktop\\e2e-artifact.mjs": "9d2d096495635d89e0c6d9ea198b5ae900c3034cab0e18275e3e6ac67af3b625",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671"
       },
@@ -225,8 +225,8 @@
       ]
     }
   },
-  "epoch_digest": "62ad316d3f311905375997f4c73275f25de9896e5ca071eb9c42a27687bacf4a",
-  "prior_candidate_commit": "d3addcd",
-  "prior_epoch_digest": "62ad316d3f311905375997f4c73275f25de9896e5ca071eb9c42a27687bacf4a",
+  "epoch_digest": "4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf",
+  "prior_candidate_commit": "74721cf",
+  "prior_epoch_digest": "4b97b0587f9df3514bd4d101cf266544546b98c1a9dc43d4b869f49ace6048bf",
   "total_inputs": 128
 }

@@ -23,11 +23,12 @@ assert_exportable,domain,crates/domain/src/lib.rs,REACHABLE,"named from apps\des
 assess_asset_readiness,commercialization,crates/commercialization/src/asset_readiness.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 audit_len,storage,crates/storage/src/vault.rs,TEST_ONLY,named only from tests: crates\storage\src\vault.rs
 authoritative,domain,crates/domain/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\domain\src\lib.rs"
+backup_once,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
 backup_to,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 backup_vault,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 blob_count,storage,crates/storage/src/vault.rs,TEST_ONLY,named only from tests: crates\storage\src\vault.rs
 boundary_by_id,domain,crates/domain/src/scope.rs,TEST_ONLY,named only from tests: crates\domain\src\scope.rs
-bounded,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\provider_transport\src\lib.rs"
+bounded,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\provider_transport\src\lib.rs, crates\storage\src\vault.rs"
 build_asset_readiness,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 build_commercialization_package,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 build_docx,patent,crates/patent/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
@@ -127,6 +128,7 @@ is_authoritative,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\deskt
 is_empty,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\application\src\lib.rs, crates\commercialization\src\asset_readiness.rs"
 is_external_transient,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\provider_transport\src\lib.rs"
 is_live,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,named from crates\provider_transport\src\lib.rs
+is_lock_error,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
 is_replay,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 is_safe_for_export,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 is_token_char,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from crates\crash_reporter\src\lib.rs
@@ -151,7 +153,7 @@ new,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\de
 new_ai,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 new_human,domain,crates/domain/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 new_in_memory,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests: crates\storage\src\lib.rs
-none,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from crates\provider_transport\src\lib.rs, crates\research\src\lib.rs"
+none,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from crates\provider_transport\src\lib.rs, crates\research\src\lib.rs, crates\storage\src\vault.rs"
 now_utc,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
 observation,research,crates/research/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\application\src\lib.rs, crates\domain\src\scope.rs"
 open,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\commercialization\src\asset_readiness.rs, crates\storage\src\vault.rs"

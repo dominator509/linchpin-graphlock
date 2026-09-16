@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "6e7e39a4562087f3f4db110e8f8ff34790bea364921470e43c8182362e94d92a",
+  "executable_sha256": "ed4075395380957b3570a8e26074c38a95c1ca69b94a28aa30dd5775a577d951",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a legal document that asserts a new and exclusive right to an invention, and is intended to protect th\""
+      "observed": "\"A patent claim is a creative and unique claim that outlines a unique idea, feature, or process that is intended to be us\""
     },
     {
       "name": "metadata names the live model",
@@ -47,7 +47,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"Is a patent a legal monopoly?\""
+      "observed": "\"Is a patent a legal monopoly is a fallacy in the application of the law.\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "6e7e39a4562087f3 -> 6e7e39a4562087f3"
+      "observed": "ed4075395380957b -> ed4075395380957b"
     }
   ],
   "passed": 23,
