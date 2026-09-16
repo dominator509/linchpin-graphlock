@@ -20,12 +20,12 @@
   },
   "samples_ms": {
     "count": 200,
-    "max": 53.96,
-    "min": 6.61,
-    "p50": 9.5,
-    "p95": 11.83,
-    "total_read_ms": 4.27,
-    "total_write_ms": 1951.99
+    "max": 22.85,
+    "min": 6.41,
+    "p50": 9.38,
+    "p95": 14.81,
+    "total_read_ms": 4.16,
+    "total_write_ms": 1982.6
   },
   "thresholds": {
     "max_vault_bytes": 33554432,
@@ -39,6 +39,6 @@
   "workload": {
     "events": 200,
     "operation": "record_conception (production command) then list_conception_events through a second connection",
-    "run_canary": "perf-canary-1789587469305698900"
+    "run_canary": "perf-canary-1789588394759658700"
   }
 }
