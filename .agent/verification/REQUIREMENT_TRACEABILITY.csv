@@ -37,10 +37,10 @@ REQ-PAT-003,7,7,7,0,PASS,claim_tests::test_claim_classes_are_a_closed_set_of_sev
 REQ-PAT-004,3,3,3,0,PASS,action_tests::test_office_action_workspace;commands::tests::test_docket_validates_inputs;commands::tests::test_office_action_refuses_allowance_response,apps/desktop/src-tauri/src/commands.rs;crates/patent/src/lib.rs
 REQ-PAT-005,8,7,7,0,PASS,commands::tests::test_filing_handoff_reports_blockers_and_never_automates;commands::tests::test_import_receipt_fails_closed_on_bad_input;commands::tests::test_import_receipt_parses_real_values;manifest_tests::probe_receipt_import_parses_input;manifest_tests::test_receipt_import_accepts_realistic_receipt;manifest_tests::test_receipt_import_fails_closed_on_malformed_input;manifest_tests::test_uspto_manifest_handoff,apps/desktop/src-tauri/src/commands.rs;crates/patent/src/lib.rs
 REQ-PLAT-001,2,1,1,0,PASS,tests::test_app_paths,crates/platform_windows/src/lib.rs
-REQ-PLAT-002,0,0,0,0,NO_BOUND_TEST,,
+REQ-PLAT-002,3,2,2,0,PASS,test_local_first_core_works_with_a_local_model_and_no_network;test_local_first_proof_names_a_real_local_model_and_endpoint,crates/platform_windows/tests/local_first.rs
 REQ-PLAT-003,2,2,2,0,PASS,tests::test_current_rss_bytes_is_a_real_measurement;tests::test_memory_keyring,crates/platform_windows/src/lib.rs
 REQ-REL-001,0,0,0,0,NO_BOUND_TEST,,
-REQ-REL-002,0,0,0,0,NO_BOUND_TEST,,
+REQ-REL-002,2,1,1,0,PASS,test_local_first_core_works_with_a_local_model_and_no_network,crates/platform_windows/tests/local_first.rs
 REQ-REL-003,1,1,1,0,PASS,commands::tests::test_filing_handoff_reports_blockers_and_never_automates,apps/desktop/src-tauri/src/commands.rs
 REQ-REL-004,0,0,0,0,NO_BOUND_TEST,,
 REQ-REL-005,0,0,0,0,NO_BOUND_TEST,,

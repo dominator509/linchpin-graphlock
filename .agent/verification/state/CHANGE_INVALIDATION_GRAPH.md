@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `9bc88bf4fa9d2fc48efbe9f9717b7895f4e620c1fe55c8677302060580a480ce`
-- Candidate commit at generation: `d42397b`
-- Total tracked inputs: 117
-- Previous epoch digest: `8eb2e2afc647fc01bc1eb36bafa6b3f629b15fd8d5a9fee70c22a60225081248`
-- **Changed input classes since that epoch: gate-script**
+- Current epoch digest: `827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76`
+- Candidate commit at generation: `cf52216`
+- Total tracked inputs: 118
+- Previous epoch digest: `9bc88bf4fa9d2fc48efbe9f9717b7895f4e620c1fe55c8677302060580a480ce`
+- **Changed input classes since that epoch: rust-source, js-source**
 
 ## Input classes and what a change invalidates
 
@@ -70,7 +70,7 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-015 usability/accessibility
 
   - `apps\desktop\e2e\shell.spec.ts` `060fed4727356374…`
-  - `apps\desktop\src\App.tsx` `d5e3c1ee496fe44c…`
+  - `apps\desktop\src\App.tsx` `fa00d91be8e1acda…`
   - `apps\desktop\src\main.tsx` `bfcf131d8fb04a4d…`
   - `apps\desktop\tests\has-ipc.test.ts` `8f2e208b7f1499e6…`
   - `packages\contracts\src\index.ts` `72fd005dc2fdd303…`
@@ -98,7 +98,7 @@ definition and its PASS status is revoked until rerun.
   - `crates\crash_reporter\Cargo.toml` `be20a3f1e5b5e0b5…`
   - … and 10 more
 
-### `rust-source` — 17 file(s)
+### `rust-source` — 18 file(s)
 
 - invalidates: V-005 clean build
 - invalidates: V-006 smoke
@@ -108,12 +108,12 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-012 regression/mutation
 - invalidates: V-013 dynamic security/domain packs
 
-  - `apps\desktop\src-tauri\src\commands.rs` `d6dde38e7b20e2bf…`
+  - `apps\desktop\src-tauri\src\commands.rs` `0426b2f934759c18…`
   - `apps\desktop\src-tauri\src\lib.rs` `3caaedc99872a98f…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
   - `crates\application\src\lib.rs` `2e05c121d6728fbf…`
   - `crates\commercialization\src\lib.rs` `b3cda133f33472b0…`
-  - … and 12 more
+  - … and 13 more
 
 ### `test-oracle` — 3 file(s)
 

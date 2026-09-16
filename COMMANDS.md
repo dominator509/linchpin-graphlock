@@ -78,6 +78,34 @@ cases; and installer state preservation across update/uninstall/rollback. It
 prerequisite when absent — a live-fire gate that quietly skipped its live
 dependency would be the fabrication AG-006 recorded.
 
+## Local provider prerequisite (PF-011)
+
+The provider lane and every gate that composes it need a **running** loopback
+inference server. The runtime is installed at
+`%LOCALAPPDATA%\linchpin-local-runtime\ollama` with models under
+`...\linchpin-local-runtime\models`, but it is not a background service: it stops
+when the process does, and the gates then exit 2 naming PF-011 rather than
+passing or skipping. Start it before running those gates:
+
+```powershell
+$dir = "$env:LOCALAPPDATA\linchpin-local-runtime"
+$env:OLLAMA_HOST = "127.0.0.1:11434"          # loopback only, by design
+$env:OLLAMA_MODELS = "$dir\models"
+Start-Process -FilePath "$dir\ollama\ollama.exe" -ArgumentList "serve" -WindowStyle Hidden
+```
+
+Verify before relying on it — the first request after start can take several
+seconds to warm up, so a short timeout can look like a failure:
+
+```powershell
+(Invoke-WebRequest http://127.0.0.1:11434/api/tags -TimeoutSec 20).Content.Contains("smollm2")
+```
+
+Observed during this run: the server had exited between sessions, `V-013` failed
+with exit 2 and the message `PF-011 UNSATISFIED`, and the lane passed after the
+server was restarted. That is the designed behaviour — the prerequisite is
+reported, never assumed.
+
 ## Local start
 After EP-005 creates the application: `pnpm --filter @linchpin/desktop tauri dev > .agent/state/dev-server.log 2>&1 & echo $! > .agent/state/dev-server.pid`; readiness is a bounded 60-second probe defined in EP-005; stop with `kill "$(cat .agent/state/dev-server.pid)"`.
 

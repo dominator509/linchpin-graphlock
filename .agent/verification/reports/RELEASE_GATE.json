@@ -2,11 +2,11 @@
   "artifact": {
     "candidate_commit": "1bca002",
     "executable": "target\\release\\linchpin-desktop.exe",
-    "executable_bytes": "12171264",
-    "executable_sha256": "f15d085c093393cdaed07f6f0b9571c5af8b2484c2070e8297afb6c5d935272a",
+    "executable_bytes": "12172288",
+    "executable_sha256": "38b07a670255e1e3f44bbf3cf587096c7040b881977c1878dc1ed76f6bf27805",
     "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
     "msi_bytes": "5603328",
-    "msi_sha256": "f145b827bd661a3daad07d637782051c1b690ae64fdad733daeaf1e04186d6c2"
+    "msi_sha256": "ab00fd8d04df30830365852ef724b86bb5f9eb6b2d83dad88b5755b70eab5e11"
   },
   "blocking_clauses": [
     "DOD-001=PARTIAL"

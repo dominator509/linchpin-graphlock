@@ -1120,11 +1120,27 @@ pub fn check_support_matrix(
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ConfigurationView {
     pub app_data_dir: String,
-    pub vault_dir: String,
+    /// The actual durable vault FILE, not a directory the product never writes
+    /// to. An earlier version reported `AppPaths::vault_dir`
+    /// (`<app_data>/vaults`), which the Settings surface displayed as the vault
+    /// location while the product wrote `<app_data>/linchpin-vault.db` one level
+    /// up -- a surface asserting a state the product did not have.
+    pub vault_file: String,
     pub runtime: String,
     /// Unknown configuration keys that were ignored in development. Reported
     /// rather than dropped, so a typo stays visible.
     pub warnings: Vec<String>,
+}
+
+/// The durable vault file, derived from the resolved app-data directory.
+///
+/// This mirrors `vault_file()` in the desktop crate, which is the single writer
+/// of this path. Kept as one expression so the reported location cannot drift
+/// from the written one.
+pub fn vault_file_path() -> std::path::PathBuf {
+    platform_windows::get_app_paths()
+        .app_data_dir
+        .join("linchpin-vault.db")
 }
 
 /// Report the typed configuration the process actually resolved
@@ -1144,7 +1160,7 @@ pub fn get_configuration() -> CommandResult<ConfigurationView> {
                 correlation,
                 ConfigurationView {
                     app_data_dir: paths.app_data_dir.display().to_string(),
-                    vault_dir: paths.vault_dir.display().to_string(),
+                    vault_file: vault_file_path().display().to_string(),
                     runtime: format!("{:?}", config.runtime),
                     warnings: config.warnings,
                 },

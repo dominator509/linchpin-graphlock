@@ -250,6 +250,176 @@ try {
     outcome?.live === true && outcome?.attempts === 1,
     `live=${outcome?.live} attempts=${outcome?.attempts}`,
   );
+
+  // --- Local-first core workflows with a local model (REQ-PLAT-002) --------
+  //
+  // REQ-PLAT-002: "The local-first core remains functional with a local model
+  // and cached/user evidence, with no mandatory network dependency for core
+  // workflows." Each core workflow is driven at the product's own command
+  // boundary, and the network egress of the app process is MEASURED rather than
+  // inferred from configuration.
+  const cfg = await invoke("get_configuration", {});
+  const vaultFile = cfg?.value?.vault_file ?? "";
+  const appDataDir = cfg?.value?.app_data_dir ?? "";
+  record(
+    "core: resolved configuration is reported (REQ-PLAT-002)",
+    cfg?.ok === true && vaultFile.length > 0 && appDataDir.length > 0,
+    `app_data=${appDataDir} vault_file=${vaultFile}`,
+  );
+
+  // Durable, device-local evidence: a conception event written to the vault.
+  const conception = await invoke("record_conception", {
+    workspaceId: "local-first-workspace",
+    content: "local-first proof: a self-sealing valve",
+    authorIsHuman: true,
+  });
+  record(
+    "core: durable evidence written with no network (REQ-PLAT-002)",
+    conception?.ok === true && conception?.value?.persisted === true,
+    `persisted=${conception?.value?.persisted} detail=${conception?.value?.storage_detail}`,
+  );
+
+  // A screening decision, computed on-device.
+  const firewall = await invoke("evaluate_export", {
+    workspaceId: "local-first-workspace",
+    content: "screening export content",
+    sensitivity: "Restricted",
+  });
+  record(
+    "core: disclosure screening runs on-device (REQ-PLAT-002)",
+    firewall?.ok === true && typeof firewall?.value?.allowed === "boolean",
+    `allowed=${firewall?.value?.allowed} reason=${firewall?.value?.reason}`,
+  );
+
+  // A docket decision from a local ruleset.
+  const deadline = await invoke("schedule_docket_deadline", {
+    workspaceId: "local-first-workspace",
+    dueDate: "2026-11-14",
+    rulesetSource: "USPTO-37CFR",
+    rulesetVersion: "2026.1",
+    suggestedByModel: false,
+  });
+  record(
+    "core: docket deadline resolves from a local ruleset (REQ-PLAT-002)",
+    deadline?.ok === true && deadline?.value?.authoritative === true,
+    `authoritative=${deadline?.value?.authoritative} source=${deadline?.value?.ruleset_source}`,
+  );
+
+  // A valuation range, computed on-device.
+  const valuation = await invoke("evaluate_valuation", {
+    workspaceId: "local-first-workspace",
+    scenarioLabel: "Illustrative planning scenario only",
+    low: 1000,
+    high: 2500,
+    assumptions: [["market size", 100, 400]],
+  });
+  record(
+    "core: valuation range computed on-device (REQ-PLAT-002)",
+    valuation?.ok === true && valuation?.value?.is_range === true,
+    `range=${valuation?.value?.is_range} dominant=${valuation?.value?.dominant_assumption}`,
+  );
+
+  // --- Measured network egress (REQ-PLAT-002, REQ-REL-002) -----------------
+  //
+  // The claim is "no mandatory network dependency for core workflows". Rather
+  // than reading configuration and assuming, ask the OS which remote endpoints
+  // this process actually holds open.
+  //
+  // The sampler must ALSO be proven to work, or its silence proves nothing. Two
+  // measured failures shaped this:
+  //   1. A single sample taken AFTER the inference returned reported "sampled 0
+  //      endpoint(s)" -- it passed while demonstrating nothing.
+  //   2. Polling by spawning PowerShell per sample was still useless: process
+  //      start-up (~300ms) dwarfs a localhost connection that lasts tens of ms,
+  //      so the positive control observed nothing while inference succeeded.
+  // One long-running PowerShell now polls internally at ~20ms, and several real
+  // inference calls run during the window. The assertion requires BOTH: at least
+  // one loopback endpoint observed (positive control) and zero non-loopback
+  // endpoints (the requirement).
+  const observed = new Set();
+  const sampler = spawn(
+    "powershell",
+    [
+      "-NoProfile",
+      "-Command",
+      `$deadline = (Get-Date).AddSeconds(75)
+while ((Get-Date) -lt $deadline) {
+  Get-NetTCPConnection -OwningProcess ${app.pid} -ErrorAction SilentlyContinue |
+    ForEach-Object { $_.RemoteAddress }
+  Start-Sleep -Milliseconds 20
+}`,
+    ],
+    { stdio: ["ignore", "pipe", "ignore"] },
+  );
+  sampler.stdout.on("data", (buf) => {
+    for (const line of String(buf).split(/\r?\n/)) {
+      const addr = line.trim();
+      if (addr) observed.add(addr);
+    }
+  });
+
+  // Several real inference calls, so the loopback connection exists repeatedly
+  // inside the sampling window.
+  let liveCalls = 0;
+  for (let i = 0; i < 5; i += 1) {
+    const r = await invoke("run_local_inference", {
+      endpoint: ENDPOINT,
+      modelId: MODEL,
+      prompt: `Name one property of a valve, in three words. ${canary()}`,
+    });
+    if (r?.value?.live === true) liveCalls += 1;
+  }
+  await sleep(300);
+  sampler.kill();
+  await sleep(200);
+
+  const addrs = [...observed];
+  // `0.0.0.0` and `::` are the unspecified bind addresses Windows reports as the
+  // remote address of a LISTENING socket; they name no peer and are therefore
+  // not egress. Anything else that is not loopback IS a real remote endpoint and
+  // would falsify the claim.
+  const nonLoopback = addrs.filter(
+    (a) =>
+      a !== "127.0.0.1" &&
+      a !== "::1" &&
+      a !== "0.0.0.0" &&
+      a !== "::" &&
+      !a.startsWith("127."),
+  );
+  const sawLoopback = addrs.some(
+    (a) => a === "127.0.0.1" || a === "::1" || a.startsWith("127."),
+  );
+
+  record(
+    "egress sampler observes connections (positive control, REQ-REL-002)",
+    sawLoopback && liveCalls > 0,
+    `observed=[${addrs.join(",")}] live_calls=${liveCalls}/5`,
+  );
+  record(
+    "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
+    nonLoopback.length === 0,
+    `observed ${addrs.length} distinct endpoint(s): ${addrs.join(",") || "none"}` +
+      (nonLoopback.length ? ` -- NON-LOOPBACK: ${nonLoopback.join(",")}` : ""),
+  );
+
+  // --- Durable state is readable from disk (REQ-PLAT-002) ------------------
+  //
+  // The path comes from the product's own configuration report, not from a
+  // guess. Measured mistake: the first version assumed `<vault_dir>/linchpin-
+  // vault.db`, but the product writes `<app_data_dir>/linchpin-vault.db`, so the
+  // assertion failed against a file that was never supposed to exist.
+  const { existsSync, statSync } = await import("node:fs");
+  const vaultOk =
+    vaultFile.length > 0 &&
+    existsSync(vaultFile) &&
+    statSync(vaultFile).size > 0;
+  record(
+    "core: user evidence persists to a device-local vault file (REQ-PLAT-002)",
+    vaultOk,
+    vaultFile
+      ? `${vaultFile} (${existsSync(vaultFile) ? statSync(vaultFile).size : "absent"})`
+      : "no vault file reported",
+  );
 } catch (e) {
   record("harness completed", false, String(e));
 } finally {
@@ -302,6 +472,31 @@ const lines = [
 ];
 
 writeFileSync(REPORT, lines.join("\n"), "utf8");
+
+// Machine-readable companion. The Rust acceptance test
+// (crates/platform_windows/tests/local_first.rs) asserts on THIS file, which is
+// what binds REQ-PLAT-002 and REQ-REL-002 to an executed proof rather than to a
+// description of one. Written only after every assertion has been evaluated, so
+// a crashed run cannot leave a report that looks complete.
+const jsonPath = REPORT.replace(/STATUS\.md$/, "report.json");
+writeFileSync(
+  jsonPath,
+  JSON.stringify(
+    {
+      executable: EXE,
+      executable_sha256: digestBefore,
+      endpoint: ENDPOINT,
+      model: MODEL,
+      checks,
+      passed: checks.length - failures.length,
+      total: checks.length,
+    },
+    null,
+    2,
+  ),
+  "utf8",
+);
+
 console.log(lines.slice(-1 - checks.length - 6).join("\n"));
 console.log(
   `\nlocal-provider: ${checks.length - failures.length}/${checks.length} passed`,

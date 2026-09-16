@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "d42397b",
+  "candidate_commit": "cf52216",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -114,7 +114,7 @@
       "count": 9,
       "files": {
         "apps\\desktop\\e2e\\shell.spec.ts": "060fed4727356374841f8db39695faca5f98e3e348fb11928c4ceb2a96ee5217",
-        "apps\\desktop\\src\\App.tsx": "d5e3c1ee496fe44c30c411d127ff4d9369e873c247bcdb542220112d230c7d83",
+        "apps\\desktop\\src\\App.tsx": "fa00d91be8e1acda476364b76907a4ca492b611fc3ed3fa2cee5804c33b6f7be",
         "apps\\desktop\\src\\main.tsx": "bfcf131d8fb04a4dadcdd633c0bdbefea3f3a7af5bb35d34dc55588991887654",
         "apps\\desktop\\tests\\has-ipc.test.ts": "8f2e208b7f1499e680843f672d5ebe4c6be7dd528740e5ff1f1bf7e8d09ba10c",
         "packages\\contracts\\src\\index.ts": "72fd005dc2fdd303863557b1adf8b594509112d5ea55642b960093676ef8bd06",
@@ -167,9 +167,9 @@
       ]
     },
     "rust-source": {
-      "count": 17,
+      "count": 18,
       "files": {
-        "apps\\desktop\\src-tauri\\src\\commands.rs": "d6dde38e7b20e2bfe89b83a827aa5207c3ac9114667397d54e9dff81cfe69180",
+        "apps\\desktop\\src-tauri\\src\\commands.rs": "0426b2f934759c18da19b87de748ee4970808026249205eeb64177b2177b4d08",
         "apps\\desktop\\src-tauri\\src\\lib.rs": "3caaedc99872a98f1c3c2b7a511487f686f89764877e3e5adf98d7e1986237af",
         "apps\\desktop\\src-tauri\\src\\main.rs": "82c94e55918dc550ae04cdcff09542519c4d45a86590b3f483f6cf1ad0ed6070",
         "crates\\application\\src\\lib.rs": "2e05c121d6728fbf7d7d1a6a8e714546acd2dd68816b822cf13af64a59297e34",
@@ -181,6 +181,7 @@
         "crates\\patent\\src\\lib.rs": "938e40ab0e373b7e52ed849a762cb04c6ce1fd025913e8400d5ccec0728f7156",
         "crates\\platform_windows\\src\\lib.rs": "20bbb410079f4faf5644c6f63ae900b0b4a1e5dddd4aeaaa5acc92c1088042c9",
         "crates\\platform_windows\\tests\\licensing_policy.rs": "93cbf446566964963c6c6febe01aa3ea8ff278aa570a4eb5389b9df5154d3452",
+        "crates\\platform_windows\\tests\\local_first.rs": "fbb25c61b5b081625e246224771fbdec9eab36ea923b79a2047aeb8b983f92b1",
         "crates\\provider_transport\\src\\lib.rs": "a62348a0bfcf96e67c141cc8f3c593d45a80e6ca1939873c1df6c7a1b9c59813",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
@@ -211,8 +212,8 @@
       ]
     }
   },
-  "epoch_digest": "9bc88bf4fa9d2fc48efbe9f9717b7895f4e620c1fe55c8677302060580a480ce",
-  "prior_candidate_commit": "7db0cf6",
-  "prior_epoch_digest": "8eb2e2afc647fc01bc1eb36bafa6b3f629b15fd8d5a9fee70c22a60225081248",
-  "total_inputs": 117
+  "epoch_digest": "827420e713ebdc30f32deb0b4d671914ab8b5c354f19fbf35a949d7b4eda5e76",
+  "prior_candidate_commit": "d42397b",
+  "prior_epoch_digest": "9bc88bf4fa9d2fc48efbe9f9717b7895f4e620c1fe55c8677302060580a480ce",
+  "total_inputs": 118
 }

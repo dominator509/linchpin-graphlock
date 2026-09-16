@@ -49,7 +49,7 @@ interface NamespaceStatus {
 
 interface ConfigurationView {
   app_data_dir: string;
-  vault_dir: string;
+  vault_file: string;
   runtime: string;
   warnings: string[];
 }
@@ -1458,7 +1458,7 @@ export default function App() {
           <ul>
             <li>Runtime: {configuration.runtime}</li>
             <li>Application data: {configuration.app_data_dir}</li>
-            <li>Vault directory: {configuration.vault_dir}</li>
+            <li>Vault file: {configuration.vault_file}</li>
             <li>
               Configuration warnings:{" "}
               {configuration.warnings.length === 0

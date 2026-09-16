@@ -1,0 +1,115 @@
+{
+  "executable": "target/release/linchpin-desktop-e2e.exe",
+  "executable_sha256": "d1ec4edda5ae29efefe02a9d2c57502be8f84c32b68925e3f640876648ca6467",
+  "endpoint": "http://127.0.0.1:11434",
+  "model": "smollm2:135m",
+  "checks": [
+    {
+      "name": "provider independently serves the named model (second channel)",
+      "ok": true,
+      "observed": "HTTP 200, tags=[smollm2:135m], serves smollm2:135m=true"
+    },
+    {
+      "name": "run_local_inference returned a CommandResult",
+      "ok": true,
+      "observed": "null"
+    },
+    {
+      "name": "reached a live inference boundary (live=true)",
+      "ok": true,
+      "observed": "live=true error_class=none"
+    },
+    {
+      "name": "transport identity is the local adapter",
+      "ok": true,
+      "observed": "\"local-ollama\""
+    },
+    {
+      "name": "completion is non-empty",
+      "ok": true,
+      "observed": "\"A patent claim is a patent filing that outlines a claim that an inventor seeks to protect a unique product or process fr\""
+    },
+    {
+      "name": "metadata names the live model",
+      "ok": true,
+      "observed": "\"local-ollama:smollm2:135m\""
+    },
+    {
+      "name": "completion text is not a string that already exists in the repository",
+      "ok": true,
+      "observed": "not found in tracked files"
+    },
+    {
+      "name": "a second, differently-phrased request also returns real output",
+      "ok": true,
+      "observed": "\"Is a patent a legal monopoly?\""
+    },
+    {
+      "name": "non-loopback endpoint is refused (POLICY, no attempt)",
+      "ok": true,
+      "observed": "{\"class\":\"POLICY\",\"message\":\"invalid request: local transport requires a loopback endpoint, got host \\\"192.0.2.1\\\"\"}"
+    },
+    {
+      "name": "unreachable loopback reports a transport error, not fabricated text",
+      "ok": true,
+      "observed": "live=false class=UNREACHABLE text=null"
+    },
+    {
+      "name": "transient failure retried under the bounded policy (REQ-OPS-002)",
+      "ok": true,
+      "observed": "class=UNREACHABLE attempts=3 retryable_exhausted=true"
+    },
+    {
+      "name": "a successful call reports exactly one attempt",
+      "ok": true,
+      "observed": "live=true attempts=1"
+    },
+    {
+      "name": "core: resolved configuration is reported (REQ-PLAT-002)",
+      "ok": true,
+      "observed": "app_data=C:\\Users\\domin\\AppData\\Local\\LINCHPIN vault_file=C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\linchpin-vault.db"
+    },
+    {
+      "name": "core: durable evidence written with no network (REQ-PLAT-002)",
+      "ok": true,
+      "observed": "persisted=true detail=committed to C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\linchpin-vault.db"
+    },
+    {
+      "name": "core: disclosure screening runs on-device (REQ-PLAT-002)",
+      "ok": true,
+      "observed": "allowed=false reason=Cannot export restricted payload under current firewall rules"
+    },
+    {
+      "name": "core: docket deadline resolves from a local ruleset (REQ-PLAT-002)",
+      "ok": true,
+      "observed": "authoritative=true source=USPTO-37CFR"
+    },
+    {
+      "name": "core: valuation range computed on-device (REQ-PLAT-002)",
+      "ok": true,
+      "observed": "range=true dominant=market size"
+    },
+    {
+      "name": "egress sampler observes connections (positive control, REQ-REL-002)",
+      "ok": true,
+      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=5/5"
+    },
+    {
+      "name": "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
+      "ok": true,
+      "observed": "observed 2 distinct endpoint(s): 0.0.0.0,127.0.0.1"
+    },
+    {
+      "name": "core: user evidence persists to a device-local vault file (REQ-PLAT-002)",
+      "ok": true,
+      "observed": "C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\linchpin-vault.db (49152)"
+    },
+    {
+      "name": "artifact digest unchanged across the run",
+      "ok": true,
+      "observed": "d1ec4edda5ae29ef -> d1ec4edda5ae29ef"
+    }
+  ],
+  "passed": 21,
+  "total": 21
+}

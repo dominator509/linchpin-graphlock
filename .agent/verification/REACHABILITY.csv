@@ -77,7 +77,7 @@ from,storage,crates/storage/src/vault.rs,REACHABLE,"named from apps\desktop\src-
 from_env,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\platform_windows\src\lib.rs"
 from_lookup,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from crates\platform_windows\src\lib.rs
 generate,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\provider_transport\src\lib.rs"
-get_app_paths,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs
+get_app_paths,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs"
 get_blob,storage,crates/storage/src/vault.rs,TEST_ONLY,named only from tests: crates\storage\src\vault.rs
 get_conception_event,storage,crates/storage/src/vault.rs,TEST_ONLY,"named only from tests: apps\desktop\src-tauri\src\commands.rs, crates\storage\src\vault.rs"
 get_configuration,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
@@ -183,7 +183,8 @@ unsupported,domain,crates/domain/src/lib.rs,REACHABLE,"named from apps\desktop\s
 validate,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\research\src\lib.rs"
 validate_handoff,patent,crates/patent/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 validation,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
-vault_file,desktop,apps/desktop/src-tauri/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\lib.rs
+vault_file,desktop,apps/desktop/src-tauri/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs"
+vault_file_path,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 verify_audit_chain,storage,crates/storage/src/vault.rs,TEST_ONLY,"named only from tests: apps\desktop\src-tauri\src\commands.rs, crates\storage\src\vault.rs"
 verify_domain_regression,commercialization,crates/commercialization/src/lib.rs,TEST_ONLY,named only from tests: crates\commercialization\src\lib.rs
 with_secret,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs

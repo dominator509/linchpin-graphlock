@@ -146,8 +146,13 @@
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-PAT-005", "result": "PASS", "test_id": "commands::tests::test_filing_handoff_reports_blockers_and_never_automates"}
 {"collected": false, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-PLAT-001", "result": "NOT_RUN", "test_id": "get_secret"}
 {"collected": true, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-PLAT-001", "result": "PASS", "test_id": "tests::test_app_paths"}
+{"collected": false, "file": "crates/platform_windows/tests/local_first.rs", "requirement_id": "REQ-PLAT-002", "result": "NOT_RUN", "test_id": "report"}
+{"collected": true, "file": "crates/platform_windows/tests/local_first.rs", "requirement_id": "REQ-PLAT-002", "result": "PASS", "test_id": "test_local_first_core_works_with_a_local_model_and_no_network"}
+{"collected": true, "file": "crates/platform_windows/tests/local_first.rs", "requirement_id": "REQ-PLAT-002", "result": "PASS", "test_id": "test_local_first_proof_names_a_real_local_model_and_endpoint"}
 {"collected": true, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-PLAT-003", "result": "PASS", "test_id": "tests::test_memory_keyring"}
 {"collected": true, "file": "crates/platform_windows/src/lib.rs", "requirement_id": "REQ-PLAT-003", "result": "PASS", "test_id": "tests::test_current_rss_bytes_is_a_real_measurement"}
+{"collected": false, "file": "crates/platform_windows/tests/local_first.rs", "requirement_id": "REQ-REL-002", "result": "NOT_RUN", "test_id": "report"}
+{"collected": true, "file": "crates/platform_windows/tests/local_first.rs", "requirement_id": "REQ-REL-002", "result": "PASS", "test_id": "test_local_first_core_works_with_a_local_model_and_no_network"}
 {"collected": true, "file": "apps/desktop/src-tauri/src/commands.rs", "requirement_id": "REQ-REL-003", "result": "PASS", "test_id": "commands::tests::test_filing_handoff_reports_blockers_and_never_automates"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_redaction_actually_removes_invention_content"}
 {"collected": true, "file": "crates/crash_reporter/src/lib.rs", "requirement_id": "REQ-REPAIR-001", "result": "PASS", "test_id": "capsule_tests::test_flag_alone_is_not_sufficient"}
