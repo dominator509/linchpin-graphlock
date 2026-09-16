@@ -74,6 +74,26 @@ def requirement_rows() -> list[dict]:
         return list(csv.DictReader(handle))
 
 
+def registry_note(tally: Counter) -> str:
+    """The registry-limitation sentence, rendered from the measured tally.
+
+    It used to be frozen prose ("473 of 484 remain NOT_RUN_BLOCKED_MATERIAL ...
+    require material (credentials, external services, human evaluators)"), which
+    became false as the accounting changed: the measured tally is 4 IDs blocked on
+    material -- each naming its own subject -- and 432 decided NOT_APPLICABLE from
+    per-ID applicability evidence. A sentence that counts rows must be rendered
+    from the rows.
+    """
+    blocked = tally.get("NOT_RUN_BLOCKED_MATERIAL", 0)
+    na = tally.get("NOT_APPLICABLE", 0)
+    total = sum(tally.values())
+    return (
+        f"{blocked} of {total} capabilities are `NOT_RUN_BLOCKED_MATERIAL`, each naming the specific "
+        "material its subject requires (an authorization surface, an isolation boundary, a git hook, "
+        f"hardware key storage), and {na} are `NOT_APPLICABLE` on per-ID applicability evidence"
+    )
+
+
 def build() -> str:
     dod = dod_rows()
     tally = Counter(row["status"] for row in dod)
@@ -204,9 +224,16 @@ def build() -> str:
         "- **Update/rollback across versions is unexecuted** because only one version exists; the lanes install",
         "  and remove the same v0.1.0 MSI, and same-version reinstall is weaker evidence than a cross-version",
         "  upgrade.",
-        "- **No operator dashboard**: diagnostics are reachable over IPC and rendered nowhere.",
-        "- **Registry capabilities**: 473 of 484 remain `NOT_RUN_BLOCKED_MATERIAL` — they require material",
-        "  (credentials, external services, human evaluators) that this environment does not hold.",
+        # Both lines below were frozen prose and had gone STALE, which is the
+        # defect this section exists to avoid: the report claimed 473 of 484 IDs
+        # "remain NOT_RUN_BLOCKED_MATERIAL" (the measured tally is now 4 blocked on
+        # material and 432 decided NOT_APPLICABLE from per-ID applicability
+        # evidence), and it listed "No operator dashboard" as a remaining
+        # limitation after the operator diagnostics dashboard had been built,
+        # rendered and asserted in the browser and exact-artifact lanes (DOD-037).
+        # The registry line is now rendered from the accounting tally, so it cannot
+        # drift from the rows it counts.
+        "- **Registry capabilities**: " + registry_note(registry_tally) + ".",
         "",
         "## Deployment state",
         "",

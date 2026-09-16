@@ -198,6 +198,60 @@ def derived_reason(clause: str, tally: dict[str, int]) -> str | None:
     )
 
 
+# Measurements that were written into these reasons as frozen prose and had gone
+# stale by the time this was measured: DOD-008 quoted line 93.4% / function 91.39%
+# / region 93.04% and per-crate figures from an earlier coverage run (the current
+# measurement is 93.37 / 91.61 / 93.02); and DOD-040 said "115 tracked inputs" (the
+# graph now has 141 after the test oracles were added). A claim about a measurement
+# must be FORMATTED from the measurement, so these fragments are replaced with
+# values read at generation time; the surrounding reasoning is left exactly as
+# written. The third stale count found in the same sweep -- "473 registry
+# capabilities that need material this environment does not hold" -- lives in the
+# generated completion report and is rendered from the tally by
+# scripts/completion-report.py instead.
+DERIVED_SUBSTITUTIONS: list[tuple[str, str, str]] = [
+    (
+        "DOD-008",
+        "**line 93.4%, function 91.39%, region 93.04%**",
+        "**line {line}%, function {function}%, region {region}%**",
+    ),
+    ("DOD-008", "line 93.4%, function 91.39%, region 93.04%", "line {line}%, function {function}%, region {region}%"),
+    ("DOD-040", "computes an epoch over 115 tracked inputs in 9 classes",
+     "computes an epoch over {epoch_inputs} tracked inputs in {epoch_classes} classes"),
+]
+
+
+def measured_substitutions(tally: dict[str, int]) -> dict[str, object]:
+    """Values for DERIVED_SUBSTITUTIONS, read from the artifacts that measure them."""
+    values: dict[str, object] = {
+        "blocked": tally.get("NOT_RUN_BLOCKED_MATERIAL", 0),
+        "na": tally.get("NOT_APPLICABLE", 0),
+    }
+    coverage_path = Path(".agent/evidence/coverage/report.json")
+    if coverage_path.exists():
+        totals = json.loads(coverage_path.read_text("utf-8")).get("totals", {})
+        values.update(
+            line=totals.get("line_percent", "?"),
+            function=totals.get("function_percent", "?"),
+            region=totals.get("region_percent", "?"),
+        )
+    epoch_path = Path(".agent/verification/state/EPOCH.json")
+    if epoch_path.exists():
+        epoch = json.loads(epoch_path.read_text("utf-8"))
+        values.update(
+            epoch_inputs=epoch.get("total_inputs", "?"),
+            epoch_classes=len(epoch.get("classes", {})),
+        )
+    return values
+
+
+def apply_substitutions(clause: str, reason: str, values: dict[str, object]) -> str:
+    for target, stale, template in DERIVED_SUBSTITUTIONS:
+        if target == clause and stale in reason:
+            reason = reason.replace(stale, template.format(**values))
+    return reason
+
+
 def main() -> int:
     check = "--check" in sys.argv
     with REGISTRY.open(newline="", encoding="utf-8") as fh:
@@ -212,11 +266,13 @@ def main() -> int:
 
     rows = []
     tally = ledger_tally()
+    substitutions = measured_substitutions(tally)
     for c in clauses:
         status, evidence, reason = DISPOSITIONS[c]
         if status == "PASS" and not Path(evidence).exists():
             raise SystemExit(f"{c}: PASS claimed but evidence {evidence} is absent")
         reason = derived_reason(c, tally) or reason
+        reason = apply_substitutions(c, reason, substitutions)
         rows.append(
             {
                 "dod_id": c,

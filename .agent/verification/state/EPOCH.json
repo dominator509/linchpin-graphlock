@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "721d0d5",
+  "candidate_commit": "ce23990",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -39,13 +39,13 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "1fa5a88c4432051ff15363b2c02cbcafa5d2fff36a9e54adaa3dacfa678003f9",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "ef476e2590b4eb02014b2f1d5788d336764a73d5a8890bcc1b2a163617d2b734",
+        "scripts\\build-dod-status.py": "a14d0db40418a392a7d785bda4508a4e6dc0e35debfb97787c776331f582147e",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "7bb6499a61a35585e38e31e26ab4c24e07c0af4de1ae80915b40114aee879988",
         "scripts\\clean-build.sh": "b262d0333310aab42dc803355d856a1099686f981d6f3f891fd058ecbcf9dde6",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
-        "scripts\\completion-report.py": "9ae9d8f20106772a311dad91d687ad91a214c8327ae00292dd9dd1166c271e93",
+        "scripts\\completion-report.py": "c1496b9c92b83d34883d503e74a20e532e585516c0069ac814441ed342676757",
         "scripts\\coverage-gate.py": "856917e300a7586e28f731100be16d0c6fe08747c3137bd4ac92779e24dfc358",
         "scripts\\dependency-audit.sh": "508cc370daf842ab1ea1535a658196adf677566088ca9928d3ca7d498fc9d1eb",
         "scripts\\doc-exec.py": "2e47017bc04b74b76decd60905f110280798b7668810803f1741b9857e61d516",
@@ -238,8 +238,8 @@
       ]
     }
   },
-  "epoch_digest": "5fa99bff0476cf08edf41d0317f4e3dff555d5f0c77dcfb8677cf9f546597d48",
-  "prior_candidate_commit": "721d0d5",
-  "prior_epoch_digest": "5fa99bff0476cf08edf41d0317f4e3dff555d5f0c77dcfb8677cf9f546597d48",
+  "epoch_digest": "60f2d9a6b2b3aaf1e518cda7ada36a734614e2cfb603a6e59819703a2181b913",
+  "prior_candidate_commit": "ce23990",
+  "prior_epoch_digest": "60f2d9a6b2b3aaf1e518cda7ada36a734614e2cfb603a6e59819703a2181b913",
   "total_inputs": 141
 }
