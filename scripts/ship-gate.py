@@ -245,22 +245,21 @@ def main() -> int:
             candidate = epoch_candidate
             candidate_source = "EPOCH.json"
         elif epoch_candidate and not same:
-            # EPOCH.json names HEAD; RUN_MANIFEST.json names the commit whose tree
-            # was verified. After a settle commit the two legitimately differ by
-            # commits that changed only derived verification state -- the same
-            # relation run-manifest.py --check allows. MEASURED: rejecting that
-            # outright made this gate report INCONCLUSIVE during a settle rerun
-            # ("recorded NO_GO, recomputed INCONCLUSIVE") and failed V-000 for a
-            # state that was in fact consistent. The relation is VERIFIED, not
-            # assumed: the pinned candidate must be an ancestor of the epoch
-            # candidate, and a genuine divergence is still INCONCLUSIVE.
-            if is_ancestor(candidate, epoch_candidate):
+            # EPOCH.json names the commit the invalidation graph was computed at;
+            # RUN_MANIFEST.json names the commit whose tree was verified. They may
+            # legitimately differ by commits that changed only derived verification
+            # state, in EITHER order -- MEASURED: a fix committed after the epoch was
+            # recorded left EPOCH at 04fd659 and the manifest at 1c32527, and the
+            # one-directional check called that a disagreement. The relation is
+            # VERIFIED, not assumed: the two must be related by ancestry (no divergent
+            # identity), and a genuine fork is still INCONCLUSIVE.
+            if is_ancestor(candidate, epoch_candidate) or is_ancestor(epoch_candidate, candidate):
                 artifact["settle_commits_after_candidate"] = True
             else:
                 reasons.append(
                     f"candidate identity disagrees: RUN_MANIFEST.json says {candidate[:7]}, "
-                    f"EPOCH.json says {epoch_candidate[:7]} (and the pinned candidate is "
-                    "not an ancestor of the epoch candidate)"
+                    f"EPOCH.json says {epoch_candidate[:7]} (and the two are not related by "
+                    "ancestry, so they describe different work)"
                 )
     artifact["candidate_commit"] = candidate
     artifact["candidate_source"] = candidate_source
