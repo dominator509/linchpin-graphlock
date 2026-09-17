@@ -8,7 +8,7 @@
     "DOD-014=PARTIAL",
     "DOD-038=PARTIAL"
   ],
-  "candidate_commit": "57c562ee018d3e872405cb5b4ba03f497e9f408e",
+  "candidate_commit": "e8f8ef2bb0722072c397daa146215c9dad56001b",
   "dod": {
     "DOD-001": "EXTERNAL_REQUIRED",
     "DOD-002": "PASS",
