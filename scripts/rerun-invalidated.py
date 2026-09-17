@@ -205,6 +205,12 @@ def refresh_derived_evidence() -> None:
         # done nothing wrong. They are not cited by digest (that would be a cycle)
         # but their content must still be current when verify.sh checks it.
         ("the run manifest", "scripts/run-manifest.py"),
+        # The ship gate READS the run manifest's candidate identity and the DOD
+        # status, so it must be recomputed after both: measured, RELEASE_GATE.json
+        # still named candidate 1bca002 while the manifest pinned a later candidate,
+        # because nothing in the refresh path rewrote it. It is regenerated here so
+        # the recorded verdict always belongs to the state that was just settled.
+        ("the ship gate", "scripts/ship-gate.py"),
         ("the completion report", "scripts/completion-report.py"),
         ("the evidence index", "scripts/generate-evidence-index.py"),
     ):

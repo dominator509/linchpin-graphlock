@@ -46,6 +46,7 @@ MATRIX = ROOT / ".agent/verification/APPLICABILITY_MATRIX.csv"
 REGISTRY = ROOT / ".agent/verification/MASTER_TEST_REGISTRY.csv"
 CASE_RESULTS = ROOT / ".agent/verification/state/CASE_RESULTS.json"
 RUNS = ROOT / ".agent/evidence/applicable-cases/RUNS.json"
+EPOCH = ROOT / ".agent/verification/state/EPOCH.json"
 PROBES = ROOT / ".agent/evidence/applicable-cases/logs/probes.log"
 LOGS = ROOT / ".agent/evidence/applicable-cases/logs"
 OUT = ROOT / ".agent/evidence/applicable-cases"
@@ -618,6 +619,15 @@ def main() -> int:
         return 0
 
     results["results"] = [existing[k] for k in sorted(existing)]
+    # The header identity is stamped from the epoch, because a frozen header lies:
+    # measured, CASE_RESULTS.json still claimed candidate '1bca002' and epoch
+    # 'EP-009-attempt-002' long after both had moved, and the ship gate was reading
+    # that header as the release candidate. RUN_MANIFEST.json remains the
+    # authoritative pin; this header is kept consistent with it.
+    if EPOCH.exists():
+        epoch = json.loads(EPOCH.read_text(encoding="utf-8"))
+        results["candidate_commit"] = str(epoch.get("candidate_commit") or "")[:7]
+        results["candidate_epoch"] = str(epoch.get("epoch_digest") or "")[:16]
     CASE_RESULTS.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     tally: dict[str, int] = {}
     for case in CASES.values():

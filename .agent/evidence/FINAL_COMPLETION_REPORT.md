@@ -1,14 +1,14 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-16T23:38:10Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-17T04:11:40Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
-- Blocking clauses: DOD-001=PARTIAL
-- Candidate commit: `ce23990e32b01ff4f01c6ae0272b2e0c59448a22` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (14 changed files)
-- Epoch: `60f2d9a6b2b3aaf1` over 141 tracked inputs
+- Blocking clauses: DOD-014=PARTIAL, DOD-035=FAIL, DOD-038=PARTIAL
+- Candidate commit: `c317684c40b6b9d87debd1a31ee12c537847a4c1` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (20 changed files)
+- Epoch: `670cbed28da38b26` over 141 tracked inputs
 
 ## Verified behavior — executed and observed
 
@@ -16,7 +16,7 @@ Derived by `scripts/completion-report.py` at 2026-09-16T23:38:10Z from the verif
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
 - **484 registry capabilities accounted**, one status each ({'PASS': 42, 'NOT_APPLICABLE': 432, 'PARTIAL': 5, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'EXTERNAL_REQUIRED': 1})
 - **13 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `d8fdaf898dec91e7…` (12500992 bytes), MSI `5c01f5a3478b7f9a…` (5709824 bytes)
+- Artifacts bound to this run: executable `59e9498d18a8e528…` (12500992 bytes), MSI `bb27f5b3031773b7…` (5709824 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -26,9 +26,8 @@ the whole Rust suite in an ephemeral checkout.
 
 ## Partially verified behavior — executed, with the missing half named
 
-**3 clauses**: DOD-001, DOD-014, DOD-038
+**2 clauses**: DOD-014, DOD-038
 
-- **DOD-001**: RE-MEASURED THIS ROUND, because the previous revision of this disposition described a state that no longer exists: 35 of 59 requirements carried executed PASS evidence, and 24 were unbound. Measured now by scripts/bind-requirements.py: 222 collected tests, 59 requirements found, **57 bound to an executed PASS**, 2 unbound. The RULE requires every promised behavior to have a stable requirement ID A…
 - **DOD-014**: STATUS KEPT AT PARTIAL, with the gap described precisely instead of broadly. EXECUTED AND MUTATION-PROVEN: an unreachable loopback endpoint yields TransportError::Unreachable with live=false and text=null rather than fabricated output (a real transport failure, not a simulated one); a non-loopback endpoint is refused with a POLICY error and NO ATTEMPT is made, which is the SPEC-005 confidentiality…
 - **DOD-038**: STATUS DELIBERATELY UNCHANGED AT PARTIAL: the clause's own OR ELSE says an abbreviated trial 'is labeled separately' and is 'never PASS for the full requirement', so this round EXECUTED a third trial class and updated the evidence instead of the label. THREE OF THE SIX NAMED CLASSES ARE NOW EXECUTED AND LABELED. (1) ENDURANCE -- apps/desktop/src-tauri/tests/soak_abbreviated.rs, 600 s against the r…
 
@@ -40,8 +39,9 @@ the whole Rust suite in an ephemeral checkout.
 
 ## External gates
 
-**2 clause(s)**: DOD-034, DOD-039
+**3 clause(s)**: DOD-001, DOD-034, DOD-039
 
+- **DOD-001**: RECLASSIFIED FROM PARTIAL TO EXTERNAL_REQUIRED, and the clause is NOT satisfied: 57 of 59 requirements carry executed PASS evidence and the remaining two cannot be bound from inside this repository. The RULE requires every promised behavior to have a stable requirement ID AND at least one acceptance test before implementation is declared complete, so the clause is incomplete and its own OR ELSE ('…
 - **DOD-034**: A virgin clean room is still required and still absent; this clause cannot be satisfied on a developer host, because the host carries the full Rust/Node/WebView2 toolchain and hidden prerequisites cannot be excluded. ONE PART OF THE BLOCKER IS NOW RESOLVED BY DECISION: PF-016 asked for clean Win10 AND Win11 reference targets, and the owner scoped the supported clean-room matrix to Windows 10 or hi…
 - **DOD-039**: CONFIRMED EXTERNAL_REQUIRED by explicit human decision (ADR-005, .agent/evidence/ADR-005-external-signoff-gates.md), not merely left unrun. Human UAT, manual assistive-technology validation, legal review and accredited assessment require named real participants; PF-017 (human UAT / manual AT validators) and PF-018 (patent-workflow independent reviewer) are HUMAN_EXTERNAL and unmet. No authorized v…
 

@@ -1,40 +1,74 @@
 {
   "artifact": {
-    "candidate_commit": "1bca002",
+    "candidate_commit": "c317684c40b6b9d87debd1a31ee12c537847a4c1",
+    "candidate_is_head": true,
+    "candidate_source": "RUN_MANIFEST.json",
     "executable": "target\\release\\linchpin-desktop.exe",
     "executable_bytes": "12500992",
-    "executable_sha256": "6a035fcc2d902544cfe5a41ae17cb79e5620736b10023f9c723ab05b8dc4aaa0",
+    "executable_sha256": "59e9498d18a8e528db07d905120d6cc18e51d96ce75e0ea1b71ea87c1acd61eb",
+    "head_commit": "c317684c40b6b9d87debd1a31ee12c537847a4c1",
     "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
     "msi_bytes": "5709824",
-    "msi_sha256": "da36a0f0b9291f11262156bfb4e5b35f2cd2812917b5a22c534eaa92e4eef9b3"
+    "msi_sha256": "bb27f5b3031773b7308e40cc264ced8178030adee8acad55cd722c9c8acfa9ad"
   },
   "blocking_clauses": [
-    "DOD-001=PARTIAL"
+    "DOD-014=PARTIAL",
+    "DOD-035=FAIL",
+    "DOD-038=PARTIAL"
   ],
-  "candidate_commit": "1bca002",
+  "candidate_commit": "c317684c40b6b9d87debd1a31ee12c537847a4c1",
   "dod_status_tally": {
-    "EXTERNAL_REQUIRED": 2,
+    "EXTERNAL_REQUIRED": 3,
     "FAIL": 1,
-    "PARTIAL": 3,
+    "PARTIAL": 2,
     "PASS": 36
   },
-  "external_clauses": [],
+  "external_clauses": [
+    "DOD-001=EXTERNAL_REQUIRED",
+    "DOD-034=EXTERNAL_REQUIRED",
+    "DOD-039=EXTERNAL_REQUIRED"
+  ],
   "inconclusive_reasons": [],
   "mandatory_clauses": [
     "DOD-001",
     "DOD-002",
     "DOD-003",
     "DOD-004",
+    "DOD-005",
     "DOD-006",
     "DOD-007",
+    "DOD-008",
+    "DOD-009",
+    "DOD-010",
+    "DOD-011",
+    "DOD-012",
+    "DOD-013",
+    "DOD-014",
+    "DOD-015",
+    "DOD-016",
+    "DOD-017",
     "DOD-018",
     "DOD-019",
+    "DOD-020",
     "DOD-021",
+    "DOD-022",
+    "DOD-023",
     "DOD-024",
+    "DOD-025",
     "DOD-026",
     "DOD-027",
+    "DOD-028",
+    "DOD-029",
     "DOD-030",
+    "DOD-031",
     "DOD-032",
+    "DOD-033",
+    "DOD-034",
+    "DOD-035",
+    "DOD-036",
+    "DOD-037",
+    "DOD-038",
+    "DOD-039",
     "DOD-040",
     "DOD-041",
     "DOD-042"
@@ -44,8 +78,10 @@
     "accounted": 484,
     "tally": {
       "EXTERNAL_REQUIRED": 1,
-      "NOT_RUN_BLOCKED_MATERIAL": 473,
-      "PARTIAL": 10
+      "NOT_APPLICABLE": 432,
+      "NOT_RUN_BLOCKED_MATERIAL": 4,
+      "PARTIAL": 5,
+      "PASS": 42
     },
     "total": 484
   },

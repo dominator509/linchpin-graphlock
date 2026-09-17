@@ -96,12 +96,48 @@ compliance. The fix removes a real blind spot without inflating the result.
 
 ## Consequence for DOD-001
 
-`DOD-001` stays **PARTIAL**. Of the 24 unbound requirements, 7 are directly
-verified absent or partial, 1 is verified present and merely untested, and 15
-remain unassessed. Closing DOD-001 requires implementation work for the absent
-behaviour (starting with REQ-DOM-005 enforcement and REQ-DOM-010's redaction
-guarantee, both of which are bounded and testable) plus a test for each
-present-but-untested behaviour — not merely writing more tests.
+**Reclassified from `PARTIAL` to `EXTERNAL_REQUIRED`, and the clause is NOT
+satisfied.** Measured at candidate `c317684` by `python3 scripts/bind-requirements.py`:
+222 collected tests, 59 requirements, **57 bound to an executed PASS**, 2
+`NO_BOUND_TEST`.
+
+The taxonomy distinction decides the status, and it is not a wording preference:
+
+* `PARTIAL` means work remains **that this run could do**;
+* `EXTERNAL_REQUIRED` means the remaining condition needs a **real outside
+  participant**.
+
+Both residues are the second kind, and each is the subject of a clause this run
+already records as `EXTERNAL_REQUIRED`:
+
+| Requirement | Residual | Same subject as |
+| --- | --- | --- |
+| REQ-REL-001 | signed virgin clean-room install and boot of the exact final artifact | DOD-034 (`EXTERNAL_REQUIRED`, ADR-004) |
+| REQ-REL-004 | manual AT validation, human UAT, long-running fuzz/soak | DOD-039 (`EXTERNAL_REQUIRED`, ADR-005) |
+
+Two properties were checked before making the change, because a reclassification
+that quietly removes a release blocker would be laundering:
+
+1. **The clause's own OR ELSE still applies.** DOD-001 says "the item is
+   INCOMPLETE and NODE_DONE/GO is prohibited until the mapping exists and
+   passes". The mapping does not exist for 2 of 59 items, so GO remains
+   prohibited; `EXTERNAL_REQUIRED` records where the condition lives, not that it
+   is waived.
+2. **The verdict did not move.** Before: `NO_GO` with one blocker,
+   `DOD-001=PARTIAL`. After: `NO_GO` with three blockers
+   (`DOD-014=PARTIAL`, `DOD-035=FAIL`, `DOD-038=PARTIAL`) and three external
+   conditions (`DOD-001`, `DOD-034`, `DOD-039`). The blocker list grew because
+   `scripts/ship-gate.py` was, in the same round, changed to account for **every**
+   release-scoped clause in `DOD_REGISTRY.csv` instead of a hand-written list of
+   17 that had silently omitted DOD-014, DOD-034, DOD-035, DOD-038 and DOD-039.
+
+Earlier in the run, 24 requirements were unbound and 7 were directly verified
+absent or partial. Those required implementation, not reclassification, and were
+closed by implementation (REQ-DOM-005 identity enforcement, REQ-DOM-010
+redaction, REQ-DOM-006 support matrix, REQ-DOM-009 docket rulesets, REQ-PAT-003
+claim classes, REQ-UI-001/004 navigation and consequence-specific confirmation,
+REQ-UI-002/003 badges and vocabulary) plus tests. The two that remain are the
+only ones whose closure needs someone this repository does not contain.
 
 ## Progress this round
 

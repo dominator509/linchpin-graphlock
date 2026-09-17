@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "ce23990",
+  "candidate_commit": "c317684",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -32,14 +32,14 @@
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\applicable-case-evidence.py": "7b10143e6b158932f719bb2f76a9c3b69a65265e4606cf5ee9844889c76923fd",
+        "scripts\\applicable-case-evidence.py": "e5f56ef68ea98359c7964ea5ad8bb9e80b1f6fbc1ddfb9bd3d8aa4c8df666a62",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\assert-no-debug-port.py": "54b17113000ddaec872c310d5c063a3aba002cda17d03adebc8cb57b70589b44",
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "1fa5a88c4432051ff15363b2c02cbcafa5d2fff36a9e54adaa3dacfa678003f9",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "a14d0db40418a392a7d785bda4508a4e6dc0e35debfb97787c776331f582147e",
+        "scripts\\build-dod-status.py": "5ad64d8c3f45f0893add2446f5c03f2eb9ed7350261d1fcab64fee244b8d5a81",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "7bb6499a61a35585e38e31e26ab4c24e07c0af4de1ae80915b40114aee879988",
@@ -73,13 +73,13 @@
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
         "scripts\\reality-gate.sh": "d6d8fd785d9eadf8d74d15b86d18bb08fdb4e0ff9f05d2e26f2f0ecb263f9092",
-        "scripts\\rerun-invalidated.py": "b995fd21884152a164aa641e899c9eff49a2a38ec6fcd0468a12b2b6a13902a5",
+        "scripts\\rerun-invalidated.py": "0b6b879a44b6695f34d472724f562db614ec4a48a4b86a602ebf25f66366a38a",
         "scripts\\run-integration-real.sh": "a1f218daae2ab710aa9fc1ffd4df4b399bfa55c3212a8e9a909548d4a030d685",
         "scripts\\run-live-fire-real.sh": "b3641eed140c03789261aac8c5b371fe3c35616f9a03844b5c85a721c9f69e31",
         "scripts\\run-manifest.py": "13d30cf245e8b7782e6c547951b07567e7767fd5fd7173946f744daeb844f208",
         "scripts\\secret-scan.py": "f1e753e9eab570336274b4f645192ed8346a9645856173c9f8729e7f21edfece",
         "scripts\\security-check.sh": "e4d605f8caa76b7142962ad975c871ba60617cc6916f553f822048b1cd322529",
-        "scripts\\ship-gate.py": "c7650a1f78b9b256dfe7ca7e968cfedc129b50aaa374494a790f9961e465f5cc",
+        "scripts\\ship-gate.py": "52c2d5fece8e70de4223b68f07ad540186088ca69162393628e149df8afc8a29",
         "scripts\\smoke-installed-artifact.sh": "71de10b34c0a69e915773b1bcc92a8a08d4757b9c7a4e5dd963a343a4f4448ac",
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
         "scripts\\test-collection-guard.py": "bfc4722f587b03e19aab38605f402e5846e475b668bb195132814555129d3044",
@@ -238,8 +238,8 @@
       ]
     }
   },
-  "epoch_digest": "60f2d9a6b2b3aaf1e518cda7ada36a734614e2cfb603a6e59819703a2181b913",
-  "prior_candidate_commit": "ce23990",
-  "prior_epoch_digest": "60f2d9a6b2b3aaf1e518cda7ada36a734614e2cfb603a6e59819703a2181b913",
+  "epoch_digest": "670cbed28da38b262a9a3e5ccd4d09c35f4e196bb0c04ba5a122db949a361487",
+  "prior_candidate_commit": "c317684",
+  "prior_epoch_digest": "670cbed28da38b262a9a3e5ccd4d09c35f4e196bb0c04ba5a122db949a361487",
   "total_inputs": 141
 }

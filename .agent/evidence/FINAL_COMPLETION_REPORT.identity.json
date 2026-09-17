@@ -1,15 +1,17 @@
 {
   "artifacts": {
-    "executable_sha256": "d8fdaf898dec91e7b12e7fbbe59ffbb6fb262bb141946d3a520b8636bb25d61b",
-    "msi_sha256": "5c01f5a3478b7f9af5f971f889d9abe3daec0d6088fd57bb682b1eec0ddd5cfd"
+    "executable_sha256": "59e9498d18a8e528db07d905120d6cc18e51d96ce75e0ea1b71ea87c1acd61eb",
+    "msi_sha256": "bb27f5b3031773b7308e40cc264ced8178030adee8acad55cd722c9c8acfa9ad"
   },
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "blocking_clauses": [
-    "DOD-001=PARTIAL"
+    "DOD-014=PARTIAL",
+    "DOD-035=FAIL",
+    "DOD-038=PARTIAL"
   ],
-  "candidate_commit": "ce23990e32b01ff4f01c6ae0272b2e0c59448a22",
+  "candidate_commit": "c317684c40b6b9d87debd1a31ee12c537847a4c1",
   "dod": {
-    "DOD-001": "PARTIAL",
+    "DOD-001": "EXTERNAL_REQUIRED",
     "DOD-002": "PASS",
     "DOD-003": "PASS",
     "DOD-004": "PASS",
@@ -52,7 +54,7 @@
     "DOD-041": "PASS",
     "DOD-042": "PASS"
   },
-  "epoch_digest": "60f2d9a6b2b3aaf1e518cda7ada36a734614e2cfb603a6e59819703a2181b913",
+  "epoch_digest": "670cbed28da38b262a9a3e5ccd4d09c35f4e196bb0c04ba5a122db949a361487",
   "epoch_inputs": 141,
   "mutation_ids": [
     "MUT-COM-002-a",

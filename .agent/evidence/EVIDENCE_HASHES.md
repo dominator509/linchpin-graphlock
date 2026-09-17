@@ -15,7 +15,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 
 | Clause | Status | Evidence | sha256 | Bytes |
 | --- | --- | --- | --- | --- |
-| DOD-001 | PARTIAL | `.agent/evidence/DOD-001-unbound-requirements.md` | `560eb8391930b7bb` | 10716 |
+| DOD-001 | EXTERNAL_REQUIRED | `.agent/evidence/DOD-001-unbound-requirements.md` | `8f743cacca116464` | 12712 |
 | DOD-002 | PASS | `.agent/evidence/clean-build/STATUS.md` | `c2a15dfd459315e9` | 2093 |
 | DOD-003 | PASS | `.agent/evidence/sbom/linchpin.cdx.json` | `4c68dff3ae720d1f` | 467090 |
 | DOD-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `421b083307ccbe56` | 7089 |
@@ -46,7 +46,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-029 | PASS | `scripts/run-manifest.py` | `13d30cf245e8b778` | 10086 |
 | DOD-030 | PASS | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `0153eccfe1f16310` | 244777 |
 | DOD-031 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `25082f24c8bdb4bb` | 6552 |
-| DOD-032 | PASS | `.agent/verification/state/CASE_RESULTS.json` | `bff26dfcaa29848f` | 56517 |
+| DOD-032 | PASS | `.agent/verification/state/CASE_RESULTS.json` | `a01106559084e913` | 56515 |
 | DOD-033 | PASS | `.agent/evidence/clean-build/ENVIRONMENT.json` | `b600f03bc797581a` | 3755 |
 | DOD-034 | EXTERNAL_REQUIRED | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` | 3804 |
 | DOD-035 | FAIL | `.agent/evidence/EP-009/M4/STATUS.md` | `3fa1fa072aaf33e2` | 4524 |
@@ -54,9 +54,9 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
 | DOD-038 | PARTIAL | `.agent/evidence/stress/STATUS.md` | `0eb9becc48617460` | 5605 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `e86cf886d8576f6a` | 2381 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `8733783f183e64e7` | 187 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `b398fe2ef2f93175` | 144224 |
-| DOD-042 | PASS | `.agent/verification/reports/RELEASE_GATE.json` | `5a16e0175755a5fb` | 1364 |
+| DOD-042 | PASS | `scripts/ship-gate.py` | `52c2d5fece8e70de` | 12950 |
 
 ## Registry ledger rows with a cited evidence document
 
