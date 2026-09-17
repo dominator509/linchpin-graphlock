@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "6c22585",
+  "candidate_commit": "a612eb4",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -84,7 +84,7 @@
         "scripts\\reachability.py": "b8e6bc1e9debaefaba9b1473eb2ef1b731feec593258ce3228fc59f38d62e1e6",
         "scripts\\reality-gate.sh": "d6d8fd785d9eadf8d74d15b86d18bb08fdb4e0ff9f05d2e26f2f0ecb263f9092",
         "scripts\\rerun-invalidated.py": "abb0b5358a385a435a5a412de38d917d63c1ad798f3615d8b0a9c175fdffef8b",
-        "scripts\\residual-risk-report.py": "9fe91b20a5daca39ae6cb9f7d588680da2ca9f1e391adaa7fa87dd0eabdb422b",
+        "scripts\\residual-risk-report.py": "9fc5e25f51530889e5688b9fa70e719265b1935158a041c4ce712f522570fb64",
         "scripts\\run-integration-real.sh": "a1f218daae2ab710aa9fc1ffd4df4b399bfa55c3212a8e9a909548d4a030d685",
         "scripts\\run-live-fire-real.sh": "b3641eed140c03789261aac8c5b371fe3c35616f9a03844b5c85a721c9f69e31",
         "scripts\\run-manifest.py": "bd6ff561ed6a4d8aa570f6a3aef311cc076bd51b082f79714a49b3e591b5f940",
@@ -254,8 +254,8 @@
       ]
     }
   },
-  "epoch_digest": "75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200",
-  "prior_candidate_commit": "6ef5968",
-  "prior_epoch_digest": "75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200",
+  "epoch_digest": "ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74",
+  "prior_candidate_commit": "a612eb4",
+  "prior_epoch_digest": "ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74",
   "total_inputs": 156
 }

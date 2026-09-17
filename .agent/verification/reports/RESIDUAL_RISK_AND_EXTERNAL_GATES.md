@@ -9,7 +9,7 @@ the advisory register and `RELEASE_GATE.json`.
 - Blocking clauses: none
 - DoD clauses: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 3, "PASS": 38}
 - Registry IDs: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 7, "NOT_APPLICABLE": 410, "NOT_RUN_BLOCKED_MATERIAL": 4, "PARTIAL": 4, "PASS": 58}
-- Candidate: `6ef5968`, epoch `75f078ac0961b54a…` over 156 inputs
+- Candidate: `a612eb4`, epoch `ff66d326b022152c…` over 156 inputs
 - Artifacts: executable `2c94241d1e10f1f2…`, MSI `f9ac3296af27494f…`
 
 ## Clause-level gates that are not PASS

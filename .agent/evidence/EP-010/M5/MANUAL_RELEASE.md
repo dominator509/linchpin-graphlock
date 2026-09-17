@@ -8,8 +8,8 @@ ship-ready, the deployment is MANUAL.
 
 | Field | Value |
 | --- | --- |
-| Candidate commit | `6ef5968` |
-| Epoch | `75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200` over 156 tracked inputs |
+| Candidate commit | `a612eb4` |
+| Epoch | `ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74` over 156 tracked inputs |
 | Executable | `target\release\linchpin-desktop.exe` — `2c94241d1e10f1f23163c673b15e8c9d377a73f8a77f16d0eb674a8fed64bcb3` (12500992 B) |
 | Installer (MSI) | `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` — `f9ac3296af27494f31ec75cbe1647e95d78705e204a77ee5863d26c065f66a05` (5709824 B) |
 | Ship-gate verdict | **CONDITIONAL_EXTERNAL_GATES** (blocking clauses: none) |

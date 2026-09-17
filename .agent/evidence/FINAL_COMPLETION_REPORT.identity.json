@@ -5,7 +5,7 @@
   },
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "blocking_clauses": [],
-  "candidate_commit": "6ef5968f0cbcf44908710e5ce7f6df144834c462",
+  "candidate_commit": "a612eb47dd41d9f9f60f4add12abe9798b65dc8c",
   "dod": {
     "DOD-001": "EXTERNAL_REQUIRED",
     "DOD-002": "PASS",
@@ -50,7 +50,7 @@
     "DOD-041": "PASS",
     "DOD-042": "PASS"
   },
-  "epoch_digest": "75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200",
+  "epoch_digest": "ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74",
   "epoch_inputs": 156,
   "mutation_ids": [
     "MUT-COM-002-a",
