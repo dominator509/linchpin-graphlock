@@ -13,14 +13,14 @@
   "outcomes": {
     "backup_failures": 0,
     "backup_failures_reported_busy_or_locked": 0,
-    "backups": 59,
-    "backups_before_vault_existed": 0,
+    "backups": 52,
+    "backups_before_vault_existed": 1,
     "events_in_ledger": 2000,
     "events_lost": 0,
     "hung": false,
-    "read_backs": 1678,
+    "read_backs": 1069,
     "read_failures": 0,
-    "reads_before_vault_existed": 2,
+    "reads_before_vault_existed": 4,
     "replays": 0,
     "sample_failure_messages": [],
     "write_failures": 0,
@@ -28,14 +28,14 @@
     "writes_ok": 2000
   },
   "performance": {
-    "bytes_per_event": 649,
-    "elapsed_s": 18.46,
-    "final_vault_bytes": 1298432,
-    "peak_working_set_bytes": 19329024,
-    "throughput_events_per_s": 108.35,
-    "write_max_ms": 2523.59,
-    "write_p50_ms": 17.74,
-    "write_p95_ms": 221.14
+    "bytes_per_event": 645,
+    "elapsed_s": 18.96,
+    "final_vault_bytes": 1290240,
+    "peak_working_set_bytes": 19333120,
+    "throughput_events_per_s": 105.49,
+    "write_max_ms": 1679.67,
+    "write_p50_ms": 37.52,
+    "write_p95_ms": 203.41
   },
   "specification_gap": "no stress concurrency level, duration or throughput target is specified in the repository or in the pack's suite library, so 'their specified scale' has no defined value for the STRESS term; this trial defines a workload, labels itself ABBREVIATED and does not claim DOD-038. (The clause's SOAK term does have a specified scale -- 24/48/72+ hours in E2E-SoakResourceLeakTesting.md -- and is DEFERRED_LONG_RUNNING because it requires dedicated persistent infrastructure and this host is a shared workstation.)",
   "thresholds": {

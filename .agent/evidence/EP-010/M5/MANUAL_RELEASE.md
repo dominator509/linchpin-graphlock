@@ -8,10 +8,10 @@ ship-ready, the deployment is MANUAL.
 
 | Field | Value |
 | --- | --- |
-| Candidate commit | `1c7092c` |
-| Epoch | `3265f8fa39d12757dd7961b4030619de1e8cd8fe27174f9acf2843a95a99ffb9` over 153 tracked inputs |
-| Executable | `target\release\linchpin-desktop.exe` — `00286e822ad93a846d5ee2fda4da13e56f9fa90c2bac6f92aa8b9e94985b5862` (12500992 B) |
-| Installer (MSI) | `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` — `a29cdb38c463594ad4f930a830831d711aff4e01b7f065bbd4d79c0a86126681` (5709824 B) |
+| Candidate commit | `18203a8` |
+| Epoch | `9b4b5bb04ea28788a9edbbaa1fabd0b47517b9f3c7f9ab245690b52543a109ef` over 156 tracked inputs |
+| Executable | `target\release\linchpin-desktop.exe` — `2480972ee78027a8a3c8625a58574d9ee2c69a4f28bc411daf839e23a451b35b` (12500992 B) |
+| Installer (MSI) | `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` — `501ac72e018fa382f1f0acb7ee660f5c909e45b63fe030e8e36cdd5b384869c4` (5709824 B) |
 | Ship-gate verdict | **CONDITIONAL_EXTERNAL_GATES** (blocking clauses: none) |
 
 ## 2. Preconditions

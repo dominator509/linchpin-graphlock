@@ -41,7 +41,7 @@
     {
       "id": "npm:1193683",
       "ecosystem": "npm",
-      "package": "3.2.7",
+      "package": "vitest",
       "installed_versions": [
         "3.2.7"
       ],
@@ -59,7 +59,7 @@
     {
       "id": "npm:1193684",
       "ecosystem": "npm",
-      "package": "3.2.7",
+      "package": "@vitest/mocker",
       "installed_versions": [
         "3.2.7"
       ],
@@ -75,9 +75,6 @@
       "reviewed": "round 57"
     }
   ],
-  "problems": [
-    "npm:1193683: the register records package '3.2.7' but the scanner reports 'vitest'",
-    "npm:1193684: the register records package '3.2.7' but the scanner reports '@vitest/mocker'"
-  ],
-  "verdict": "FAIL"
+  "problems": [],
+  "verdict": "PASS"
 }

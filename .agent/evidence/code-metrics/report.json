@@ -16,9 +16,9 @@
     ]
   },
   "totals": {
-    "functions": 410,
+    "functions": 411,
     "max_complexity": 43,
-    "mean_complexity": 3.9,
+    "mean_complexity": 3.89,
     "unsafe_blocks": 1,
     "panics_production": 7,
     "panics_test": 484,
@@ -26,7 +26,7 @@
     "todo_production": 0,
     "max_complexity_production": 35,
     "max_complexity_test": 43,
-    "functions_production": 353,
+    "functions_production": 354,
     "functions_test": 57
   },
   "hotspots": [

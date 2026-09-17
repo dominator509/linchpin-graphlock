@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "cf773ffc345b856744469a0b16a8ef810bdd189b82783ff8e59565a926f91c06",
+  "executable_sha256": "eefdf3324d356813a3a1278b454d279b40c3f0fd02c26e116100c30fd965c324",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a formal assertion of an invention's novelty and limitation, often requiring a significant amount of t\""
+      "observed": "\"A patent claim is a legally protected work of art, created by a person or entity, that is intended to be made, used, dis\""
     },
     {
       "name": "metadata names the live model",
@@ -47,7 +47,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"A legal monopoly.\""
+      "observed": "\"is a legal monopoly\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -97,12 +97,12 @@
     {
       "name": "egress sampler started and polled (harness liveness, REQ-REL-002)",
       "ok": true,
-      "observed": "ready=true heartbeats=4"
+      "observed": "ready=true heartbeats=2"
     },
     {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",
       "ok": true,
-      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=15 (minimum 5)"
+      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=11 (minimum 5)"
     },
     {
       "name": "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "cf773ffc345b8567 -> cf773ffc345b8567"
+      "observed": "eefdf3324d356813 -> eefdf3324d356813"
     }
   ],
   "passed": 23,

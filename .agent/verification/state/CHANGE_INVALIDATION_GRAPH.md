@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `3265f8fa39d12757dd7961b4030619de1e8cd8fe27174f9acf2843a95a99ffb9`
-- Candidate commit at generation: `1c7092c`
-- Total tracked inputs: 153
-- Previous epoch digest: `3265f8fa39d12757dd7961b4030619de1e8cd8fe27174f9acf2843a95a99ffb9`
+- Current epoch digest: `9b4b5bb04ea28788a9edbbaa1fabd0b47517b9f3c7f9ab245690b52543a109ef`
+- Candidate commit at generation: `18203a8`
+- Total tracked inputs: 156
+- Previous epoch digest: `9b4b5bb04ea28788a9edbbaa1fabd0b47517b9f3c7f9ab245690b52543a109ef`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -39,7 +39,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - … and 1 more
 
-### `gate-script` — 74 file(s)
+### `gate-script` — 77 file(s)
 
 - invalidates: V-000 harness validation
 - invalidates: V-005 clean build
@@ -49,9 +49,9 @@ definition and its PASS status is revoked until rerun.
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
   - `scripts\applicable-case-evidence.py` `b17db2fd7a086a4b…`
+  - `scripts\architecture-drift.py` `1df01d0b2864fea1…`
   - `scripts\artifact-e2e.sh` `665ba19ebd5fd33f…`
-  - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
-  - … and 69 more
+  - … and 72 more
 
 ### `js-manifest` — 7 file(s)
 
@@ -84,7 +84,7 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-005 clean build
 - invalidates: DOD-021 license gate
 
-  - `Cargo.lock` `621c52cd81b62799…`
+  - `Cargo.lock` `771d4279475074c6…`
   - `pnpm-lock.yaml` `45b0fad113529e45…`
 
 ### `rust-manifest` — 15 file(s)
@@ -95,7 +95,7 @@ definition and its PASS status is revoked until rerun.
 
   - `Cargo.toml` `0d0b50947cf1f81b…`
   - `apps\desktop\src-tauri\Cargo.toml` `9360ecae2ff3d0b2…`
-  - `crates\application\Cargo.toml` `e00d97aec3cee509…`
+  - `crates\application\Cargo.toml` `7a2c98dc50166c59…`
   - `crates\commercialization\Cargo.toml` `67245a3fe78ea355…`
   - `crates\crash_reporter\Cargo.toml` `be20a3f1e5b5e0b5…`
   - … and 10 more
@@ -113,7 +113,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\src\commands.rs` `85b994d390d6eda8…`
   - `apps\desktop\src-tauri\src\lib.rs` `1ae6665c78653d4e…`
   - `apps\desktop\src-tauri\src\main.rs` `82c94e55918dc550…`
-  - `crates\application\src\lib.rs` `9e8dd477b8dcd22d…`
+  - `crates\application\src\lib.rs` `71bc436cd0f24c50…`
   - `crates\commercialization\src\asset_readiness.rs` `f4143f42b1e5da03…`
   - … and 15 more
 

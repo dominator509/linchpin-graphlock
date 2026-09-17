@@ -63,7 +63,7 @@ count_evidence,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests
 coverage_complete,research,crates/research/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\research\src\lib.rs"
 create_repair_branch,application,crates/application/src/lib.rs,TEST_ONLY,named only from tests: crates\application\src\lib.rs
 create_workspace,storage,crates/storage/src/vault.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
-current_rss_bytes,application,crates/application/src/lib.rs,REACHABLE,named from crates\application\src\lib.rs
+current_rss_bytes,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,named from crates\application\src\lib.rs
 default,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs, crates\application\src\lib.rs"
 diagnostic_timestamp,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 diagnostic_window,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
@@ -114,7 +114,7 @@ get_traces_for,crash_reporter,crates/crash_reporter/src/lib.rs,TEST_ONLY,named o
 get_value,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests: crates\storage\src\lib.rs
 grant_capability,mcp_hub,crates/mcp_hub/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
 identity,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\domain\src\lib.rs, crates\evidence\src\lib.rs"
-import,patent,crates/patent/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\patent\src\lib.rs"
+import,patent,crates/patent/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\application\src\lib.rs, crates\patent\src\lib.rs"
 import_receipt,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 incident,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\crash_reporter\src\lib.rs, crates\evidence\src\lib.rs"
 increment,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests: crates\storage\src\lib.rs
@@ -163,7 +163,9 @@ parse_title_kind,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named 
 passing_count,research,crates/research/src/lib.rs,TEST_ONLY,named only from tests: crates\research\src\lib.rs
 paths,platform_windows,crates/platform_windows/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\platform_windows\src\lib.rs, crates\provider_transport\src\lib.rs"
 planning_scenario,commercialization,crates/commercialization/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
+platform_probe,application,crates/application/src/lib.rs,REACHABLE,named from crates\application\src\lib.rs
 policy,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\crash_reporter\src\lib.rs, crates\domain\src\scope.rs"
+probe_bytes,application,crates/application/src/lib.rs,REACHABLE,named from crates\application\src\lib.rs
 probe_storage,application,crates/application/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, apps\desktop\src-tauri\src\lib.rs"
 provider_status,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]
 public_export,domain,crates/domain/src/lib.rs,TEST_ONLY,named only from tests: crates\domain\src\lib.rs
@@ -240,4 +242,5 @@ vault_file_path,desktop,apps/desktop/src-tauri/src/commands.rs,REACHABLE,named f
 verify_audit_chain,storage,crates/storage/src/vault.rs,TEST_ONLY,"named only from tests: apps\desktop\src-tauri\src\commands.rs, crates\storage\src\vault.rs"
 verify_domain_regression,commercialization,crates/commercialization/src/lib.rs,TEST_ONLY,named only from tests: crates\commercialization\src\lib.rs
 verify_schema,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
+with_probe,application,crates/application/src/lib.rs,REACHABLE,named from crates\application\src\lib.rs
 with_secret,crash_reporter,crates/crash_reporter/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
