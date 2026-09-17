@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `f8f792114d0ed530bc4073b9bafa96308ff6bbb32806b65c8f8d0ad71f54e2fd`
-- Candidate commit at generation: `855111c`
-- Total tracked inputs: 147
-- Previous epoch digest: `f8f792114d0ed530bc4073b9bafa96308ff6bbb32806b65c8f8d0ad71f54e2fd`
+- Current epoch digest: `05bfbdbb314d13ca251a346af3b2f06c00f78b6404eae7583013899eb32f7932`
+- Candidate commit at generation: `821400d`
+- Total tracked inputs: 148
+- Previous epoch digest: `05bfbdbb314d13ca251a346af3b2f06c00f78b6404eae7583013899eb32f7932`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -26,16 +26,18 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\Cargo.toml` `9360ecae2ff3d0b2…`
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
 
-### `config` — 5 file(s)
+### `config` — 6 file(s)
 
 - invalidates: V-005 clean build
 - invalidates: V-011 configuration matrix
+- invalidates: V-020 exact artifact
 
+  - `.cargo\config.toml` `872c1bb36aa4a982…`
   - `.gitattributes` `3de8a5dfac003c5f…`
   - `.prettierignore` `f6bc22748f98df53…`
   - `apps\desktop\playwright.config.ts` `0245031fa9af124d…`
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
-  - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
+  - … and 1 more
 
 ### `gate-script` — 69 file(s)
 
@@ -140,6 +142,7 @@ PASS recorded against the prior epoch may be reinstated:
 - (`artifact-inputs` changed) → rerun V-021 final accounting
 - (`config` changed) → rerun V-005 clean build
 - (`config` changed) → rerun V-011 configuration matrix
+- (`config` changed) → rerun V-020 exact artifact
 - (`gate-script` changed) → rerun V-000 harness validation
 - (`gate-script` changed) → rerun V-005 clean build
 - (`gate-script` changed) → rerun V-008 full functionality

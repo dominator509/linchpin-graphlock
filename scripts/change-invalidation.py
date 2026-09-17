@@ -89,7 +89,13 @@ INVALIDATION_RULES: dict[str, list[str]] = {
         "V-020 exact artifact",
         "DOD-007 collection guard",
     ],
-    "config": ["V-005 clean build", "V-011 configuration matrix"],
+    # A CONFIG CHANGE NOW RERUNS THE EXACT-ARTIFACT LANE. Added with .cargo/config.toml:
+    # linker/build configuration changes the BYTES of every release artifact, so the
+    # artifact lane's evidence -- which records the digest it drove -- becomes stale even
+    # though no Rust source changed. Without this, adding `/Brepro` would have left
+    # V-020's evidence naming a binary that no longer exists, which is the stale-artifact
+    # failure this repository has already recorded once.
+    "config": ["V-005 clean build", "V-011 configuration matrix", "V-020 exact artifact"],
     "artifact-inputs": ["V-020 exact artifact", "V-021 final accounting"],
 }
 
@@ -151,6 +157,12 @@ INPUT_GLOBS: dict[str, list[str]] = {
         ".prettierignore",
         "apps/desktop/vitest.config.ts",
         "apps/desktop/playwright.config.ts",
+        # Linker/build configuration, added after it changed and NOTHING invalidated:
+        # .cargo/config.toml now carries `-C link-arg=/Brepro` for reproducible release
+        # binaries (SUP-004), which changes every release artifact's bytes. A build input
+        # no class tracks is a change the graph cannot see, which is exactly the defect
+        # DOD-040 exists to prevent.
+        ".cargo/config.toml",
     ],
     # The ARTIFACT class deliberately does NOT hash build output.
     #

@@ -1,5 +1,5 @@
 {
-  "actual_seconds": 3.93,
+  "actual_seconds": 5.12,
   "adversarial_inputs_per_target": 4634,
   "campaign": "mutation-fuzz",
   "corpus_size": 512,
@@ -23,12 +23,12 @@
   "targets": [
     {
       "iterations": 6634,
-      "seconds": 0.62,
+      "seconds": 0.82,
       "target": "domain::scope::check_claim_text"
     },
     {
       "iterations": 6634,
-      "seconds": 3.14,
+      "seconds": 4.18,
       "target": "crash_reporter::RedactionPolicy::apply"
     },
     {
@@ -43,12 +43,12 @@
     },
     {
       "iterations": 6634,
-      "seconds": 0.07,
+      "seconds": 0.04,
       "target": "evidence::LogRedactor::redact_with_report"
     },
     {
       "iterations": 6634,
-      "seconds": 0.01,
+      "seconds": 0.0,
       "target": "patent::PatentLinter::lint_claims"
     },
     {
@@ -58,7 +58,7 @@
     },
     {
       "iterations": 6634,
-      "seconds": 0.03,
+      "seconds": 0.02,
       "target": "patent::PackageBuilder::build_docx"
     },
     {

@@ -1,0 +1,16 @@
+# Reproducible release binaries (SUP-004).
+#
+# WHY: two release builds of the same revision produced binaries differing in exactly
+# 19 bytes -- the PE `TimeDateStamp` (written four times) and the CodeView `RSDS`
+# GUID/age block -- which is the MSVC linker stamping wall-clock build metadata into an
+# otherwise identical image. MEASURED in .agent/evidence/EP-009/M2/SUP-004-reproducible-build.md.
+#
+# `/Brepro` is the MSVC linker's documented reproducible-build switch: the timestamp
+# becomes a hash of the image content instead of the current time, and the debug
+# directory stops carrying a per-link GUID. It changes no code, data, import or symbol.
+#
+# Scope: this file sets the flag for every cargo invocation in the workspace. The
+# coverage gate passes RUSTFLAGS in the environment, which takes precedence, so the
+# instrumented builds are unaffected.
+[build]
+rustflags = ["-C", "link-arg=/Brepro"]

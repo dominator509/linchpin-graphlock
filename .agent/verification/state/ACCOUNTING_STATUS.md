@@ -88,7 +88,7 @@ digest of that matrix document is recorded beside it.
 | SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | Repository Reality / Anti-Simulation Verification |
 | SUP-002 | PASS | `.agent/evidence/applicable-cases/SUP-002.md` | Requirements-to-Release Traceability Verification |
 | SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | Packaging & Distribution Artifact Verification |
-| SUP-004 | PARTIAL | `.agent/evidence/EP-009/M2/SUP-004-reproducible-build.md` | Reproducible Build Verification |
+| SUP-004 | PARTIAL | `.agent/evidence/SUP-004-reproducibility-after-brepro.md` | Reproducible Build Verification |
 | SUP-006 | PASS | `.agent/evidence/DOD-017-idempotency.md` | Idempotency, Retry & Delivery-Semantics Verification |
 | SUP-009 | PASS | `.agent/evidence/applicable-cases/SUP-009.md` | Executable Documentation & Quickstart Verification |
 | SUP-015 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | Manual Accessibility & Assistive-Technology Validation |
