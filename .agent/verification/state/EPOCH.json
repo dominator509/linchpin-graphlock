@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "d6f744d",
+  "candidate_commit": "8074e5e",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -43,7 +43,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "f9b4041e8f5a05373a73b4d562bcedd7a6e077d7dc85e4d85318a36ba77cf89d",
         "scripts\\build-applicability.py": "bd5b8a128e37e36721f573e583158ea49c5a0d59a5cbfd4f87a3e1fc489d2bc7",
-        "scripts\\build-dod-status.py": "4567ac7d62c962a47a99654f5ec1facb53e50c0e061136c0b8eb702de62ce0cf",
+        "scripts\\build-dod-status.py": "d9d028d3fd2f0ef000be578499f06daaf2835f23dd7c403d5fe78195106be66b",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "f9d79238a9bf8154062bd1f0123eabb981a76597af4d33d46f8caa33534f25ae",
@@ -76,7 +76,7 @@
         "scripts\\live-fire-local-provider.sh": "9e25245913fbe5cf01b4ced3fe4f059f61f221c80589dbb30d8c740f5fb6e3c7",
         "scripts\\live-fire.sh": "0c0748192a9fc4f020ec879669f1e9a19db446f8d31e81addeaf48437e10209a",
         "scripts\\materialize-atomic-sources.sh": "6c62352ae2e1e9b1f91945a2943a9f6ffbf4ccaeee677d2eb81f40109d80fac2",
-        "scripts\\mutation-proof.py": "3e50b6a198df37d831ad66501710f2a79f76d1ba1826c6c6b1ee1ac4302e6ca6",
+        "scripts\\mutation-proof.py": "e496ab3a3268ad1f56490dbb7c7bcb016a8b1daaaa55d953b8b0f21b1dcf0e44",
         "scripts\\performance-lane.sh": "de71066dede78dd82c6084833c0de4fc5326aa315e4287aa2293ad2e6e9251f5",
         "scripts\\preflight.sh": "a7239500a99b1918fb3ea1fad03a75602e8de8fe60781288e6449941914a2c05",
         "scripts\\production-readiness-check.sh": "5156ab91efacbb86f69514fa7fe0871ddb4fd362eee890159d349976287ec5d6",
@@ -204,7 +204,7 @@
         "crates\\platform_windows\\src\\lib.rs": "20bbb410079f4faf5644c6f63ae900b0b4a1e5dddd4aeaaa5acc92c1088042c9",
         "crates\\platform_windows\\tests\\licensing_policy.rs": "93cbf446566964963c6c6febe01aa3ea8ff278aa570a4eb5389b9df5154d3452",
         "crates\\platform_windows\\tests\\local_first.rs": "fbb25c61b5b081625e246224771fbdec9eab36ea923b79a2047aeb8b983f92b1",
-        "crates\\provider_transport\\src\\lib.rs": "a62348a0bfcf96e67c141cc8f3c593d45a80e6ca1939873c1df6c7a1b9c59813",
+        "crates\\provider_transport\\src\\lib.rs": "4ce5b57353114dc11689fdc0e3808fce576bdf8c063638bbcb8045856868e3c1",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
         "crates\\storage\\src\\vault.rs": "0867936570fd44ef675c67f7f81d98eb8edcb1f9f23c4639243ffd622f5487d6",
@@ -225,7 +225,7 @@
       "files": {
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "1c34dc60b47ef1ee021d24098541929373da34f484d717a19e56aa3a955dd432",
+        ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "0d5093616d55dead9cd6f843896de8071b618911b62a0bbef780fbe1b3e7e803",
         "apps\\desktop\\e2e-artifact.mjs": "9d2d096495635d89e0c6d9ea198b5ae900c3034cab0e18275e3e6ac67af3b625",
         "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671",
         "apps\\desktop\\e2e\\shell.spec.ts": "d4a08469939173f196d158de33d1c00b91c5ccc9785ac995e4589e3864641eb2",
@@ -251,8 +251,8 @@
       ]
     }
   },
-  "epoch_digest": "a3cb1e609532beabcd5b150ac793eca2fb0ea6af030d7fc9ccfcc1155fb08feb",
-  "prior_candidate_commit": "8661920",
-  "prior_epoch_digest": "a3cb1e609532beabcd5b150ac793eca2fb0ea6af030d7fc9ccfcc1155fb08feb",
+  "epoch_digest": "3265f8fa39d12757dd7961b4030619de1e8cd8fe27174f9acf2843a95a99ffb9",
+  "prior_candidate_commit": "8074e5e",
+  "prior_epoch_digest": "3265f8fa39d12757dd7961b4030619de1e8cd8fe27174f9acf2843a95a99ffb9",
   "total_inputs": 153
 }

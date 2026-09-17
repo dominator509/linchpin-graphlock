@@ -373,6 +373,136 @@ mod tests {
         assert_eq!(b.request_url(), "http://localhost:8080/completion");
     }
 
+    /// One loopback HTTP server that answers every request with a canned status.
+    ///
+    /// DOD-014 names "wrong credentials, revoked permissions, expired tokens" as failure
+    /// modes that must fail closed. This product holds no credentials by architecture
+    /// (SPEC-005 / REQ-LLM-004 put credential ownership in the first-party CLI tools), so
+    /// the scenario that CAN occur here is the provider answering an auth failure -- and
+    /// that is exactly what a real server does: it returns 401/403 over HTTP. This stub is
+    /// a raw TcpListener rather than a mock transport, so the code under test performs a
+    /// real HTTP exchange against a real socket and its own reqwest client parses a real
+    /// response; nothing about the request path is simulated.
+    fn a_status_server(
+        status: u16,
+        body: &str,
+    ) -> (String, std::sync::Arc<std::sync::atomic::AtomicUsize>) {
+        use std::io::{Read, Write};
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind loopback");
+        let port = listener.local_addr().expect("addr").port();
+        let requests = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let counter = requests.clone();
+        let reason = match status {
+            401 => "Unauthorized",
+            403 => "Forbidden",
+            429 => "Too Many Requests",
+            500 => "Internal Server Error",
+            _ => "Status",
+        };
+        let response = format!(
+            "HTTP/1.1 {status} {reason}\r\nContent-Type: text/plain\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+            body.len()
+        );
+        std::thread::spawn(move || {
+            for stream in listener.incoming() {
+                let Ok(mut stream) = stream else { continue };
+                counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                let mut buffer = [0u8; 2048];
+                let _ = stream.read(&mut buffer);
+                let _ = stream.write_all(response.as_bytes());
+                let _ = stream.flush();
+            }
+        });
+        (format!("http://127.0.0.1:{port}"), requests)
+    }
+
+    /// covers: REQ-OPS-002, REQ-LLM-001
+    ///
+    /// A provider that answers an AUTH FAILURE must produce an accurate error, no text, and
+    /// no retry storm: retrying a 401 cannot succeed, and retrying it is the all-retry
+    /// pattern DOD-024 forbids. 5xx is the contrasting case -- transient, so it is retried
+    /// up to the bounded policy and still yields no fabricated text.
+    ///
+    /// The attempts are made here rather than through `RetryPolicy::run`, because that
+    /// helper is synchronous and a `#[tokio::test]` already owns a runtime: blocking a
+    /// future inside it panics with "cannot start a runtime from within a runtime", which is
+    /// how the first version of this test failed.
+    #[tokio::test]
+    async fn test_loopback_auth_failures_fail_closed_without_retrying() {
+        use std::sync::atomic::Ordering;
+
+        for status in [401u16, 403] {
+            let (endpoint, requests) = a_status_server(status, "no");
+            let adapter = LocalModelAdapter::new(&endpoint, "m", LocalFlavor::Ollama).unwrap();
+            let error = adapter
+                .generate(ModelRequest {
+                    prompt: "invention text".to_string(),
+                    model_id: "m".to_string(),
+                })
+                .await
+                .expect_err("an auth failure must not produce a response");
+            assert!(
+                matches!(error, TransportError::ProviderFailure { status: s, .. } if s == status),
+                "status {status} must map to ProviderFailure, got {error:?}"
+            );
+            assert!(
+                !error.is_external_transient(),
+                "a {status} is not EXTERNAL_TRANSIENT and must not be retried"
+            );
+            assert!(
+                error.to_string().contains(&status.to_string()),
+                "the error text must name the status it received: {error}"
+            );
+            assert_eq!(
+                requests.load(Ordering::SeqCst),
+                1,
+                "exactly one request must reach the server for status {status}"
+            );
+
+            // The bounded policy agrees: a non-transient failure stops after one attempt.
+            let (result, attempts) = RetryPolicy::default().run(|_| {
+                Err::<ModelResponse, _>(TransportError::ProviderFailure {
+                    status,
+                    body: "no".to_string(),
+                })
+            });
+            assert!(result.is_err());
+            assert_eq!(
+                attempts, 1,
+                "a {status} must be attempted once by the policy"
+            );
+        }
+
+        let (endpoint, requests) = a_status_server(500, "boom");
+        let adapter = LocalModelAdapter::new(&endpoint, "m", LocalFlavor::Ollama).unwrap();
+        let policy = RetryPolicy::bounded(3).unwrap();
+        let mut attempts = 0;
+        let mut last: Option<TransportError> = None;
+        while attempts < policy.max_attempts {
+            attempts += 1;
+            match adapter
+                .generate(ModelRequest {
+                    prompt: "invention text".to_string(),
+                    model_id: "m".to_string(),
+                })
+                .await
+            {
+                Ok(response) => panic!("a 500 must not produce text, got {response:?}"),
+                Err(error) => {
+                    assert!(error.is_external_transient(), "a 5xx is EXTERNAL_TRANSIENT");
+                    last = Some(error);
+                }
+            }
+        }
+        assert!(last.is_some(), "the loop must have observed the 500");
+        assert_eq!(attempts, 3, "the bounded policy stops at three attempts");
+        assert_eq!(
+            requests.load(Ordering::SeqCst),
+            3,
+            "three attempts reach the server"
+        );
+    }
+
     #[test]
     fn test_extract_text_fails_closed_on_missing_field() {
         let a = LocalModelAdapter::new("http://127.0.0.1:11434", "m", LocalFlavor::Ollama).unwrap();

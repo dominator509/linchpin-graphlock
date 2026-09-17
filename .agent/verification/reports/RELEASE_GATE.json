@@ -1,25 +1,22 @@
 {
   "artifact": {
-    "candidate_commit": "d6f744dc1879f8035c20b8e850668e96dfefd35e",
+    "candidate_commit": "8074e5e987a698b84419bdab515ae86b20bd8e32",
     "candidate_is_head": true,
     "candidate_source": "RUN_MANIFEST.json",
     "executable": "target\\release\\linchpin-desktop.exe",
     "executable_bytes": "12500992",
     "executable_sha256": "00286e822ad93a846d5ee2fda4da13e56f9fa90c2bac6f92aa8b9e94985b5862",
-    "head_commit": "d6f744dc1879f8035c20b8e850668e96dfefd35e",
+    "head_commit": "8074e5e987a698b84419bdab515ae86b20bd8e32",
     "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
     "msi_bytes": "5709824",
-    "msi_sha256": "e03c4b62a79a56b84d891ca5f54a0fea65c09c047db41299605b83f944abed43"
+    "msi_sha256": "a29cdb38c463594ad4f930a830831d711aff4e01b7f065bbd4d79c0a86126681"
   },
-  "blocking_clauses": [
-    "DOD-014=PARTIAL"
-  ],
-  "candidate_commit": "d6f744dc1879f8035c20b8e850668e96dfefd35e",
+  "blocking_clauses": [],
+  "candidate_commit": "8074e5e987a698b84419bdab515ae86b20bd8e32",
   "dod_status_tally": {
     "DEFERRED_LONG_RUNNING": 1,
     "EXTERNAL_REQUIRED": 3,
-    "PARTIAL": 1,
-    "PASS": 37
+    "PASS": 38
   },
   "external_clauses": [
     "DOD-001=EXTERNAL_REQUIRED",
@@ -85,5 +82,5 @@
     },
     "total": 484
   },
-  "verdict": "NO_GO"
+  "verdict": "CONDITIONAL_EXTERNAL_GATES"
 }

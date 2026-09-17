@@ -1,6 +1,109 @@
 {
-  "epoch_digest": "a3cb1e609532beabcd5b150ac793eca2fb0ea6af030d7fc9ccfcc1155fb08feb",
-  "changed_classes": [],
-  "results": [],
-  "note": "no epoch change; no rerun obligation"
+  "changed_classes": [
+    "rust-source"
+  ],
+  "epoch_digest": "3265f8fa39d12757dd7961b4030619de1e8cd8fe27174f9acf2843a95a99ffb9",
+  "failures": 0,
+  "results": [
+    {
+      "command": "sh scripts/build.sh",
+      "duration_s": 84.57,
+      "exit_code": 0,
+      "output_sha256": "f57fd2b661b77e8243b349c8464eaf471ec592c5d339dca4396d9085fd3962af",
+      "output_tail": [
+        "    Finished 2 bundles at:",
+        "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
+        "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe"
+      ],
+      "stage": "V-005 clean build",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/smoke-test.sh",
+      "duration_s": 11.14,
+      "exit_code": 0,
+      "output_sha256": "03b24296fa052e7b5e9194ae85f26505c089606575a8a041eca215a90020b204",
+      "output_tail": [
+        "smoke: verifying removal",
+        "smoke: clean removal confirmed",
+        "smoke: ok (artifact 8c7d7f4615070eb42a1418d5a185707ae63e0b7c3a250f8efa5f19a73452027d verified through install/launch/uninstall)"
+      ],
+      "stage": "V-006 smoke",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/typecheck.sh",
+      "duration_s": 6.17,
+      "exit_code": 0,
+      "output_sha256": "6dc75385076f63d5efecbdcf2a728bfa680b99776074b919db6bddb0dc7b81b5",
+      "output_tail": [
+        "    Checking provider_transport v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\provider_transport)",
+        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.73s"
+      ],
+      "stage": "V-007 sanity",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/test-unit.sh",
+      "duration_s": 177.82,
+      "exit_code": 0,
+      "output_sha256": "2f817916cf41b48353831f37aa39c09fd01ebad05f28d7819063dbd5195bedd4",
+      "output_tail": [
+        "   Doc-tests provider_transport",
+        "   Doc-tests research",
+        "   Doc-tests storage"
+      ],
+      "stage": "V-008 full functionality",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/test-integration.sh",
+      "duration_s": 1.75,
+      "exit_code": 0,
+      "output_sha256": "738ec561d4f1a98ee0cc446ad528c52a384015779c4081c067c81ec8cfa17ca6",
+      "output_tail": [
+        "integration: ok (5 real-dependency tests)",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.52s",
+        "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-b7199ae2d998fc2c.exe)"
+      ],
+      "stage": "V-009 integration/concurrency",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/lint.sh",
+      "duration_s": 8.38,
+      "exit_code": 0,
+      "output_sha256": "f695b3d26f07615fc6c25ff6c1bd335df0b8c3a57de4c0017eb67609c17902be",
+      "output_tail": [
+        "    Checking provider_transport v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\provider_transport)",
+        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.19s"
+      ],
+      "stage": "V-012 regression/mutation",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/live-fire-local-provider.sh",
+      "duration_s": 184.14,
+      "exit_code": 0,
+      "output_sha256": "de3704aaba94368de9dfe32888461e516def264721fa74f3bda5ddd15bdbce42",
+      "output_tail": [
+        "local-provider: restored the production artifact",
+        "local-provider: rebuilding the production artifact from the committed config",
+        "assert-no-debug-port: ok -- target/release/linchpin-desktop.exe opens no port 9222"
+      ],
+      "stage": "V-013 dynamic security/domain packs",
+      "status": "PASS"
+    }
+  ],
+  "stages": [
+    "V-005 clean build",
+    "V-006 smoke",
+    "V-007 sanity",
+    "V-008 full functionality",
+    "V-009 integration/concurrency",
+    "V-012 regression/mutation",
+    "V-013 dynamic security/domain packs"
+  ]
 }

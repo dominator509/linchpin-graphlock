@@ -1,22 +1,22 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-17T20:10:50Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-17T21:06:13Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
-- Machine-validated verdict: **NO_GO**
-- Blocking clauses: DOD-014=PARTIAL
-- Candidate commit: `d6f744dc1879f8035c20b8e850668e96dfefd35e` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (4 changed files)
-- Epoch: `a3cb1e609532beab` over 153 tracked inputs
+- Machine-validated verdict: **CONDITIONAL_EXTERNAL_GATES**
+- Blocking clauses: none
+- Candidate commit: `8074e5e987a698b84419bdab515ae86b20bd8e32` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (30 changed files)
+- Epoch: `3265f8fa39d12757` over 153 tracked inputs
 
 ## Verified behavior — executed and observed
 
-- **37 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-035, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
+- **38 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-014, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-035, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
 - **484 registry capabilities accounted**, one status each ({'PASS': 58, 'NOT_APPLICABLE': 410, 'EXTERNAL_REQUIRED': 7, 'PARTIAL': 4, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'DEFERRED_LONG_RUNNING': 1})
-- **13 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `00286e822ad93a84…` (12500992 bytes), MSI `e03c4b62a79a56b8…` (5709824 bytes)
+- **14 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
+- Artifacts bound to this run: executable `00286e822ad93a84…` (12500992 bytes), MSI `a29cdb38c463594a…` (5709824 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -26,9 +26,8 @@ the whole Rust suite in an ephemeral checkout.
 
 ## Partially verified behavior — executed, with the missing half named
 
-**1 clauses**: DOD-014
+**0 clauses**: none
 
-- **DOD-014**: STATUS KEPT AT PARTIAL, with the gap described precisely instead of broadly. EXECUTED AND MUTATION-PROVEN: an unreachable loopback endpoint yields TransportError::Unreachable with live=false and text=null rather than fabricated output (a real transport failure, not a simulated one); a non-loopback endpoint is refused with a POLICY error and NO ATTEMPT is made, which is the SPEC-005 confidentiality…
 
 ## Blocked work
 

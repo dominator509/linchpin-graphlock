@@ -1,5 +1,5 @@
 {
-  "actual_seconds": 2.95,
+  "actual_seconds": 2.97,
   "adversarial_inputs_per_target": 4634,
   "campaign": "mutation-fuzz",
   "corpus_size": 512,
@@ -68,7 +68,7 @@
     },
     {
       "iterations": 6634,
-      "seconds": 0.01,
+      "seconds": 0.02,
       "target": "commercialization::asset_readiness date validation"
     }
   ]

@@ -21,7 +21,7 @@
     "mean_complexity": 3.9,
     "unsafe_blocks": 1,
     "panics_production": 7,
-    "panics_test": 478,
+    "panics_test": 484,
     "allow_attributes": 5,
     "todo_production": 0,
     "max_complexity_production": 35,

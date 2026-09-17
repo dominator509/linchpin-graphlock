@@ -56,6 +56,41 @@ PER_COMMAND_TIMEOUT_S = 900
 # SURVIVED, which is a failure mode worth being unable to have.
 MUTATIONS = [
     {
+        "id": "MUT-OPS-014-a",
+        "clause": "DOD-018",
+        "covers": "DOD-014",
+        "feature": "a provider auth failure fails closed instead of being treated as success",
+        "changed_behavior": (
+            "the local adapter stops checking the HTTP status, so a 401/403 response is "
+            "parsed as if it were a completion -- the 'simulated success' DOD-014 forbids. "
+            "The status gate is the whole control; removing it must break the auth-failure "
+            "test that was added with it."
+        ),
+        "edits": [
+            {
+                "path": "crates/provider_transport/src/lib.rs",
+                "old": (
+                    "        if !status.is_success() {\n"
+                    "            return Err(TransportError::ProviderFailure {\n"
+                    "                status: status.as_u16(),\n"
+                    "                body: text,\n"
+                    "            });\n"
+                    "        }\n"
+                ),
+                "new": "        let _ = status;\n",
+            }
+        ],
+        "command": [
+            "cargo",
+            "test",
+            "-p",
+            "provider_transport",
+            "--lib",
+            "test_loopback_auth_failures_fail_closed_without_retrying",
+        ],
+        "expect_test": "test_loopback_auth_failures_fail_closed_without_retrying",
+    },
+    {
         "id": "MUT-REL-005-a",
         "clause": "DOD-018",
         "covers": "REQ-REL-005",

@@ -103,7 +103,7 @@ Each row below is checked: the file must exist and must contain the quoted text.
 | R-3 | RPO after the last backup is unbounded (no off-device replication) | ACCEPTED | REQ-REL-005 evidence | product owner |
 | R-4 | clean-room install, human UAT and manual AT validation are outstanding | EXTERNAL | ADR-004, ADR-005 | external participants |
 | R-5 | full-scale soak (24/48/72+ hours) uncompleted | DEFERRED | DOD-038 DEFERRED_LONG_RUNNING | needs a dedicated host |
-| R-6 | no credentialed provider lane, so credential-failure behaviour is unexecuted | OPEN | DOD-014 PARTIAL; terms review precedes integration | product owner |
+| R-6 | no credentialed provider lane is wired, so this product never transmits a credential and a remote provider's auth behaviour is unexercised by it | OPEN | DOD-014 is satisfied for every failure a provider can return to this architecture (401/403/connection-refused/5xx executed against a real loopback socket, mutation-proven by MUT-OPS-014-a); the LANE itself remains a capability gap recorded as UO-09 PARTIAL in the scope map, and wiring one would oblige DOD-014 to be re-run against that lane's real auth failures | product owner |
 
 ## Reproduce
 

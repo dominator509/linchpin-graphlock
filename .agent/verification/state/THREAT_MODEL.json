@@ -235,6 +235,6 @@
     {"id": "R-3", "risk": "RPO after the last backup is unbounded (no off-device replication)", "status": "ACCEPTED", "decision": "REQ-REL-005 evidence", "owner": "product owner"},
     {"id": "R-4", "risk": "clean-room install, human UAT and manual AT validation are outstanding", "status": "EXTERNAL", "decision": "ADR-004, ADR-005", "owner": "external participants"},
     {"id": "R-5", "risk": "full-scale soak (24/48/72+ hours) uncompleted", "status": "DEFERRED", "decision": "DOD-038 DEFERRED_LONG_RUNNING", "owner": "needs a dedicated host"},
-    {"id": "R-6", "risk": "no credentialed provider lane, so credential-failure behaviour is unexecuted", "status": "OPEN", "decision": "DOD-014 PARTIAL; terms review precedes integration", "owner": "product owner"}
+    {"id": "R-6", "risk": "no credentialed provider lane is wired, so this product never transmits a credential and a remote provider's auth behaviour is unexercised by it", "status": "OPEN", "decision": "DOD-014 is satisfied for every failure a provider can return to this architecture (401/403/connection-refused/5xx executed against a real loopback socket, mutation-proven by MUT-OPS-014-a); the LANE itself remains a capability gap recorded as UO-09 PARTIAL in the scope map, and wiring one would oblige DOD-014 to be re-run against that lane's real auth failures", "owner": "product owner"}
   ]
 }
