@@ -15,8 +15,8 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 | EXTERNAL_REQUIRED | 7 |
 | NOT_APPLICABLE | 410 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
-| PARTIAL | 5 |
-| PASS | 57 |
+| PARTIAL | 4 |
+| PASS | 58 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
 carries the applicability matrix's own per-ID evidence in the ledger, and the
@@ -96,7 +96,7 @@ digest of that matrix document is recorded beside it.
 | SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | Repository Reality / Anti-Simulation Verification |
 | SUP-002 | PASS | `.agent/evidence/applicable-cases/SUP-002.md` | Requirements-to-Release Traceability Verification |
 | SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | Packaging & Distribution Artifact Verification |
-| SUP-004 | PARTIAL | `.agent/evidence/SUP-004-reproducibility-after-brepro.md` | Reproducible Build Verification |
+| SUP-004 | PASS | `.agent/evidence/SUP-004-reproducible-build-verification.md` | Reproducible Build Verification |
 | SUP-006 | PASS | `.agent/evidence/DOD-017-idempotency.md` | Idempotency, Retry & Delivery-Semantics Verification |
 | SUP-009 | PASS | `.agent/evidence/applicable-cases/SUP-009.md` | Executable Documentation & Quickstart Verification |
 | SUP-015 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | Manual Accessibility & Assistive-Technology Validation |

@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "bc4a82a",
+  "candidate_commit": "8661920",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -43,7 +43,7 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "f9b4041e8f5a05373a73b4d562bcedd7a6e077d7dc85e4d85318a36ba77cf89d",
         "scripts\\build-applicability.py": "bd5b8a128e37e36721f573e583158ea49c5a0d59a5cbfd4f87a3e1fc489d2bc7",
-        "scripts\\build-dod-status.py": "b48cc9a933188afd05de84dbb601116fb770877f9f2d641a7947a0fb8372ea4a",
+        "scripts\\build-dod-status.py": "4567ac7d62c962a47a99654f5ec1facb53e50c0e061136c0b8eb702de62ce0cf",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "f9d79238a9bf8154062bd1f0123eabb981a76597af4d33d46f8caa33534f25ae",
@@ -251,8 +251,8 @@
       ]
     }
   },
-  "epoch_digest": "f58a4f3e286cbecdc5a4df8c6c82f60f2b4a6d75f88949e68bcbd44c74cb2e58",
-  "prior_candidate_commit": "1935a68",
-  "prior_epoch_digest": "f58a4f3e286cbecdc5a4df8c6c82f60f2b4a6d75f88949e68bcbd44c74cb2e58",
+  "epoch_digest": "a3cb1e609532beabcd5b150ac793eca2fb0ea6af030d7fc9ccfcc1155fb08feb",
+  "prior_candidate_commit": "8661920",
+  "prior_epoch_digest": "a3cb1e609532beabcd5b150ac793eca2fb0ea6af030d7fc9ccfcc1155fb08feb",
   "total_inputs": 153
 }
