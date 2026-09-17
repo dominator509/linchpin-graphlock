@@ -1,0 +1,240 @@
+{
+  "_comment": "Authored threat model for LINCHPIN. scripts/check-threat-model.py validates it against the tree (every cited symbol must exist, every truth boundary must be modelled, every STRIDE category must be covered) and renders .agent/evidence/threat-model.md. Edit here, never in the rendered document.",
+  "scope": {
+    "product": "LINCHPIN -- local-first Windows patent-intelligence and commercialization desktop application",
+    "deployment": "single-user device-local install (MSI/NSIS); no server, no fleet, no shared state",
+    "reviewed": "round 54, epoch 05bfbdbb314d13ca",
+    "method": "asset/boundary enumeration from the code (SCOPE_MAP, TRUTH_BOUNDARIES, the command registry and the gate ladder), then STRIDE per asset, with each mitigation bound to a symbol and an executed check"
+  },
+  "assets": [
+    {
+      "id": "A-1",
+      "name": "invention content and conception records",
+      "why": "the user's confidential disclosure; the product's reason to exist and its highest-value secret",
+      "location": "vault database and content-addressed blobs under %LOCALAPPDATA%\\LINCHPIN"
+    },
+    {
+      "id": "A-2",
+      "name": "durable vault (SQLite + WAL) and blob store",
+      "why": "holds A-1 and the audit trail; corruption or loss destroys unrecoverable work",
+      "location": "device-local filesystem"
+    },
+    {
+      "id": "A-3",
+      "name": "conception ledger and audit chain",
+      "why": "provenance of who conceived what (human vs AI origin); the record a patent workflow depends on",
+      "location": "vault tables, hash-chained audit entries"
+    },
+    {
+      "id": "A-4",
+      "name": "filing packages, evidence bundles and export artefacts",
+      "why": "leave the device; an over-disclosing export is irreversible",
+      "location": "user-chosen paths outside the vault"
+    },
+    {
+      "id": "A-5",
+      "name": "release artefacts (executable, MSI, NSIS setup) and their digests",
+      "why": "what the user installs and runs",
+      "location": "target/release, distribution channel"
+    },
+    {
+      "id": "A-6",
+      "name": "provider prompts and completions",
+      "why": "carry A-1 to an inference boundary if routed off-device",
+      "location": "loopback HTTP to the local model runtime"
+    },
+    {
+      "id": "A-7",
+      "name": "operator diagnostics, traces and incident capsules",
+      "why": "grow without bound and can capture secrets if redaction fails",
+      "location": "in-process surfaces and the crash-reporter capsule"
+    }
+  ],
+  "threats": [
+    {
+      "id": "T-01",
+      "stride": "Spoofing",
+      "asset": "A-1",
+      "attack": "a tool or client claims capabilities it was not granted and drives the product on the user's behalf",
+      "mitigation": {
+        "summary": "MCP capability grants are explicit per server/client/workspace/capability and deny by default; a request for a capability not granted is refused.",
+        "symbols": [
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "pub fn check_mcp_capability"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_mcp_capability_grant_is_explicit"},
+          {"file": "crates/mcp_hub/src/lib.rs", "contains": "test_mcp_grants_and_boundaries"}
+        ]
+      },
+      "residual": "there is no user identity to spoof: the product has no login, session or role surface (measured scan: zero auth constructs), so spoofing reduces to capability grants and file access."
+    },
+    {
+      "id": "T-02",
+      "stride": "Tampering",
+      "asset": "A-2",
+      "attack": "an attacker or a crash corrupts the vault, or a restore silently replaces live state with an empty database",
+      "mitigation": {
+        "summary": "writes are reconciled by content digest, a mistyped backup path is refused instead of created, restore recreates and quarantines a missing destination, and the audit chain detects tampering.",
+        "symbols": [
+          {"file": "crates/storage/src/vault.rs", "contains": "fn digest_of"},
+          {"file": "crates/storage/src/vault.rs", "contains": "test_audit_chain_verifies_and_detects_tampering"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_restore_recovers_from_a_lost_and_from_a_corrupt_vault"},
+          {"file": "apps/desktop/src-tauri/tests/recovery_drill.rs", "contains": "in-place corruption"}
+        ]
+      },
+      "residual": "the vault is a device-local SQLite database, not an OS-encrypted container, and the only KeyringStore is an in-process map -- stated by the product's own scope map (UO-01)."
+    },
+    {
+      "id": "T-03",
+      "stride": "Repudiation",
+      "asset": "A-3",
+      "attack": "AI-generated content is presented as human conception, or a record is edited without trace",
+      "mitigation": {
+        "summary": "conception events carry an origin label that cannot be conflated, the ledger is read back through the product, and the audit chain is hash-chained with a tamper-detecting test.",
+        "symbols": [
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_record_conception_labels_ai_origin_distinctly"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_conception_ledger_reads_durable_state_and_separates_origins"},
+          {"file": "crates/storage/src/vault.rs", "contains": "test_audit_chain_verifies_and_detects_tampering"}
+        ]
+      },
+      "residual": "the ledger read returns all events for a workspace with no pagination, and the chain is local: a user with filesystem access can delete the whole vault, which is detectable only as absence."
+    },
+    {
+      "id": "T-04",
+      "stride": "Information disclosure",
+      "asset": "A-1",
+      "attack": "invention content leaves the device through a provider call, a log line, a telemetry field or an export",
+      "mitigation": {
+        "summary": "the provider transport refuses any non-loopback endpoint with POLICY and makes no attempt; telemetry and diagnostics run through a redaction policy; the disclosure firewall refuses restricted exports; the evidence boundary hardens paths and archive entries.",
+        "symbols": [
+          {"file": "crates/provider_transport/src/lib.rs", "contains": "test_local_adapter_rejects_non_loopback_endpoint"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_export_firewall_blocks_restricted_content"},
+          {"file": "crates/evidence/src/lib.rs", "contains": "test_disclosure_firewall"},
+          {"file": "crates/crash_reporter/src/lib.rs", "contains": "redact_key_values"},
+          {"file": "crates/evidence/src/lib.rs", "contains": "sanitize_path"}
+        ]
+      },
+      "residual": "redaction removes what it can attribute to a key name or a known token shape; unlabelled secret material pasted into free text is not detectable by either layer."
+    },
+    {
+      "id": "T-05",
+      "stride": "Information disclosure",
+      "asset": "A-6",
+      "attack": "a misconfigured endpoint sends prompts to a remote host that logs or trains on them",
+      "mitigation": {
+        "summary": "the local adapter builds loopback URLs only, the endpoint is validated before any I/O, an unreachable port yields a transport error rather than fabricated text, and unwired provider lanes report Unimplemented instead of silently resolving to a fake.",
+        "symbols": [
+          {"file": "crates/provider_transport/src/lib.rs", "contains": "test_local_adapter_accepts_loopback_and_builds_urls"},
+          {"file": "crates/provider_transport/src/lib.rs", "contains": "test_unimplemented_transport_never_succeeds"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_local_inference_refuses_non_loopback_endpoint"}
+        ]
+      },
+      "residual": "no credentialed provider lane exists (openai/anthropic/xai report not-wired and configured=false), so a remote lane's credential and egress behaviour is unexecuted; DOD-014 records this."
+    },
+    {
+      "id": "T-06",
+      "stride": "Denial of service",
+      "asset": "A-2",
+      "attack": "concurrent writers, a lock-holding backup or a failing disk makes the vault unusable or silently drops work",
+      "mitigation": {
+        "summary": "busy timeouts with bounded retries, a journal-mode switch only when the file is not already WAL, an online-backup retry on lock errors, a stress trial with encoded latency/throughput floors and non-vacuity assertions, and a soak trial that samples the working set.",
+        "symbols": [
+          {"file": "crates/storage/src/vault.rs", "contains": "fn is_lock_error"},
+          {"file": "apps/desktop/src-tauri/tests/stress_concurrency.rs", "contains": "min_throughput_events_per_s"},
+          {"file": "apps/desktop/src-tauri/tests/soak_abbreviated.rs", "contains": "max_bytes_per_event"}
+        ]
+      },
+      "residual": "the clause's full soak scale (24/48/72+ hours) is uncompleted: only abbreviated trials have run, and DOD-038 is DEFERRED_LONG_RUNNING."
+    },
+    {
+      "id": "T-07",
+      "stride": "Elevation of privilege",
+      "asset": "A-1",
+      "attack": "a crafted path or archive entry escapes the evidence directory and writes or reads outside it",
+      "mitigation": {
+        "summary": "path and archive-entry hardening rejects absolute paths and traversal, verified by a property test over a generated corpus and by the mutation proof that removes the guard.",
+        "symbols": [
+          {"file": "crates/evidence/src/lib.rs", "contains": "test_archive_entry_rejects_zip_slip"},
+          {"file": "crates/evidence/src/lib.rs", "contains": "test_sanitize_path_property_over_generated_corpus"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_export_gateway_hardens_paths_and_blocks_restricted"}
+        ]
+      },
+      "residual": "the product spawns no shell and holds no elevation path; the remaining privilege surface is the user's own filesystem rights."
+    },
+    {
+      "id": "T-08",
+      "stride": "Tampering",
+      "asset": "A-5",
+      "attack": "a substituted or corrupted installer is shipped or installed",
+      "mitigation": {
+        "summary": "artifact digests are pinned in the release gate and the run manifest, the installed artifact is verified against the payload the MSI carries, the production artifact is asserted to open no debug port, and the build is reproducible.",
+        "symbols": [
+          {"file": "scripts/assert-no-debug-port.py", "contains": "debug port"},
+          {"file": "scripts/version-matrix.py", "contains": "payload_exe_sha256"},
+          {"file": ".cargo/config.toml", "contains": "link-arg=/Brepro"}
+        ]
+      },
+      "residual": "the release is UNSIGNED (ADR-003): a digest proves integrity against an out-of-band value, not authorship, so a compromised distribution channel is not defended against."
+    },
+    {
+      "id": "T-09",
+      "stride": "Information disclosure",
+      "asset": "A-7",
+      "attack": "diagnostics or an incident capsule captures invention text or a credential",
+      "mitigation": {
+        "summary": "the diagnostics recorder redacts before storing, an induced failure is asserted to carry its correlation id with a planted credential absent from every recorded detail, and the capsule export guard refuses a surviving registered secret.",
+        "symbols": [
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_diagnostics_report_induced_failure_with_correlation_and_redaction"},
+          {"file": "crates/crash_reporter/src/lib.rs", "contains": "test_export_guard_rejects_surviving_registered_secret"},
+          {"file": "crates/evidence/src/lib.rs", "contains": "probe_redactor_scrubs_unregistered_secrets"}
+        ]
+      },
+      "residual": "the diagnostics surface is device-local with no exporter, so there is no off-device log pipeline to harden; alerting beyond the in-app surface does not exist."
+    },
+    {
+      "id": "T-11",
+      "stride": "Information disclosure",
+      "asset": "A-4",
+      "attack": "an export or filing package carries restricted content, an unanchored claim or a document format the product cannot actually produce, and the disclosure cannot be recalled",
+      "mitigation": {
+        "summary": "the export gateway refuses restricted content, the support matrix blocks a package whose limitations are unanchored, a package never claims a document format the product does not generate, exports are confirmation-gated and audited, and the boundary guard refuses text that promises an outcome.",
+        "symbols": [
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_export_firewall_blocks_restricted_content"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_check_support_matrix_blocks_unanchored_limitations"},
+          {"file": "apps/desktop/src-tauri/src/commands.rs", "contains": "test_build_filing_package_does_not_claim_a_document_format"},
+          {"file": "crates/domain/src/scope.rs", "contains": "check_claim_text"}
+        ]
+      },
+      "residual": "the product's own formats are covered (vault, evidence bundle, filing package); no third-party docketing interchange format is implemented, so a downstream system cannot help catch an over-disclosure."
+    },
+    {
+      "id": "T-10",
+      "stride": "Tampering",
+      "asset": "A-5",
+      "attack": "a compromised or vulnerable dependency enters the build",
+      "mitigation": {
+        "summary": "locked dependency graphs, advisory and ban scanning, licence policy, SBOM generation with currency enforcement, secret scanning over the tracked tree, and a clean-environment build from the committed locks.",
+        "symbols": [
+          {"file": "deny.toml", "contains": "unknown-registry"},
+          {"file": "scripts/secret-scan.py", "contains": "RULES"},
+          {"file": "scripts/generate-sbom.py", "contains": "licenses"},
+          {"file": "scripts/clean-build.sh", "contains": "locked"}
+        ]
+      },
+      "residual": "crate checksums are verified by Cargo itself rather than independently, the SBOM covers Rust and npm components only, and two moderate dev-only npm advisories are disclosed as accepted risk."
+    }
+  ],
+  "truth_boundary_coverage": [
+    {"id": "TB-1", "threats": ["T-01"], "note": "claims that would turn an opportunity score into a patentability probability are refused by the boundary guard; the threat is a tool or export asserting it"},
+    {"id": "TB-2", "threats": ["T-04"], "note": "a clearance conclusion is refused, and an export that asserts one is blocked by the disclosure firewall"},
+    {"id": "TB-3", "threats": ["T-03"], "note": "AI-origin content cannot be recorded as human conception"},
+    {"id": "TB-4", "threats": ["T-04"], "note": "unsupported claims cannot be exported as supported"},
+    {"id": "TB-5", "threats": ["T-03"], "note": "the ledger distinguishes human from AI origin when read back"}
+  ],
+  "accepted_risks": [
+    {"id": "R-1", "risk": "unsigned release (no code-signing certificate)", "status": "ACCEPTED", "decision": "ADR-003", "owner": "product owner"},
+    {"id": "R-2", "risk": "no OS-encrypted container and an in-process keyring", "status": "ACCEPTED", "decision": "scope map UO-01 limitation", "owner": "product owner"},
+    {"id": "R-3", "risk": "RPO after the last backup is unbounded (no off-device replication)", "status": "ACCEPTED", "decision": "REQ-REL-005 evidence", "owner": "product owner"},
+    {"id": "R-4", "risk": "clean-room install, human UAT and manual AT validation are outstanding", "status": "EXTERNAL", "decision": "ADR-004, ADR-005", "owner": "external participants"},
+    {"id": "R-5", "risk": "full-scale soak (24/48/72+ hours) uncompleted", "status": "DEFERRED", "decision": "DOD-038 DEFERRED_LONG_RUNNING", "owner": "needs a dedicated host"},
+    {"id": "R-6", "risk": "no credentialed provider lane, so credential-failure behaviour is unexecuted", "status": "OPEN", "decision": "DOD-014 PARTIAL; terms review precedes integration", "owner": "product owner"}
+  ]
+}

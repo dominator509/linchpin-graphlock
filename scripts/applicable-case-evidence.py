@@ -276,6 +276,17 @@ CASES: dict[str, dict] = {
         "finding": "Applicable-but-external: the engagement needs human participants on both sides.",
         "not_proven": "No purple-team exercise has been run and no detection-engineering feedback loop exists.",
     },
+    "GEN-091": {
+        "status": "PASS",
+        "cites": [
+            ("source", "scripts/check-threat-model.py", ["no threat model document exists", "truth_boundary_ids"]),
+            ("artifact", ".agent/evidence/threat-model.md", ["## Threats", "Mitigation bindings", "Accepted, external, deferred and open risks"]),
+            ("source", "crates/domain/src/scope.rs", ["TRUTH_BOUNDARIES"]),
+            ("artifact", ".agent/verification/state/THREAT_MODEL.json", ["accepted_risks", "truth_boundary_coverage"]),
+        ],
+        "finding": "Threat modelling is authored AND bound, which is what turns this row from a documented skip into an executed case. The model enumerates 7 assets (invention content, vault, ledger/audit chain, export artefacts, release artefacts, provider prompts, diagnostics/incident capsules), 11 threats covering all six STRIDE categories, the five truth boundaries of ARCHITECTURE.md section 5 transcribed from code, and 6 recorded risks with the decision that recorded each. Every mitigation is bound to a symbol that must exist in the file it cites, and scripts/check-threat-model.py FAILS when a mitigation cites something the tree does not contain, when a boundary declared in scope.rs is not modelled, when a STRIDE category is uncovered, when an asset has no threat, or when the rendered document drifts from the model. The lane runs in verify.sh.",
+        "not_proven": "This is a design-level threat model, not a validated one: it is not a penetration test (GEN-018 is EXTERNAL_REQUIRED), it does not enumerate attack trees (GEN-092) or abuse/misuse cases (GEN-093/094), and its mitigations are verified individually by the tests it cites rather than by an end-to-end adversarial exercise. Its residuals are the residue the rest of this run records: unsigned release, no OS-encrypted container, unbounded RPO after the last backup, the unbuilt credentialed lane, and the deferred full-scale soak.",
+    },
     "GEN-103": {
         "status": "EXTERNAL_REQUIRED",
         "cites": [

@@ -63,6 +63,12 @@ run "evidence index currency" python3 scripts/generate-evidence-index.py --check
 # Re-derive with `python3 scripts/applicable-case-evidence.py --write`.
 run "applicable-case evidence currency" python3 scripts/applicable-case-evidence.py --check
 
+# GEN-091 threat-model currency: the model is only worth having if it is BOUND to the
+# code. This lane re-reads every mitigation symbol, every truth boundary declared in
+# crates/domain/src/scope.rs, every STRIDE category and every recorded risk, and fails
+# when the model and the tree disagree or the rendered document is stale.
+run "threat-model currency" python3 scripts/check-threat-model.py --check
+
 # Identity check LAST, after the epoch has settled: DOD-029 requires the
 # candidate commit, base revision, epoch and artifact digests to belong to the
 # SAME run, and this lane fails when any of them has moved since the manifest was

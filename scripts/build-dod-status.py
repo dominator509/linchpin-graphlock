@@ -221,6 +221,49 @@ DERIVED_SUBSTITUTIONS: list[tuple[str, str, str]] = [
 ]
 
 
+def derived_pack_summary() -> str:
+    """Per-pack applicability counts, computed from the matrix.
+
+    DOD-041's reason quoted these as frozen prose ("HIPAA 125 IDs NOT_APPLICABLE;
+    blockchain 202 IDs NOT_APPLICABLE; AI/agentic 1 ID APPLICABLE and 6 NOT_APPLICABLE;
+    ..."). MEASURED when this was added: the blockchain figure was already wrong -- that
+    pack holds 202 rows of which ONE is APPLICABLE (BC-111, decided by the authored
+    hardware probe), so "202 NOT_APPLICABLE" miscounted the group and contradicted the
+    AI/agentic and hardware figures quoted beside it. A sentence that counts rows must be
+    computed from the rows.
+    """
+    path = Path(".agent/verification/APPLICABILITY_MATRIX.csv")
+    if not path.exists():
+        return "Measured pack counts unavailable: the applicability matrix is missing."
+    with path.open(newline="", encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    per_pack: dict[str, dict[str, int]] = {}
+    for row in rows:
+        pack = per_pack.setdefault(row["source_group"], {})
+        pack[row["decision"]] = pack.get(row["decision"], 0) + 1
+    parts = []
+    for pack in sorted(per_pack):
+        counts = per_pack[pack]
+        total = counts.get("APPLICABLE", 0) + counts.get("NOT_APPLICABLE", 0)
+        parts.append(
+            f"{pack} {total} rows ({counts.get('APPLICABLE', 0)} APPLICABLE, "
+            f"{counts.get('NOT_APPLICABLE', 0)} NOT_APPLICABLE)"
+        )
+    return "Measured from APPLICABILITY_MATRIX.csv: " + "; ".join(parts) + "."
+
+
+PACK_SENTENCE_START = "Measured, all seven named packs:"
+PACK_SENTENCE_END = "Zero of the 484 decisions lack attached evidence"
+
+
+def replace_pack_summary(reason: str, summary: str) -> str:
+    start = reason.find(PACK_SENTENCE_START)
+    end = reason.find(PACK_SENTENCE_END)
+    if start < 0 or end <= start:
+        return reason
+    return f"{reason[:start]}{summary} {reason[end:]}"
+
+
 def measured_substitutions(tally: dict[str, int]) -> dict[str, object]:
     """Values for DERIVED_SUBSTITUTIONS, read from the artifacts that measure them."""
     values: dict[str, object] = {
@@ -242,6 +285,7 @@ def measured_substitutions(tally: dict[str, int]) -> dict[str, object]:
             epoch_inputs=epoch.get("total_inputs", "?"),
             epoch_classes=len(epoch.get("classes", {})),
         )
+    values["pack_summary"] = derived_pack_summary()
     return values
 
 
@@ -273,6 +317,10 @@ def main() -> int:
             raise SystemExit(f"{c}: PASS claimed but evidence {evidence} is absent")
         reason = derived_reason(c, tally) or reason
         reason = apply_substitutions(c, reason, substitutions)
+        if c == "DOD-041":
+            # The pack counts in this clause's reason are a measurement, so they are
+            # computed at generation time (see derived_pack_summary).
+            reason = replace_pack_summary(reason, str(substitutions.get("pack_summary", "")))
         rows.append(
             {
                 "dod_id": c,

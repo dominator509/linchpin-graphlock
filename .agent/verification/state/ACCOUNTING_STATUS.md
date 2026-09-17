@@ -13,10 +13,10 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 | --- | --- |
 | DEFERRED_LONG_RUNNING | 1 |
 | EXTERNAL_REQUIRED | 7 |
-| NOT_APPLICABLE | 418 |
+| NOT_APPLICABLE | 417 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
 | PARTIAL | 5 |
-| PASS | 49 |
+| PASS | 50 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
 carries the applicability matrix's own per-ID evidence in the ledger, and the
@@ -59,6 +59,7 @@ digest of that matrix document is recorded beside it.
 | GEN-088 | PASS | `.agent/evidence/applicable-cases/GEN-088.md` | Security Test Automation |
 | GEN-089 | PASS | `.agent/evidence/applicable-cases/GEN-089.md` | Security Test Orchestration |
 | GEN-090 | PASS | `.agent/evidence/applicable-cases/GEN-090.md` | Security Requirements Testing (Requirements-Driven) |
+| GEN-091 | PASS | `.agent/evidence/applicable-cases/GEN-091.md` | Threat Modeling |
 | GEN-098 | PASS | `.agent/evidence/applicable-cases/GEN-098.md` | Security Control Verification |
 | GEN-099 | PASS | `.agent/evidence/applicable-cases/GEN-099.md` | Compliance Testing |
 | GEN-100 | PASS | `.agent/evidence/applicable-cases/GEN-100.md` | Policy-as-Code Testing |

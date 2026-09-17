@@ -260,6 +260,13 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-088": ("cmd", "harness-run-stage", "harness stage automation"),
     "GEN-089": ("cmd", "harness-next", "stage orchestration"),
     "GEN-090": ("cmd", "bind-requirements", "requirement-driven test binding"),
+    # GEN-091 was NOT_APPLICABLE with "no threat model document exists in the
+    # repository" -- accurate then, closable by work rather than by an outsider. The
+    # model now exists AND is bound: scripts/check-threat-model.py fails when a
+    # mitigation cites a symbol the tree does not contain, when a truth boundary
+    # declared in scope.rs is not modelled, when a STRIDE category is uncovered, or
+    # when an asset has no threat. A document nobody checks would not be a case.
+    "GEN-091": ("cmd", "check-threat-model", "authored threat model bound to the code (mitigations, truth boundaries, STRIDE coverage, recorded risks)"),
     "GEN-099": ("cmd", "harness-accounting", "registry compliance accounting"),
     "GEN-100": ("cmd", "harness-validate", "policy-as-code harness rules"),
     "GEN-110": ("cmd", "test-unit", "regression suite over the production crates"),
@@ -357,7 +364,10 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-084": ("cmd", "artifact-identity", "post-build artifact verification by digest"),
     "GEN-085": ("no-cmd", "", "auto-deploy is disabled; no pre-deployment gate runs"),
     "GEN-086": ("no-cmd", "", "no continuous security scheduler exists"),
-    "GEN-091": ("no-cmd", "", "no threat model DOCUMENT: a ThreatMap data structure exists for patent-claim threat mapping (a different subject), and SECURITY.md states boundaries, but no threat model artefact enumerates threats against the product"),
+    # GEN-091 no longer appears here: the threat model EXISTS and is bound (see the
+    # executed-command section above). This line is what the duplicate-key guard in
+    # scripts/validate-generated-pack.py exists to prevent -- leaving it would have made
+    # the "no-cmd" entry win, silently, exactly as happened in round 51.
     "GEN-092": ("no-cmd", "", "no attack tree analysis exists"),
     "GEN-093": ("no-cmd", "", "no abuse case suite exists"),
     "GEN-094": ("no-cmd", "", "no misuse case suite exists"),
