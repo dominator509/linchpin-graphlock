@@ -16,14 +16,30 @@ soak; DOD-001/034/039 need the clean room and named human validators. The next l
 MANUAL action is unchanged: run the documented install on a clean machine and record it
 (REQ-REL-001).
 
-## SUP-004, now blocked only on installer-package identity
+## SUP-004, fully characterised, blocked on packaging decisions
 
-The release executable is byte-identical across rebuilds (`/Brepro`, round 53). What is
-left: the MSI's `ProductCode` regenerates per build (UpgradeCode/ProductVersion stable)
-and the NSIS container's differing bytes are NOT yet isolated. Next steps, in order:
-isolate the NSIS difference byte-for-byte (measurement only); then pin `ProductCode` per
-version through a custom WiX template, which Tauri's schema does not expose and which
-carries an upgrade-semantics review.
+All three artifacts are now measured: the release executable is BYTE-IDENTICAL across
+rebuilds (`/Brepro`); the MSI carries an identical payload but WiX regenerates
+`ProductCode` per build; the NSIS setup carries an identical payload (8 files, every digest
+equal) inside a non-reproducible COMPRESSED STREAM. Two unblock paths, both packaging
+decisions rather than build fixes:
+
+1. Pin `ProductCode` per version through a custom WiX template or fragment (Tauri's schema
+   exposes `upgradeCode` only) — carries an upgrade-semantics review, because a pinned
+   ProductCode is what makes patching possible and must change between versions.
+2. Make NSIS compression deterministic, or stop shipping NSIS and ship the MSI alone (the
+   format the installer lanes and the clean-room procedure already use).
+
+## Applicability rows still open
+
+- **GEN-013 (security code metrics)** and **GEN-014 (complexity)** are adjacent but
+  distinct: coverage, mutation sensitivity and reachability classification are measured and
+  enforced; no complexity or security-density metric exists. A real measurement needs a tool
+  or a hand-rolled AST pass, so measure the cost before claiming either.
+- **GEN-105/107/108/109** remain the formal-methods cluster and stay NOT_APPLICABLE unless a
+  real specification language or model checker appears; GEN-108's reason points at
+  GEN-093/GEN-106 so the boundary is explicit.
+
 
 ## Applicability rows worth closing next, with real harnesses
 
