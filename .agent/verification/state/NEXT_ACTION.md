@@ -32,13 +32,23 @@ decisions rather than build fixes:
 
 ## Applicability rows still open
 
-- **GEN-013 (security code metrics)** and **GEN-014 (complexity)** are adjacent but
-  distinct: coverage, mutation sensitivity and reachability classification are measured and
-  enforced; no complexity or security-density metric exists. A real measurement needs a tool
-  or a hand-rolled AST pass, so measure the cost before claiming either.
-- **GEN-105/107/108/109** remain the formal-methods cluster and stay NOT_APPLICABLE unless a
-  real specification language or model checker appears; GEN-108's reason points at
-  GEN-093/GEN-106 so the boundary is explicit.
+- **GEN-105/107/108/109** remain the formal-methods cluster (model-based tests, a formal
+  verification harness, formal security-property verification, a theorem prover) and stay
+  NOT_APPLICABLE unless a real specification language or model checker appears. GEN-108's
+  reason points at GEN-093/GEN-106 so the boundary is explicit.
+- **GEN-092's neighbours** (GEN-094 misuse, GEN-093 now closed) and the remaining ~400
+  NOT_APPLICABLE rows have been audited by keyword only, which is a reading list rather than
+  evidence; the rows that matter are closed one at a time with a harness and verified
+  citations, which is the only method that has worked.
+
+## The metrics ratchet, as a standing obligation
+
+`scripts/code-metrics.py` enforces production complexity <= 40, production panicking calls
+<= 15, zero production todos and one allowlisted `unsafe` block. The panic bound is a
+RATCHET: it may be lowered, and raising it needs a recorded decision in the source comment.
+Measuring it again after any production change is the point, and `--check` fails when the
+numbers move without the report being regenerated.
+
 
 
 ## Applicability rows worth closing next, with real harnesses
