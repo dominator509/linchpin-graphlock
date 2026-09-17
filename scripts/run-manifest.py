@@ -60,7 +60,29 @@ RERUN = Path(".agent/verification/state/RERUN_RECORD.json")
 ACCOUNTING = Path(".agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv")
 DOD_STATUS = Path(".agent/verification/state/DOD_STATUS.jsonl")
 EXE = Path("target/release/linchpin-desktop.exe")
-MSI = Path("target/release/bundle/msi/LINCHPIN_0.1.0_x64_en-US.msi")
+MSI_DIR = Path("target/release/bundle/msi")
+
+
+def installer_path() -> Path | None:
+    """The installer that matches the version the repository DECLARES.
+
+    This used to be a literal path carrying '0.1.0', which is correct only until the
+    product version moves -- and a literal is exactly the kind of stale pin DOD-029 is
+    about. Measured while harden­ing the release gate: a foreign-version package can sit
+    in the same directory (the cross-version matrix builds one), so the version is read
+    from the product manifest and the match must be unique.
+    """
+    version = ""
+    conf = Path("apps/desktop/src-tauri/tauri.conf.json")
+    if conf.exists():
+        try:
+            version = str(json.loads(conf.read_text(encoding="utf-8")).get("version") or "")
+        except json.JSONDecodeError:
+            version = ""
+    if not version:
+        return None
+    matches = sorted(MSI_DIR.glob(f"*{version}*.msi")) if MSI_DIR.exists() else []
+    return matches[-1] if matches else None
 
 
 def git(*args: str) -> str:
@@ -102,6 +124,7 @@ def base_revision() -> str:
 
 def build_manifest() -> dict:
     dirty_lines = [line for line in git("status", "--porcelain").splitlines() if line.strip()]
+    msi = installer_path()
     return {
         "clause": "DOD-029",
         "harness": "scripts/run-manifest.py",
@@ -131,9 +154,15 @@ def build_manifest() -> dict:
             "executable": str(EXE),
             "executable_sha256": sha256_file(EXE),
             "executable_bytes": EXE.stat().st_size if EXE.exists() else None,
-            "msi": str(MSI),
-            "msi_sha256": sha256_file(MSI),
-            "msi_bytes": MSI.stat().st_size if MSI.exists() else None,
+            "msi": str(msi) if msi else None,
+            "msi_sha256": sha256_file(msi) if msi else None,
+            "msi_bytes": msi.stat().st_size if msi and msi.exists() else None,
+            "msi_note": (
+                "the installer matching the version declared in apps/desktop/src-tauri/tauri.conf.json; "
+                "a foreign-version package in the same directory (the cross-version matrix builds one) is "
+                "never selected, and the release gate rejects a bound installer that does not carry the "
+                "declared version"
+            ),
             "recorded_in_release_gate": json_field(GATE, "artifact"),
         },
         "results": {
