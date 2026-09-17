@@ -1,20 +1,20 @@
 {
   "clause": "DOD-029",
   "harness": "scripts/run-manifest.py",
-  "measured_at_utc": "2026-09-17T04:11:38Z",
-  "candidate_commit": "c317684c40b6b9d87debd1a31ee12c537847a4c1",
-  "candidate_commit_short": "c317684",
+  "measured_at_utc": "2026-09-17T04:25:49Z",
+  "candidate_commit": "9c852c84286e685d1e13a5a92a537828d860d6f6",
+  "candidate_commit_short": "9c852c8",
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "branch": "main",
   "working_tree": {
     "dirty": true,
-    "changed_files": 20,
+    "changed_files": 2,
     "statement": "evidence in this run was produced on a DIRTY tree; the manifest records that rather than implying a frozen revision"
   },
   "epoch": {
     "digest": "670cbed28da38b262a9a3e5ccd4d09c35f4e196bb0c04ba5a122db949a361487",
     "total_inputs": 141,
-    "candidate_commit": "c317684"
+    "candidate_commit": "9c852c8"
   },
   "artifacts": {
     "executable": "target\\release\\linchpin-desktop.exe",
