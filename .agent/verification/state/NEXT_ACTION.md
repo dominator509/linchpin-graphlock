@@ -30,6 +30,31 @@ reports a keyword signal for 80 of 89 remaining absence claims, the same
 false-positive rate this repository already documented for regex probes. It is
 deliberately not a gate lane.
 
+## SUP-004 is now blocked only on installer-package identity
+
+Round 53 made the release **executable** byte-identical across rebuilds (`/Brepro`) and
+isolated what is left: the MSI's `ProductCode` is regenerated per build while
+`UpgradeCode`/`ProductVersion` stay stable, and the NSIS container's differing bytes are
+**not yet isolated**. Two bounded next steps, in order:
+
+1. Isolate the NSIS difference byte-for-byte (the MSI is already characterised through
+   the Windows Installer COM API) — measurement only, no product change.
+2. Pin `ProductCode` per version through a custom WiX template or fragment. Tauri's
+   config schema exposes `upgradeCode` only, so this means shipping a template, and it
+   carries an upgrade-semantics review: a pinned ProductCode is what makes patching
+   possible and must change between versions.
+
+## Worth building next, with a real harness behind it
+
+**GEN-091 (threat modelling)** is recorded NOT_APPLICABLE with "no threat model artefact
+exists", which is true today and is closable by work rather than by an outside party: a
+threat-model document covering the declared assets (UO-01..12), the five truth
+boundaries (TB-1..TB-5), the disclosure firewall, the loopback-only transport, the vault
+container and the MCP capability boundary — plus a validator that fails when the model
+drifts from the code (a boundary added in `crates/domain/src/scope.rs` but not modelled,
+or a mitigation cited without its test). That turns a skip into an executed case with a
+discriminating check, in the style that has worked all run.
+
 What remains is bounded, individual review of rows whose claim might have aged, in the
 style that worked: name the harness that exists, add a per-ID case result whose
 citations `scripts/applicable-case-evidence.py --check` re-reads from the tree, then
