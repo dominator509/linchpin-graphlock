@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "18203a8",
+  "candidate_commit": "6ef5968",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -90,7 +90,7 @@
         "scripts\\run-manifest.py": "bd6ff561ed6a4d8aa570f6a3aef311cc076bd51b082f79714a49b3e591b5f940",
         "scripts\\secret-scan.py": "f1e753e9eab570336274b4f645192ed8346a9645856173c9f8729e7f21edfece",
         "scripts\\security-check.sh": "e4d605f8caa76b7142962ad975c871ba60617cc6916f553f822048b1cd322529",
-        "scripts\\ship-gate.py": "d7feff2d63bf6d38a220f6dc14a7a332102a57e02bb69b39665e3fc49340e176",
+        "scripts\\ship-gate.py": "1cbffb092d52e58b47b127ad25e75f0e537373b117e99c1f18efe146a2555195",
         "scripts\\smoke-installed-artifact.sh": "71de10b34c0a69e915773b1bcc92a8a08d4757b9c7a4e5dd963a343a4f4448ac",
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
         "scripts\\soak-lane.sh": "115c427e513f3efb98234f6149c915af463883332cc0b3af9da538b9cb3a1084",
@@ -254,8 +254,8 @@
       ]
     }
   },
-  "epoch_digest": "9b4b5bb04ea28788a9edbbaa1fabd0b47517b9f3c7f9ab245690b52543a109ef",
-  "prior_candidate_commit": "18203a8",
-  "prior_epoch_digest": "9b4b5bb04ea28788a9edbbaa1fabd0b47517b9f3c7f9ab245690b52543a109ef",
+  "epoch_digest": "75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200",
+  "prior_candidate_commit": "6ef5968",
+  "prior_epoch_digest": "75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200",
   "total_inputs": 156
 }
