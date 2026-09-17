@@ -1,13 +1,13 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-17T18:59:00Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-17T19:06:25Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
 - Blocking clauses: DOD-014=PARTIAL
-- Candidate commit: `71423bdf7aaa662e4d0f24c08dc98e8ac350a5d5` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (24 changed files)
+- Candidate commit: `e88428b833e27afc53f04e1f1c9c274d86f64311` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (4 changed files)
 - Epoch: `6f1042e5a4102afd` over 152 tracked inputs
 
 ## Verified behavior — executed and observed
