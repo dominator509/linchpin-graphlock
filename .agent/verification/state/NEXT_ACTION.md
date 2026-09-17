@@ -27,25 +27,28 @@ carries an upgrade-semantics review.
 
 ## Applicability rows worth closing next, with real harnesses
 
-Round 54 closed GEN-091 by authoring a threat model and BINDING it (`check-threat-model.py`
-fails on drift, and runs in verify.sh). The same shape applies to its neighbours:
+Round 54 closed GEN-091 by authoring a threat model and BINDING it
+(`check-threat-model.py`); round 55 did the same for GEN-092 (attack trees bound to the
+model and to the code) and claimed GEN-093 from executed fail-closed negatives. Both new
+validators run in verify.sh, and both refused to pass on first use — the pattern works.
 
-- **GEN-093 / GEN-094 (abuse and misuse case suites)** are recorded NOT_APPLICABLE, but
-  the product already asserts misuse scenarios fail closed: a non-loopback provider
-  endpoint refused with POLICY and no attempt, an export of restricted content refused by
-  the firewall, an ungranted MCP capability denied, malformed filing input refused, a
-  zip-slip path rejected, an empty prompt rejected before any I/O. Reclassifying ONE of
-  them (with a per-ID case result citing those tests) and cross-referencing the other is
-  the honest move; claiming both from one evidence set would double-count.
-- **GEN-092 (attack trees)** could then be authored FROM the threat model, with a
-  validator binding each leaf to a modelled threat -- the pattern that made GEN-091 a
-  case rather than a document.
+Next candidates, each needing its own verification before any status moves:
+
 - **GEN-106 (property-based security testing)** claims none exists while
   `test_sanitize_path_property_over_generated_corpus` generates a corpus and the fuzz
-  campaign mutates one; verify before moving it. GEN-107/108 sit in the formal-methods
-  cluster and stay NOT_APPLICABLE unless a real property harness appears.
+  campaign mutates one. Verify the claim against those two before moving it; GEN-107/108
+  sit in the formal-methods cluster and stay NOT_APPLICABLE unless a real property harness
+  appears.
+- **GEN-013 (security code metrics)** and **GEN-014 (complexity)** are adjacent but
+  distinct: coverage, mutation sensitivity and reachability classification are measured
+  and enforced; no complexity or security-density metric exists. Do not merge them.
+- **GEN-043 (vulnerability assessment record)** — advisories are scanned and disclosed
+  under GEN-042; no severity/exploitability assessment exists.
+- **GEN-058 (weak-primitive detection)** — the implementation is tested under GEN-057;
+  nothing scans for weak primitives, and the dependency ban list names none.
 
 Standing instruction: name the harness, add a per-ID case result whose citations
 `scripts/applicable-case-evidence.py --check` re-reads from the tree, then rebuild
 accounting. `scripts/audit-applicability-absences.py` remains a reading list, never a
 decision tool (80 of 89 claims produce a keyword signal).
+
