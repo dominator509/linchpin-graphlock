@@ -10,7 +10,7 @@ definition and its PASS status is revoked until rerun.
 ## Epoch identity
 
 - Current epoch digest: `75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200`
-- Candidate commit at generation: `6ef5968`
+- Candidate commit at generation: `6c22585`
 - Total tracked inputs: 156
 - Previous epoch digest: `75f078ac0961b54a8be5e5363e78369e519e993dd939f0c08bbb65851603e200`
 - Changed input classes since that epoch: none

@@ -154,7 +154,13 @@ def derive() -> dict:
         "blocking_clauses": gate.get("blocking_clauses", []),
         "dod_tally": gate.get("dod_status_tally", {}),
         "registry_tally": gate.get("registry_accounting", {}).get("tally", {}),
-        "candidate_commit": epoch.get("candidate_commit"),
+        # The PINNED candidate, from RUN_MANIFEST.json, not EPOCH.json's candidate.
+        # MEASURED: scripts/verify.sh recomputes the epoch early in its own run, which
+        # moves EPOCH.json's candidate to the current HEAD, so a document derived from
+        # it went stale inside the very run that checked it. The pinned candidate is
+        # the identity the evidence belongs to and it only moves when the settle path
+        # re-derives the manifest.
+        "candidate_commit": (manifest.get("candidate_commit_short") or epoch.get("candidate_commit")),
         "epoch": epoch.get("epoch_digest"),
         "epoch_inputs": epoch.get("total_inputs"),
         "artifact": manifest.get("artifacts", {}),
