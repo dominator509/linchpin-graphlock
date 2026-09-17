@@ -39,14 +39,14 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-022 | PASS | `.agent/evidence/DOD-022-performance-thresholds.md` | `79df98d7a63ba85b` | 3175 |
 | DOD-023 | PASS | `scripts/doc-exec.py` | `2e47017bc04b74b7` | 14107 |
 | DOD-024 | PASS | `.agent/evidence/EP-009/M1/STATUS.md` | `cb2ae00ad9d40d1a` | 6756 |
-| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `f99c40fa539737ab` | 196307 |
+| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `5c47228e5efbd521` | 196307 |
 | DOD-026 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `d803f15674f44efb` | 8677 |
 | DOD-027 | PASS | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
 | DOD-028 | PASS | `scripts/completion-report.py` | `207e639d133c229e` | 16579 |
 | DOD-029 | PASS | `scripts/run-manifest.py` | `13d30cf245e8b778` | 10086 |
-| DOD-030 | PASS | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `89a9aa65a4b497fd` | 264902 |
+| DOD-030 | PASS | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `3a363a429a9d1cdc` | 265100 |
 | DOD-031 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `d803f15674f44efb` | 8677 |
-| DOD-032 | PASS | `.agent/verification/state/CASE_RESULTS.json` | `cb7b7a3f71331f7c` | 84982 |
+| DOD-032 | PASS | `.agent/verification/state/CASE_RESULTS.json` | `b672330f30ddf620` | 85180 |
 | DOD-033 | PASS | `.agent/evidence/clean-build/ENVIRONMENT.json` | `b600f03bc797581a` | 3755 |
 | DOD-034 | EXTERNAL_REQUIRED | `.agent/evidence/EP-009/M3/STATUS.md` | `9f624be502aa3b7c` | 3804 |
 | DOD-035 | PASS | `scripts/version-matrix.py` | `3ad61748f3c63f3f` | 28486 |
@@ -538,7 +538,7 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `896c7cf6d3705fec` |
 | SUP-002 | PASS | `.agent/evidence/applicable-cases/SUP-002.md` | `11152e761fd05ada` |
 | SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `896c7cf6d3705fec` |
-| SUP-004 | PARTIAL | `.agent/evidence/SUP-004-reproducibility-after-brepro.md` | `689e3bb52c3a4bab` |
+| SUP-004 | PARTIAL | `.agent/evidence/SUP-004-reproducibility-after-brepro.md` | `0afca0e44b212b3c` |
 | SUP-005 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `e73b0e218efc505f` |
 | SUP-006 | PASS | `.agent/evidence/DOD-017-idempotency.md` | `a292bc32b80efc1d` |
 | SUP-007 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `e73b0e218efc505f` |

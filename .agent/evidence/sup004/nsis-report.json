@@ -1,0 +1,17 @@
+{
+  "artifact": "run-a-LINCHPIN_0.1.0_x64-setup.exe",
+  "setup_identical": false,
+  "sizes": [
+    3233958,
+    3232330
+  ],
+  "differing_ranges": [],
+  "differing_bytes": 0,
+  "payload_files_a": 8,
+  "payload_files_b": 8,
+  "payload_only_in_a": [],
+  "payload_only_in_b": [],
+  "payload_differing_files": [],
+  "payload_identical": true,
+  "extractor": "C:\\Program Files\\7-Zip\\7z.exe"
+}

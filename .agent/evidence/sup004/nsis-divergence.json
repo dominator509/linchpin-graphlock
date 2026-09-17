@@ -1,0 +1,16 @@
+{
+  "sizes": [
+    3233958,
+    3232330
+  ],
+  "size_delta": 1628,
+  "first_differing_offset": 52760,
+  "differing_bytes_in_common": 3164219,
+  "common_prefix_equal": true,
+  "signature_equal": true,
+  "data_block_marker_a": 9732,
+  "data_block_marker_b": 9732,
+  "bytes_from_marker_equal": false,
+  "trailing_64_equal": false,
+  "interpretation": "the two setup executables differ in size and in their header/compression region, while the payload they install is byte-identical (all 8 extracted files match)"
+}
