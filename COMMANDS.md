@@ -25,6 +25,36 @@ Run commands from repository root. Export: `CI=true GIT_TERMINAL_PROMPT=0 GIT_PA
 | graph next | `sh scripts/graph-next.sh` |
 | ledger tail | `sh scripts/ledger.sh tail 30` |
 | materialize security sources | `sh scripts/materialize-atomic-sources.sh` |
+| stage accounting (EP-010 M1) | `python3 scripts/stage-accounting.py --check` |
+| architecture drift (EP-010 M3) | `python3 scripts/architecture-drift.py` |
+| architecture drift self-test | `python3 scripts/architecture-drift.py --self-test` |
+| residual risk / readiness derivation (EP-010 M4/M5) | `python3 scripts/residual-risk-report.py --check` |
+| version-matrix source currency (DOD-040) | `python3 scripts/version-matrix.py --check-source` |
+
+### Verification accounting commands
+
+Added by EP-010 so that every gate the closure depends on is published here rather
+than living only inside `scripts/verify.sh`. Each is a lane of `verify.sh`:
+
+* `scripts/stage-accounting.py` derives a per-stage record for V-000..V-021 from the
+  pack's own `default_stage` ownership and the per-ID accounting. It writes
+  `.agent/verification/reports/STAGE_ACCOUNTING.md`, `state/STAGE_ACCOUNTING.json` and
+  the harness cursor `state/RUN_STATE.json`; `--check` fails when the record is stale
+  against the registry, the applicability matrix or the accounting.
+* `scripts/architecture-drift.py` implements the nine-question review of
+  `ARCHITECTURE.md` section 145. `--self-test` plants one violation per mechanical
+  rule and requires each to be caught; `--check` fails when the record is stale
+  against `ARCHITECTURE.md`, the scope module or the crate manifests.
+* `scripts/residual-risk-report.py` derives `RESIDUAL_RISK_AND_EXTERNAL_GATES.md`,
+  `FINAL_PRODUCTION_READINESS_REPORT.md`, `state/NEXT_ACTION.md`,
+  `FINAL_SUBMIT_REPORT.md` and the EP-010 M5 manual release instructions from the
+  executed state; `--check` fails when any of them stops matching it.
+* `scripts/version-matrix.py --check-source` compares the fingerprint of the staged
+  v0.1.0/v0.2.0 packages with the current build inputs and fails naming both revisions.
+
+The **full** cross-version matrix run is deliberately not published as a runnable
+command here: it builds both releases and installs/uninstalls them on the host. It is
+lane 4 of `sh scripts/test-e2e.sh` and re-provisions itself when the source has moved.
 
 ## Known command status
 
