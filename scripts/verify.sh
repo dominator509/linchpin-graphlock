@@ -69,6 +69,12 @@ run "applicable-case evidence currency" python3 scripts/applicable-case-evidence
 # when the model and the tree disagree or the rendered document is stale.
 run "threat-model currency" python3 scripts/check-threat-model.py --check
 
+# GEN-092 attack-tree currency: the trees are bound to the threat model and to the code
+# the same way the model is -- every MITIGATED leaf must cite a symbol the tree contains,
+# every OPEN/PARTIAL leaf must carry a residual traceable to the risk register, and every
+# modelled threat must be either represented or explicitly noted.
+run "attack-tree currency" python3 scripts/check-attack-trees.py --check
+
 # Identity check LAST, after the epoch has settled: DOD-029 requires the
 # candidate commit, base revision, epoch and artifact digests to belong to the
 # SAME run, and this lane fails when any of them has moved since the manifest was

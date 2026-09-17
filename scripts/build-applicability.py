@@ -267,6 +267,19 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     # declared in scope.rs is not modelled, when a STRIDE category is uncovered, or
     # when an asset has no threat. A document nobody checks would not be a case.
     "GEN-091": ("cmd", "check-threat-model", "authored threat model bound to the code (mitigations, truth boundaries, STRIDE coverage, recorded risks)"),
+    # GEN-092 closed the same way one round later: three goal-first attack trees, each
+    # leaf either mitigated by a symbol that must exist or left OPEN/PARTIAL with a
+    # residual traceable to the threat model's risk register, and every modelled threat
+    # either represented by a tree or given an explicit coverage note. The validator is
+    # the harness; the trees alone would be a document.
+    "GEN-092": ("cmd", "check-attack-trees", "attack trees bound to the threat model (leaf symbols, residuals, per-threat coverage)"),
+    # GEN-093: the misuse scenarios this suite names are already asserted to FAIL CLOSED
+    # across the product, so "no abuse case suite exists" was a claim about a package
+    # that was never assembled rather than about evidence that was never produced.
+    # GEN-094 (misuse, i.e. accidental wrong use) is deliberately NOT claimed from the
+    # same evidence set -- it is recorded beside GEN-049's input-validation work instead,
+    # because claiming both from one set would double-count.
+    "GEN-093": ("cmd", "test-unit", "abuse scenarios asserted to fail closed (provider egress, export firewall, capability grants, malformed input, traversal)"),
     "GEN-099": ("cmd", "harness-accounting", "registry compliance accounting"),
     "GEN-100": ("cmd", "harness-validate", "policy-as-code harness rules"),
     "GEN-110": ("cmd", "test-unit", "regression suite over the production crates"),
@@ -364,13 +377,12 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-084": ("cmd", "artifact-identity", "post-build artifact verification by digest"),
     "GEN-085": ("no-cmd", "", "auto-deploy is disabled; no pre-deployment gate runs"),
     "GEN-086": ("no-cmd", "", "no continuous security scheduler exists"),
-    # GEN-091 no longer appears here: the threat model EXISTS and is bound (see the
-    # executed-command section above). This line is what the duplicate-key guard in
-    # scripts/validate-generated-pack.py exists to prevent -- leaving it would have made
-    # the "no-cmd" entry win, silently, exactly as happened in round 51.
-    "GEN-092": ("no-cmd", "", "no attack tree analysis exists"),
-    "GEN-093": ("no-cmd", "", "no abuse case suite exists"),
-    "GEN-094": ("no-cmd", "", "no misuse case suite exists"),
+    # GEN-091 and GEN-092 no longer appear here: both harnesses exist and are bound (see
+    # the executed-command section above). GEN-093 moved for the same reason -- its
+    # scenarios are asserted to fail closed by tests that already run. Leaving any of
+    # them here would let a stale "no-cmd" entry win silently, which is what the
+    # duplicate-key guard in scripts/validate-generated-pack.py exists to prevent.
+    "GEN-094": ("no-cmd", "", "no MISUSE case suite as a distinct artefact: accidental wrong use is covered by the input-validation tests recorded under GEN-049, and deliberate abuse by GEN-093, so this row is not claimed from either evidence set"),
     "GEN-095": ("no-cmd", "", "no architecture security assessment record exists"),
     "GEN-096": ("no-cmd", "", "no secure design review record exists"),
     "GEN-097": ("no-cmd", "", "no security feature design review record exists"),

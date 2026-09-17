@@ -287,6 +287,29 @@ CASES: dict[str, dict] = {
         "finding": "Threat modelling is authored AND bound, which is what turns this row from a documented skip into an executed case. The model enumerates 7 assets (invention content, vault, ledger/audit chain, export artefacts, release artefacts, provider prompts, diagnostics/incident capsules), 11 threats covering all six STRIDE categories, the five truth boundaries of ARCHITECTURE.md section 5 transcribed from code, and 6 recorded risks with the decision that recorded each. Every mitigation is bound to a symbol that must exist in the file it cites, and scripts/check-threat-model.py FAILS when a mitigation cites something the tree does not contain, when a boundary declared in scope.rs is not modelled, when a STRIDE category is uncovered, when an asset has no threat, or when the rendered document drifts from the model. The lane runs in verify.sh.",
         "not_proven": "This is a design-level threat model, not a validated one: it is not a penetration test (GEN-018 is EXTERNAL_REQUIRED), it does not enumerate attack trees (GEN-092) or abuse/misuse cases (GEN-093/094), and its mitigations are verified individually by the tests it cites rather than by an end-to-end adversarial exercise. Its residuals are the residue the rest of this run records: unsigned release, no OS-encrypted container, unbounded RPO after the last backup, the unbuilt credentialed lane, and the deferred full-scale soak.",
     },
+    "GEN-092": {
+        "status": "PASS",
+        "cites": [
+            ("source", "scripts/check-attack-trees.py", ["MITIGATED leaf must name at least one", "traceable to the threat model"]),
+            ("artifact", ".agent/evidence/attack-trees.md", ["## AT-1", "## AT-2", "## AT-3", "Unmitigated or partial leaves"]),
+            ("artifact", ".agent/verification/state/ATTACK_TREES.json", ["threat_notes", "goal-first attack trees"]),
+            ("artifact", ".agent/verification/state/THREAT_MODEL.json", ["accepted_risks"]),
+        ],
+        "finding": "Attack-tree analysis is authored AND bound: three goal-first trees (exfiltrate invention content; destroy or forge the conception record; get a tampered build installed) decompose into 14 leaves, of which 10 are MITIGATED with a symbol that must exist in the file it cites and 4 are OPEN or PARTIAL with a residual that must be traceable to the threat model's risk register. The validator fails on a tree naming an undeclared threat, a malformed node graph (missing children, orphans, cycles, non-leaf with fewer than two alternatives), a MITIGATED leaf with no bound symbol, an OPEN leaf with no residual, an untraceable residual, or a modelled threat that is neither represented by a tree nor given an explicit coverage note. Every one of the threat model's 11 threats is accounted for that way, so the two artefacts cannot drift apart.",
+        "not_proven": "Trees are a design artefact, not an exercise: nothing here was validated by an adversary, and 4 of the 14 leaves are deliberately left OPEN or PARTIAL (unbuilt credentialed lane, signed-release absence, unlabelled secret material, no OS-encrypted container). GEN-018 (manual penetration test) remains EXTERNAL_REQUIRED.",
+    },
+    "GEN-093": {
+        "status": "PASS",
+        "cites": [
+            ("source", "crates/provider_transport/src/lib.rs", ["test_local_adapter_rejects_non_loopback_endpoint", "test_empty_prompt_is_rejected_before_any_io"]),
+            ("source", "apps/desktop/src-tauri/src/commands.rs", ["test_export_firewall_blocks_restricted_content", "test_mcp_capability_grant_is_explicit", "test_import_receipt_fails_closed_on_bad_input"]),
+            ("source", "crates/evidence/src/lib.rs", ["test_archive_entry_rejects_zip_slip"]),
+            ("source", "crates/patent/src/lib.rs", ["test_receipt_import_fails_closed_on_malformed_input"]),
+            ("artifact", ".agent/evidence/fuzz/STATUS.md", ["fuzz_campaign.rs"]),
+        ],
+        "finding": "The abuse scenarios this capability names are executed as fail-closed assertions rather than collected into a separate suite: a remote provider endpoint is refused with POLICY and no attempt is made; a filing receipt that is malformed or has bad input is refused; an export carrying restricted content is refused; an ungranted MCP capability is denied; a zip-slip archive entry and a traversal path are rejected; an empty prompt is refused before any I/O; a workspace that does not exist is refused; and the fuzz campaign drives adversarial input through every IPC-reachable text parser. Each assertion requires the abuse to FAIL, so a regression that made any of them succeed would fail the lane.",
+        "not_proven": "There is no single abuse-case document enumerating scenarios against the threat model, and no adversary validated the set's completeness: the suite is the union of negative assertions written while building each control, not a designed catalogue. GEN-094 (misuse) is deliberately not claimed from this evidence.",
+    },
     "GEN-103": {
         "status": "EXTERNAL_REQUIRED",
         "cites": [

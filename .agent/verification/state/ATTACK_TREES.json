@@ -1,0 +1,353 @@
+{
+  "_comment": "Authored attack trees for LINCHPIN, rooted in the threat model. scripts/check-attack-trees.py validates them against .agent/verification/state/THREAT_MODEL.json and the tree (every leaf must cite a modelled threat, every MITIGATED leaf must name a symbol that exists, every OPEN or PARTIAL leaf must name the decision or residual that keeps it open) and renders .agent/evidence/attack-trees.md. Edit here, never in the rendered document.",
+  "scope": {
+    "product": "LINCHPIN -- local-first Windows patent-intelligence desktop application",
+    "reviewed": "round 55, epoch 98d254624ce9cc5c",
+    "method": "goal-first attack trees in the Schneier sense: a root adversarial goal decomposed into AND/OR refinements, with each leaf either mitigated by a named control (bound to a symbol that must exist) or left OPEN/PARTIAL with the decision that keeps it that way"
+  },
+  "trees": [
+    {
+      "id": "AT-1",
+      "goal": "exfiltrate the invention content from the device",
+      "threat": "T-04",
+      "comment": "The highest-value goal for this product: the disclosure is the asset. Three independent routes are considered, and the tree is an OR because any one of them suffices for the attacker.",
+      "children": [
+        "AT-1.1",
+        "AT-1.2",
+        "AT-1.3"
+      ],
+      "nodes": [
+        {
+          "id": "AT-1.1",
+          "parent": "AT-1",
+          "kind": "OR",
+          "description": "route the content off-device through the provider boundary",
+          "children": [
+            "AT-1.1.1",
+            "AT-1.1.2"
+          ]
+        },
+        {
+          "id": "AT-1.1.1",
+          "parent": "AT-1.1",
+          "leaf": true,
+          "description": "point the product at a remote inference endpoint and let it send prompts there",
+          "status": "MITIGATED",
+          "evidence": "the endpoint is validated before any I/O and a non-loopback host is refused with POLICY, with no attempt made; the refusal is asserted at both the transport and the product-command layer, and the same negative runs against the packaged executable",
+          "symbols": [
+            {
+              "file": "crates/provider_transport/src/lib.rs",
+              "contains": "test_local_adapter_rejects_non_loopback_endpoint"
+            },
+            {
+              "file": "apps/desktop/src-tauri/src/commands.rs",
+              "contains": "test_local_inference_refuses_non_loopback_endpoint"
+            }
+          ]
+        },
+        {
+          "id": "AT-1.1.2",
+          "parent": "AT-1.1",
+          "leaf": true,
+          "description": "exploit a credentialed remote lane once one is wired",
+          "status": "OPEN",
+          "evidence": "no credentialed provider lane exists in this architecture, so neither the egress nor the credential-failure behaviour of one has been executed",
+          "residual": "DOD-014 is PARTIAL for exactly this reason: the pack's governance (terms review) precedes any provider integration, and wiring a lane is an owner decision under change control"
+        },
+        {
+          "id": "AT-1.2",
+          "parent": "AT-1",
+          "kind": "OR",
+          "description": "capture the content in something the product writes down",
+          "children": [
+            "AT-1.2.1",
+            "AT-1.2.2",
+            "AT-1.2.3"
+          ]
+        },
+        {
+          "id": "AT-1.2.1",
+          "parent": "AT-1.2",
+          "leaf": true,
+          "description": "have a credential or invention fragment land in telemetry, diagnostics or an incident capsule",
+          "status": "MITIGATED",
+          "evidence": "redaction runs on the diagnostics path before storage, an induced failure is asserted to carry its correlation id with a planted credential absent from every recorded detail, and the capsule export guard refuses a surviving registered secret",
+          "symbols": [
+            {
+              "file": "apps/desktop/src-tauri/src/commands.rs",
+              "contains": "test_diagnostics_report_induced_failure_with_correlation_and_redaction"
+            },
+            {
+              "file": "crates/crash_reporter/src/lib.rs",
+              "contains": "test_export_guard_rejects_surviving_registered_secret"
+            }
+          ]
+        },
+        {
+          "id": "AT-1.2.2",
+          "parent": "AT-1.2",
+          "leaf": true,
+          "description": "export a filing package or evidence bundle that carries restricted content",
+          "status": "MITIGATED",
+          "evidence": "the export gateway refuses restricted content, the support matrix refuses a package whose limitations are unanchored, and a package never claims a document format the product cannot produce",
+          "symbols": [
+            {
+              "file": "apps/desktop/src-tauri/src/commands.rs",
+              "contains": "test_export_firewall_blocks_restricted_content"
+            },
+            {
+              "file": "apps/desktop/src-tauri/src/commands.rs",
+              "contains": "test_check_support_matrix_blocks_unanchored_limitations"
+            }
+          ]
+        },
+        {
+          "id": "AT-1.2.3",
+          "parent": "AT-1.2",
+          "leaf": true,
+          "description": "leave unlabelled secret material in free text that the redactor cannot attribute to a key or token shape",
+          "status": "PARTIAL",
+          "evidence": "the redactor removes values it can attribute to a key name or a known token shape, and a property-style test covers punctuation-wrapped and quoted forms",
+          "residual": "a secret pasted with no key name and no recognisable shape is not detectable by either layer; stated as a residual in the threat model rather than claimed closed"
+        },
+        {
+          "id": "AT-1.3",
+          "parent": "AT-1",
+          "kind": "OR",
+          "description": "read the vault from the filesystem",
+          "children": [
+            "AT-1.3.1",
+            "AT-1.3.2"
+          ]
+        },
+        {
+          "id": "AT-1.3.1",
+          "parent": "AT-1.3",
+          "leaf": true,
+          "description": "read the vault file directly as the logged-in user or as malware running with the user's rights",
+          "status": "PARTIAL",
+          "evidence": "the vault is a device-local SQLite database with content-addressed blobs; workspace scoping and the audit chain are asserted, but the file is readable by anything running as the user",
+          "residual": "no OS-encrypted container exists and the only KeyringStore is an in-process map -- the product's own scope map (UO-01) states this limitation, and the threat model records it as accepted risk R-2"
+        },
+        {
+          "id": "AT-1.3.2",
+          "parent": "AT-1.3",
+          "leaf": true,
+          "description": "reach the vault through a path or archive traversal from a crafted import",
+          "status": "MITIGATED",
+          "evidence": "path and archive-entry hardening rejects absolute paths and traversal, verified by a property test over a generated corpus and by a mutation proof that removes the guard",
+          "symbols": [
+            {
+              "file": "crates/evidence/src/lib.rs",
+              "contains": "test_sanitize_path_property_over_generated_corpus"
+            },
+            {
+              "file": "crates/evidence/src/lib.rs",
+              "contains": "test_archive_entry_rejects_zip_slip"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AT-2",
+      "goal": "destroy or forge the conception record",
+      "threat": "T-02",
+      "comment": "For a patent workflow the record of who conceived what is the product's output; destroying it is a denial of the user's rights, and forging it is worse.",
+      "children": [
+        "AT-2.1",
+        "AT-2.2"
+      ],
+      "nodes": [
+        {
+          "id": "AT-2.1",
+          "parent": "AT-2",
+          "kind": "OR",
+          "description": "destroy the durable state",
+          "children": [
+            "AT-2.1.1",
+            "AT-2.1.2"
+          ]
+        },
+        {
+          "id": "AT-2.1.1",
+          "parent": "AT-2.1",
+          "leaf": true,
+          "description": "corrupt or delete the vault and its WAL siblings",
+          "status": "MITIGATED",
+          "evidence": "the recovery drill injects total loss and in-place corruption repeatedly, recovers through the production command, and reconciles the recovered state by content digest through an independent connection with measured RPO/RTO against an enforced threshold",
+          "symbols": [
+            {
+              "file": "apps/desktop/src-tauri/tests/recovery_drill.rs",
+              "contains": "in-place corruption"
+            },
+            {
+              "file": "apps/desktop/src-tauri/src/commands.rs",
+              "contains": "test_restore_recovers_from_a_lost_and_from_a_corrupt_vault"
+            }
+          ]
+        },
+        {
+          "id": "AT-2.1.2",
+          "parent": "AT-2.1",
+          "leaf": true,
+          "description": "make a restore silently replace live state with an empty database",
+          "status": "MITIGATED",
+          "evidence": "a mistyped backup path is refused instead of created, the destination is recreated and quarantined when missing, and every recovery is reconciled by digest",
+          "symbols": [
+            {
+              "file": "crates/storage/src/vault.rs",
+              "contains": "test_digest_of_is_read_only_and_refuses_non_vaults"
+            },
+            {
+              "file": "crates/storage/src/vault.rs",
+              "contains": "test_backup_and_restore_reconcile_to_the_snapshot"
+            }
+          ]
+        },
+        {
+          "id": "AT-2.2",
+          "parent": "AT-2",
+          "kind": "OR",
+          "description": "forge or rewrite the record without detection",
+          "children": [
+            "AT-2.2.1",
+            "AT-2.2.2"
+          ]
+        },
+        {
+          "id": "AT-2.2.1",
+          "parent": "AT-2.2",
+          "leaf": true,
+          "description": "edit the audit chain after the fact",
+          "status": "MITIGATED",
+          "evidence": "the audit chain is hash-chained and a test tampers with a stored entry and asserts detection",
+          "symbols": [
+            {
+              "file": "crates/storage/src/vault.rs",
+              "contains": "test_audit_chain_verifies_and_detects_tampering"
+            }
+          ]
+        },
+        {
+          "id": "AT-2.2.2",
+          "parent": "AT-2.2",
+          "leaf": true,
+          "description": "present AI-generated content as human conception",
+          "status": "MITIGATED",
+          "evidence": "conception events carry an origin label that cannot be conflated, and the ledger read separates the two origins at the product boundary",
+          "symbols": [
+            {
+              "file": "apps/desktop/src-tauri/src/commands.rs",
+              "contains": "test_record_conception_labels_ai_origin_distinctly"
+            },
+            {
+              "file": "apps/desktop/src-tauri/src/commands.rs",
+              "contains": "test_conception_ledger_reads_durable_state_and_separates_origins"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AT-3",
+      "goal": "get a tampered or unauthorised build installed and run",
+      "threat": "T-08",
+      "comment": "The distribution path carries no signature, so the tree concentrates on what IS checked.",
+      "children": [
+        "AT-3.1",
+        "AT-3.2.1"
+      ],
+      "nodes": [
+        {
+          "id": "AT-3.1",
+          "parent": "AT-3",
+          "kind": "OR",
+          "description": "substitute the artefact in transit or at rest",
+          "children": [
+            "AT-3.1.1",
+            "AT-3.1.2"
+          ]
+        },
+        {
+          "id": "AT-3.1.1",
+          "parent": "AT-3.1",
+          "leaf": true,
+          "description": "swap the executable for one that opens a debug port and leaks through it",
+          "status": "MITIGATED",
+          "evidence": "the production artifact is asserted to open no debug port, with the probe baseline-checked, pid-attributed and liveness-checked so a dead process cannot pass vacuously",
+          "symbols": [
+            {
+              "file": "scripts/assert-no-debug-port.py",
+              "contains": "debug port"
+            }
+          ]
+        },
+        {
+          "id": "AT-3.1.2",
+          "parent": "AT-3.1",
+          "leaf": true,
+          "description": "ship a package whose payload is not the built binary",
+          "status": "MITIGATED",
+          "evidence": "the installed executable is bound to the digest of the payload the MSI itself carries (extracted with msiexec /a), which is what exposed the bundler relinking the binary during packaging",
+          "symbols": [
+            {
+              "file": "scripts/version-matrix.py",
+              "contains": "payload_exe_sha256"
+            }
+          ]
+        },
+        {
+          "id": "AT-3.2.1",
+          "parent": "AT-3",
+          "leaf": true,
+          "description": "distribute through a compromised channel",
+          "status": "OPEN",
+          "evidence": "digests are published and verified out of band, and the build is reproducible, but nothing binds authorship",
+          "residual": "the release is UNSIGNED (ADR-003): a digest proves integrity against an out-of-band value, not authorship; accepted risk R-1"
+        }
+      ]
+    }
+  ],
+  "threat_notes": [
+    {
+      "id": "T-01",
+      "coverage": "leaf:AT-1.2.1",
+      "why": "spoofing reduces to capability grants and file access here: there is no identity surface to spoof (measured: zero login/session/role constructs), and a granted capability is what decides whether a client may act, which is a control rather than an attack route of its own"
+    },
+    {
+      "id": "T-03",
+      "coverage": "leaf:AT-2.2.2",
+      "why": "repudiation of conception is the forging branch of AT-2: the origin label and the audit chain are the two controls that decide it"
+    },
+    {
+      "id": "T-05",
+      "coverage": "leaf:AT-1.1.1",
+      "why": "prompt egress to a remote host is the first branch of AT-1; the loopback-only guard is the same control seen from the provider side"
+    },
+    {
+      "id": "T-06",
+      "coverage": "leaf:AT-2.1.1",
+      "why": "denial of service against the vault is the destruction branch of AT-2, where the fault-injected recovery drill and the encoded latency/throughput floors are the controls"
+    },
+    {
+      "id": "T-07",
+      "coverage": "leaf:AT-1.3.2",
+      "why": "traversal out of the evidence directory is the escape branch of AT-1's filesystem route; the hardening property test is the control"
+    },
+    {
+      "id": "T-09",
+      "coverage": "leaf:AT-1.2.1",
+      "why": "a secret captured by diagnostics or an incident capsule is the capture branch of AT-1; the redaction and capsule-export guards are the controls"
+    },
+    {
+      "id": "T-10",
+      "coverage": "no tree: dependency compromise is a supply-chain path whose controls (locked graphs, advisory and ban scanning, SBOM currency, secret scan, clean build) are policy gates rather than steps an attacker takes against this host, and none of them is an attack leaf the user can be walked through"
+    },
+    {
+      "id": "T-11",
+      "coverage": "leaf:AT-1.2.2",
+      "why": "over-disclosure through an export is the export branch of AT-1; the firewall, support matrix and document-format assertions are the controls"
+    }
+  ]
+}
