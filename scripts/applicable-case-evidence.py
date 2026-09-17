@@ -246,6 +246,67 @@ CASES: dict[str, dict] = {
         "finding": "Fault injection IS executed, which this row denied. The drill injects two fault classes repeatedly against a live vault -- TOTAL LOSS (the vault file and its WAL siblings deleted) and CORRUPTION (the live vault overwritten in place) -- then recovers through the PRODUCTION restore command and reconciles the recovered state by content digest through an independent connection, with RPO/RTO measured against an enforced threshold. The exact-artifact lane adds a hard process kill with the ledger read back in a new process, and the stress trial injects backup destruction under concurrent load.",
         "not_proven": "The faults are filesystem-level on one host: no disk-error injection, no power-loss or kernel-level fault, and no network partition (the product serves no network). The drill covers the vault, not the whole machine.",
     },
+    "GEN-018": {
+        "status": "EXTERNAL_REQUIRED",
+        "cites": [
+            ("artifact", ".agent/verification/APPLICABILITY_MATRIX.csv", ["GEN-018", "requires an external participant or accredited body"]),
+            ("artifact", ".agent/evidence/ADR-005-external-signoff-gates.md", ["HUMAN_EXTERNAL", "signed"]),
+        ],
+        "material": "a qualified human penetration tester. The decision is APPLICABLE -- this is a security-sensitive local-first product holding confidential invention material, so a manual penetration test is owed rather than inapplicable -- and the blocker is an outside engagement, not tooling. No automated harness substitutes for it: the executed lanes cover specific surfaces (artifact E2E, provider live-fire, injection and access-control tests), and GEN-019 (automated penetration harness) is separately recorded as absent. Nothing in this repository can discharge the row, and no agent may sign for a human tester's findings.",
+        "finding": "Recorded as applicable-but-external rather than not-applicable, which is what the earlier NOT_APPLICABLE decision understated.",
+        "not_proven": "No penetration test has been performed at any depth by any party; resistance to a motivated human adversary is unmeasured.",
+    },
+    "GEN-020": {
+        "status": "EXTERNAL_REQUIRED",
+        "cites": [
+            ("artifact", ".agent/verification/APPLICABILITY_MATRIX.csv", ["GEN-020", "requires an external participant or accredited body"]),
+            ("source", "PREFLIGHT.md", ["HUMAN_EXTERNAL"]),
+        ],
+        "material": "a human red team. The capability is applicable but the exercise is an adversarial human engagement this repository cannot perform or credibly simulate; the automated negatives that exist (fail-closed transport, disclosure firewall, export refusal) are recorded under their own clauses and are not a red-team result.",
+        "finding": "Applicable-but-external: adversarial human exercise owed, none performed.",
+        "not_proven": "No red-team exercise has been run, and attacker creativity is not modelled anywhere in this harness.",
+    },
+    "GEN-021": {
+        "status": "EXTERNAL_REQUIRED",
+        "cites": [
+            ("artifact", ".agent/verification/APPLICABILITY_MATRIX.csv", ["GEN-021", "requires an external participant or accredited body"]),
+            ("source", "PREFLIGHT.md", ["HUMAN_EXTERNAL"]),
+        ],
+        "material": "a human purple-team engagement, which by definition requires attackers and defenders working together. Nothing here can stand in for it; the closest executed evidence is the operator diagnostics surface and the incident-path tests, which are different subjects.",
+        "finding": "Applicable-but-external: the engagement needs human participants on both sides.",
+        "not_proven": "No purple-team exercise has been run and no detection-engineering feedback loop exists.",
+    },
+    "GEN-103": {
+        "status": "EXTERNAL_REQUIRED",
+        "cites": [
+            ("artifact", ".agent/verification/APPLICABILITY_MATRIX.csv", ["GEN-103", "requires an external participant or accredited body"]),
+            ("artifact", ".agent/evidence/ADR-005-external-signoff-gates.md", ["accredited"]),
+        ],
+        "material": "an accredited Common Criteria laboratory and a certification scheme the product is not enrolled in. The row is applicable in principle for a security product sold into regulated markets; the blocker is an accredited external assessment by a licensed laboratory, which no agent or repository can provide. GEN-099 records what IS done for compliance (licence allowlisting, SBOM, advisory disclosure) and explicitly claims no certification.",
+        "finding": "Applicable-but-external: accredited evaluation owed, none performed, no certification claimed anywhere.",
+        "not_proven": "No Common Criteria evaluation, protection profile or accreditation has been obtained or started.",
+    },
+    "E2E-007": {
+        "status": "EXTERNAL_REQUIRED",
+        "cites": [
+            ("artifact", ".agent/evidence/ADR-005-external-signoff-gates.md", ["PF-017", "EXTERNAL_REQUIRED"]),
+            ("artifact", ".agent/verification/APPLICABILITY_MATRIX.csv", ["E2E-007", "requires an external participant or accredited body"]),
+            ("source", "apps/desktop/e2e/shell.spec.ts", ["Manual AT validation", "Accessibility baseline"]),
+        ],
+        "material": "human participants using assistive technology on the real artifact. PF-017 (human UAT and manual accessibility validators) is HUMAN_EXTERNAL and unmet, and ADR-005 records the owner decision that it stays EXTERNAL_REQUIRED rather than being waived. The Playwright accessibility test is a BASELINE whose own comment states that manual AT validation remains external and is not implied by it.",
+        "finding": "Applicable-but-external: usability and lived accessibility validation owed to human participants.",
+        "not_proven": "No manual assistive-technology validation and no usability session with real users has been performed; the automated baseline asserts structure and labels, not lived usability.",
+    },
+    "E2E-020": {
+        "status": "EXTERNAL_REQUIRED",
+        "cites": [
+            ("artifact", ".agent/evidence/ADR-005-external-signoff-gates.md", ["PF-017", "Human UAT"]),
+            ("artifact", ".agent/verification/APPLICABILITY_MATRIX.csv", ["E2E-020", "requires an external participant or accredited body"]),
+        ],
+        "material": "real business users performing acceptance on the exact artifact. Human UAT is HUMAN_EXTERNAL (PF-017) and unmet, and ADR-005 fixes that status: not waived, not replaced with an automated approximation, and not signable by an agent. The installer and exact-artifact lanes prove the artifact installs, launches and behaves; they cannot accept it on a user's behalf.",
+        "finding": "Applicable-but-external: user acceptance owed to named human participants.",
+        "not_proven": "No user acceptance test has been run by any real user and no acceptance record exists to sign.",
+    },
     "GEN-052": {
         "status": "PASS",
         "cites": [

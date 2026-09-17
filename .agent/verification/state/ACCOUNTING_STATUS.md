@@ -12,10 +12,10 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 | Status | IDs |
 | --- | --- |
 | DEFERRED_LONG_RUNNING | 1 |
-| EXTERNAL_REQUIRED | 1 |
-| NOT_APPLICABLE | 423 |
+| EXTERNAL_REQUIRED | 7 |
+| NOT_APPLICABLE | 418 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
-| PARTIAL | 6 |
+| PARTIAL | 5 |
 | PASS | 49 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
@@ -33,7 +33,9 @@ digest of that matrix document is recorded beside it.
 | GEN-005 | PASS | `.agent/evidence/applicable-cases/GEN-005.md` | Secrets Scanning |
 | GEN-006 | PASS | `.agent/evidence/applicable-cases/GEN-006.md` | Credential Scanning |
 | GEN-007 | PASS | `.agent/evidence/applicable-cases/GEN-007.md` | Hardcoded Credential Detection |
-| GEN-016 | PARTIAL | `crates/storage/tests/integration_real_dependencies.rs` | Interactive Application Security Testing (IAST) |
+| GEN-018 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-018.md` | Manual Penetration Testing |
+| GEN-020 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-020.md` | Red Team Testing |
+| GEN-021 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-021.md` | Purple Team Testing |
 | GEN-024 | PASS | `.agent/evidence/applicable-cases/GEN-024.md` | Fuzz Testing |
 | GEN-027 | PASS | `.agent/evidence/applicable-cases/GEN-027.md` | Mutation-Based Fuzzing |
 | GEN-035 | PASS | `.agent/evidence/applicable-cases/GEN-035.md` | Desktop Application Security Testing |
@@ -60,6 +62,7 @@ digest of that matrix document is recorded beside it.
 | GEN-098 | PASS | `.agent/evidence/applicable-cases/GEN-098.md` | Security Control Verification |
 | GEN-099 | PASS | `.agent/evidence/applicable-cases/GEN-099.md` | Compliance Testing |
 | GEN-100 | PASS | `.agent/evidence/applicable-cases/GEN-100.md` | Policy-as-Code Testing |
+| GEN-103 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-103.md` | Common Criteria Security Evaluation |
 | GEN-110 | PASS | `.agent/evidence/applicable-cases/GEN-110.md` | Security Regression Testing |
 | GEN-112 | PASS | `.agent/evidence/applicable-cases/GEN-112.md` | Security Baseline Validation |
 | GEN-115 | PASS | `.agent/evidence/applicable-cases/GEN-115.md` | Fault Injection Security Testing |
@@ -70,6 +73,7 @@ digest of that matrix document is recorded beside it.
 | E2E-003 | PASS | `apps/desktop/e2e/shell.spec.ts` | Full Functional Verification |
 | E2E-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | API Contract & Security Validation |
 | E2E-005 | PASS | `.agent/evidence/applicable-cases/E2E-005.md` | Regression & Differential Verification |
+| E2E-007 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/E2E-007.md` | Usability, Accessibility & DX Verification |
 | E2E-008 | PASS | `.agent/evidence/applicable-cases/E2E-008.md` | Performance & Workload Orchestration |
 | E2E-009 | PASS | `.agent/evidence/applicable-cases/E2E-009.md` | Systemic Stress & Exhaustion Testing |
 | E2E-010 | PASS | `.agent/evidence/applicable-cases/E2E-010.md` | Resilience & Recovery Verification |
@@ -80,6 +84,7 @@ digest of that matrix document is recorded beside it.
 | E2E-015 | PASS | `.agent/evidence/applicable-cases/E2E-015.md` | Import / Export / Data Portability Round-Trip |
 | E2E-018 | DEFERRED_LONG_RUNNING | `.agent/evidence/applicable-cases/E2E-018.md` | Soak, Endurance & Resource-Leak Verification |
 | E2E-019 | PASS | `.agent/evidence/applicable-cases/E2E-019.md` | AI/Agentic Systems Safety & Capability Verification |
+| E2E-020 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/E2E-020.md` | User Acceptance Testing Orchestration |
 | SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | Repository Reality / Anti-Simulation Verification |
 | SUP-002 | PASS | `.agent/evidence/applicable-cases/SUP-002.md` | Requirements-to-Release Traceability Verification |
 | SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | Packaging & Distribution Artifact Verification |

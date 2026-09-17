@@ -29,6 +29,29 @@ required = [
 for rel in required:
     exists(rel)
 
+# Duplicate probe keys. MEASURED DEFECT this guards: round 51 reclassified four
+# registry rows from NOT_APPLICABLE to APPLICABLE but left three of the older "no-cmd"
+# entries in the same dict literal, and Python keeps the LAST assignment -- so the
+# matrix silently kept the old decision while case results for those IDs were written
+# anyway. A duplicate key in a probe table is never intentional, and the failure mode
+# is invisible in the rendered matrix, so it is an error here.
+builder = root / "scripts/build-applicability.py"
+if builder.exists():
+    text = builder.read_text("utf-8", errors="replace")
+    key_pattern = re.compile(r'"([A-Z]+-\d+)": \(')
+    for table in ("GEN_PROBES", "E2E_PROBES", "SUP_PROBES"):
+        start = text.find(f"{table}: dict")
+        if start < 0:
+            continue
+        positions = [text.find(f"{other}: dict", start + 1) for other in
+                     ("GEN_PROBES", "E2E_PROBES", "SUP_PROBES")]
+        end = min([p for p in positions if p > 0] + [len(text)])
+        keys = key_pattern.findall(text[start:end])
+        duplicates = sorted({key for key in keys if keys.count(key) > 1})
+        if duplicates:
+            err(f"{table} declares duplicate keys (last assignment silently wins): {duplicates}")
+
+
 # Placeholder residue.
 # The skip predicate must test whether ANY component is an excluded directory
 # (`not any(part in SKIP_DIRS ...)`). The previous form used

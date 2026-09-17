@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "fb4082c",
+  "candidate_commit": "26a203f",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -28,17 +28,18 @@
       ]
     },
     "gate-script": {
-      "count": 68,
+      "count": 69,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\applicable-case-evidence.py": "b97c409ee7a783d756266c4b3b127c03a3b88c984030a3c489320fbd5e911258",
+        "scripts\\applicable-case-evidence.py": "9ad507e289a45d683b43576b420872153050c590fdb048f84aefab2ec7f98123",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\assert-no-debug-port.py": "54b17113000ddaec872c310d5c063a3aba002cda17d03adebc8cb57b70589b44",
+        "scripts\\audit-applicability-absences.py": "6effc28c3fcc52bb2d6031cbabd2e3e143474ff50b51931f7f92619cb3196dac",
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
-        "scripts\\build-accounting.py": "1fa5a88c4432051ff15363b2c02cbcafa5d2fff36a9e54adaa3dacfa678003f9",
-        "scripts\\build-applicability.py": "effd53a279859b9f103033b4acf065cf37a066e060eddd39ef6a8bf8b2e61685",
+        "scripts\\build-accounting.py": "f9b4041e8f5a05373a73b4d562bcedd7a6e077d7dc85e4d85318a36ba77cf89d",
+        "scripts\\build-applicability.py": "ed3e736044d5fd2654366d20f6796b794d1065fd4fa8a0653587f06e09098b3f",
         "scripts\\build-dod-status.py": "880f728dd37e9bdf981030892c4a2d16f790e63343e78808cc0716e222616760",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
@@ -93,7 +94,7 @@
         "scripts\\test-unit.sh": "0feb713f778b4416900735069b515d236c3dbc485271590123d6157b54d8bce4",
         "scripts\\typecheck.sh": "4ce965051793b2fec197d8b8fd86fa7e8027c30cd2c52102767f6ac1d088b904",
         "scripts\\update-test-manifest.py": "00ecb67c020c0c6f02d818fb5311e015e35379040a86e09050e685b2e2f9735e",
-        "scripts\\validate-generated-pack.py": "50dc425bbcc17145e559a7fc1eccc9957b0ecbcbb6b6539a2ac5cde1cb8adf47",
+        "scripts\\validate-generated-pack.py": "ebefe6a81b91fcb8bc1ad030eba7e024327549bfdae601dfa5c05800aa1d75b7",
         "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
         "scripts\\vault-preservation-e2e.sh": "99077fbdbbebea0d09390a2c6d0bdb67a63698e796a6f3ac884b3b12cc0fca7a",
         "scripts\\verify.sh": "b7ee4a660dd1c1e2822b176cbc1ad1befce1b8d6bd396ec19b5287503c6064ed",
@@ -243,8 +244,8 @@
       ]
     }
   },
-  "epoch_digest": "6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5",
-  "prior_candidate_commit": "6488f40",
-  "prior_epoch_digest": "6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5",
-  "total_inputs": 146
+  "epoch_digest": "f8f792114d0ed530bc4073b9bafa96308ff6bbb32806b65c8f8d0ad71f54e2fd",
+  "prior_candidate_commit": "26a203f",
+  "prior_epoch_digest": "f8f792114d0ed530bc4073b9bafa96308ff6bbb32806b65c8f8d0ad71f54e2fd",
+  "total_inputs": 147
 }

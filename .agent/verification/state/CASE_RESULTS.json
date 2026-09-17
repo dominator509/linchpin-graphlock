@@ -1,7 +1,7 @@
 {
   "_comment": "Real executed case results. Only IDs whose acceptance oracle genuinely ran may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
-  "candidate_commit": "ba1bf21",
-  "candidate_epoch": "f6417988bc07a827",
+  "candidate_commit": "fb4082c",
+  "candidate_epoch": "6998dd02266c598c",
   "environment": {
     "host": "Windows 10 Home 10.0.19045 x64",
     "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
@@ -47,6 +47,12 @@
       "status": "PASS",
       "evidence_path": ".agent/evidence/applicable-cases/E2E-005.md",
       "reason": "EXECUTED: evidence artifact `.agent/verification/state/RERUN_RECORD.json` -- quoted and verified: 'epoch_digest'; first-party source `scripts/change-invalidation.py` -- quoted and verified: 'changed_classes'; evidence artifact `.agent/evidence/mutation-proof/REPORT.json` -- quoted and verified: 'MUT-OPS-037'. Regression and differential verification executed: a change to any tracked input class advances the epoch and obliges a rerun of the affected stages, recorded with commands, exit codes and output digests, while the mutation harness supplies the differential half by proving the guarded behaviour fails when the guard is removed. NOT PROVEN: Differential comparison is against the guard's absence, not against a previous release build; no historical version-to-version differential run exists (see DOD-035)."
+    },
+    {
+      "test_id": "E2E-007",
+      "status": "EXTERNAL_REQUIRED",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-007.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/ADR-005-external-signoff-gates.md` -- quoted and verified: 'PF-017', 'EXTERNAL_REQUIRED'; evidence artifact `.agent/verification/APPLICABILITY_MATRIX.csv` -- quoted and verified: 'E2E-007', 'requires an external participant or accredited body'; first-party source `apps/desktop/e2e/shell.spec.ts` -- quoted and verified: 'Manual AT validation', 'Accessibility baseline'. Applicable-but-external: usability and lived accessibility validation owed to human participants. NOT PROVEN: No manual assistive-technology validation and no usability session with real users has been performed; the automated baseline asserts structure and labels, not lived usability."
     },
     {
       "test_id": "E2E-008",
@@ -109,6 +115,12 @@
       "reason": "EXECUTED: evidence artifact `.agent/evidence/local-provider/STATUS.md` -- quoted and verified: 'smollm2:135m', 'transport identity is the local adapter', 'non-loopback endpoint is refused'; first-party source `apps/desktop/e2e-local-provider.mjs` -- quoted and verified: 'canary'; first-party source `crates/provider_transport/src/lib.rs` -- quoted and verified: 'test_local_adapter_rejects_non_loopback_endpoint'; first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'test_local_inference_refuses_non_loopback_endpoint'; architecture probe -- `loopback_guard_hits: 66` (captured in `probes.log`); architecture probe -- `concern[provider]_tests: 9` (captured in `probes.log`). AI/agentic safety verification executed: the provider lane drives the product's inference command against a real loopback model and asserts a live completion with a runtime canary that must not already exist in the tracked tree, proves the fail-closed negatives (non-loopback endpoint refused with POLICY and no attempt; unreachable endpoint yields a transport error rather than fabricated text), labels AI-origin content distinctly from human conception, and denies MCP capabilities by default. NOT PROVEN: One small local model is exercised; no adversarial prompt-injection campaign is run against the model, and model-output trustworthiness is bounded by the labelling and the disclosure firewall rather than by output verification."
     },
     {
+      "test_id": "E2E-020",
+      "status": "EXTERNAL_REQUIRED",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-020.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/ADR-005-external-signoff-gates.md` -- quoted and verified: 'PF-017', 'Human UAT'; evidence artifact `.agent/verification/APPLICABILITY_MATRIX.csv` -- quoted and verified: 'E2E-020', 'requires an external participant or accredited body'. Applicable-but-external: user acceptance owed to named human participants. NOT PROVEN: No user acceptance test has been run by any real user and no acceptance record exists to sign."
+    },
+    {
       "test_id": "GEN-001",
       "status": "PASS",
       "evidence_path": ".agent/evidence/applicable-cases/GEN-001.md",
@@ -151,10 +163,22 @@
       "reason": "EXECUTED: `python3 scripts/secret-scan.py --check` -- exit 0, output sha256 `c4842551ef6d5a06...`, 45 bytes (log `secret-scan.log`); asserted: 'secret-scan check: ok (9 rules, no findings)'; first-party source `crates/crash_reporter/src/lib.rs` -- quoted and verified: 'redact_key_values', 'looks_like_secret'; architecture probe -- `concern[redaction]_tests: 21` (captured in `probes.log`). Hardcoded-credential detection executed: the tracked tree is scanned, and the shipping redactor detects credential shapes at runtime (`looks_like_secret`, `redact_key_values`) with the defect history recorded rather than tidied -- an earlier version both leaked short credentials and panicked on case-folding characters, and both were fixed with regression tests. NOT PROVEN: Pattern rules cover known provider shapes; a fabricated or unusual credential format in source would not be flagged by either layer."
     },
     {
-      "test_id": "GEN-016",
-      "status": "PARTIAL",
-      "evidence_path": "crates/storage/tests/integration_real_dependencies.rs",
-      "reason": "RESTATED PRECISELY, because the previous note was both stale and mis-scoped. EXECUTED AND MUTATION-PROVEN at the database boundary: a query against a schema that does not exist fails closed with 'no such table' rather than returning empty results, a unique-constraint violation is verified not to mutate the existing row, a vault whose recorded migrations have no tables is refused at open rather than failing later at a random write, and a mistyped backup path is refused without touching the destination. EXECUTED at the policy and provider boundaries: a non-loopback endpoint is refused with POLICY and no attempt, an unreachable endpoint yields UNREACHABLE with text=null, the bounded retry policy is observed to exhaust, and a mutation-fuzz campaign now sweeps ten text-parsing targets with 4 634 adversarial inputs each (it found and fixed a real panic in the credential redactor). STILL NOT COVERED, and stated as such: there is no AUTH boundary to exercise -- this is a local-first single-user application with no login, session or role surface, so 'negative-path coverage across auth' is NOT_APPLICABLE rather than absent; and no wrong-credential case exists for the same reason DOD-014 records (no credentialed provider lane is wired)."
+      "test_id": "GEN-018",
+      "status": "EXTERNAL_REQUIRED",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-018.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/APPLICABILITY_MATRIX.csv` -- quoted and verified: 'GEN-018', 'requires an external participant or accredited body'; evidence artifact `.agent/evidence/ADR-005-external-signoff-gates.md` -- quoted and verified: 'HUMAN_EXTERNAL', 'signed'. Recorded as applicable-but-external rather than not-applicable, which is what the earlier NOT_APPLICABLE decision understated. NOT PROVEN: No penetration test has been performed at any depth by any party; resistance to a motivated human adversary is unmeasured."
+    },
+    {
+      "test_id": "GEN-020",
+      "status": "EXTERNAL_REQUIRED",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-020.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/APPLICABILITY_MATRIX.csv` -- quoted and verified: 'GEN-020', 'requires an external participant or accredited body'; first-party source `PREFLIGHT.md` -- quoted and verified: 'HUMAN_EXTERNAL'. Applicable-but-external: adversarial human exercise owed, none performed. NOT PROVEN: No red-team exercise has been run, and attacker creativity is not modelled anywhere in this harness."
+    },
+    {
+      "test_id": "GEN-021",
+      "status": "EXTERNAL_REQUIRED",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-021.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/APPLICABILITY_MATRIX.csv` -- quoted and verified: 'GEN-021', 'requires an external participant or accredited body'; first-party source `PREFLIGHT.md` -- quoted and verified: 'HUMAN_EXTERNAL'. Applicable-but-external: the engagement needs human participants on both sides. NOT PROVEN: No purple-team exercise has been run and no detection-engineering feedback loop exists."
     },
     {
       "test_id": "GEN-024",
@@ -311,6 +335,12 @@
       "status": "PASS",
       "evidence_path": ".agent/evidence/applicable-cases/GEN-100.md",
       "reason": "EXECUTED: first-party source `deny.toml` -- quoted and verified: '[licenses]', '[bans]'; first-party source `scripts/ship-gate.py` -- quoted and verified: 'NO_GO'; `sh scripts/lint.sh` -- exit 0, output sha256 `85b382dadd552896...`, 1863 bytes (log `lint.log`); asserted: 'lint: Done'. Policy-as-code executed: the rules are executable configuration that returns non-zero when violated -- deny.toml for licences/bans/sources/advisories, ESLint and Prettier and TypeScript strictness for source, the applicability matrix that decides pack activation from repository probes, and the ship gate that maps clause statuses to a verdict. NOT PROVEN: The policies are enforced where the ladder runs; there is no policy engine evaluating infrastructure or runtime state, and no continuous compliance monitor."
+    },
+    {
+      "test_id": "GEN-103",
+      "status": "EXTERNAL_REQUIRED",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-103.md",
+      "reason": "EXECUTED: evidence artifact `.agent/verification/APPLICABILITY_MATRIX.csv` -- quoted and verified: 'GEN-103', 'requires an external participant or accredited body'; evidence artifact `.agent/evidence/ADR-005-external-signoff-gates.md` -- quoted and verified: 'accredited'. Applicable-but-external: accredited evaluation owed, none performed, no certification claimed anywhere. NOT PROVEN: No Common Criteria evaluation, protection profile or accreditation has been obtained or started."
     },
     {
       "test_id": "GEN-110",

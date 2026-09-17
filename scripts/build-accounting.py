@@ -197,6 +197,26 @@ def main() -> int:
     if unknown:
         raise SystemExit(f"case results reference IDs not in the registry: {unknown}")
 
+    # COHERENCE GUARD, added after the defect it catches actually happened. Round 51
+    # reclassified four IDs from NOT_APPLICABLE to APPLICABLE, but three of those edits
+    # left the older "no-cmd" entries in place, and a Python dict literal takes the LAST
+    # assignment -- so the matrix kept saying NOT_APPLICABLE while case results for
+    # those IDs were written anyway and this script happily reported them as PASS. A
+    # solution that inflates the tally by ignoring the applicability decision is worse
+    # than a wrong decision, because it hides itself. Now it is a hard failure.
+    contradictory = sorted(
+        tid
+        for tid in case_results
+        if matrix.get(tid, {}).get("decision") == "NOT_APPLICABLE"
+    )
+    if contradictory:
+        raise SystemExit(
+            "case results exist for IDs the applicability matrix decided NOT_APPLICABLE: "
+            f"{contradictory}. Fix the applicability decision (the probe table most often "
+            "holds a stale duplicate key, where the LAST assignment wins) or remove the "
+            "case result -- the two records may not disagree."
+        )
+
     out_rows, ledger_rows = [], []
     tally: dict[str, int] = {}
 

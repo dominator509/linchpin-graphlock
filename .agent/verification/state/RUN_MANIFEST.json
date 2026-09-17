@@ -1,36 +1,37 @@
 {
   "clause": "DOD-029",
   "harness": "scripts/run-manifest.py",
-  "measured_at_utc": "2026-09-17T09:33:56Z",
-  "candidate_commit": "fb4082c9ab318b3cce9b71ffd8a31970f8d9d387",
-  "candidate_commit_short": "fb4082c",
+  "measured_at_utc": "2026-09-17T16:11:23Z",
+  "candidate_commit": "26a203f9a6e0324df1d1336ef6a3be7fe5beb329",
+  "candidate_commit_short": "26a203f",
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "branch": "main",
   "working_tree": {
     "dirty": true,
-    "changed_files": 4,
+    "changed_files": 33,
     "statement": "evidence in this run was produced on a DIRTY tree; the manifest records that rather than implying a frozen revision"
   },
   "epoch": {
-    "digest": "6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5",
-    "total_inputs": 146,
-    "candidate_commit": "fb4082c"
+    "digest": "f8f792114d0ed530bc4073b9bafa96308ff6bbb32806b65c8f8d0ad71f54e2fd",
+    "total_inputs": 147,
+    "candidate_commit": "26a203f"
   },
   "artifacts": {
     "executable": "target\\release\\linchpin-desktop.exe",
-    "executable_sha256": "c517732f8906f460542d81320c12a82af4e75f0ee01af3f4a07d6e92dd89882f",
+    "executable_sha256": "72140b720fb743c4e95cca364b760f136d80d6a67f0e8316ab55ff714c6dc40c",
     "executable_bytes": 12500992,
     "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
-    "msi_sha256": "5916bfbc06dd9e2ab4f0b154115cb00e6fd937c23bb3861b3c0b7e3d207ef7a5",
+    "msi_sha256": "8a3df35f49d12770e0696ecc7557b0dbd54219fe0eff51a1696f71748a759652",
     "msi_bytes": 5709824,
     "recorded_in_release_gate": {
-      "candidate_commit": "6488f407abe042466d988ff3efa80e32a39dc54e",
-      "candidate_is_head": true,
+      "candidate_commit": "fb4082c9ab318b3cce9b71ffd8a31970f8d9d387",
+      "candidate_is_ancestor_of_head": true,
+      "candidate_is_head": false,
       "candidate_source": "RUN_MANIFEST.json",
       "executable": "target\\release\\linchpin-desktop.exe",
       "executable_bytes": "12500992",
       "executable_sha256": "c517732f8906f460542d81320c12a82af4e75f0ee01af3f4a07d6e92dd89882f",
-      "head_commit": "6488f407abe042466d988ff3efa80e32a39dc54e",
+      "head_commit": "26a203f9a6e0324df1d1336ef6a3be7fe5beb329",
       "msi": "target\\release\\bundle\\msi\\LINCHPIN_0.2.0_x64_en-US.msi",
       "msi_bytes": "5709824",
       "msi_sha256": "e6bd4a1e5437792eb8e4347e1c6e611ebd3a238e2dd20d9f69a163127aff60b4"
@@ -38,11 +39,11 @@
   },
   "results": {
     "rerun_record": ".agent\\verification\\state\\RERUN_RECORD.json",
-    "rerun_record_sha256": "498a6ae1bdaa4cea5bec909b72166192db776ac534e84b243be82346c3dfeb45",
+    "rerun_record_sha256": "a761459ed4b7e348eb2a6c75322e1a3ef21d68d6b4b26473b6ca034c5796604e",
     "accounting": ".agent\\verification\\reports\\COMPLETE_TEST_ACCOUNTING.csv",
-    "accounting_sha256": "2d9987adf3bdb47b090f2e76b486d7b71a33e2a75edb0f20066c4252e27a5020",
+    "accounting_sha256": "3b245edf04b8d36739e2bec7510707c8d547d5d82ba4d191aad6d227eb32b362",
     "dod_status": ".agent\\verification\\state\\DOD_STATUS.jsonl",
-    "dod_status_sha256": "20dcb265556cfd42b9e92f1dcd3bfbf25c32e70c24d5331850f52d8a42933075"
+    "dod_status_sha256": "da17f2955da95711c665af108ce459b35c0578d7d8bbb686ada418cfc6c025ad"
   },
   "lockfiles": {
     "Cargo.lock_sha256": "621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4",

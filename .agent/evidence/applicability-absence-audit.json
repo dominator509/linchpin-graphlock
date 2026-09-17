@@ -1,0 +1,1808 @@
+{
+  "gate": "applicability-absence-audit",
+  "covers": [
+    "DOD-041"
+  ],
+  "harness": "scripts/audit-applicability-absences.py",
+  "totals": {
+    "claims": 89,
+    "with_signal": 80,
+    "with_no_signal": 9
+  },
+  "note": "A signal means at least one keyword from the claim appears in first-party source OUTSIDE the applicability builder. It is a REVIEW trigger, not proof that the claim is false: keywords like 'fuzz' legitimately appear in code that documents the absence. Each signal must be read before a row moves.",
+  "signals": [
+    {
+      "test_id": "GEN-008",
+      "claim": "static taint analysis tool is not installed",
+      "keywords": [
+        "static",
+        "taint"
+      ],
+      "hit_count": 37,
+      "hits": [
+        "crates/storage/src/lib.rs:256:static",
+        "crates/research/src/lib.rs:32:static",
+        "crates/research/src/lib.rs:52:taint",
+        "crates/provider_transport/src/lib.rs:130:static",
+        "crates/platform_windows/src/lib.rs:59:static",
+        "crates/patent/src/lib.rs:29:static",
+        "crates/mcp_hub/src/lib.rs:64:static",
+        "crates/evidence/src/lib.rs:31:static",
+        "crates/domain/src/lib.rs:42:static",
+        "crates/domain/src/lib.rs:138:taint",
+        "crates/domain/src/scope.rs:34:static",
+        "crates/domain/src/scope.rs:66:taint"
+      ]
+    },
+    {
+      "test_id": "GEN-009",
+      "claim": "data flow analysis tool is not installed",
+      "keywords": [
+        "data",
+        "flow"
+      ],
+      "hit_count": 52,
+      "hits": [
+        "crates/storage/Cargo.toml:13:data",
+        "crates/storage/src/lib.rs:98:data",
+        "crates/storage/src/lib.rs:235:flow",
+        "crates/storage/src/vault.rs:3:data",
+        "crates/storage/tests/integration_real_dependencies.rs:9:data",
+        "crates/provider_transport/src/lib.rs:40:data",
+        "crates/platform_windows/src/lib.rs:44:data",
+        "crates/platform_windows/tests/local_first.rs:68:data",
+        "crates/platform_windows/tests/local_first.rs:5:flow",
+        "crates/domain/src/scope.rs:58:data",
+        "crates/commercialization/src/lib.rs:167:data",
+        "crates/commercialization/src/lib.rs:235:flow"
+      ]
+    },
+    {
+      "test_id": "GEN-010",
+      "claim": "no secure code review record exists",
+      "keywords": [
+        "secure",
+        "code"
+      ],
+      "hit_count": 62,
+      "hits": [
+        "crates/storage/src/vault.rs:193:code",
+        "crates/research/src/lib.rs:481:code",
+        "crates/provider_transport/src/lib.rs:18:code",
+        "crates/platform_windows/src/lib.rs:82:code",
+        "crates/platform_windows/tests/licensing_policy.rs:309:code",
+        "crates/patent/src/lib.rs:196:code",
+        "crates/evidence/src/lib.rs:434:code",
+        "crates/domain/src/scope.rs:160:code",
+        "crates/crash_reporter/src/lib.rs:464:code",
+        "crates/commercialization/src/asset_readiness.rs:21:code",
+        "crates/application/src/lib.rs:29:code",
+        "apps/desktop/e2e-artifact.mjs:74:code"
+      ]
+    },
+    {
+      "test_id": "GEN-011",
+      "claim": "no manual secure code review record exists",
+      "keywords": [
+        "secure",
+        "code"
+      ],
+      "hit_count": 62,
+      "hits": [
+        "crates/storage/src/vault.rs:193:code",
+        "crates/research/src/lib.rs:481:code",
+        "crates/provider_transport/src/lib.rs:18:code",
+        "crates/platform_windows/src/lib.rs:82:code",
+        "crates/platform_windows/tests/licensing_policy.rs:309:code",
+        "crates/patent/src/lib.rs:196:code",
+        "crates/evidence/src/lib.rs:434:code",
+        "crates/domain/src/scope.rs:160:code",
+        "crates/crash_reporter/src/lib.rs:464:code",
+        "crates/commercialization/src/asset_readiness.rs:21:code",
+        "crates/application/src/lib.rs:29:code",
+        "apps/desktop/e2e-artifact.mjs:74:code"
+      ]
+    },
+    {
+      "test_id": "GEN-012",
+      "claim": "no source code security audit record exists",
+      "keywords": [
+        "source",
+        "code",
+        "audit"
+      ],
+      "hit_count": 124,
+      "hits": [
+        "crates/storage/src/lib.rs:224:source",
+        "crates/storage/src/vault.rs:566:source",
+        "crates/storage/src/vault.rs:193:code",
+        "crates/storage/src/vault.rs:8:audit",
+        "crates/research/src/lib.rs:27:source",
+        "crates/research/src/lib.rs:481:code",
+        "crates/provider_transport/src/lib.rs:18:code",
+        "crates/platform_windows/src/lib.rs:82:code",
+        "crates/platform_windows/tests/licensing_policy.rs:38:source",
+        "crates/platform_windows/tests/licensing_policy.rs:309:code",
+        "crates/platform_windows/tests/local_first.rs:7:source",
+        "crates/patent/src/lib.rs:196:code"
+      ]
+    },
+    {
+      "test_id": "GEN-013",
+      "claim": "no security code metrics tool is configured",
+      "keywords": [
+        "code",
+        "metrics"
+      ],
+      "hit_count": 67,
+      "hits": [
+        "crates/storage/src/vault.rs:193:code",
+        "crates/research/src/lib.rs:481:code",
+        "crates/provider_transport/src/lib.rs:18:code",
+        "crates/platform_windows/src/lib.rs:82:code",
+        "crates/platform_windows/tests/licensing_policy.rs:309:code",
+        "crates/patent/src/lib.rs:196:code",
+        "crates/evidence/src/lib.rs:434:code",
+        "crates/domain/src/scope.rs:160:code",
+        "crates/crash_reporter/src/lib.rs:464:code",
+        "crates/commercialization/src/asset_readiness.rs:21:code",
+        "crates/application/src/lib.rs:29:code",
+        "apps/desktop/e2e-artifact.mjs:74:code"
+      ]
+    },
+    {
+      "test_id": "GEN-014",
+      "claim": "no cyclomatic complexity measurement is recorded",
+      "keywords": [
+        "cyclomatic",
+        "complexity",
+        "measurement"
+      ],
+      "hit_count": 15,
+      "hits": [
+        "crates/platform_windows/src/lib.rs:8:measurement",
+        "crates/application/src/lib.rs:336:measurement",
+        "apps/desktop/e2e-artifact.mjs:206:measurement",
+        "apps/desktop/src-tauri/src/commands.rs:2174:measurement",
+        "apps/desktop/src-tauri/tests/recovery_drill.rs:332:measurement",
+        "apps/desktop/src-tauri/tests/soak_abbreviated.rs:305:measurement",
+        "scripts/add-requirement-markers.py:98:measurement",
+        "scripts/applicable-case-evidence.py:329:measurement",
+        "scripts/bind-requirements.py:140:measurement",
+        "scripts/build-dod-status.py:67:measurement",
+        "scripts/completion-report.py:15:measurement",
+        "scripts/coverage-gate.py:24:measurement"
+      ]
+    },
+    {
+      "test_id": "GEN-015",
+      "claim": "no DAST tool targets the desktop IPC boundary",
+      "keywords": [
+        "dast",
+        "desktop",
+        "boundary"
+      ],
+      "hit_count": 80,
+      "hits": [
+        "crates/platform_windows/Cargo.toml:20:desktop",
+        "crates/provider_transport/Cargo.toml:11:boundary",
+        "crates/storage/src/vault.rs:12:desktop",
+        "crates/storage/src/vault.rs:3:boundary",
+        "crates/storage/tests/integration_real_dependencies.rs:164:desktop",
+        "crates/storage/tests/integration_real_dependencies.rs:3:boundary",
+        "crates/provider_transport/src/lib.rs:24:desktop",
+        "crates/provider_transport/src/lib.rs:13:boundary",
+        "crates/platform_windows/tests/licensing_policy.rs:270:desktop",
+        "crates/platform_windows/tests/local_first.rs:10:desktop",
+        "crates/mcp_hub/src/lib.rs:62:boundary",
+        "crates/domain/src/scope.rs:152:boundary"
+      ]
+    },
+    {
+      "test_id": "GEN-016",
+      "claim": "no IAST instrumentation exists",
+      "keywords": [
+        "iast",
+        "instrumentation"
+      ],
+      "hit_count": 1,
+      "hits": [
+        "scripts/coverage-gate.py:327:instrumentation"
+      ]
+    },
+    {
+      "test_id": "GEN-019",
+      "claim": "no automated penetration test harness exists",
+      "keywords": [
+        "penetration"
+      ],
+      "hit_count": 1,
+      "hits": [
+        "scripts/applicable-case-evidence.py:152:penetration"
+      ]
+    },
+    {
+      "test_id": "GEN-022",
+      "claim": "no adversary emulation harness exists",
+      "keywords": [
+        "adversary",
+        "emulation"
+      ],
+      "hit_count": 1,
+      "hits": [
+        "scripts/applicable-case-evidence.py:257:adversary"
+      ]
+    },
+    {
+      "test_id": "GEN-023",
+      "claim": "no breach-and-attack simulation harness exists",
+      "keywords": [
+        "breach-and-attack",
+        "simulation"
+      ],
+      "hit_count": 3,
+      "hits": [
+        "crates/evidence/src/lib.rs:161:simulation",
+        "scripts/anti-gaming-scan.py:17:simulation",
+        "scripts/applicable-case-evidence.py:152:simulation"
+      ]
+    },
+    {
+      "test_id": "GEN-025",
+      "claim": "no coverage-guided fuzzing engine (measured: the campaign documents that cargo-fuzz/libFuzzer would need a nightly toolchain and a new dependency); the deterministic mutation campaign is recorded under GEN-024/GEN-027",
+      "keywords": [
+        "coverage-guided",
+        "fuzzing",
+        "engine",
+        "measured",
+        "campaign",
+        "documents"
+      ],
+      "hit_count": 68,
+      "hits": [
+        "crates/storage/src/lib.rs:230:measured",
+        "crates/storage/src/vault.rs:331:engine",
+        "crates/storage/src/vault.rs:358:measured",
+        "crates/storage/tests/integration_real_dependencies.rs:7:engine",
+        "crates/provider_transport/src/lib.rs:23:measured",
+        "crates/platform_windows/src/lib.rs:7:measured",
+        "crates/evidence/src/lib.rs:516:documents",
+        "crates/domain/src/scope.rs:208:engine",
+        "crates/domain/src/scope.rs:242:measured",
+        "crates/crash_reporter/src/lib.rs:192:measured",
+        "crates/crash_reporter/src/lib.rs:640:campaign",
+        "crates/application/src/lib.rs:7:measured"
+      ]
+    },
+    {
+      "test_id": "GEN-026",
+      "claim": "no grammar-based fuzzer: the campaign generates an adversarial character corpus deterministically, but no grammar drives input generation",
+      "keywords": [
+        "grammar-based",
+        "fuzzer",
+        "campaign",
+        "generates",
+        "adversarial",
+        "character"
+      ],
+      "hit_count": 17,
+      "hits": [
+        "crates/crash_reporter/src/lib.rs:640:campaign",
+        "crates/crash_reporter/src/lib.rs:165:character",
+        "apps/desktop/src-tauri/tests/fuzz_campaign.rs:4:fuzzer",
+        "apps/desktop/src-tauri/tests/fuzz_campaign.rs:1:campaign",
+        "apps/desktop/src-tauri/tests/fuzz_campaign.rs:279:adversarial",
+        "apps/desktop/src-tauri/tests/fuzz_campaign.rs:16:character",
+        "packages/contracts/src/validate.ts:212:character",
+        "packages/contracts/tests/validate.test.ts:4:character",
+        "scripts/applicable-case-evidence.py:137:campaign",
+        "scripts/applicable-case-evidence.py:141:adversarial",
+        "scripts/applicable-case-evidence.py:131:character",
+        "scripts/build-dod-status.py:69:campaign"
+      ]
+    },
+    {
+      "test_id": "GEN-028",
+      "claim": "no protocol fuzzing surface exists: the product serves no network protocol, and its IPC is an in-process Tauri command boundary",
+      "keywords": [
+        "protocol",
+        "fuzzing",
+        "serves",
+        "network",
+        "in-process",
+        "tauri"
+      ],
+      "hit_count": 69,
+      "hits": [
+        "crates/platform_windows/Cargo.toml:9:tauri",
+        "crates/storage/src/vault.rs:1237:serves",
+        "crates/provider_transport/src/lib.rs:7:network",
+        "crates/provider_transport/src/lib.rs:24:tauri",
+        "crates/platform_windows/tests/licensing_policy.rs:270:tauri",
+        "crates/platform_windows/tests/local_first.rs:41:serves",
+        "crates/platform_windows/tests/local_first.rs:5:network",
+        "crates/evidence/src/lib.rs:389:serves",
+        "crates/domain/src/scope.rs:58:in-process",
+        "crates/application/src/lib.rs:27:tauri",
+        "apps/desktop/e2e-artifact.mjs:21:serves",
+        "apps/desktop/e2e-artifact.mjs:19:tauri"
+      ]
+    },
+    {
+      "test_id": "GEN-029",
+      "claim": "no web application is served by this product",
+      "keywords": [
+        "application",
+        "served"
+      ],
+      "hit_count": 50,
+      "hits": [
+        "crates/application/Cargo.toml:2:application",
+        "crates/storage/src/vault.rs:1229:served",
+        "crates/storage/tests/integration_real_dependencies.rs:101:served",
+        "crates/provider_transport/src/lib.rs:392:served",
+        "crates/platform_windows/src/lib.rs:6:application",
+        "crates/platform_windows/tests/licensing_policy.rs:339:application",
+        "crates/platform_windows/tests/local_first.rs:56:served",
+        "crates/patent/src/lib.rs:187:application",
+        "crates/domain/src/lib.rs:419:application",
+        "crates/domain/src/scope.rs:169:application",
+        "crates/commercialization/src/asset_readiness.rs:39:application",
+        "crates/commercialization/src/lib.rs:360:served"
+      ]
+    },
+    {
+      "test_id": "GEN-030",
+      "claim": "no dedicated API security suite: the IPC boundary has no HTTP surface and no auth; injection and access-control behaviour over it is executed under GEN-045 and GEN-052, which are APPLICABLE",
+      "keywords": [
+        "dedicated",
+        "boundary",
+        "http",
+        "auth",
+        "injection",
+        "access-control"
+      ],
+      "hit_count": 80,
+      "hits": [
+        "crates/provider_transport/Cargo.toml:11:boundary",
+        "crates/storage/src/lib.rs:234:http",
+        "crates/storage/src/vault.rs:3:boundary",
+        "crates/storage/tests/integration_real_dependencies.rs:3:boundary",
+        "crates/storage/tests/integration_real_dependencies.rs:63:http",
+        "crates/provider_transport/src/lib.rs:13:boundary",
+        "crates/provider_transport/src/lib.rs:14:http",
+        "crates/platform_windows/tests/licensing_policy.rs:405:http",
+        "crates/mcp_hub/src/lib.rs:62:boundary",
+        "crates/mcp_hub/src/lib.rs:50:injection",
+        "crates/evidence/src/lib.rs:367:auth",
+        "crates/domain/src/lib.rs:191:http"
+      ]
+    },
+    {
+      "test_id": "GEN-031",
+      "claim": "no REST surface exists; IPC commands are not HTTP",
+      "keywords": [
+        "rest",
+        "commands",
+        "http"
+      ],
+      "hit_count": 81,
+      "hits": [
+        "crates/storage/Cargo.toml:8:rest",
+        "crates/storage/src/lib.rs:234:http",
+        "crates/storage/src/vault.rs:260:rest",
+        "crates/storage/tests/integration_real_dependencies.rs:63:http",
+        "crates/provider_transport/src/lib.rs:14:http",
+        "crates/platform_windows/tests/licensing_policy.rs:47:rest",
+        "crates/platform_windows/tests/licensing_policy.rs:302:commands",
+        "crates/platform_windows/tests/licensing_policy.rs:405:http",
+        "crates/platform_windows/tests/local_first.rs:65:rest",
+        "crates/platform_windows/tests/local_first.rs:12:commands",
+        "crates/evidence/src/lib.rs:5:rest",
+        "crates/domain/src/lib.rs:191:http"
+      ]
+    },
+    {
+      "test_id": "GEN-032",
+      "claim": "no GraphQL endpoint exists",
+      "keywords": [
+        "graphql",
+        "endpoint"
+      ],
+      "hit_count": 16,
+      "hits": [
+        "crates/storage/src/lib.rs:230:endpoint",
+        "crates/provider_transport/src/lib.rs:50:endpoint",
+        "crates/platform_windows/tests/local_first.rs:147:endpoint",
+        "crates/evidence/src/lib.rs:355:endpoint",
+        "apps/desktop/e2e-artifact.mjs:56:endpoint",
+        "apps/desktop/e2e-local-provider.mjs:26:endpoint",
+        "apps/desktop/src/App.tsx:739:endpoint",
+        "apps/desktop/src-tauri/Cargo.toml:33:endpoint",
+        "apps/desktop/src-tauri/src/commands.rs:2637:endpoint",
+        "apps/desktop/src-tauri/src/lib.rs:457:endpoint",
+        "scripts/add-requirement-markers.py:82:endpoint",
+        "scripts/applicable-case-evidence.py:147:endpoint"
+      ]
+    },
+    {
+      "test_id": "GEN-033",
+      "claim": "no SOAP endpoint exists",
+      "keywords": [
+        "soap",
+        "endpoint"
+      ],
+      "hit_count": 16,
+      "hits": [
+        "crates/storage/src/lib.rs:230:endpoint",
+        "crates/provider_transport/src/lib.rs:50:endpoint",
+        "crates/platform_windows/tests/local_first.rs:147:endpoint",
+        "crates/evidence/src/lib.rs:355:endpoint",
+        "apps/desktop/e2e-artifact.mjs:56:endpoint",
+        "apps/desktop/e2e-local-provider.mjs:26:endpoint",
+        "apps/desktop/src/App.tsx:739:endpoint",
+        "apps/desktop/src-tauri/Cargo.toml:33:endpoint",
+        "apps/desktop/src-tauri/src/commands.rs:2637:endpoint",
+        "apps/desktop/src-tauri/src/lib.rs:457:endpoint",
+        "scripts/add-requirement-markers.py:82:endpoint",
+        "scripts/applicable-case-evidence.py:147:endpoint"
+      ]
+    },
+    {
+      "test_id": "GEN-034",
+      "claim": "no mobile target exists; the product is Windows desktop",
+      "keywords": [
+        "mobile",
+        "windows",
+        "desktop"
+      ],
+      "hit_count": 83,
+      "hits": [
+        "crates/application/Cargo.toml:10:windows",
+        "crates/platform_windows/Cargo.toml:2:windows",
+        "crates/platform_windows/Cargo.toml:20:desktop",
+        "crates/storage/src/vault.rs:12:desktop",
+        "crates/storage/tests/integration_real_dependencies.rs:164:desktop",
+        "crates/provider_transport/src/lib.rs:24:desktop",
+        "crates/platform_windows/src/lib.rs:12:windows",
+        "crates/platform_windows/tests/licensing_policy.rs:18:windows",
+        "crates/platform_windows/tests/licensing_policy.rs:270:desktop",
+        "crates/platform_windows/tests/local_first.rs:10:desktop",
+        "crates/crash_reporter/src/lib.rs:85:windows",
+        "crates/application/src/lib.rs:174:windows"
+      ]
+    },
+    {
+      "test_id": "GEN-036",
+      "claim": "no XSS/CSP client-side security suite: the WebView is exercised by the browser and exact-artifact lanes, but no client-side injection suite attacks it (GEN-047 records the same absence)",
+      "keywords": [
+        "client-side",
+        "webview",
+        "exercised",
+        "browser",
+        "exact-artifact",
+        "lanes"
+      ],
+      "hit_count": 69,
+      "hits": [
+        "crates/provider_transport/src/lib.rs:18:lanes",
+        "crates/mcp_hub/src/lib.rs:57:exercised",
+        "crates/evidence/src/lib.rs:202:exercised",
+        "crates/domain/src/scope.rs:23:exercised",
+        "crates/domain/src/scope.rs:122:lanes",
+        "crates/application/src/lib.rs:49:exact-artifact",
+        "crates/application/src/lib.rs:51:lanes",
+        "apps/desktop/e2e-artifact.mjs:16:webview",
+        "apps/desktop/e2e-artifact.mjs:24:browser",
+        "apps/desktop/e2e-artifact.mjs:9:exact-artifact",
+        "apps/desktop/e2e-artifact.mjs:167:lanes",
+        "apps/desktop/e2e-local-provider.mjs:74:browser"
+      ]
+    },
+    {
+      "test_id": "GEN-038",
+      "claim": "no serverless/FaaS deployment exists",
+      "keywords": [
+        "serverless",
+        "faas",
+        "deployment"
+      ],
+      "hit_count": 4,
+      "hits": [
+        "scripts/build-dod-status.py:135:serverless",
+        "scripts/build-dod-status.py:59:deployment",
+        "scripts/completion-report.py:213:deployment",
+        "scripts/doc-exec.py:5:deployment"
+      ]
+    },
+    {
+      "test_id": "GEN-039",
+      "claim": "no container image is produced",
+      "keywords": [
+        "container",
+        "image"
+      ],
+      "hit_count": 10,
+      "hits": [
+        "crates/domain/src/scope.rs:57:container",
+        "apps/desktop/e2e-artifact.mjs:616:container",
+        "scripts/applicable-case-evidence.py:162:container",
+        "scripts/applicable-case-evidence.py:162:image",
+        "scripts/build-dod-status.py:83:container",
+        "scripts/build-dod-status.py:63:image",
+        "scripts/clean-build.sh:12:image",
+        "scripts/generate-icons.py:9:container",
+        "scripts/generate-icons.py:145:image",
+        "scripts/security-check.sh:5:container"
+      ]
+    },
+    {
+      "test_id": "GEN-040",
+      "claim": "no Kubernetes manifest exists",
+      "keywords": [
+        "kubernetes",
+        "manifest"
+      ],
+      "hit_count": 28,
+      "hits": [
+        "crates/platform_windows/tests/licensing_policy.rs:16:manifest",
+        "crates/platform_windows/tests/local_first.rs:23:manifest",
+        "crates/patent/src/lib.rs:17:manifest",
+        "apps/desktop/src/App.tsx:210:manifest",
+        "apps/desktop/src-tauri/src/commands.rs:837:manifest",
+        "apps/desktop/src-tauri/src/lib.rs:367:manifest",
+        "apps/desktop/src-tauri/tests/fuzz_campaign.rs:469:manifest",
+        "apps/desktop/src-tauri/tests/performance_gate.rs:188:manifest",
+        "apps/desktop/src-tauri/tests/recovery_drill.rs:341:manifest",
+        "apps/desktop/src-tauri/tests/soak_abbreviated.rs:103:manifest",
+        "apps/desktop/src-tauri/tests/stress_concurrency.rs:532:manifest",
+        "scripts/add-requirement-markers.py:62:manifest"
+      ]
+    },
+    {
+      "test_id": "GEN-041",
+      "claim": "no cloud-native runtime exists; the product is local-first",
+      "keywords": [
+        "cloud-native",
+        "runtime",
+        "local-first"
+      ],
+      "hit_count": 26,
+      "hits": [
+        "crates/storage/src/vault.rs:1656:runtime",
+        "crates/platform_windows/src/lib.rs:48:runtime",
+        "crates/platform_windows/tests/licensing_policy.rs:339:local-first",
+        "crates/platform_windows/tests/local_first.rs:3:runtime",
+        "crates/platform_windows/tests/local_first.rs:1:local-first",
+        "crates/application/src/lib.rs:28:runtime",
+        "apps/desktop/e2e-artifact.mjs:75:runtime",
+        "apps/desktop/e2e-artifact.mjs:159:local-first",
+        "apps/desktop/e2e-local-provider.mjs:16:runtime",
+        "apps/desktop/e2e-local-provider.mjs:280:local-first",
+        "apps/desktop/e2e/shell.spec.ts:41:local-first",
+        "apps/desktop/src/App.tsx:53:runtime"
+      ]
+    },
+    {
+      "test_id": "GEN-043",
+      "claim": "no vulnerability ASSESSMENT record: advisories are scanned and disclosed (GEN-042 is APPLICABLE and executed, and the two moderate dev-only findings are recorded as accepted risk), but no severity/exploitability assessment document exists",
+      "keywords": [
+        "vulnerability",
+        "assessment",
+        "advisories",
+        "scanned",
+        "disclosed",
+        "gen-042"
+      ],
+      "hit_count": 19,
+      "hits": [
+        "crates/research/src/lib.rs:420:assessment",
+        "scripts/applicable-case-evidence.py:161:vulnerability",
+        "scripts/applicable-case-evidence.py:285:assessment",
+        "scripts/applicable-case-evidence.py:74:advisories",
+        "scripts/applicable-case-evidence.py:131:scanned",
+        "scripts/applicable-case-evidence.py:80:disclosed",
+        "scripts/applicable-case-evidence.py:154:gen-042",
+        "scripts/bind-requirements.py:136:scanned",
+        "scripts/build-dod-status.py:131:assessment",
+        "scripts/build-dod-status.py:95:advisories",
+        "scripts/build-dod-status.py:99:scanned",
+        "scripts/build-dod-status.py:59:disclosed"
+      ]
+    },
+    {
+      "test_id": "GEN-046",
+      "claim": "SQL is parameterized in the vault crate; no injection suite runs it",
+      "keywords": [
+        "parameterized",
+        "vault",
+        "crate",
+        "injection"
+      ],
+      "hit_count": 67,
+      "hits": [
+        "crates/platform_windows/Cargo.toml:21:crate",
+        "crates/storage/Cargo.toml:10:crate",
+        "crates/storage/src/lib.rs:3:vault",
+        "crates/storage/src/vault.rs:1:vault",
+        "crates/storage/src/vault.rs:1172:crate",
+        "crates/storage/tests/integration_real_dependencies.rs:54:vault",
+        "crates/platform_windows/src/lib.rs:45:vault",
+        "crates/platform_windows/tests/licensing_policy.rs:11:crate",
+        "crates/platform_windows/tests/local_first.rs:43:vault",
+        "crates/platform_windows/tests/local_first.rs:26:crate",
+        "crates/patent/src/lib.rs:20:crate",
+        "crates/mcp_hub/src/lib.rs:3:vault"
+      ]
+    },
+    {
+      "test_id": "GEN-047",
+      "claim": "no XSS suite exercises the WebView renderer",
+      "keywords": [
+        "exercises",
+        "webview",
+        "renderer"
+      ],
+      "hit_count": 14,
+      "hits": [
+        "apps/desktop/e2e-artifact.mjs:16:webview",
+        "apps/desktop/src-tauri/Cargo.toml:33:webview",
+        "apps/desktop/src-tauri/tests/soak_abbreviated.rs:22:exercises",
+        "packages/contracts/src/validate.ts:8:webview",
+        "scripts/applicable-case-evidence.py:152:webview",
+        "scripts/artifact-e2e.sh:23:webview",
+        "scripts/assert-no-debug-port.py:2:webview",
+        "scripts/build-dod-status.py:75:exercises",
+        "scripts/build-dod-status.py:61:webview",
+        "scripts/build-traceability.py:61:exercises",
+        "scripts/clean-build.sh:18:webview",
+        "scripts/run-integration-real.sh:4:exercises"
+      ]
+    },
+    {
+      "test_id": "GEN-048",
+      "claim": "no CSRF surface exists; IPC uses no cookie auth",
+      "keywords": [
+        "csrf",
+        "uses",
+        "cookie",
+        "auth"
+      ],
+      "hit_count": 60,
+      "hits": [
+        "crates/storage/src/vault.rs:561:uses",
+        "crates/research/src/lib.rs:373:uses",
+        "crates/platform_windows/src/lib.rs:20:uses",
+        "crates/platform_windows/tests/licensing_policy.rs:98:uses",
+        "crates/evidence/src/lib.rs:270:uses",
+        "crates/evidence/src/lib.rs:367:auth",
+        "crates/domain/src/lib.rs:880:uses",
+        "crates/domain/src/lib.rs:82:auth",
+        "crates/domain/src/scope.rs:165:uses",
+        "crates/crash_reporter/src/lib.rs:258:uses",
+        "crates/crash_reporter/src/lib.rs:236:auth",
+        "crates/commercialization/src/lib.rs:89:uses"
+      ]
+    },
+    {
+      "test_id": "GEN-050",
+      "claim": "no authentication surface exists; the app is device-local",
+      "keywords": [
+        "authentication",
+        "device-local"
+      ],
+      "hit_count": 6,
+      "hits": [
+        "crates/platform_windows/tests/local_first.rs:43:device-local",
+        "crates/domain/src/scope.rs:58:device-local",
+        "apps/desktop/e2e-local-provider.mjs:296:device-local",
+        "scripts/applicable-case-evidence.py:330:device-local",
+        "scripts/build-dod-status.py:71:device-local",
+        "scripts/version-matrix.py:554:device-local"
+      ]
+    },
+    {
+      "test_id": "GEN-053",
+      "claim": "no object-reference endpoint exists beyond workspace paths",
+      "keywords": [
+        "object-reference",
+        "endpoint",
+        "workspace",
+        "paths"
+      ],
+      "hit_count": 80,
+      "hits": [
+        "crates/platform_windows/Cargo.toml:8:workspace",
+        "crates/provider_transport/Cargo.toml:9:workspace",
+        "crates/storage/Cargo.toml:17:workspace",
+        "crates/storage/src/lib.rs:230:endpoint",
+        "crates/storage/src/lib.rs:215:workspace",
+        "crates/storage/src/vault.rs:1:workspace",
+        "crates/provider_transport/src/lib.rs:50:endpoint",
+        "crates/provider_transport/src/lib.rs:11:paths",
+        "crates/platform_windows/src/lib.rs:43:paths",
+        "crates/platform_windows/tests/licensing_policy.rs:340:workspace",
+        "crates/platform_windows/tests/local_first.rs:147:endpoint",
+        "crates/patent/src/lib.rs:361:workspace"
+      ]
+    },
+    {
+      "test_id": "GEN-054",
+      "claim": "no multi-principal privilege model exists",
+      "keywords": [
+        "multi-principal",
+        "privilege",
+        "model"
+      ],
+      "hit_count": 23,
+      "hits": [
+        "crates/provider_transport/Cargo.toml:12:model",
+        "crates/storage/src/vault.rs:3:model",
+        "crates/research/src/lib.rs:12:model",
+        "crates/provider_transport/src/lib.rs:4:model",
+        "crates/platform_windows/tests/local_first.rs:4:model",
+        "crates/domain/src/lib.rs:103:model",
+        "crates/domain/src/scope.rs:210:model",
+        "apps/desktop/e2e-artifact.mjs:207:model",
+        "apps/desktop/e2e-local-provider.mjs:11:model",
+        "apps/desktop/e2e/shell.spec.ts:211:model",
+        "apps/desktop/src/App.tsx:236:model",
+        "apps/desktop/src-tauri/src/commands.rs:286:model"
+      ]
+    },
+    {
+      "test_id": "GEN-055",
+      "claim": "no session management exists",
+      "keywords": [
+        "session",
+        "management"
+      ],
+      "hit_count": 6,
+      "hits": [
+        "apps/desktop/e2e-artifact.mjs:595:session",
+        "apps/desktop/src/App.tsx:1830:session",
+        "scripts/applicable-case-evidence.py:201:session",
+        "scripts/applicable-case-evidence.py:562:management",
+        "scripts/build-dod-status.py:67:session",
+        "scripts/doc-exec.py:63:management"
+      ]
+    },
+    {
+      "test_id": "GEN-058",
+      "claim": "no weak-cryptography DETECTION test: the cryptographic implementation is tested (GEN-057 is APPLICABLE), but nothing scans for weak or deprecated primitives, and the dependency ban list names none",
+      "keywords": [
+        "weak-cryptography",
+        "detection",
+        "cryptographic",
+        "implementation",
+        "tested",
+        "gen-057"
+      ],
+      "hit_count": 32,
+      "hits": [
+        "crates/storage/src/vault.rs:196:cryptographic",
+        "crates/storage/src/vault.rs:854:tested",
+        "crates/research/src/lib.rs:499:implementation",
+        "crates/provider_transport/src/lib.rs:56:implementation",
+        "crates/patent/src/lib.rs:55:cryptographic",
+        "crates/patent/src/lib.rs:13:implementation",
+        "crates/evidence/src/lib.rs:432:cryptographic",
+        "crates/domain/src/lib.rs:292:implementation",
+        "crates/domain/src/scope.rs:245:implementation",
+        "crates/crash_reporter/src/lib.rs:362:implementation",
+        "crates/crash_reporter/src/lib.rs:192:tested",
+        "crates/commercialization/src/lib.rs:258:implementation"
+      ]
+    },
+    {
+      "test_id": "GEN-059",
+      "claim": "no TLS listener is operated by the product",
+      "keywords": [
+        "listener",
+        "operated"
+      ],
+      "hit_count": 2,
+      "hits": [
+        "scripts/assert-no-debug-port.py:18:listener",
+        "scripts/build-dod-status.py:99:listener"
+      ]
+    },
+    {
+      "test_id": "GEN-060",
+      "claim": "no side-channel resistance testing exists",
+      "keywords": [
+        "side-channel",
+        "resistance"
+      ],
+      "hit_count": 1,
+      "hits": [
+        "scripts/applicable-case-evidence.py:257:resistance"
+      ]
+    },
+    {
+      "test_id": "GEN-061",
+      "claim": "no security misconfiguration scanner targets the installed app",
+      "keywords": [
+        "misconfiguration",
+        "scanner"
+      ],
+      "hit_count": 6,
+      "hits": [
+        "crates/platform_windows/Cargo.toml:22:scanner",
+        "crates/platform_windows/tests/licensing_policy.rs:161:scanner",
+        "scripts/applicable-case-evidence.py:100:scanner",
+        "scripts/generate-sbom.py:43:scanner",
+        "scripts/secret-scan.py:10:scanner",
+        "scripts/validate-generated-pack.py:91:scanner"
+      ]
+    },
+    {
+      "test_id": "GEN-064",
+      "claim": "no IaC definitions exist in the repository",
+      "keywords": [
+        "definitions"
+      ],
+      "hit_count": 1,
+      "hits": [
+        "scripts/collect-skip-report.py:48:definitions"
+      ]
+    },
+    {
+      "test_id": "GEN-066",
+      "claim": "no container image is built or scanned",
+      "keywords": [
+        "container",
+        "image",
+        "built",
+        "scanned"
+      ],
+      "hit_count": 32,
+      "hits": [
+        "crates/storage/src/vault.rs:572:built",
+        "crates/domain/src/scope.rs:57:container",
+        "crates/domain/src/scope.rs:18:built",
+        "crates/crash_reporter/src/lib.rs:535:built",
+        "apps/desktop/e2e-artifact.mjs:616:container",
+        "apps/desktop/e2e-artifact.mjs:23:built",
+        "apps/desktop/playwright.config.ts:16:built",
+        "scripts/applicable-case-evidence.py:162:container",
+        "scripts/applicable-case-evidence.py:162:image",
+        "scripts/applicable-case-evidence.py:373:built",
+        "scripts/applicable-case-evidence.py:131:scanned",
+        "scripts/bind-requirements.py:136:scanned"
+      ]
+    },
+    {
+      "test_id": "GEN-067",
+      "claim": "no cloud configuration exists",
+      "keywords": [
+        "cloud",
+        "configuration"
+      ],
+      "hit_count": 15,
+      "hits": [
+        "crates/platform_windows/src/lib.rs:48:configuration",
+        "crates/platform_windows/tests/licensing_policy.rs:391:configuration",
+        "crates/platform_windows/tests/local_first.rs:13:configuration",
+        "apps/desktop/e2e-artifact.mjs:410:configuration",
+        "apps/desktop/e2e-local-provider.mjs:286:configuration",
+        "apps/desktop/playwright.config.ts:4:configuration",
+        "apps/desktop/vitest.config.ts:4:configuration",
+        "apps/desktop/src/App.tsx:50:configuration",
+        "apps/desktop/src-tauri/src/commands.rs:1715:configuration",
+        "apps/desktop/src-tauri/src/lib.rs:13:configuration",
+        "scripts/applicable-case-evidence.py:235:configuration",
+        "scripts/build-dod-status.py:135:cloud"
+      ]
+    },
+    {
+      "test_id": "GEN-068",
+      "claim": "the product opens no network listener by default",
+      "keywords": [
+        "opens",
+        "network",
+        "listener",
+        "default"
+      ],
+      "hit_count": 63,
+      "hits": [
+        "crates/provider_transport/Cargo.toml:13:default",
+        "crates/storage/src/lib.rs:18:default",
+        "crates/storage/src/vault.rs:360:opens",
+        "crates/storage/src/vault.rs:75:default",
+        "crates/provider_transport/src/lib.rs:7:network",
+        "crates/provider_transport/src/lib.rs:118:default",
+        "crates/platform_windows/src/lib.rs:27:default",
+        "crates/platform_windows/tests/licensing_policy.rs:121:default",
+        "crates/platform_windows/tests/local_first.rs:5:network",
+        "crates/patent/src/lib.rs:180:default",
+        "crates/mcp_hub/src/lib.rs:18:default",
+        "crates/evidence/src/lib.rs:18:default"
+      ]
+    },
+    {
+      "test_id": "GEN-069",
+      "claim": "no service mesh exists",
+      "keywords": [
+        "service",
+        "mesh"
+      ],
+      "hit_count": 10,
+      "hits": [
+        "crates/mcp_hub/src/lib.rs:139:service",
+        "apps/desktop/src-tauri/tests/performance_gate.rs:28:service",
+        "apps/desktop/src-tauri/tests/recovery_drill.rs:37:service",
+        "apps/desktop/src-tauri/tests/stress_concurrency.rs:44:service",
+        "scripts/applicable-case-evidence.py:572:service",
+        "scripts/build-dod-status.py:71:service",
+        "scripts/completion-report.py:81:service",
+        "scripts/live-fire-local-provider.sh:52:service",
+        "scripts/performance-lane.sh:18:service",
+        "scripts/run-live-fire-real.sh:10:service"
+      ]
+    },
+    {
+      "test_id": "GEN-070",
+      "claim": "no API gateway exists",
+      "keywords": [
+        "gateway"
+      ],
+      "hit_count": 3,
+      "hits": [
+        "apps/desktop/src-tauri/src/commands.rs:2992:gateway",
+        "apps/desktop/src-tauri/src/lib.rs:486:gateway",
+        "scripts/add-requirement-markers.py:135:gateway"
+      ]
+    },
+    {
+      "test_id": "GEN-074",
+      "claim": "no build provenance attestation is produced (PF-015)",
+      "keywords": [
+        "build",
+        "provenance",
+        "attestation",
+        "pf-015"
+      ],
+      "hit_count": 71,
+      "hits": [
+        "crates/storage/src/lib.rs:127:build",
+        "crates/storage/src/vault.rs:591:build",
+        "crates/research/src/lib.rs:45:provenance",
+        "crates/provider_transport/src/lib.rs:192:build",
+        "crates/platform_windows/src/lib.rs:36:build",
+        "crates/platform_windows/tests/licensing_policy.rs:252:build",
+        "crates/patent/src/lib.rs:7:build",
+        "crates/domain/src/scope.rs:89:build",
+        "crates/domain/src/scope.rs:119:provenance",
+        "crates/crash_reporter/src/lib.rs:244:build",
+        "crates/commercialization/src/asset_readiness.rs:3:build",
+        "apps/desktop/e2e-artifact.mjs:19:build"
+      ]
+    },
+    {
+      "test_id": "GEN-075",
+      "claim": "no artifact signing key or signature exists (PF-015)",
+      "keywords": [
+        "artifact",
+        "signing",
+        "signature",
+        "pf-015"
+      ],
+      "hit_count": 49,
+      "hits": [
+        "crates/platform_windows/tests/licensing_policy.rs:243:artifact",
+        "crates/platform_windows/tests/local_first.rs:11:artifact",
+        "crates/patent/src/lib.rs:17:artifact",
+        "crates/patent/src/lib.rs:55:signature",
+        "crates/evidence/src/lib.rs:430:signature",
+        "crates/application/src/lib.rs:8:artifact",
+        "apps/desktop/e2e-artifact.mjs:9:artifact",
+        "apps/desktop/e2e-local-provider.mjs:10:artifact",
+        "apps/desktop/e2e/shell.spec.ts:7:artifact",
+        "apps/desktop/src/App.tsx:1410:artifact",
+        "apps/desktop/src-tauri/Cargo.toml:34:artifact",
+        "apps/desktop/src-tauri/src/commands.rs:2219:artifact"
+      ]
+    },
+    {
+      "test_id": "GEN-076",
+      "claim": "no artifact attestation is produced (PF-015)",
+      "keywords": [
+        "artifact",
+        "attestation",
+        "pf-015"
+      ],
+      "hit_count": 44,
+      "hits": [
+        "crates/platform_windows/tests/licensing_policy.rs:243:artifact",
+        "crates/platform_windows/tests/local_first.rs:11:artifact",
+        "crates/patent/src/lib.rs:17:artifact",
+        "crates/application/src/lib.rs:8:artifact",
+        "apps/desktop/e2e-artifact.mjs:9:artifact",
+        "apps/desktop/e2e-local-provider.mjs:10:artifact",
+        "apps/desktop/e2e/shell.spec.ts:7:artifact",
+        "apps/desktop/src/App.tsx:1410:artifact",
+        "apps/desktop/src-tauri/Cargo.toml:34:artifact",
+        "apps/desktop/src-tauri/src/commands.rs:2219:artifact",
+        "apps/desktop/src-tauri/src/lib.rs:108:artifact",
+        "scripts/applicable-case-evidence.py:21:artifact"
+      ]
+    },
+    {
+      "test_id": "GEN-078",
+      "claim": "no binary analysis tooling is configured",
+      "keywords": [
+        "binary",
+        "tooling"
+      ],
+      "hit_count": 19,
+      "hits": [
+        "crates/storage/src/vault.rs:1661:binary",
+        "crates/application/src/lib.rs:53:binary",
+        "apps/desktop/e2e-artifact.mjs:26:binary",
+        "apps/desktop/src-tauri/Cargo.toml:38:binary",
+        "scripts/applicable-case-evidence.py:372:binary",
+        "scripts/applicable-case-evidence.py:255:tooling",
+        "scripts/artifact-e2e.sh:23:binary",
+        "scripts/assert-no-debug-port.py:4:binary",
+        "scripts/build-dod-status.py:61:binary",
+        "scripts/change-invalidation.py:127:tooling",
+        "scripts/coverage-gate.py:50:binary",
+        "scripts/doc-exec.py:193:binary"
+      ]
+    },
+    {
+      "test_id": "GEN-080",
+      "claim": "no third-party software assessment record exists",
+      "keywords": [
+        "third-party",
+        "software",
+        "assessment"
+      ],
+      "hit_count": 10,
+      "hits": [
+        "crates/research/src/lib.rs:420:assessment",
+        "scripts/applicable-case-evidence.py:152:third-party",
+        "scripts/applicable-case-evidence.py:285:assessment",
+        "scripts/build-dod-status.py:59:third-party",
+        "scripts/build-dod-status.py:131:assessment",
+        "scripts/clean-build.sh:289:software",
+        "scripts/doc-exec.py:61:software",
+        "scripts/generate-sbom.py:2:third-party",
+        "scripts/smoke-installed-artifact.sh:98:software",
+        "scripts/version-matrix.py:97:software"
+      ]
+    },
+    {
+      "test_id": "GEN-083",
+      "claim": "no pre-build security gate exists beyond the pre-commit set",
+      "keywords": [
+        "pre-build",
+        "gate",
+        "pre-commit"
+      ],
+      "hit_count": 44,
+      "hits": [
+        "crates/storage/src/vault.rs:1662:gate",
+        "crates/platform_windows/tests/local_first.rs:16:gate",
+        "crates/domain/src/lib.rs:528:gate",
+        "crates/commercialization/src/lib.rs:270:gate",
+        "crates/application/src/lib.rs:76:gate",
+        "apps/desktop/e2e-artifact.mjs:108:gate",
+        "apps/desktop/e2e-local-provider.mjs:10:gate",
+        "apps/desktop/e2e/shell.spec.ts:162:gate",
+        "apps/desktop/src-tauri/Cargo.toml:40:gate",
+        "apps/desktop/tests/has-ipc.test.ts:8:gate",
+        "apps/desktop/src-tauri/src/commands.rs:2992:gate",
+        "apps/desktop/src-tauri/src/lib.rs:486:gate"
+      ]
+    },
+    {
+      "test_id": "GEN-085",
+      "claim": "auto-deploy is disabled; no pre-deployment gate runs",
+      "keywords": [
+        "auto-deploy",
+        "disabled",
+        "pre-deployment",
+        "gate"
+      ],
+      "hit_count": 50,
+      "hits": [
+        "crates/storage/src/vault.rs:1662:gate",
+        "crates/platform_windows/tests/local_first.rs:16:gate",
+        "crates/domain/src/lib.rs:528:gate",
+        "crates/commercialization/src/lib.rs:270:gate",
+        "crates/application/src/lib.rs:76:gate",
+        "apps/desktop/e2e-artifact.mjs:108:gate",
+        "apps/desktop/e2e-local-provider.mjs:10:gate",
+        "apps/desktop/e2e/shell.spec.ts:162:gate",
+        "apps/desktop/src/App.tsx:363:disabled",
+        "apps/desktop/src-tauri/Cargo.toml:40:gate",
+        "apps/desktop/tests/has-ipc.test.ts:8:gate",
+        "apps/desktop/src-tauri/src/commands.rs:2846:disabled"
+      ]
+    },
+    {
+      "test_id": "GEN-086",
+      "claim": "no continuous security scheduler exists",
+      "keywords": [
+        "continuous",
+        "scheduler"
+      ],
+      "hit_count": 9,
+      "hits": [
+        "crates/storage/src/vault.rs:1658:continuous",
+        "crates/commercialization/src/asset_readiness.rs:20:continuous",
+        "apps/desktop/src-tauri/src/commands.rs:2474:continuous",
+        "apps/desktop/src-tauri/tests/recovery_drill.rs:35:continuous",
+        "apps/desktop/src-tauri/tests/soak_abbreviated.rs:15:continuous",
+        "scripts/applicable-case-evidence.py:90:continuous",
+        "scripts/build-dod-status.py:125:continuous",
+        "scripts/completion-report.py:219:continuous",
+        "scripts/soak-lane.sh:14:continuous"
+      ]
+    },
+    {
+      "test_id": "GEN-091",
+      "claim": "no threat model DOCUMENT: a ThreatMap data structure exists for patent-claim threat mapping (a different subject), and SECURITY.md states boundaries, but no threat model artefact enumerates threats against the product",
+      "keywords": [
+        "threat",
+        "model",
+        "document",
+        "threatmap",
+        "data",
+        "structure"
+      ],
+      "hit_count": 113,
+      "hits": [
+        "crates/provider_transport/Cargo.toml:12:model",
+        "crates/storage/Cargo.toml:13:data",
+        "crates/storage/src/lib.rs:135:document",
+        "crates/storage/src/lib.rs:98:data",
+        "crates/storage/src/vault.rs:3:model",
+        "crates/storage/src/vault.rs:567:document",
+        "crates/storage/src/vault.rs:3:data",
+        "crates/storage/tests/integration_real_dependencies.rs:215:document",
+        "crates/storage/tests/integration_real_dependencies.rs:9:data",
+        "crates/research/src/lib.rs:22:threat",
+        "crates/research/src/lib.rs:12:model",
+        "crates/provider_transport/src/lib.rs:4:model"
+      ]
+    },
+    {
+      "test_id": "GEN-092",
+      "claim": "no attack tree analysis exists",
+      "keywords": [
+        "attack",
+        "tree"
+      ],
+      "hit_count": 25,
+      "hits": [
+        "crates/storage/src/vault.rs:1552:tree",
+        "crates/platform_windows/tests/local_first.rs:151:tree",
+        "crates/mcp_hub/src/lib.rs:120:attack",
+        "crates/commercialization/src/asset_readiness.rs:24:tree",
+        "apps/desktop/playwright.config.ts:17:tree",
+        "apps/desktop/src-tauri/tests/stress_concurrency.rs:29:tree",
+        "scripts/applicable-case-evidence.py:152:attack",
+        "scripts/applicable-case-evidence.py:28:tree",
+        "scripts/audit-applicability-absences.py:11:tree",
+        "scripts/build-dod-status.py:57:tree",
+        "scripts/build-traceability.py:38:tree",
+        "scripts/change-invalidation.py:20:tree"
+      ]
+    },
+    {
+      "test_id": "GEN-093",
+      "claim": "no abuse case suite exists",
+      "keywords": [
+        "abuse",
+        "case"
+      ],
+      "hit_count": 37,
+      "hits": [
+        "crates/storage/src/vault.rs:368:case",
+        "crates/storage/tests/integration_real_dependencies.rs:134:case",
+        "crates/provider_transport/src/lib.rs:391:case",
+        "crates/mcp_hub/src/lib.rs:54:case",
+        "crates/evidence/src/lib.rs:229:case",
+        "crates/domain/src/scope.rs:215:case",
+        "crates/crash_reporter/src/lib.rs:244:case",
+        "crates/commercialization/src/lib.rs:114:case",
+        "apps/desktop/tsconfig.json:17:case",
+        "apps/desktop/e2e/shell.spec.ts:50:case",
+        "apps/desktop/tests/has-ipc.test.ts:13:case",
+        "apps/desktop/src-tauri/src/commands.rs:3:case"
+      ]
+    },
+    {
+      "test_id": "GEN-094",
+      "claim": "no misuse case suite exists",
+      "keywords": [
+        "misuse",
+        "case"
+      ],
+      "hit_count": 37,
+      "hits": [
+        "crates/storage/src/vault.rs:368:case",
+        "crates/storage/tests/integration_real_dependencies.rs:134:case",
+        "crates/provider_transport/src/lib.rs:391:case",
+        "crates/mcp_hub/src/lib.rs:54:case",
+        "crates/evidence/src/lib.rs:229:case",
+        "crates/domain/src/scope.rs:215:case",
+        "crates/crash_reporter/src/lib.rs:244:case",
+        "crates/commercialization/src/lib.rs:114:case",
+        "apps/desktop/tsconfig.json:17:case",
+        "apps/desktop/e2e/shell.spec.ts:50:case",
+        "apps/desktop/tests/has-ipc.test.ts:13:case",
+        "apps/desktop/src-tauri/src/commands.rs:3:case"
+      ]
+    },
+    {
+      "test_id": "GEN-095",
+      "claim": "no architecture security assessment record exists",
+      "keywords": [
+        "architecture",
+        "assessment"
+      ],
+      "hit_count": 9,
+      "hits": [
+        "crates/research/src/lib.rs:420:assessment",
+        "crates/domain/src/scope.rs:6:architecture",
+        "apps/desktop/src-tauri/tests/performance_gate.rs:22:architecture",
+        "scripts/applicable-case-evidence.py:20:architecture",
+        "scripts/applicable-case-evidence.py:285:assessment",
+        "scripts/build-dod-status.py:57:architecture",
+        "scripts/build-dod-status.py:131:assessment",
+        "scripts/clean-build.sh:17:architecture",
+        "scripts/verify.sh:59:architecture"
+      ]
+    },
+    {
+      "test_id": "GEN-096",
+      "claim": "no secure design review record exists",
+      "keywords": [
+        "secure",
+        "design"
+      ],
+      "hit_count": 13,
+      "hits": [
+        "crates/storage/src/vault.rs:1761:design",
+        "crates/research/src/lib.rs:406:design",
+        "crates/domain/src/lib.rs:218:design",
+        "crates/domain/src/scope.rs:138:design",
+        "apps/desktop/playwright.config.ts:11:design",
+        "apps/desktop/src-tauri/src/commands.rs:429:design",
+        "packages/contracts/src/validate.ts:16:design",
+        "scripts/add-requirement-markers.py:28:design",
+        "scripts/build-dod-status.py:75:design",
+        "scripts/change-invalidation.py:160:design",
+        "scripts/completion-report.py:220:design",
+        "scripts/secret-scan.py:14:design"
+      ]
+    },
+    {
+      "test_id": "GEN-097",
+      "claim": "no security feature design review record exists",
+      "keywords": [
+        "feature",
+        "design"
+      ],
+      "hit_count": 26,
+      "hits": [
+        "crates/application/Cargo.toml:7:feature",
+        "crates/domain/Cargo.toml:7:feature",
+        "crates/platform_windows/Cargo.toml:13:feature",
+        "crates/provider_transport/Cargo.toml:8:feature",
+        "crates/storage/Cargo.toml:11:feature",
+        "crates/storage/src/vault.rs:1761:design",
+        "crates/storage/tests/integration_real_dependencies.rs:7:feature",
+        "crates/research/src/lib.rs:406:design",
+        "crates/domain/src/lib.rs:218:design",
+        "crates/domain/src/scope.rs:138:design",
+        "apps/desktop/e2e-artifact.mjs:23:feature",
+        "apps/desktop/playwright.config.ts:11:design"
+      ]
+    },
+    {
+      "test_id": "GEN-101",
+      "claim": "no compliance-as-code validator exists",
+      "keywords": [
+        "compliance-as-code",
+        "validator"
+      ],
+      "hit_count": 6,
+      "hits": [
+        "scripts/applicable-case-evidence.py:296:validator",
+        "scripts/build-dod-status.py:131:validator",
+        "scripts/completion-report.py:226:validator",
+        "scripts/harness-validate.sh:8:validator",
+        "scripts/ship-gate.py:11:validator",
+        "scripts/validate-generated-pack.py:2:validator"
+      ]
+    },
+    {
+      "test_id": "GEN-102",
+      "claim": "no regulatory security test suite exists",
+      "keywords": [
+        "regulatory"
+      ],
+      "hit_count": 1,
+      "hits": [
+        "scripts/applicable-case-evidence.py:468:regulatory"
+      ]
+    },
+    {
+      "test_id": "GEN-104",
+      "claim": "no symbolic execution engine is configured",
+      "keywords": [
+        "symbolic",
+        "execution",
+        "engine"
+      ],
+      "hit_count": 20,
+      "hits": [
+        "crates/storage/src/vault.rs:331:engine",
+        "crates/storage/tests/integration_real_dependencies.rs:7:engine",
+        "crates/provider_transport/src/lib.rs:26:execution",
+        "crates/domain/src/scope.rs:208:engine",
+        "crates/commercialization/src/lib.rs:303:execution",
+        "apps/desktop/e2e-artifact.mjs:109:execution",
+        "apps/desktop/e2e/shell.spec.ts:7:engine",
+        "apps/desktop/src-tauri/src/commands.rs:2161:execution",
+        "apps/desktop/src-tauri/tests/fuzz_campaign.rs:5:engine",
+        "scripts/applicable-case-evidence.py:69:engine",
+        "scripts/bind-requirements.py:180:execution",
+        "scripts/build-dod-status.py:63:execution"
+      ]
+    },
+    {
+      "test_id": "GEN-106",
+      "claim": "no property-based security test exists",
+      "keywords": [
+        "property-based"
+      ],
+      "hit_count": 1,
+      "hits": [
+        "scripts/applicable-case-evidence.py:192:property-based"
+      ]
+    },
+    {
+      "test_id": "GEN-108",
+      "claim": "no security property verification exists",
+      "keywords": [
+        "property"
+      ],
+      "hit_count": 16,
+      "hits": [
+        "crates/storage/src/vault.rs:365:property",
+        "crates/storage/tests/integration_real_dependencies.rs:4:property",
+        "crates/research/src/lib.rs:13:property",
+        "crates/evidence/src/lib.rs:159:property",
+        "crates/crash_reporter/src/lib.rs:261:property",
+        "apps/desktop/e2e-artifact.mjs:322:property",
+        "apps/desktop/e2e-local-provider.mjs:427:property",
+        "apps/desktop/src-tauri/src/commands.rs:3433:property",
+        "scripts/add-requirement-markers.py:43:property",
+        "scripts/applicable-case-evidence.py:181:property",
+        "scripts/assert-no-debug-port.py:72:property",
+        "scripts/build-dod-status.py:97:property"
+      ]
+    },
+    {
+      "test_id": "GEN-111",
+      "claim": "no incident-response REHEARSAL: incident-path tests exist (minidump capture, telemetry correlation, the redactor's incident path) and the recovery drill exercises repair, but no runbook is rehearsed end to end",
+      "keywords": [
+        "incident-response",
+        "rehearsal",
+        "incident-path",
+        "minidump",
+        "capture",
+        "telemetry"
+      ],
+      "hit_count": 44,
+      "hits": [
+        "crates/storage/Cargo.toml:10:capture",
+        "crates/storage/src/vault.rs:562:capture",
+        "crates/provider_transport/src/lib.rs:26:capture",
+        "crates/platform_windows/src/lib.rs:8:telemetry",
+        "crates/domain/src/scope.rs:184:capture",
+        "crates/crash_reporter/src/lib.rs:78:minidump",
+        "crates/crash_reporter/src/lib.rs:80:capture",
+        "crates/crash_reporter/src/lib.rs:4:telemetry",
+        "crates/application/src/lib.rs:263:telemetry",
+        "apps/desktop/src-tauri/src/commands.rs:2952:minidump",
+        "apps/desktop/src-tauri/src/commands.rs:281:capture",
+        "apps/desktop/src-tauri/src/commands.rs:29:telemetry"
+      ]
+    },
+    {
+      "test_id": "GEN-113",
+      "claim": "no zero-trust control set exists",
+      "keywords": [
+        "zero-trust",
+        "control"
+      ],
+      "hit_count": 13,
+      "hits": [
+        "crates/platform_windows/tests/local_first.rs:41:control",
+        "crates/mcp_hub/src/lib.rs:139:control",
+        "crates/evidence/src/lib.rs:476:control",
+        "crates/crash_reporter/src/lib.rs:565:control",
+        "apps/desktop/e2e-artifact.mjs:366:control",
+        "apps/desktop/e2e-local-provider.mjs:360:control",
+        "apps/desktop/e2e/shell.spec.ts:121:control",
+        "apps/desktop/src/App.tsx:753:control",
+        "scripts/applicable-case-evidence.py:201:control",
+        "scripts/build-dod-status.py:69:control",
+        "scripts/completion-report.py:142:control",
+        "scripts/doc-exec.py:75:control"
+      ]
+    },
+    {
+      "test_id": "GEN-114",
+      "claim": "no chaos-engineering harness: fault injection exists under GEN-115 (filesystem faults against a live vault) but it is a bounded drill on one host, not deliberate chaos in a production-like environment",
+      "keywords": [
+        "chaos-engineering",
+        "fault",
+        "injection",
+        "under",
+        "gen-115",
+        "filesystem"
+      ],
+      "hit_count": 96,
+      "hits": [
+        "crates/provider_transport/Cargo.toml:13:fault",
+        "crates/storage/src/lib.rs:18:fault",
+        "crates/storage/src/vault.rs:75:fault",
+        "crates/storage/src/vault.rs:248:under",
+        "crates/storage/src/vault.rs:262:filesystem",
+        "crates/storage/tests/integration_real_dependencies.rs:4:under",
+        "crates/provider_transport/src/lib.rs:118:fault",
+        "crates/provider_transport/src/lib.rs:69:under",
+        "crates/platform_windows/src/lib.rs:27:fault",
+        "crates/platform_windows/src/lib.rs:102:under",
+        "crates/platform_windows/tests/licensing_policy.rs:121:fault",
+        "crates/patent/src/lib.rs:180:fault"
+      ]
+    },
+    {
+      "test_id": "GEN-116",
+      "claim": "no canary release process exists; publication is manual",
+      "keywords": [
+        "canary",
+        "release",
+        "publication"
+      ],
+      "hit_count": 43,
+      "hits": [
+        "crates/storage/src/vault.rs:10:release",
+        "crates/platform_windows/src/lib.rs:53:release",
+        "crates/platform_windows/tests/licensing_policy.rs:159:release",
+        "crates/evidence/src/lib.rs:351:canary",
+        "crates/commercialization/src/asset_readiness.rs:22:release",
+        "crates/commercialization/src/lib.rs:269:release",
+        "apps/desktop/e2e-artifact.mjs:75:canary",
+        "apps/desktop/e2e-artifact.mjs:19:release",
+        "apps/desktop/e2e-local-provider.mjs:16:canary",
+        "apps/desktop/e2e-local-provider.mjs:34:release",
+        "apps/desktop/e2e/shell.spec.ts:378:release",
+        "apps/desktop/src/App.tsx:1593:release"
+      ]
+    },
+    {
+      "test_id": "GEN-117",
+      "claim": "no blue-green deployment exists",
+      "keywords": [
+        "blue-green",
+        "deployment"
+      ],
+      "hit_count": 3,
+      "hits": [
+        "scripts/build-dod-status.py:59:deployment",
+        "scripts/completion-report.py:213:deployment",
+        "scripts/doc-exec.py:5:deployment"
+      ]
+    },
+    {
+      "test_id": "GEN-119",
+      "claim": "no anomaly-detection component: the diagnostics surface derives threshold alerts from measured outcomes (failure rate, durations), which is rule-based alerting rather than anomaly detection",
+      "keywords": [
+        "anomaly-detection",
+        "diagnostics",
+        "derives",
+        "threshold",
+        "alerts",
+        "from"
+      ],
+      "hit_count": 113,
+      "hits": [
+        "crates/storage/src/lib.rs:83:from",
+        "crates/storage/src/vault.rs:168:from",
+        "crates/storage/tests/integration_real_dependencies.rs:68:from",
+        "crates/research/src/lib.rs:12:from",
+        "crates/provider_transport/src/lib.rs:25:from",
+        "crates/platform_windows/src/lib.rs:23:from",
+        "crates/platform_windows/tests/licensing_policy.rs:16:from",
+        "crates/platform_windows/tests/local_first.rs:13:from",
+        "crates/patent/src/lib.rs:16:from",
+        "crates/evidence/src/lib.rs:225:from",
+        "crates/domain/src/lib.rs:589:from",
+        "crates/domain/src/scope.rs:3:from"
+      ]
+    },
+    {
+      "test_id": "GEN-120",
+      "claim": "no web application firewall fronts the product",
+      "keywords": [
+        "application",
+        "firewall",
+        "fronts"
+      ],
+      "hit_count": 29,
+      "hits": [
+        "crates/application/Cargo.toml:2:application",
+        "crates/platform_windows/src/lib.rs:6:application",
+        "crates/platform_windows/tests/licensing_policy.rs:339:application",
+        "crates/patent/src/lib.rs:187:application",
+        "crates/evidence/src/lib.rs:14:firewall",
+        "crates/domain/src/lib.rs:419:application",
+        "crates/domain/src/scope.rs:169:application",
+        "crates/commercialization/src/asset_readiness.rs:39:application",
+        "apps/desktop/e2e-local-provider.mjs:309:firewall",
+        "apps/desktop/e2e/shell.spec.ts:157:firewall",
+        "apps/desktop/src/App.tsx:214:application",
+        "apps/desktop/src/App.tsx:1570:firewall"
+      ]
+    },
+    {
+      "test_id": "GEN-121",
+      "claim": "no WAF exists to bypass",
+      "keywords": [
+        "bypass"
+      ],
+      "hit_count": 6,
+      "hits": [
+        "crates/mcp_hub/src/lib.rs:58:bypass",
+        "apps/desktop/src-tauri/src/commands.rs:634:bypass",
+        "scripts/anti-gaming-scan.py:17:bypass",
+        "scripts/applicable-case-evidence.py:384:bypass",
+        "scripts/build-dod-status.py:101:bypass",
+        "scripts/harness-validate.sh:11:bypass"
+      ]
+    },
+    {
+      "test_id": "GEN-122",
+      "claim": "no exploratory security session is recorded",
+      "keywords": [
+        "exploratory",
+        "session"
+      ],
+      "hit_count": 4,
+      "hits": [
+        "apps/desktop/e2e-artifact.mjs:595:session",
+        "apps/desktop/src/App.tsx:1830:session",
+        "scripts/applicable-case-evidence.py:201:session",
+        "scripts/build-dod-status.py:67:session"
+      ]
+    },
+    {
+      "test_id": "SUP-005",
+      "claim": "no prior released version exists to upgrade from",
+      "keywords": [
+        "prior",
+        "released",
+        "version",
+        "upgrade",
+        "from"
+      ],
+      "hit_count": 173,
+      "hits": [
+        "crates/application/Cargo.toml:3:version",
+        "crates/commercialization/Cargo.toml:3:version",
+        "crates/crash_reporter/Cargo.toml:3:version",
+        "crates/domain/Cargo.toml:3:version",
+        "crates/evidence/Cargo.toml:3:version",
+        "crates/mcp_hub/Cargo.toml:3:version",
+        "crates/patent/Cargo.toml:3:version",
+        "crates/platform_windows/Cargo.toml:3:version",
+        "crates/provider_transport/Cargo.toml:3:version",
+        "crates/research/Cargo.toml:3:version",
+        "crates/storage/Cargo.toml:3:version",
+        "crates/storage/src/lib.rs:224:prior"
+      ]
+    },
+    {
+      "test_id": "SUP-008",
+      "claim": "no cross-platform matrix is claimed; Windows only",
+      "keywords": [
+        "cross-platform",
+        "matrix",
+        "claimed",
+        "windows",
+        "only"
+      ],
+      "hit_count": 136,
+      "hits": [
+        "crates/application/Cargo.toml:10:windows",
+        "crates/platform_windows/Cargo.toml:2:windows",
+        "crates/platform_windows/Cargo.toml:9:only",
+        "crates/provider_transport/Cargo.toml:11:matrix",
+        "crates/storage/Cargo.toml:15:only",
+        "crates/storage/src/lib.rs:231:only",
+        "crates/storage/src/vault.rs:763:matrix",
+        "crates/storage/src/vault.rs:8:only",
+        "crates/research/src/lib.rs:418:claimed",
+        "crates/research/src/lib.rs:27:only",
+        "crates/provider_transport/src/lib.rs:15:matrix",
+        "crates/provider_transport/src/lib.rs:10:claimed"
+      ]
+    },
+    {
+      "test_id": "SUP-010",
+      "claim": "no visual regression baseline exists",
+      "keywords": [
+        "visual",
+        "regression",
+        "baseline"
+      ],
+      "hit_count": 27,
+      "hits": [
+        "crates/storage/src/lib.rs:294:regression",
+        "crates/research/src/lib.rs:480:regression",
+        "crates/patent/src/lib.rs:98:regression",
+        "crates/mcp_hub/src/lib.rs:113:regression",
+        "crates/evidence/src/lib.rs:489:regression",
+        "crates/crash_reporter/src/lib.rs:436:regression",
+        "crates/commercialization/src/lib.rs:278:regression",
+        "crates/application/src/lib.rs:353:regression",
+        "crates/application/src/lib.rs:272:baseline",
+        "apps/desktop/e2e/shell.spec.ts:70:baseline",
+        "apps/desktop/src-tauri/src/commands.rs:2963:regression",
+        "apps/desktop/src-tauri/tests/performance_gate.rs:27:regression"
+      ]
+    },
+    {
+      "test_id": "SUP-011",
+      "claim": "no operator observability stack exists (DOD-037)",
+      "keywords": [
+        "operator",
+        "observability",
+        "stack",
+        "dod-037"
+      ],
+      "hit_count": 33,
+      "hits": [
+        "crates/storage/src/vault.rs:459:operator",
+        "crates/evidence/src/lib.rs:271:operator",
+        "crates/domain/src/scope.rs:261:stack",
+        "crates/crash_reporter/src/lib.rs:226:operator",
+        "crates/crash_reporter/src/lib.rs:585:dod-037",
+        "crates/application/src/lib.rs:10:operator",
+        "crates/application/src/lib.rs:29:dod-037",
+        "apps/desktop/e2e-artifact.mjs:303:operator",
+        "apps/desktop/e2e-artifact.mjs:211:dod-037",
+        "apps/desktop/e2e/shell.spec.ts:163:operator",
+        "apps/desktop/e2e/shell.spec.ts:462:dod-037",
+        "apps/desktop/src/App.tsx:67:operator"
+      ]
+    },
+    {
+      "test_id": "SUP-012",
+      "claim": "no SLO/SLA or error budget is defined (DOD-022)",
+      "keywords": [
+        "error",
+        "budget",
+        "defined",
+        "dod-022"
+      ],
+      "hit_count": 67,
+      "hits": [
+        "crates/storage/src/lib.rs:5:error",
+        "crates/storage/src/vault.rs:241:error",
+        "crates/storage/src/vault.rs:1659:budget",
+        "crates/storage/tests/integration_real_dependencies.rs:149:error",
+        "crates/research/src/lib.rs:66:error",
+        "crates/provider_transport/src/lib.rs:19:error",
+        "crates/platform_windows/src/lib.rs:22:error",
+        "crates/evidence/src/lib.rs:355:error",
+        "crates/domain/src/lib.rs:225:error",
+        "crates/domain/src/scope.rs:459:error",
+        "crates/commercialization/src/asset_readiness.rs:136:error",
+        "crates/commercialization/src/lib.rs:19:error"
+      ]
+    },
+    {
+      "test_id": "SUP-013",
+      "claim": "deployment/promotion/canary lifecycle is not activated: RELEASE.md states auto-deploy is no and publication remains manual, so there is no promotion pipeline to verify",
+      "keywords": [
+        "deployment",
+        "promotion",
+        "canary",
+        "lifecycle",
+        "activated",
+        "release.md"
+      ],
+      "hit_count": 24,
+      "hits": [
+        "crates/research/src/lib.rs:290:lifecycle",
+        "crates/evidence/src/lib.rs:351:canary",
+        "crates/domain/src/lib.rs:65:lifecycle",
+        "apps/desktop/e2e-artifact.mjs:75:canary",
+        "apps/desktop/e2e-local-provider.mjs:16:canary",
+        "apps/desktop/e2e/shell.spec.ts:141:lifecycle",
+        "apps/desktop/src-tauri/src/commands.rs:4728:canary",
+        "apps/desktop/src-tauri/src/commands.rs:426:lifecycle",
+        "apps/desktop/src-tauri/tests/performance_gate.rs:17:canary",
+        "apps/desktop/src-tauri/tests/recovery_drill.rs:73:canary",
+        "scripts/add-requirement-markers.py:45:canary",
+        "scripts/add-requirement-markers.py:25:lifecycle"
+      ]
+    },
+    {
+      "test_id": "SUP-014",
+      "claim": "multi-tenant isolation is not activated: LINCHPIN is local-first single-user and workspace scoping is not tenancy isolation",
+      "keywords": [
+        "multi-tenant",
+        "isolation",
+        "activated",
+        "linchpin",
+        "local-first",
+        "single-user"
+      ],
+      "hit_count": 65,
+      "hits": [
+        "crates/storage/src/vault.rs:1188:linchpin",
+        "crates/storage/tests/integration_real_dependencies.rs:24:linchpin",
+        "crates/platform_windows/src/lib.rs:37:linchpin",
+        "crates/platform_windows/tests/licensing_policy.rs:202:linchpin",
+        "crates/platform_windows/tests/licensing_policy.rs:339:local-first",
+        "crates/platform_windows/tests/local_first.rs:1:local-first",
+        "crates/domain/src/scope.rs:71:linchpin",
+        "crates/commercialization/src/asset_readiness.rs:436:linchpin",
+        "crates/application/src/lib.rs:58:linchpin",
+        "apps/desktop/e2e-artifact.mjs:32:linchpin",
+        "apps/desktop/e2e-artifact.mjs:159:local-first",
+        "apps/desktop/e2e-local-provider.mjs:34:linchpin"
+      ]
+    }
+  ],
+  "no_signal": [
+    {
+      "test_id": "GEN-017",
+      "claim": "no RASP component exists in the product"
+    },
+    {
+      "test_id": "GEN-037",
+      "claim": "no microservice topology exists"
+    },
+    {
+      "test_id": "GEN-056",
+      "claim": "no business-logic abuse suite exists"
+    },
+    {
+      "test_id": "GEN-062",
+      "claim": "no sensitive-data exposure suite exists"
+    },
+    {
+      "test_id": "GEN-079",
+      "claim": "no reverse-engineering analysis is performed"
+    },
+    {
+      "test_id": "GEN-105",
+      "claim": "no model-based security test exists"
+    },
+    {
+      "test_id": "GEN-107",
+      "claim": "no formal verification harness exists"
+    },
+    {
+      "test_id": "GEN-109",
+      "claim": "no theorem prover is configured"
+    },
+    {
+      "test_id": "SUP-007",
+      "claim": "no feature-flag combinatorics exist in the product"
+    }
+  ]
+}

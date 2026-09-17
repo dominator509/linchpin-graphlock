@@ -71,7 +71,7 @@ E2E_PROBES: dict[str, tuple[str, str, str]] = {
     "E2E-004": ("cmd", "test-integration", "command contract validation against real SQLite"),
     "E2E-005": ("cmd", "test-e2e", "regression and differential verification lane"),
     "E2E-006": ("no-cmd", "", "no ad hoc/exploratory session record exists"),
-    "E2E-007": ("no-cmd", "", "no usability/a11y/DX verification exists (DOD-039 external)"),
+    "E2E-007": ("external", "", "manual assistive-technology and lived usability validation is performed by human participants (PF-017, ADR-005); the automated accessibility baseline is not a substitute"),
     # FIVE STALE ABSENCES CORRECTED. These rows recorded that no harness existed, and
     # they stayed that way after the harnesses were built in later rounds -- the same
     # class of error as the DOD-038 disposition that claimed no soak scale was
@@ -86,7 +86,12 @@ E2E_PROBES: dict[str, tuple[str, str, str]] = {
     "E2E-008": ("cmd", "performance-lane", "performance workload with encoded thresholds (DOD-022)"),
     "E2E-009": ("cmd", "stress-lane", "concurrent stress/exhaustion trial with encoded floors (DOD-038)"),
     "E2E-010": ("cmd", "test-integration", "recovery verified by reopen-after-write in the vault"),
-    "E2E-011": ("no-cmd", "", "clean-room deployment requires a virgin host (PF-016)"),
+    # E2E-011 used to be "no-cmd / requires a virgin host", which contradicted its own
+    # case result: installer-level deployment verification IS executable here and was
+    # executed (install, launch, uninstall with independently verified pre/post state),
+    # while the VIRGIN-clean-room half is external (DOD-034, ADR-004). The row now
+    # names the lane that runs and keeps the external half stated in its case result.
+    "E2E-011": ("cmd", "smoke-installed-artifact", "installer-level deployment verification against the real MSI; the virgin clean-room half is EXTERNAL_REQUIRED (DOD-034, ADR-004)"),
     "E2E-012": ("cmd", "test-unit", "schema evolution verified by the migration tests"),
     "E2E-013": ("cmd", "version-matrix", "two released versions exist and are installed in sequence; simultaneous mixed-fleet skew is not applicable to a device-local single-user product"),
     "E2E-014": ("cmd", "version-matrix", "downgrade and rollback executed against realistic persistent state (DOD-035)"),
@@ -100,7 +105,7 @@ E2E_PROBES: dict[str, tuple[str, str, str]] = {
     # product's own command boundary) and the fail-closed negatives (a
     # non-loopback endpoint refused, an unreachable port producing no text).
     "E2E-019": ("cmd", "live-fire-local-provider", "AI/agentic capability plus fail-closed safety negatives"),
-    "E2E-020": ("no-cmd", "", "user acceptance testing requires real human participants (DOD-039)"),
+    "E2E-020": ("external", "", "user acceptance testing is performed by real human participants (PF-017, ADR-005); no automated run substitutes for it"),
 }
 
 SUP_PROBES: dict[str, tuple[str, str, str]] = {
@@ -123,7 +128,7 @@ SUP_PROBES: dict[str, tuple[str, str, str]] = {
     # than depending on a branch order.
     "SUP-013": ("no-cmd", "", "deployment/promotion/canary lifecycle is not activated: RELEASE.md states auto-deploy is no and publication remains manual, so there is no promotion pipeline to verify"),
     "SUP-014": ("no-cmd", "", "multi-tenant isolation is not activated: LINCHPIN is local-first single-user and workspace scoping is not tenancy isolation"),
-    "SUP-015": ("no-cmd", "", "manual assistive-technology validation requires a human (DOD-039)"),
+    "SUP-015": ("external", "", "manual assistive-technology validation requires named human validators (PF-017, ADR-005); automated checks cannot discharge it"),
 }
 
 
@@ -289,10 +294,10 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-015": ("no-cmd", "", "no DAST tool targets the desktop IPC boundary"),
     "GEN-016": ("no-cmd", "", "no IAST instrumentation exists"),
     "GEN-017": ("no-cmd", "", "no RASP component exists in the product"),
-    "GEN-018": ("no-cmd", "", "manual penetration test is an external engagement"),
+    "GEN-018": ("external", "", "a manual penetration test is a human engagement performed by a qualified tester; no automated harness substitutes for it"),
     "GEN-019": ("no-cmd", "", "no automated penetration test harness exists"),
-    "GEN-020": ("no-cmd", "", "red team engagement is an external activity"),
-    "GEN-021": ("no-cmd", "", "purple team engagement is an external activity"),
+    "GEN-020": ("external", "", "a red-team engagement is a human adversarial exercise, not an automated case"),
+    "GEN-021": ("external", "", "a purple-team engagement requires human attackers and defenders working together"),
     "GEN-022": ("no-cmd", "", "no adversary emulation harness exists"),
     "GEN-023": ("no-cmd", "", "no breach-and-attack simulation harness exists"),
     "GEN-025": ("no-cmd", "", "no coverage-guided fuzzing engine (measured: the campaign documents that cargo-fuzz/libFuzzer would need a nightly toolchain and a new dependency); the deterministic mutation campaign is recorded under GEN-024/GEN-027"),
@@ -319,7 +324,16 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-054": ("no-cmd", "", "no multi-principal privilege model exists"),
     "GEN-055": ("no-cmd", "", "no session management exists"),
     "GEN-056": ("no-cmd", "", "no business-logic abuse suite exists"),
-    "GEN-057": ("no-cmd", "", "crypto usage is not covered by an implementation test"),
+    # GEN-057 / GEN-065 / GEN-115 used to sit HERE as "no-cmd" rows; their
+    # replacements are the "cmd" entries in the executed-command section ABOVE.
+    # Keeping both was a real defect, not untidiness: a Python dict literal takes
+    # the LAST assignment, so the stale entries silently WON and three of round 51's
+    # four reclassifications never took effect -- while their case results were
+    # written anyway and the accounting reported them as PASS. Found by a
+    # duplicate-key check the following round. Two guards now fail on this shape:
+    # scripts/validate-generated-pack.py rejects duplicate probe keys, and
+    # scripts/build-accounting.py rejects a case result for an ID the matrix
+    # decided NOT_APPLICABLE.
     "GEN-058": ("no-cmd", "", "no weak-cryptography DETECTION test: the cryptographic implementation is tested (GEN-057 is APPLICABLE), but nothing scans for weak or deprecated primitives, and the dependency ban list names none"),
     "GEN-059": ("no-cmd", "", "no TLS listener is operated by the product"),
     "GEN-060": ("no-cmd", "", "no side-channel resistance testing exists"),
@@ -327,7 +341,6 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-062": ("no-cmd", "", "no sensitive-data exposure suite exists"),
     "GEN-063": ("cmd", "security-check", "logging/redaction verification via RedactionReport"),
     "GEN-064": ("no-cmd", "", "no IaC definitions exist in the repository"),
-    "GEN-065": ("no-cmd", "", "no configuration hardening baseline is asserted"),
     "GEN-066": ("no-cmd", "", "no container image is built or scanned"),
     "GEN-067": ("no-cmd", "", "no cloud configuration exists"),
     "GEN-068": ("no-cmd", "", "the product opens no network listener by default"),
@@ -354,7 +367,7 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-098": ("cmd", "test-unit", "security controls (scope guard, redaction) verified by unit tests"),
     "GEN-101": ("no-cmd", "", "no compliance-as-code validator exists"),
     "GEN-102": ("no-cmd", "", "no regulatory security test suite exists"),
-    "GEN-103": ("no-cmd", "", "Common Criteria evaluation is an accredited external assessment"),
+    "GEN-103": ("external", "", "Common Criteria evaluation is an accredited external assessment performed by a licensed laboratory"),
     "GEN-104": ("no-cmd", "", "no symbolic execution engine is configured"),
     "GEN-105": ("no-cmd", "", "no model-based security test exists"),
     "GEN-106": ("no-cmd", "", "no property-based security test exists"),
@@ -364,7 +377,6 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-111": ("no-cmd", "", "no incident-response REHEARSAL: incident-path tests exist (minidump capture, telemetry correlation, the redactor's incident path) and the recovery drill exercises repair, but no runbook is rehearsed end to end"),
     "GEN-113": ("no-cmd", "", "no zero-trust control set exists"),
     "GEN-114": ("no-cmd", "", "no chaos-engineering harness: fault injection exists under GEN-115 (filesystem faults against a live vault) but it is a bounded drill on one host, not deliberate chaos in a production-like environment"),
-    "GEN-115": ("no-cmd", "", "no fault injection harness exists"),
     "GEN-116": ("no-cmd", "", "no canary release process exists; publication is manual"),
     "GEN-117": ("no-cmd", "", "no blue-green deployment exists"),
     "GEN-118": ("cmd", "security-check", "observability signal validation via gate output"),
@@ -420,6 +432,22 @@ def decide_by_probe(row: dict, tree: str) -> tuple[str, str, str] | None:
             f"{pack}: probe names scripts/{cmd} for '{row['title']}' ({why}) "
             "but that entry point cannot execute a case -- it refuses "
             "unconditionally or delegates to a runner absent from the tree.",
+        )
+    if mode == "external":
+        # A THIRD MODE, added because the two-way choice was wrong for these rows.
+        # NOT_APPLICABLE means "this product does not need it"; for a manual
+        # penetration test, a red-team engagement, an accredited assessment or a
+        # human accessibility/UAT validation the product DOES need it and the blocker
+        # is a real outside participant, which is EXTERNAL_REQUIRED. Recording those
+        # as NOT_APPLICABLE understated the gap by 7 rows (measured when the coherence
+        # guard in build-accounting.py flagged SUP-015, whose case result already said
+        # EXTERNAL_REQUIRED while the matrix said NOT_APPLICABLE).
+        return (
+            "APPLICABLE",
+            "EXTERNAL_REQUIRED",
+            f"{pack}: case '{row['title']}' applies to this product and requires an "
+            f"external participant or accredited body that this repository cannot "
+            f"supply -- {why}. No automated harness can discharge it.",
         )
     return (
         "NOT_APPLICABLE",
