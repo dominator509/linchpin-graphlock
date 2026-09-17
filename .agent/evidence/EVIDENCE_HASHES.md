@@ -54,7 +54,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
 | DOD-038 | DEFERRED_LONG_RUNNING | `apps/desktop/src-tauri/tests/soak_abbreviated.rs` | `faaeeb26a9bae7e4` | 17998 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `d335b223067f28f2` | 2381 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `5a9f2f37a9f0e59c` | 187 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `653513f97f4638c5` | 147537 |
 | DOD-042 | PASS | `scripts/ship-gate.py` | `52c2d5fece8e70de` | 12950 |
 
