@@ -1,13 +1,13 @@
 {
   "artifacts": {
     "executable_sha256": "00286e822ad93a846d5ee2fda4da13e56f9fa90c2bac6f92aa8b9e94985b5862",
-    "msi_sha256": "6a9a95efa5645b2e02099b301f0d43cff9b09bafa5dfb8f20f35257d889bd843"
+    "msi_sha256": "03fecced1431ff94491c23cd0ff928d77f57e0dea736d8a968d7bf67ab40dd1c"
   },
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "blocking_clauses": [
     "DOD-014=PARTIAL"
   ],
-  "candidate_commit": "8027bec2849c533ad44509fa783df22249348dbb",
+  "candidate_commit": "15d88bcaceaab4ad226f4e2e67c338b9a2aae772",
   "dod": {
     "DOD-001": "EXTERNAL_REQUIRED",
     "DOD-002": "PASS",
@@ -52,8 +52,8 @@
     "DOD-041": "PASS",
     "DOD-042": "PASS"
   },
-  "epoch_digest": "2393103ae4da3fd2c6118269e8721444c5e0aa5acdcc3093328b2a29f6b7ef44",
-  "epoch_inputs": 150,
+  "epoch_digest": "d5114e6a4ff282e03d42f816b4d1c20996f40074fc3259f3ab7c6ccc8d628742",
+  "epoch_inputs": 151,
   "mutation_ids": [
     "MUT-COM-002-a",
     "MUT-DATA-001-a",
@@ -73,10 +73,10 @@
   "registry_tally": {
     "DEFERRED_LONG_RUNNING": 1,
     "EXTERNAL_REQUIRED": 7,
-    "NOT_APPLICABLE": 415,
+    "NOT_APPLICABLE": 413,
     "NOT_RUN_BLOCKED_MATERIAL": 4,
     "PARTIAL": 5,
-    "PASS": 52
+    "PASS": 54
   },
   "requirements_bound": [
     "REQ-COM-001",

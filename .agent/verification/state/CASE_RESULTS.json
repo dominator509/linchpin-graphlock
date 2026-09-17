@@ -1,7 +1,7 @@
 {
   "_comment": "Real executed case results. Only IDs whose acceptance oracle genuinely ran may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
-  "candidate_commit": "b0e2740",
-  "candidate_epoch": "98d254624ce9cc5c",
+  "candidate_commit": "8027bec",
+  "candidate_epoch": "2393103ae4da3fd2",
   "environment": {
     "host": "Windows 10 Home 10.0.19045 x64",
     "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
@@ -241,6 +241,12 @@
       "reason": "EXECUTED: first-party source `crates/storage/src/vault.rs` -- quoted and verified: 'test_sha256_known_vector'; first-party source `crates/storage/src/lib.rs` -- quoted and verified: 'test_encrypted_vault'; first-party source `crates/evidence/src/lib.rs` -- quoted and verified: 'test_update_signature_verification'; architecture probe -- `concern[redaction]_tests: 21` (captured in `probes.log`). Cryptographic implementation IS tested, which this row denied. Executed: a SHA-256 known-vector test (so the hash is checked against a published value rather than against itself), an encrypted-blob container round trip, update-signature verification, content-addressed blob storage whose address is the digest of the content, and the threat-control tests that assert the secret allowlist holds no cryptographic material of its own. NOT PROVEN: There is no cryptographic review by a specialist and no FIPS/algorithm-agility requirement to test against; the primitives are those of the pinned dependencies (SHA-256, the encrypted container's cipher), so the tests prove the product uses them correctly at the boundaries it exposes, not that the primitives themselves are sound."
     },
     {
+      "test_id": "GEN-058",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-058.md",
+      "reason": "EXECUTED: first-party source `scripts/weak-crypto-scan.py` -- quoted and verified: 'WEAK_PRIMITIVES', 'def self_test', 'discriminate'; evidence artifact `.agent/evidence/weak-crypto/STATUS.md` -- quoted and verified: 'Verdict: **PASS**', 'Discrimination', 'Limits, stated rather than implied'; evidence artifact `.agent/evidence/weak-crypto/report.json` -- quoted and verified: 'primitives_watched', 'allowlist', 'findings'. Weak-cryptography detection now runs, which is what this row denied. scripts/weak-crypto-scan.py scans first-party code USE of weak primitives (md5/md4/md2/sha1/rc4/rc2/blowfish/skipjack/cast5/des/tripledes and ECB-mode string forms, matched in code-shaped patterns so the repository's own prose about them is not flagged) and both LOCKED dependency graphs (Cargo.lock, pnpm-lock.yaml) for a weak primitive reaching the product transitively. Result on this candidate: ZERO findings, and the scan is wired into verify.sh. DISCRIMINATION IS PROVEN rather than assumed: --self-test runs the same scanner over a synthetic tree containing a weak crate in each lockfile and a weak call in source and asserts all three are reported (3 findings), then over a clean synthetic tree and asserts nothing is reported; it runs as its own verify.sh lane. One documented allowlist entry is recorded in the report: the scanner excludes its own file, because it must name the primitives it looks for and build a synthetic weak fixture. NOT PROVEN: The scan detects named weak primitives in code use and in the locked graphs; it performs no cryptanalysis, does not judge key strength, does not detect a misuse that has no named pattern (for example a static IV), and cannot see a primitive that is weak for a reason absent from its list. The list is in one place so a reviewer can extend it."
+    },
+    {
       "test_id": "GEN-063",
       "status": "PASS",
       "evidence_path": ".agent/evidence/applicable-cases/GEN-063.md",
@@ -359,6 +365,12 @@
       "status": "EXTERNAL_REQUIRED",
       "evidence_path": ".agent/evidence/applicable-cases/GEN-103.md",
       "reason": "EXECUTED: evidence artifact `.agent/verification/APPLICABILITY_MATRIX.csv` -- quoted and verified: 'GEN-103', 'requires an external participant or accredited body'; evidence artifact `.agent/evidence/ADR-005-external-signoff-gates.md` -- quoted and verified: 'accredited'. Applicable-but-external: accredited evaluation owed, none performed, no certification claimed anywhere. NOT PROVEN: No Common Criteria evaluation, protection profile or accreditation has been obtained or started."
+    },
+    {
+      "test_id": "GEN-106",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-106.md",
+      "reason": "EXECUTED: first-party source `crates/evidence/src/lib.rs` -- quoted and verified: 'test_sanitize_path_property_over_generated_corpus', '20_000'; first-party source `apps/desktop/src-tauri/tests/fuzz_campaign.rs` -- quoted and verified: 'Deterministic adversarial', 'fn mutate('; evidence artifact `.agent/evidence/fuzz/STATUS.md` -- quoted and verified: '4 634 inputs per target'; first-party source `crates/crash_reporter/src/lib.rs` -- quoted and verified: 'test_redaction_survives_case_folding_characters'. Property-based security testing IS executed, which this row denied. Two generated-input harnesses run: (1) a seeded property test over a GENERATED path corpus -- 20 000 candidates assembled from an adversarial alphabet ('.', '..', '/', '\\\\', '%2e', '~', '..\\\\', ':' ...) asserting the invariant that sanitize_path never panics and rejects every path that resolves to an escape or an absolute root, with counters proving the corpus actually contained traversals; and (2) the fuzz campaign's deterministic adversarial phase (every awkward character at every position of every seed, 4 634 inputs per target across ten IPC-reachable parsers) plus its seeded mutation phase, both asserting the no-panic property. The mutation harness then proves the properties are discriminating by removing the guards they protect. NOT PROVEN: The generators are hand-rolled (a seeded xorshift64*), not proptest/quickcheck: there is no automatic shrinking outside the fuzz campaign's, no coverage-guided search, and the corpora are bounded by construction. The invariants asserted are the ones written down here; nobody proved the set is complete."
     },
     {
       "test_id": "GEN-110",

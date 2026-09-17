@@ -75,6 +75,12 @@ run "threat-model currency" python3 scripts/check-threat-model.py --check
 # modelled threat must be either represented or explicitly noted.
 run "attack-tree currency" python3 scripts/check-attack-trees.py --check
 
+# GEN-058 weak-cryptography detection: scans code use and both locked graphs, and its
+# self-test proves the scanner discriminates (a gate that finds nothing must show it can
+# find something).
+run "weak-crypto scan" python3 scripts/weak-crypto-scan.py
+run "weak-crypto self-test" python3 scripts/weak-crypto-scan.py --self-test
+
 # Identity check LAST, after the epoch has settled: DOD-029 requires the
 # candidate commit, base revision, epoch and artifact digests to belong to the
 # SAME run, and this lane fails when any of them has moved since the manifest was

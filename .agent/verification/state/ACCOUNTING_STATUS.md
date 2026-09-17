@@ -13,10 +13,10 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 | --- | --- |
 | DEFERRED_LONG_RUNNING | 1 |
 | EXTERNAL_REQUIRED | 7 |
-| NOT_APPLICABLE | 415 |
+| NOT_APPLICABLE | 413 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
 | PARTIAL | 5 |
-| PASS | 52 |
+| PASS | 54 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
 carries the applicability matrix's own per-ID evidence in the ledger, and the
@@ -46,6 +46,7 @@ digest of that matrix document is recorded beside it.
 | GEN-051 | NOT_RUN_BLOCKED_MATERIAL | `.agent/evidence/applicable-cases/GEN-051.md` | Authorization Testing |
 | GEN-052 | PASS | `.agent/evidence/applicable-cases/GEN-052.md` | Broken Access Control Testing |
 | GEN-057 | PASS | `.agent/evidence/applicable-cases/GEN-057.md` | Cryptographic Implementation Testing |
+| GEN-058 | PASS | `.agent/evidence/applicable-cases/GEN-058.md` | Weak Cryptography Testing |
 | GEN-063 | PASS | `.agent/evidence/applicable-cases/GEN-063.md` | Logging and Monitoring Verification |
 | GEN-065 | PASS | `.agent/evidence/applicable-cases/GEN-065.md` | Configuration Hardening Validation |
 | GEN-071 | NOT_RUN_BLOCKED_MATERIAL | `.agent/evidence/applicable-cases/GEN-071.md` | Sandbox and Isolated Environment Security Testing |
@@ -66,6 +67,7 @@ digest of that matrix document is recorded beside it.
 | GEN-099 | PASS | `.agent/evidence/applicable-cases/GEN-099.md` | Compliance Testing |
 | GEN-100 | PASS | `.agent/evidence/applicable-cases/GEN-100.md` | Policy-as-Code Testing |
 | GEN-103 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-103.md` | Common Criteria Security Evaluation |
+| GEN-106 | PASS | `.agent/evidence/applicable-cases/GEN-106.md` | Property-Based Security Testing |
 | GEN-110 | PASS | `.agent/evidence/applicable-cases/GEN-110.md` | Security Regression Testing |
 | GEN-112 | PASS | `.agent/evidence/applicable-cases/GEN-112.md` | Security Baseline Validation |
 | GEN-115 | PASS | `.agent/evidence/applicable-cases/GEN-115.md` | Fault Injection Security Testing |

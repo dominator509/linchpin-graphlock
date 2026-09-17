@@ -301,6 +301,10 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     #     rather than a fallback.
     "GEN-027": ("cmd", "mutation-proof", "seeded mutation-based fuzz campaign plus the controlled-defect mutation harness"),
     "GEN-057": ("cmd", "test-unit", "cryptographic implementation tests: SHA-256 vector, update signature verification, encrypted container"),
+    # GEN-058: "no weak-cryptography test exists" stopped being true the moment anything
+    # looked for weak primitives; the scan below does, over code use and both locked
+    # graphs, and proves its own discrimination with a synthetic weak fixture.
+    "GEN-058": ("cmd", "weak-crypto-scan", "weak-primitive scan over code use and both locked dependency graphs, with a self-test"),
     "GEN-065": ("cmd", "test-unit", "configuration hardening: release config refuses unknown keys and missing required values"),
     "GEN-115": ("cmd", "fault-injection-lane", "filesystem fault injection: total loss and in-place corruption with digest reconciliation"),
     # --- no harness command exists yet: surface probed, gap recorded -----
@@ -354,7 +358,8 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     # scripts/validate-generated-pack.py rejects duplicate probe keys, and
     # scripts/build-accounting.py rejects a case result for an ID the matrix
     # decided NOT_APPLICABLE.
-    "GEN-058": ("no-cmd", "", "no weak-cryptography DETECTION test: the cryptographic implementation is tested (GEN-057 is APPLICABLE), but nothing scans for weak or deprecated primitives, and the dependency ban list names none"),
+    # GEN-058 moved to the executed-command section above: a weak-primitive scan now
+    # exists. Leaving this line would let the stale "no-cmd" entry win silently.
     "GEN-059": ("no-cmd", "", "no TLS listener is operated by the product"),
     "GEN-060": ("no-cmd", "", "no side-channel resistance testing exists"),
     "GEN-061": ("no-cmd", "", "no security misconfiguration scanner targets the installed app"),
@@ -392,9 +397,15 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-103": ("external", "", "Common Criteria evaluation is an accredited external assessment performed by a licensed laboratory"),
     "GEN-104": ("no-cmd", "", "no symbolic execution engine is configured"),
     "GEN-105": ("no-cmd", "", "no model-based security test exists"),
-    "GEN-106": ("no-cmd", "", "no property-based security test exists"),
+    # GEN-106: "no property-based security test exists" was false. Two generated-input
+    # harnesses run today -- a seeded property test over a generated path corpus
+    # (20 000 candidates, asserting no panic and that every escape/absolute path is
+    # rejected) and the fuzz campaign's deterministic adversarial plus mutation phases
+    # over ten IPC-reachable parsers. GEN-107 (formal verification harness) and GEN-109
+    # (theorem prover) remain accurate absences in the formal-methods cluster.
+    "GEN-106": ("cmd", "test-unit", "property tests over generated inputs: generated path corpus plus the mutation-fuzz campaign"),
     "GEN-107": ("no-cmd", "", "no formal verification harness exists"),
-    "GEN-108": ("no-cmd", "", "no security property verification exists"),
+    "GEN-108": ("no-cmd", "", "no FORMAL security-property verification: the security properties this product asserts are verified by executed fail-closed tests (GEN-093) and generated-input property tests (GEN-106), not by a formal method, and no specification language or model checker is in the tree"),
     "GEN-109": ("no-cmd", "", "no theorem prover is configured"),
     "GEN-111": ("no-cmd", "", "no incident-response REHEARSAL: incident-path tests exist (minidump capture, telemetry correlation, the redactor's incident path) and the recovery drill exercises repair, but no runbook is rehearsed end to end"),
     "GEN-113": ("no-cmd", "", "no zero-trust control set exists"),

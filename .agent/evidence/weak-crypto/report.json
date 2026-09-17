@@ -1,0 +1,38 @@
+{
+  "gate": "weak-crypto-scan",
+  "covers": [
+    "GEN-058",
+    "DOD-021"
+  ],
+  "harness": "scripts/weak-crypto-scan.py",
+  "primitives_watched": [
+    "md5",
+    "sha1",
+    "sha-1",
+    "des",
+    "3des",
+    "tripledes",
+    "rc4",
+    "rc2",
+    "blowfish",
+    "ecb",
+    "md4",
+    "md2",
+    "skipjack",
+    "cast5"
+  ],
+  "scanned": [
+    "first-party source (crates, apps, packages, scripts)",
+    "Cargo.lock",
+    "pnpm-lock.yaml"
+  ],
+  "allowlist": [
+    {
+      "path": "scripts/weak-crypto-scan.py",
+      "reason": "the scanner must name the primitives it looks for and must build a synthetic weak fixture to prove it discriminates; scanning itself without this exception flags its own pattern list and self-test string, which is a false positive and would make the gate permanently red"
+    }
+  ],
+  "findings": [],
+  "verdict": "PASS",
+  "limits": "detects named weak primitives in code use and in the locked graphs; it does not perform cryptanalysis, judge key strength or mode misuse beyond the named patterns, and cannot see a primitive that is weak for a reason not on its list"
+}

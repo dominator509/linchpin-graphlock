@@ -224,6 +224,16 @@ CASES: dict[str, dict] = {
         "finding": "Cryptographic implementation IS tested, which this row denied. Executed: a SHA-256 known-vector test (so the hash is checked against a published value rather than against itself), an encrypted-blob container round trip, update-signature verification, content-addressed blob storage whose address is the digest of the content, and the threat-control tests that assert the secret allowlist holds no cryptographic material of its own.",
         "not_proven": "There is no cryptographic review by a specialist and no FIPS/algorithm-agility requirement to test against; the primitives are those of the pinned dependencies (SHA-256, the encrypted container's cipher), so the tests prove the product uses them correctly at the boundaries it exposes, not that the primitives themselves are sound.",
     },
+    "GEN-058": {
+        "status": "PASS",
+        "cites": [
+            ("source", "scripts/weak-crypto-scan.py", ["WEAK_PRIMITIVES", "def self_test", "discriminate"]),
+            ("artifact", ".agent/evidence/weak-crypto/STATUS.md", ["Verdict: **PASS**", "Discrimination", "Limits, stated rather than implied"]),
+            ("artifact", ".agent/evidence/weak-crypto/report.json", ["primitives_watched", "allowlist", "findings"]),
+        ],
+        "finding": "Weak-cryptography detection now runs, which is what this row denied. scripts/weak-crypto-scan.py scans first-party code USE of weak primitives (md5/md4/md2/sha1/rc4/rc2/blowfish/skipjack/cast5/des/tripledes and ECB-mode string forms, matched in code-shaped patterns so the repository's own prose about them is not flagged) and both LOCKED dependency graphs (Cargo.lock, pnpm-lock.yaml) for a weak primitive reaching the product transitively. Result on this candidate: ZERO findings, and the scan is wired into verify.sh. DISCRIMINATION IS PROVEN rather than assumed: --self-test runs the same scanner over a synthetic tree containing a weak crate in each lockfile and a weak call in source and asserts all three are reported (3 findings), then over a clean synthetic tree and asserts nothing is reported; it runs as its own verify.sh lane. One documented allowlist entry is recorded in the report: the scanner excludes its own file, because it must name the primitives it looks for and build a synthetic weak fixture.",
+        "not_proven": "The scan detects named weak primitives in code use and in the locked graphs; it performs no cryptanalysis, does not judge key strength, does not detect a misuse that has no named pattern (for example a static IV), and cannot see a primitive that is weak for a reason absent from its list. The list is in one place so a reviewer can extend it.",
+    },
     "GEN-065": {
         "status": "PASS",
         "cites": [
@@ -234,6 +244,17 @@ CASES: dict[str, dict] = {
         ],
         "finding": "Configuration hardening IS asserted, which this row denied: the configuration surface parses its environment ONCE into typed values, unknown keys are a warning in development and a HARD FAILURE in release, and a missing required value is an error rather than a fallback -- the fail-closed direction the hardening clause asks for. The build environment itself is pinned and recorded (toolchain, lockfile digests) by the clean-build gate.",
         "not_proven": "There is no CIS/STIG-style baseline and no scanner that compares the installed configuration against a policy; the hardening claim is bounded to the product's own configuration surface and to the release-mode behaviour its tests assert.",
+    },
+    "GEN-106": {
+        "status": "PASS",
+        "cites": [
+            ("source", "crates/evidence/src/lib.rs", ["test_sanitize_path_property_over_generated_corpus", "20_000"]),
+            ("source", "apps/desktop/src-tauri/tests/fuzz_campaign.rs", ["Deterministic adversarial", "fn mutate("]),
+            ("artifact", ".agent/evidence/fuzz/STATUS.md", ["4 634 inputs per target"]),
+            ("source", "crates/crash_reporter/src/lib.rs", ["test_redaction_survives_case_folding_characters"]),
+        ],
+        "finding": "Property-based security testing IS executed, which this row denied. Two generated-input harnesses run: (1) a seeded property test over a GENERATED path corpus -- 20 000 candidates assembled from an adversarial alphabet ('.', '..', '/', '\\\\', '%2e', '~', '..\\\\', ':' ...) asserting the invariant that sanitize_path never panics and rejects every path that resolves to an escape or an absolute root, with counters proving the corpus actually contained traversals; and (2) the fuzz campaign's deterministic adversarial phase (every awkward character at every position of every seed, 4 634 inputs per target across ten IPC-reachable parsers) plus its seeded mutation phase, both asserting the no-panic property. The mutation harness then proves the properties are discriminating by removing the guards they protect.",
+        "not_proven": "The generators are hand-rolled (a seeded xorshift64*), not proptest/quickcheck: there is no automatic shrinking outside the fuzz campaign's, no coverage-guided search, and the corpora are bounded by construction. The invariants asserted are the ones written down here; nobody proved the set is complete.",
     },
     "GEN-115": {
         "status": "PASS",
