@@ -9,7 +9,10 @@
     {
       "id": "npm:1193683",
       "ecosystem": "npm",
-      "package": "3.2.7",
+      "package": "vitest",
+      "installed_versions": [
+        "3.2.7"
+      ],
       "severity": "moderate",
       "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
       "decision": "ACCEPT",
@@ -24,7 +27,10 @@
     {
       "id": "npm:1193684",
       "ecosystem": "npm",
-      "package": "3.2.7",
+      "package": "@vitest/mocker",
+      "installed_versions": [
+        "3.2.7"
+      ],
       "severity": "moderate",
       "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock (through @vitest/mocker)",
       "decision": "ACCEPT",

@@ -13,7 +13,10 @@
     {
       "ecosystem": "npm",
       "id": "npm:1193683",
-      "package": "3.2.7",
+      "package": "vitest",
+      "installed_versions": [
+        "3.2.7"
+      ],
       "severity": "moderate",
       "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
       "paths": [
@@ -23,7 +26,10 @@
     {
       "ecosystem": "npm",
       "id": "npm:1193684",
-      "package": "3.2.7",
+      "package": "@vitest/mocker",
+      "installed_versions": [
+        "3.2.7"
+      ],
       "severity": "moderate",
       "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
       "paths": [
@@ -36,6 +42,9 @@
       "id": "npm:1193683",
       "ecosystem": "npm",
       "package": "3.2.7",
+      "installed_versions": [
+        "3.2.7"
+      ],
       "severity": "moderate",
       "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
       "decision": "ACCEPT",
@@ -51,6 +60,9 @@
       "id": "npm:1193684",
       "ecosystem": "npm",
       "package": "3.2.7",
+      "installed_versions": [
+        "3.2.7"
+      ],
       "severity": "moderate",
       "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock (through @vitest/mocker)",
       "decision": "ACCEPT",
@@ -63,6 +75,9 @@
       "reviewed": "round 57"
     }
   ],
-  "problems": [],
-  "verdict": "PASS"
+  "problems": [
+    "npm:1193683: the register records package '3.2.7' but the scanner reports 'vitest'",
+    "npm:1193684: the register records package '3.2.7' but the scanner reports '@vitest/mocker'"
+  ],
+  "verdict": "FAIL"
 }

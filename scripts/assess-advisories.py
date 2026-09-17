@@ -98,16 +98,21 @@ def npm_advisories() -> tuple[list[dict], str]:
         return advisories, note
     for advisory_id, entry in (payload.get("advisories") or {}).items():
         paths: list[str] = []
-        packages: list[str] = []
+        versions: list[str] = []
         for finding in entry.get("findings") or []:
             paths.extend(finding.get("paths") or [])
-            if finding.get("version"):
-                packages.append(f"{finding.get('version')}")
+            # MEASURED DEFECT, fixed here: this used to record the finding's VERSION
+            # as if it were the package name, so the register said
+            # `"package": "3.2.7"` for an advisory in vitest. The package name is
+            # `module_name`; the version is one attribute of the finding.
+            versions.append(str(finding.get("version") or "unknown"))
+        package = str(entry.get("module_name") or entry.get("module") or "unknown")
         advisories.append(
             {
                 "ecosystem": "npm",
                 "id": f"npm:{advisory_id}",
-                "package": ",".join(sorted(set(packages))) or "unknown",
+                "package": package,
+                "installed_versions": sorted(set(versions)),
                 "severity": str(entry.get("severity") or "unknown"),
                 "title": str(entry.get("title") or "")[:200],
                 "paths": sorted(set(paths)),
@@ -169,6 +174,18 @@ def main() -> int:
                     f"scanner now reports {advisory['paths']} -- the dependency moved, so the "
                     "assessment is stale"
                 )
+        # MEASURED DEFECT, fixed here: nothing compared the PACKAGE NAME the register
+        # records with the package the scanner names. The npm normalizer used to write
+        # the finding's version into that field, so two advisories were registered as
+        # `"package": "3.2.7"` -- an assessment about a version number, not a package --
+        # and this gate accepted it, because it only read reachability, paths and the
+        # decision. An assessment must name the package it is about.
+        recorded_package = str(entry.get("package", "")).strip()
+        if recorded_package != advisory["package"]:
+            problems.append(
+                f"{advisory_id}: the register records package {recorded_package!r} but the scanner "
+                f"reports {advisory['package']!r}"
+            )
     for advisory_id, entry in sorted(entries.items()):
         if advisory_id not in found and entry.get("decision") != "RESOLVED":
             problems.append(
