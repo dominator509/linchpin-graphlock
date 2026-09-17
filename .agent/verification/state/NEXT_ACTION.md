@@ -16,19 +16,18 @@ soak; DOD-001/034/039 need the clean room and named human validators. The next l
 MANUAL action is unchanged: run the documented install on a clean machine and record it
 (REQ-REL-001).
 
-## SUP-004, fully characterised, blocked on packaging decisions
+## SUP-004 is closed on the gate's own criteria
 
-All three artifacts are now measured: the release executable is BYTE-IDENTICAL across
-rebuilds (`/Brepro`); the MSI carries an identical payload but WiX regenerates
-`ProductCode` per build; the NSIS setup carries an identical payload (8 files, every digest
-equal) inside a non-reproducible COMPRESSED STREAM. Two unblock paths, both packaging
-decisions rather than build fixes:
+Round 60 re-read the gate and measured, and both halves of my earlier remediation plan were
+wrong: SUP-004 does NOT require byte-identical containers (its method covers the
+non-feasible case by normalising documented fields and comparing semantic contents), and
+pinning `ProductCode` would not have produced identical MSIs because the summary stream's
+**PackageCode** and timestamps are build-specific by format design. The clause now passes
+with: byte-identical executable, semantically identical payloads in both packages,
+installed-binary binding, and the environment/locale/timezone/network record its method
+requires. Cross-machine reproducibility stays where it belongs — DOD-034's
+EXTERNAL_REQUIRED virgin-clean-room gate (PF-016).
 
-1. Pin `ProductCode` per version through a custom WiX template or fragment (Tauri's schema
-   exposes `upgradeCode` only) — carries an upgrade-semantics review, because a pinned
-   ProductCode is what makes patching possible and must change between versions.
-2. Make NSIS compression deterministic, or stop shipping NSIS and ship the MSI alone (the
-   format the installer lanes and the clean-room procedure already use).
 
 ## Applicability rows still open
 
