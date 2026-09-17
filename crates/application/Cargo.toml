@@ -3,8 +3,32 @@ name = "application"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+
+# ARCHITECTURE.md section 3 (import/dependency law): "Application may depend on
+# domain interfaces and typed contracts; it may not depend on concrete provider or
+# storage implementation types" and "Adapters may depend inward; inward layers never
+# import adapters".
+#
+# Two violations were measured here and are now removed rather than documented away:
+#
+#   * `storage` was declared but referenced by nothing in the crate -- a dead edge
+#     to a concrete adapter. Removed (the lock file was refreshed offline; every
+#     lane still builds with --locked).
+#   * `platform_windows` was a production dependency used by the soak instrumentation
+#     to read the process working set. That read is now a port the caller injects
+#     (`OperationsSoakTest::with_probe`), so the adapter moved to dev-dependencies,
+#     where the tests that assert a REAL memory measurement still use it.
+#
+# `domain` was declared here as well and referenced by nothing; the drift gate's
+# dead-edge rule caught it after the first two were removed. This crate currently
+# holds generic helpers (health probes, soak instrumentation, git sandbox), so it
+# needs no port yet -- and a declaration kept "for later" is exactly the kind of
+# paper dependency the import law exists to prevent. Add it back with the code that
+# uses it.
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-domain = { path = "../domain" }
-storage = { path = "../storage" }
+
+[dev-dependencies]
+# Used only by `#[cfg(test)]` code: the real-memory soak tests and the
+# real-app-data-path health probe. Production code in this crate has no adapter edge.
 platform_windows = { path = "../platform_windows" }

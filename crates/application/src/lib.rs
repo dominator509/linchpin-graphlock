@@ -271,6 +271,14 @@ pub struct OperationsSoakTest {
     pub started_at: Option<std::time::Instant>,
     baseline_bytes: Option<u64>,
     peak_bytes: u64,
+    /// Port for the OS working-set read.
+    ///
+    /// ARCHITECTURE.md section 3: "Adapters may depend inward; inward layers never
+    /// import adapters." Production code here therefore holds a function pointer the
+    /// composition root injects (`with_probe`) instead of calling the platform crate
+    /// directly; `new()` has no probe and an unmeasurable soak is reported as
+    /// unmeasurable rather than declared leak-free.
+    probe: Option<fn() -> Option<u64>>,
 }
 
 impl Default for OperationsSoakTest {
@@ -287,14 +295,28 @@ impl OperationsSoakTest {
             started_at: None,
             baseline_bytes: None,
             peak_bytes: 0,
+            probe: None,
         }
+    }
+
+    /// Construct with the platform memory probe injected by the caller.
+    pub fn with_probe(probe: fn() -> Option<u64>) -> Self {
+        OperationsSoakTest {
+            probe: Some(probe),
+            ..Self::new()
+        }
+    }
+
+    /// One sample of resident memory, or None when no probe was injected or it failed.
+    fn probe_bytes(&self) -> Option<u64> {
+        (self.probe)?()
     }
 
     pub fn start_soak(&mut self) {
         self.is_running = true;
         self.iteration_count = 0;
         self.started_at = Some(std::time::Instant::now());
-        self.baseline_bytes = current_rss_bytes();
+        self.baseline_bytes = self.probe_bytes();
         self.peak_bytes = self.baseline_bytes.unwrap_or(0);
     }
 
@@ -304,7 +326,7 @@ impl OperationsSoakTest {
             return Err("Soak test not running");
         }
         self.iteration_count += 1;
-        if let Some(rss) = current_rss_bytes() {
+        if let Some(rss) = self.probe_bytes() {
             self.peak_bytes = self.peak_bytes.max(rss);
         }
         Ok(())
@@ -320,7 +342,7 @@ impl OperationsSoakTest {
     /// Growth in resident memory over the soak, if measurable.
     pub fn memory_growth_bytes(&self) -> Option<u64> {
         let baseline = self.baseline_bytes?;
-        let current = current_rss_bytes()?;
+        let current = self.probe_bytes()?;
         Some(current.saturating_sub(baseline))
     }
 
@@ -354,7 +376,7 @@ mod soak_tests {
     /// measurably growing process must not be reported as leak-free.
     #[test]
     fn test_soak_measures_real_memory_growth() {
-        let mut soak = OperationsSoakTest::new();
+        let mut soak = OperationsSoakTest::with_probe(platform_probe);
         assert!(soak.run_iteration().is_err(), "must not run when stopped");
 
         soak.start_soak();
@@ -391,7 +413,7 @@ mod soak_tests {
     /// A fresh soak reports zero iterations and no fabricated leak.
     #[test]
     fn test_soak_does_not_fabricate_a_leak() {
-        let mut soak = OperationsSoakTest::new();
+        let mut soak = OperationsSoakTest::with_probe(platform_probe);
         soak.start_soak();
         for _ in 0..101 {
             soak.run_iteration().unwrap();
@@ -405,7 +427,7 @@ mod soak_tests {
     /// Restarting a soak resets its counters rather than accumulating.
     #[test]
     fn test_soak_restart_resets_counters() {
-        let mut soak = OperationsSoakTest::new();
+        let mut soak = OperationsSoakTest::with_probe(platform_probe);
         soak.start_soak();
         for _ in 0..5 {
             soak.run_iteration().unwrap();
@@ -423,7 +445,13 @@ mod soak_tests {
 /// `GetProcessMemoryInfo`. It returns `None` rather than a placeholder when the
 /// OS call fails, so an unmeasurable soak is reported as unmeasurable instead
 /// of being declared leak-free.
-fn current_rss_bytes() -> Option<u64> {
+///
+/// Test-only on purpose: the platform crate is a dev-dependency of this crate, so
+/// the tests measure real memory while production code has no adapter edge
+/// (ARCHITECTURE.md section 3). Production callers inject their own probe through
+/// `OperationsSoakTest::with_probe`.
+#[cfg(test)]
+fn platform_probe() -> Option<u64> {
     platform_windows::current_rss_bytes()
 }
 
@@ -437,7 +465,7 @@ mod operations_tests {
     /// real contract: a reconciled soak returns its iteration count.
     #[test]
     fn test_soak_reconciliation() {
-        let mut soak = OperationsSoakTest::new();
+        let mut soak = OperationsSoakTest::with_probe(platform_probe);
         assert!(soak.run_iteration().is_err(), "must not run when stopped");
 
         soak.start_soak();

@@ -1,0 +1,72 @@
+{
+  "gate": "architecture-drift",
+  "covers": [
+    "EP-010 M3",
+    "AGENTS.md section 6",
+    "ARCHITECTURE.md section 145"
+  ],
+  "harness": "scripts/architecture-drift.py",
+  "checks": {
+    "truth_boundaries": [],
+    "import_law": [],
+    "local_confidentiality": [],
+    "bindings": []
+  },
+  "findings": [],
+  "bound_items": [
+    {
+      "item": "evidence provenance",
+      "files": [
+        ".agent/evidence/EVIDENCE_HASHES.md",
+        "scripts/generate-evidence-index.py"
+      ],
+      "lane": "verify.sh: evidence index currency"
+    },
+    {
+      "item": "high-impact authorization",
+      "files": [
+        "crates/mcp_hub/src/lib.rs",
+        "crates/domain/src/scope.rs"
+      ],
+      "lane": "cargo test -p mcp_hub (deny-by-default grants; unknown client has no capabilities)"
+    },
+    {
+      "item": "rebuildable derived state",
+      "files": [
+        ".agent/evidence/recovery-drill/report.json",
+        "crates/storage/Cargo.toml"
+      ],
+      "lane": "cargo test -p linchpin-desktop --test recovery_drill (canonical state restored and reconciled)"
+    },
+    {
+      "item": "terms-gated provider behavior",
+      "files": [
+        "apps/desktop/src-tauri/src/commands.rs"
+      ],
+      "lane": "cargo test -p linchpin-desktop (provider lanes: local measured, the rest not configured)"
+    },
+    {
+      "item": "deterministic filing manifests",
+      "files": [
+        "crates/patent/src/lib.rs"
+      ],
+      "lane": "cargo test -p patent"
+    },
+    {
+      "item": "exact-artifact proof",
+      "files": [
+        ".agent/evidence/artifact-e2e/STATUS.md",
+        "scripts/artifact-e2e.sh"
+      ],
+      "lane": "scripts/artifact-e2e.sh via scripts/test-e2e.sh lane 2"
+    }
+  ],
+  "inputs": {
+    "ARCHITECTURE.md": "2645a72dcc2fbe2b4a90fb200d6b7b5357df537fd087364f29cbb5b35587b8f3",
+    "crates/domain/src/scope.rs": "f0157f09d84c891665b4fd25a3fed870330aa338e5403a3209def2dae47e813e",
+    "crates/application/Cargo.toml": "7a2c98dc50166c5906e5f9aa5d71e9bbf50e797ed08437600677bdf8d03be7f4",
+    "crates/domain/Cargo.toml": "d4dc23027ba512c3fe91e7ed9f3990d21a03cbc14658fa3ed1d5ec92d7cddc39"
+  },
+  "verdict": "PASS",
+  "digest": "6fbce2d3fd2f9ca8f56351b93a9627e320b295d60bedb6f73e0226b36db06a3e"
+}
