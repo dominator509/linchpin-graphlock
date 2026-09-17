@@ -5,7 +5,7 @@
   },
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "blocking_clauses": [],
-  "candidate_commit": "8074e5e987a698b84419bdab515ae86b20bd8e32",
+  "candidate_commit": "1c7092ceef29b482fef174b51266bf006aae9d97",
   "dod": {
     "DOD-001": "EXTERNAL_REQUIRED",
     "DOD-002": "PASS",
