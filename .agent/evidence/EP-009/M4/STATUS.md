@@ -1,6 +1,83 @@
 # EP-009 / M4 — Update, rollback and uninstall data preservation
 
-Status: **PARTIAL — data preservation EXECUTED; the signing half is a documented limitation (ADR-003), and cross-version rollback is not yet possible.**
+> ## CURRENT STATE (added later; the body below is the historical record at
+> ## candidate `1604012` and is preserved, not rewritten)
+>
+> M4 is **DONE for every path this product claims**. The historical body ends by
+> naming two open items; both are now closed or resolved:
+>
+> | Item the historical body lists as open | Current state |
+> | --- | --- |
+> | Cross-version rollback untested / DOD-035 stays FAIL | **closed by execution.** A second release exists and the matrix now installs it: `scripts/version-matrix.py` builds v0.1.0 and v0.2.0 through the production build path (manifests bumped, `cargo update --workspace --offline` so `--locked` still holds, manifests and lockfiles restored byte-for-byte with `git diff --exit-code` asserted), then runs install → upgrade → downgrade attempt → uninstall → rollback against realistic persistent state at the product's real app-data path. DOD-035 is PASS |
+> | No live vault write through the installed binary | covered at the boundary: the exact-artifact lane drives the packaged executable's real WebView2 over CDP with a real vault write, and the matrix launches the upgraded binary from its installed location and observes it alive |
+> | No signature | ADR-003: unsigned release accepted as a documented limitation, not a skipped step |
+>
+> ### Measured result at the current candidate
+>
+> Re-provisioned and re-run against source `62da949ba` (build-input fingerprint
+> `d5bb1c86337a` over 82 tracked inputs), all eight steps PASS:
+>
+> | Step | Measured |
+> | --- | --- |
+> | clean_start | nothing installed, `msiexec` exit 0 |
+> | install_old | DisplayVersion `0.1.0`, installed exe `305328ddfa3074fe…` equals the package's **own** payload digest |
+> | seed_state | canary database + content-addressed blob written at `%LOCALAPPDATA%\LINCHPIN`, intact |
+> | upgrade | DisplayVersion `0.2.0`, binary **replaced** (`305328dd…` → `dddc99c8bab6d013…`), matches payload, upgraded binary **launched and observed alive**, canary intact |
+> | downgrade_attempt | applied back to `0.1.0`, installed version agrees with the outcome, canary intact |
+> | uninstall | product removed, canary intact |
+> | rollback | `0.1.0` reinstalled, payload digest matches, canary intact |
+> | cleanup | canary removed, nothing left installed |
+>
+> Live evidence: `.agent/evidence/version-matrix/report.json` and `STATUS.md`.
+>
+> ### A defect in this harness was found and fixed while producing this evidence
+>
+> The matrix was **stale and did not know it**. `staged()` only checked that the
+> artifact files existed, so the run on 2026-09-17 reused packages built on
+> 2026-09-16 while production code had changed in between: the recorded PASS
+> described a candidate that no longer existed. DOD-040 requires a changed
+> candidate to invalidate and **rerun** affected results, so this was a real
+> accounting defect, not a cosmetic one.
+>
+> The fix binds the staged artifacts to the source that produced them:
+> `target/version-matrix/STAGE.json` records the commit and a fingerprint over the
+> 82 tracked build inputs; the report and `STATUS.md` carry both; a mismatch makes
+> the lane **re-provision instead of reusing**, and `--check-source` fails outright
+> naming both revisions. The lane is wired into `verify.sh`, so a stale matrix can
+> no longer sit in the tree claiming a PASS for a moved candidate.
+>
+> Both branches were proven rather than assumed: injecting a mismatching
+> fingerprint made `--check-source` fail with
+> `staged artifacts were built from 000000000 (fingerprint deadbeefdead) but the
+> current source is 62da949ba (fingerprint d5bb1c86337a)`, and the same injected
+> state made the matrix print `STALE STAGE … re-provisioning both versions
+> (DOD-040 rerun obligation)` and rebuild. (The first revision of the fix read the
+> provenance at the wrong level and compared `None` against `None`, printing
+> `built from ? (fingerprint ?)`; that was caught by running it.)
+>
+> ### Mutation proof, refreshed against the current artifacts
+>
+> `python3 scripts/version-matrix.py --mutate destructive-upgrade` injects an
+> upgrade that **destroys** the seeded state. With the same staged artifacts as the
+> green run, the matrix fails at four steps — `upgrade`, `downgrade_attempt`,
+> `uninstall`, `rollback` all report `state_intact: false` — so the green run
+> discriminates between an upgrade that preserves user data and one that does not.
+> Record: `.agent/evidence/version-matrix/report-mutation-destructive-upgrade.json`.
+>
+> ### Still not claimed
+>
+> - mixed-fleet and multi-machine version skew: **NOT APPLICABLE** — a single-user
+>   desktop product with device-local storage, no server fleet, and no such support
+>   claimed. Recorded in the report's `applicability_notes` rather than dropped.
+> - A signed update channel: ADR-003.
+>
+> ### Milestone verdict
+>
+> **DONE.** Update, downgrade, rollback and uninstall preservation are executed
+> across two real versions with realistic persistent state, mutation-proven,
+> source-bound and currency-enforced.
+
+Status at the time of writing: **PARTIAL — data preservation EXECUTED; the signing half is a documented limitation (ADR-003), and cross-version rollback is not yet possible.**
 
 Milestone: M4 "Signed update/rollback/uninstall-vault-preservation"
 Gate: `scripts/vault-preservation-e2e.sh`, wired as **lane 3 of `scripts/test-e2e.sh`**

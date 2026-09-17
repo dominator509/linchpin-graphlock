@@ -63,6 +63,31 @@ run "evidence index currency" python3 scripts/generate-evidence-index.py --check
 # Re-derive with `python3 scripts/applicable-case-evidence.py --write`.
 run "applicable-case evidence currency" python3 scripts/applicable-case-evidence.py --check
 
+# EP-010 M1 stage accounting currency: the per-stage record is derived from the
+# registry, the applicability matrix and the per-ID accounting, all three of which
+# the settle path rewrites. This lane fails when the derived record no longer
+# matches them, so a stage verdict cannot silently describe a superseded state.
+# Re-derive with `python3 scripts/stage-accounting.py`.
+run "stage accounting currency" python3 scripts/stage-accounting.py --check
+
+# EP-010 M3 drift currency: the drift record pins the digests of ARCHITECTURE.md,
+# the scope module and the crate manifests, so a spec or dependency change fails
+# here until the accounting is re-derived.
+run "architecture drift currency" python3 scripts/architecture-drift.py --check
+
+# EP-010 M4/M5 residual-risk, readiness, next-action, submit-report and manual-release
+# documents are DERIVED from the state files. Two of them used to be pack templates
+# that had become false statements about this run; this lane fails the moment any of
+# them stops matching the evidence they describe.
+run "residual risk / readiness currency" python3 scripts/residual-risk-report.py --check
+
+# DOD-040 artifact currency for the cross-version matrix: the staged v0.1.0/v0.2.0
+# packages must have been built from the source that is in the tree NOW. Measured
+# defect this closes: the matrix ran against artifacts built the previous day while
+# production code changed, and its PASS described a candidate that no longer
+# existed. Rebuild with `python3 scripts/version-matrix.py --provision`.
+run "version-matrix source currency" python3 scripts/version-matrix.py --check-source
+
 # GEN-091 threat-model currency: the model is only worth having if it is BOUND to the
 # code. This lane re-reads every mitigation symbol, every truth boundary declared in
 # crates/domain/src/scope.rs, every STRIDE category and every recorded risk, and fails
@@ -90,6 +115,13 @@ run "advisory assessment" python3 scripts/assess-advisories.py
 # ENFORCED ceilings, plus a self-test that proves the measurement sees a planted defect.
 run "code metrics" python3 scripts/code-metrics.py
 run "code metrics self-test" python3 scripts/code-metrics.py --self-test
+
+# EP-010 M3 architecture drift accounting (AGENTS.md section 6): truth boundaries
+# transcribed verbatim into code, import/dependency law, dead workspace edges and
+# non-loopback URL literals in production source, plus the review items bound to the
+# gates that prove them. The self-test plants one violation per mechanical rule.
+run "architecture drift" python3 scripts/architecture-drift.py
+run "architecture drift self-test" python3 scripts/architecture-drift.py --self-test
 
 # Identity check LAST, after the epoch has settled: DOD-029 requires the
 # candidate commit, base revision, epoch and artifact digests to belong to the

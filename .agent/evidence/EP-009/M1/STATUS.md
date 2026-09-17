@@ -1,6 +1,26 @@
 # EP-009 / M1 — Produce frozen Windows installer/app artifacts
 
-Status: **IN_PROGRESS** (partial). M1 is not closed; see "Remaining" below.
+> **CURRENT STATE (added later; the body below is the historical record at
+> candidate `41e0b20` and is preserved, not rewritten).**
+>
+> M1 is **DONE**. The build-blocking icon defect documented below was repaired,
+> the full Windows pipeline builds both formats from the current candidate, and
+> the "Remaining" list has since been discharged item by item:
+>
+> | Item the historical body lists as open | Current state |
+> | --- | --- |
+> | No installer install/launch executed | executed — `.agent/evidence/EP-009/M3/STATUS.md` (real `msiexec`, ARP read-back, launch with window title) |
+> | Artifacts unsigned | ADR-003 records an unsigned release as an accepted limitation |
+> | No SBOM/notices/provenance | done — `.agent/evidence/EP-009/M2/STATUS.md` |
+> | No rollback/uninstall preservation proof | done, cross-version — `.agent/evidence/EP-009/M4/STATUS.md` |
+> | Digests bound to a dirty tree | superseded: `RUN_MANIFEST.json` records the dirty state explicitly (`working_tree.dirty: true`) instead of implying a frozen revision |
+>
+> Artifact identity at the current candidate (`.agent/verification/state/RUN_MANIFEST.json`):
+> executable `00286e822ad93a84…` (12,500,992 B), MSI `a29cdb38c463594a…` (5,709,824 B),
+> NSIS setup produced by the same build. Rebuilds are byte-identical (SUP-004,
+> `-C link-arg=/Brepro`).
+
+Status at the time of writing: **IN_PROGRESS** (partial). M1 is not closed; see "Remaining" below.
 
 ## Candidate identity
 

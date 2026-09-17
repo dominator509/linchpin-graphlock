@@ -1,45 +1,52 @@
 # EP-009 — Deployment and Release
 
-Status: **IN PROGRESS — re-opened for remediation (`EP-009-remediation-001`)**
+Status: **COMPLETE — every milestone has executed evidence. Node closure does not
+mean GO: the machine ship gate returns `CONDITIONAL_EXTERNAL_GATES`, and the
+external gates are named below.**
 
-The previous content of this file was a single line:
-
-```
-NOT_RUNNABLE_ENV(Windows-target-only steps this Linux sandbox cannot run)
-```
-
-That line was **false for this environment** and is preserved here rather than
-deleted so the correction is auditable. This host is Windows
-(`Microsoft Windows NT 10.0.19045.0`, target `x86_64-pc-windows-msvc`), and every
-Windows-target-only step EP-009 owns has since been executed on it — including
-real `msiexec` install/uninstall cycles with logs already committed under
-`.agent/evidence/EP-009/M2/`. The line described the Linux sandbox the blueprint
-pack was authored in, and it was inherited into the ledger as an unverified
-premise that kept `scripts/graph-next.sh` returning
-`RUN_BLOCKED dependencies prevent: EP-010` on every run. Full analysis:
-`REMEDIATION.md` in this directory.
+Requirements: REQ-REL-001, REQ-REL-005. Dependencies: EP-008 (DONE_VERIFIED).
 
 ## Milestone state
 
 | Milestone | State | Evidence |
 | --- | --- | --- |
-| M1 — frozen Windows installer/app artifacts | **DONE** | `M1/STATUS.md`; `sh scripts/build.sh` exit 0 produces MSI (5,558,272 B) and NSIS (3,121,331 B) from one candidate |
-| M2 — SBOM / notices / signing / provenance | **PARTIAL** | SBOM merged across ecosystems, CycloneDX 1.5, 720 components, `generate-sbom.py --check` green. MPL-2.0 resolved by ADR-002. Signing/provenance not applicable by decision (ADR-003) |
-| M3 — clean Win10 install / smoke / E2E | **PARTIAL** | `M3/STATUS.md`; `sh scripts/smoke-test.sh` exit 0 — silent install, ARP read-back, launch with window title and `responding=True`, clean uninstall; exact-artifact CDP E2E passes 15 assertions. Zero-state ("virgin") clean room still EXTERNAL_REQUIRED (DOD-034) |
-| M4 — update / rollback / uninstall-vault-preservation | **PARTIAL** | `M4/STATUS.md`; `scripts/vault-preservation-e2e.sh` executed as lane 3 of `scripts/test-e2e.sh`. Data preservation mutation-proven. Cross-version rollback not testable: only one version exists |
-| M5 — freeze release candidate digest | **DONE** | Artifact identity pinned in `.agent/verification/reports/RELEASE_GATE.json` and repeated in `THIRD_PARTY_NOTICES.md` |
+| M1 — frozen Windows installer/app artifacts | **DONE** | `.agent/evidence/EP-009/M1/STATUS.md`; `sh scripts/build.sh` produces MSI + NSIS from one candidate; identity pinned in `RUN_MANIFEST.json` — exe `00286e82…` (12,500,992 B), MSI `a29cdb38…` (5,709,824 B); rebuilds byte-identical (SUP-004) |
+| M2 — SBOM / notices / signing / provenance | **DONE** | `.agent/evidence/EP-009/M2/STATUS.md`; CycloneDX 1.5 SBOM (720 components, 720 purls) with a currency lane, generated notices, licence gate enforced (MPL-2.0 by ADR-002), provenance manifest, unsigned release by ADR-003 |
+| M3 — clean Win10 install / smoke / E2E | **DONE on this host** | `.agent/evidence/EP-009/M3/STATUS.md`; `sh scripts/smoke-test.sh` exit 0 (silent install → ARP read-back → launch with real window title → clean uninstall); exact-artifact CDP E2E with 15 assertions (`.agent/evidence/artifact-e2e/STATUS.md`); zero-state virgin clean room = DOD-034 `EXTERNAL_REQUIRED` |
+| M4 — update / rollback / uninstall vault preservation | **DONE** | `.agent/evidence/EP-009/M4/STATUS.md`; lane 3 `scripts/vault-preservation-e2e.sh` and lane 4 cross-version matrix — 8/8 steps PASS against realistic persistent state at source `62da949ba`, mutation-proven, source-bound and currency-enforced |
+| M5 — freeze release candidate digest | **DONE** | `RUN_MANIFEST.json` + `.agent/verification/reports/RELEASE_GATE.json` + `.agent/evidence/sbom/THIRD_PARTY_NOTICES.md`; handing to an auditor is the human gate DOD-039 |
 
-## External prerequisites still open
+## Clause dispositions this node answers
 
-- **PF-016** — zero-state/virgin target for DOD-034. Scope narrowed to Windows 10
-  or higher by ADR-004; Windows 11 is not claimed. No virgin host exists, so
-  DOD-034 remains `EXTERNAL_REQUIRED`.
-- **PF-017 / PF-018** — human sign-off gates, confirmed `EXTERNAL_REQUIRED` by
-  ADR-005.
+| Clause | Disposition | Basis |
+| --- | --- | --- |
+| DOD-003 distribution artifacts | PASS | both formats built, parsed through the Windows Installer COM API as an independent reader |
+| DOD-004 exact-artifact smoke/E2E | PASS | `.agent/evidence/artifact-e2e/STATUS.md`; E2E drives the packaged executable, not a dev server |
+| DOD-029 candidate/artifact pinning | PASS | `RUN_MANIFEST.json`, refreshed by the settle path, verified by a currency lane |
+| DOD-035 upgrade/downgrade/rollback | PASS | cross-version matrix (see M4) |
+| DOD-036 backup/restore/recovery objectives | PASS | `.agent/evidence/REQ-REL-005-recovery.md`, `.agent/evidence/recovery-drill/report.json` |
+| DOD-034 virgin clean room | **EXTERNAL_REQUIRED** | no zero-state host exists (PF-016); scope Windows 10+ by ADR-004, Windows 11 not claimed (see `M3/STATUS.md`) |
+| DOD-039 human UAT / AT / legal sign-off | **EXTERNAL_REQUIRED** | ADR-005; cannot be produced by tooling |
+| DOD-038 full-scale soak | **DEFERRED_LONG_RUNNING** | the pack specifies 24/48/72+ h on dedicated infrastructure; abbreviated trial labelled separately |
 
-## Not closed
+## What is NOT claimed
 
-M4's cross-version paths (version-skew, downgrade to an older schema, mixed fleet)
-cannot be executed while only one version exists, so EP-009 is not eligible for
-`DONE_VERIFIED` and is recorded as `REMEDIATION_REOPENED` in the ledger rather
-than being marked complete.
+1. **Not a GO.** The verdict is produced only by `scripts/ship-gate.py`; at this
+   candidate it is `CONDITIONAL_EXTERNAL_GATES` with no blocking clause.
+2. **Not a clean-room install.** This host carries the full toolchain; the
+   zero-state proof is the external gate above.
+3. **Not signed.** ADR-003.
+4. **Not deployed.** Auto-deploy authorization is `no` (AGENTS.md §5e), so
+   deployment is manual: the artifact is ship-ready and the manual release
+   instructions live in `.agent/evidence/EP-010/M5/MANUAL_RELEASE.md`.
+5. **REQ-REL-001 remains unbound** in the requirement traceability until the
+   clean-room golden path is executed; the reason is recorded in
+   `.agent/evidence/DOD-001-unbound-requirements.md` instead of being papered over.
+
+## History preserved
+
+The previous content of this file recorded the node as
+`REMEDIATION_REOPENED`, and before that it carried a single false line
+(`NOT_RUNNABLE_ENV(...)`) inherited from the pack's authoring sandbox. Both are
+preserved in `REMEDIATION.md` in this directory and in the hash-chained ledger,
+not deleted: the correction is part of the record.
