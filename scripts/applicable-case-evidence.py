@@ -202,6 +202,50 @@ CASES: dict[str, dict] = {
         "finding": "Measured absence of the subject of the test, with both nearest real controls measured present.",
         "not_proven": "No authorization test was executed, because executing one would require inventing an identity model the product does not have.",
     },
+    "GEN-027": {
+        "status": "PASS",
+        "cites": [
+            ("artifact", ".agent/evidence/fuzz/STATUS.md", ["fuzz_campaign.rs", "4 634 inputs per target"]),
+            ("source", "apps/desktop/src-tauri/tests/fuzz_campaign.rs", ["Mutation-based fuzz campaign", "fn mutate("]),
+            ("artifact", ".agent/evidence/mutation-proof/REPORT.json", ["MUT-FUZZ-001"]),
+            ("source", "scripts/mutation-proof.py", ["SURVIVED", "anchor matched"]),
+        ],
+        "finding": "Mutation-based testing is executed at two levels, and this row used to deny both. (1) FUZZING: the campaign in apps/desktop/src-tauri/tests/fuzz_campaign.rs mutates inputs with a seeded xorshift64* generator (byte flips, insertions, deletions, splices) after its deterministic adversarial phase, and it FOUND a real panic in the credential redactor; the campaign is itself mutation-proven by MUT-FUZZ-001, which reintroduces that defect and requires the campaign to fail. (2) CONTROLLED DEFECTS: scripts/mutation-proof.py applies 13 declared mutations to production code, requires the mutant to compile, requires the named guarding test to FAIL, restores the bytes and reruns green -- it fails on SURVIVED and BUILD_ERROR, and it refuses an anchor that does not match exactly once.",
+        "not_proven": "Neither mechanism is a general-purpose mutation-testing platform: coverage is the 13 declared mutations and ten fuzz targets, not the whole codebase, and no mutation-score threshold is enforced. Two earlier mutations that SURVIVED were withdrawn rather than claimed as caught.",
+    },
+    "GEN-057": {
+        "status": "PASS",
+        "cites": [
+            ("source", "crates/storage/src/vault.rs", ["test_sha256_known_vector"]),
+            ("source", "crates/storage/src/lib.rs", ["test_encrypted_vault"]),
+            ("source", "crates/evidence/src/lib.rs", ["test_update_signature_verification"]),
+            ("probe", "concern[redaction]_tests: 21"),
+        ],
+        "finding": "Cryptographic implementation IS tested, which this row denied. Executed: a SHA-256 known-vector test (so the hash is checked against a published value rather than against itself), an encrypted-blob container round trip, update-signature verification, content-addressed blob storage whose address is the digest of the content, and the threat-control tests that assert the secret allowlist holds no cryptographic material of its own.",
+        "not_proven": "There is no cryptographic review by a specialist and no FIPS/algorithm-agility requirement to test against; the primitives are those of the pinned dependencies (SHA-256, the encrypted container's cipher), so the tests prove the product uses them correctly at the boundaries it exposes, not that the primitives themselves are sound.",
+    },
+    "GEN-065": {
+        "status": "PASS",
+        "cites": [
+            ("source", "crates/platform_windows/src/lib.rs", ["test_unknown_keys_warn_in_development_and_fail_in_release"]),
+            ("source", "crates/platform_windows/src/lib.rs", ["test_missing_required_value_is_an_error_not_a_fallback"]),
+            ("source", "crates/platform_windows/src/lib.rs", ["test_release_runtime_is_parsed"]),
+            ("artifact", ".agent/evidence/clean-build/ENVIRONMENT.json", ["toolchain"]),
+        ],
+        "finding": "Configuration hardening IS asserted, which this row denied: the configuration surface parses its environment ONCE into typed values, unknown keys are a warning in development and a HARD FAILURE in release, and a missing required value is an error rather than a fallback -- the fail-closed direction the hardening clause asks for. The build environment itself is pinned and recorded (toolchain, lockfile digests) by the clean-build gate.",
+        "not_proven": "There is no CIS/STIG-style baseline and no scanner that compares the installed configuration against a policy; the hardening claim is bounded to the product's own configuration surface and to the release-mode behaviour its tests assert.",
+    },
+    "GEN-115": {
+        "status": "PASS",
+        "cites": [
+            ("source", "apps/desktop/src-tauri/tests/recovery_drill.rs", ["faults are injected at the filesystem", "in-place corruption"]),
+            ("artifact", ".agent/evidence/recovery-drill/report.json", ["fault_classes", "total_loss", "rto_ms_threshold"]),
+            ("source", "apps/desktop/src-tauri/tests/stress_concurrency.rs", ["no backup completed during the trial"]),
+            ("source", "scripts/fault-injection-lane.sh", ["recovery_drill"]),
+        ],
+        "finding": "Fault injection IS executed, which this row denied. The drill injects two fault classes repeatedly against a live vault -- TOTAL LOSS (the vault file and its WAL siblings deleted) and CORRUPTION (the live vault overwritten in place) -- then recovers through the PRODUCTION restore command and reconciles the recovered state by content digest through an independent connection, with RPO/RTO measured against an enforced threshold. The exact-artifact lane adds a hard process kill with the ledger read back in a new process, and the stress trial injects backup destruction under concurrent load.",
+        "not_proven": "The faults are filesystem-level on one host: no disk-error injection, no power-loss or kernel-level fault, and no network partition (the product serves no network). The drill covers the vault, not the whole machine.",
+    },
     "GEN-052": {
         "status": "PASS",
         "cites": [

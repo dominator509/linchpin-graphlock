@@ -1,13 +1,13 @@
 {
   "artifacts": {
-    "executable_sha256": "7e2be9703f861ebc3802fb4ac9ed39f94558b578679442eaafe26253a784f633",
-    "msi_sha256": "1b9d51c82a51236fbd1e9d30d95e0944778c7b07ea1817c4775def7e3dfcfe2d"
+    "executable_sha256": "c517732f8906f460542d81320c12a82af4e75f0ee01af3f4a07d6e92dd89882f",
+    "msi_sha256": "5916bfbc06dd9e2ab4f0b154115cb00e6fd937c23bb3861b3c0b7e3d207ef7a5"
   },
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "blocking_clauses": [
     "DOD-014=PARTIAL"
   ],
-  "candidate_commit": "ba1bf211a00ea50efa1e2f65d8edc6be5df63d7c",
+  "candidate_commit": "6488f407abe042466d988ff3efa80e32a39dc54e",
   "dod": {
     "DOD-001": "EXTERNAL_REQUIRED",
     "DOD-002": "PASS",
@@ -52,8 +52,8 @@
     "DOD-041": "PASS",
     "DOD-042": "PASS"
   },
-  "epoch_digest": "f6417988bc07a827bf801befcad8ef294c16a949fc131dd3b3e091d74e2d2bb1",
-  "epoch_inputs": 145,
+  "epoch_digest": "6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5",
+  "epoch_inputs": 146,
   "mutation_ids": [
     "MUT-COM-002-a",
     "MUT-DATA-001-a",
@@ -73,10 +73,10 @@
   "registry_tally": {
     "DEFERRED_LONG_RUNNING": 1,
     "EXTERNAL_REQUIRED": 1,
-    "NOT_APPLICABLE": 427,
+    "NOT_APPLICABLE": 423,
     "NOT_RUN_BLOCKED_MATERIAL": 4,
     "PARTIAL": 6,
-    "PASS": 45
+    "PASS": 49
   },
   "requirements_bound": [
     "REQ-COM-001",

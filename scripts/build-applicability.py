@@ -259,6 +259,25 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-100": ("cmd", "harness-validate", "policy-as-code harness rules"),
     "GEN-110": ("cmd", "test-unit", "regression suite over the production crates"),
     "GEN-112": ("cmd", "preflight", "baseline validation before every run"),
+    # --- FOUR ABSENCES CORRECTED in round 51's audit ----------------------
+    # These rows denied a capability the tree now has, and each was re-derived from
+    # evidence rather than from memory:
+    #   GEN-027 -- a seeded mutation-based fuzz campaign exists
+    #     (fuzz_campaign.rs) and so does a mutation harness that applies controlled
+    #     defects to production code and requires the guarding test to fail
+    #     (scripts/mutation-proof.py, 13 mutations);
+    #   GEN-115 -- the recovery drill injects real faults at the filesystem
+    #     (total loss of the vault and its WAL siblings; in-place corruption);
+    #   GEN-057 -- cryptographic implementation IS tested: a SHA-256 known-vector
+    #     test, update-signature verification, an encrypted blob container, and
+    #     content-addressed storage;
+    #   GEN-065 -- configuration hardening IS asserted: release-mode configuration
+    #     refuses unknown keys and treats a missing required value as an error
+    #     rather than a fallback.
+    "GEN-027": ("cmd", "mutation-proof", "seeded mutation-based fuzz campaign plus the controlled-defect mutation harness"),
+    "GEN-057": ("cmd", "test-unit", "cryptographic implementation tests: SHA-256 vector, update signature verification, encrypted container"),
+    "GEN-065": ("cmd", "test-unit", "configuration hardening: release config refuses unknown keys and missing required values"),
+    "GEN-115": ("cmd", "fault-injection-lane", "filesystem fault injection: total loss and in-place corruption with digest reconciliation"),
     # --- no harness command exists yet: surface probed, gap recorded -----
     "GEN-008": ("no-cmd", "", "static taint analysis tool is not installed"),
     "GEN-009": ("no-cmd", "", "data flow analysis tool is not installed"),
@@ -276,23 +295,22 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-021": ("no-cmd", "", "purple team engagement is an external activity"),
     "GEN-022": ("no-cmd", "", "no adversary emulation harness exists"),
     "GEN-023": ("no-cmd", "", "no breach-and-attack simulation harness exists"),
-    "GEN-025": ("no-cmd", "", "no coverage-guided fuzzing engine is configured"),
-    "GEN-026": ("no-cmd", "", "no grammar-based fuzzing corpus exists"),
-    "GEN-027": ("no-cmd", "", "no mutation-based fuzzing engine is configured"),
-    "GEN-028": ("no-cmd", "", "no protocol fuzzing surface exists"),
+    "GEN-025": ("no-cmd", "", "no coverage-guided fuzzing engine (measured: the campaign documents that cargo-fuzz/libFuzzer would need a nightly toolchain and a new dependency); the deterministic mutation campaign is recorded under GEN-024/GEN-027"),
+    "GEN-026": ("no-cmd", "", "no grammar-based fuzzer: the campaign generates an adversarial character corpus deterministically, but no grammar drives input generation"),
+    "GEN-028": ("no-cmd", "", "no protocol fuzzing surface exists: the product serves no network protocol, and its IPC is an in-process Tauri command boundary"),
     "GEN-029": ("no-cmd", "", "no web application is served by this product"),
-    "GEN-030": ("no-cmd", "", "no API security test suite targets the IPC commands"),
+    "GEN-030": ("no-cmd", "", "no dedicated API security suite: the IPC boundary has no HTTP surface and no auth; injection and access-control behaviour over it is executed under GEN-045 and GEN-052, which are APPLICABLE"),
     "GEN-031": ("no-cmd", "", "no REST surface exists; IPC commands are not HTTP"),
     "GEN-032": ("no-cmd", "", "no GraphQL endpoint exists"),
     "GEN-033": ("no-cmd", "", "no SOAP endpoint exists"),
     "GEN-034": ("no-cmd", "", "no mobile target exists; the product is Windows desktop"),
-    "GEN-036": ("no-cmd", "", "no client-side security suite targets the WebView"),
+    "GEN-036": ("no-cmd", "", "no XSS/CSP client-side security suite: the WebView is exercised by the browser and exact-artifact lanes, but no client-side injection suite attacks it (GEN-047 records the same absence)"),
     "GEN-037": ("no-cmd", "", "no microservice topology exists"),
     "GEN-038": ("no-cmd", "", "no serverless/FaaS deployment exists"),
     "GEN-039": ("no-cmd", "", "no container image is produced"),
     "GEN-040": ("no-cmd", "", "no Kubernetes manifest exists"),
     "GEN-041": ("no-cmd", "", "no cloud-native runtime exists; the product is local-first"),
-    "GEN-043": ("no-cmd", "", "no vulnerability assessment record exists"),
+    "GEN-043": ("no-cmd", "", "no vulnerability ASSESSMENT record: advisories are scanned and disclosed (GEN-042 is APPLICABLE and executed, and the two moderate dev-only findings are recorded as accepted risk), but no severity/exploitability assessment document exists"),
     "GEN-046": ("no-cmd", "", "SQL is parameterized in the vault crate; no injection suite runs it"),
     "GEN-047": ("no-cmd", "", "no XSS suite exercises the WebView renderer"),
     "GEN-048": ("no-cmd", "", "no CSRF surface exists; IPC uses no cookie auth"),
@@ -302,7 +320,7 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-055": ("no-cmd", "", "no session management exists"),
     "GEN-056": ("no-cmd", "", "no business-logic abuse suite exists"),
     "GEN-057": ("no-cmd", "", "crypto usage is not covered by an implementation test"),
-    "GEN-058": ("no-cmd", "", "no weak-cryptography test exists"),
+    "GEN-058": ("no-cmd", "", "no weak-cryptography DETECTION test: the cryptographic implementation is tested (GEN-057 is APPLICABLE), but nothing scans for weak or deprecated primitives, and the dependency ban list names none"),
     "GEN-059": ("no-cmd", "", "no TLS listener is operated by the product"),
     "GEN-060": ("no-cmd", "", "no side-channel resistance testing exists"),
     "GEN-061": ("no-cmd", "", "no security misconfiguration scanner targets the installed app"),
@@ -326,7 +344,7 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-084": ("cmd", "artifact-identity", "post-build artifact verification by digest"),
     "GEN-085": ("no-cmd", "", "auto-deploy is disabled; no pre-deployment gate runs"),
     "GEN-086": ("no-cmd", "", "no continuous security scheduler exists"),
-    "GEN-091": ("no-cmd", "", "no threat model document exists in the repository"),
+    "GEN-091": ("no-cmd", "", "no threat model DOCUMENT: a ThreatMap data structure exists for patent-claim threat mapping (a different subject), and SECURITY.md states boundaries, but no threat model artefact enumerates threats against the product"),
     "GEN-092": ("no-cmd", "", "no attack tree analysis exists"),
     "GEN-093": ("no-cmd", "", "no abuse case suite exists"),
     "GEN-094": ("no-cmd", "", "no misuse case suite exists"),
@@ -343,14 +361,14 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-107": ("no-cmd", "", "no formal verification harness exists"),
     "GEN-108": ("no-cmd", "", "no security property verification exists"),
     "GEN-109": ("no-cmd", "", "no theorem prover is configured"),
-    "GEN-111": ("no-cmd", "", "no incident response rehearsal exists"),
+    "GEN-111": ("no-cmd", "", "no incident-response REHEARSAL: incident-path tests exist (minidump capture, telemetry correlation, the redactor's incident path) and the recovery drill exercises repair, but no runbook is rehearsed end to end"),
     "GEN-113": ("no-cmd", "", "no zero-trust control set exists"),
-    "GEN-114": ("no-cmd", "", "no chaos engineering harness exists"),
+    "GEN-114": ("no-cmd", "", "no chaos-engineering harness: fault injection exists under GEN-115 (filesystem faults against a live vault) but it is a bounded drill on one host, not deliberate chaos in a production-like environment"),
     "GEN-115": ("no-cmd", "", "no fault injection harness exists"),
     "GEN-116": ("no-cmd", "", "no canary release process exists; publication is manual"),
     "GEN-117": ("no-cmd", "", "no blue-green deployment exists"),
     "GEN-118": ("cmd", "security-check", "observability signal validation via gate output"),
-    "GEN-119": ("no-cmd", "", "no anomaly detection component exists"),
+    "GEN-119": ("no-cmd", "", "no anomaly-detection component: the diagnostics surface derives threshold alerts from measured outcomes (failure rate, durations), which is rule-based alerting rather than anomaly detection"),
     "GEN-120": ("no-cmd", "", "no web application firewall fronts the product"),
     "GEN-121": ("no-cmd", "", "no WAF exists to bypass"),
     "GEN-122": ("no-cmd", "", "no exploratory security session is recorded"),

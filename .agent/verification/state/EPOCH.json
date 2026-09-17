@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "ba1bf21",
+  "candidate_commit": "6488f40",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -28,17 +28,17 @@
       ]
     },
     "gate-script": {
-      "count": 67,
+      "count": 68,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\applicable-case-evidence.py": "90b94028bd0c1119ac9fb16c2b41a3abd73694c4d0fb9d6a23ae4272e3eb4307",
+        "scripts\\applicable-case-evidence.py": "b97c409ee7a783d756266c4b3b127c03a3b88c984030a3c489320fbd5e911258",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\assert-no-debug-port.py": "54b17113000ddaec872c310d5c063a3aba002cda17d03adebc8cb57b70589b44",
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "1fa5a88c4432051ff15363b2c02cbcafa5d2fff36a9e54adaa3dacfa678003f9",
-        "scripts\\build-applicability.py": "80e4dfcbc8eae21396536321fa1cb4da24be2bfac922a4495c8e3342d2902f0c",
+        "scripts\\build-applicability.py": "effd53a279859b9f103033b4acf065cf37a066e060eddd39ef6a8bf8b2e61685",
         "scripts\\build-dod-status.py": "880f728dd37e9bdf981030892c4a2d16f790e63343e78808cc0716e222616760",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
@@ -50,6 +50,7 @@
         "scripts\\dependency-audit.sh": "508cc370daf842ab1ea1535a658196adf677566088ca9928d3ca7d498fc9d1eb",
         "scripts\\doc-exec.py": "2e47017bc04b74b76decd60905f110280798b7668810803f1741b9857e61d516",
         "scripts\\dod-gate.sh": "26d4e578e6c62da5c946fc433be1d3d5226fd520fe062cfbf01f71aef12fd6bb",
+        "scripts\\fault-injection-lane.sh": "0b7fefc8c2d93dde2b7d65752ab468692a4eb4d0fa8453503bd0d8271202d453",
         "scripts\\fix-trailing-and-lanes.py": "1975f3d7bfd6693657d2250076f0e71c4786e56f446389afaf77169ff3191ab9",
         "scripts\\format-check.sh": "2d565f3798f61577218798bec689d59bab3e48daaa372c6645985c86fb0ca545",
         "scripts\\generate-evidence-index.py": "a630cc0ddc88fbbc3d09dea9f5e6f6afb4ae3f189e9f887692656becdf2e5510",
@@ -242,8 +243,8 @@
       ]
     }
   },
-  "epoch_digest": "f6417988bc07a827bf801befcad8ef294c16a949fc131dd3b3e091d74e2d2bb1",
-  "prior_candidate_commit": "7e7b0e8",
-  "prior_epoch_digest": "f6417988bc07a827bf801befcad8ef294c16a949fc131dd3b3e091d74e2d2bb1",
-  "total_inputs": 145
+  "epoch_digest": "6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5",
+  "prior_candidate_commit": "6488f40",
+  "prior_epoch_digest": "6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5",
+  "total_inputs": 146
 }

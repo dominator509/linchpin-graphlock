@@ -13,10 +13,10 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 | --- | --- |
 | DEFERRED_LONG_RUNNING | 1 |
 | EXTERNAL_REQUIRED | 1 |
-| NOT_APPLICABLE | 427 |
+| NOT_APPLICABLE | 423 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
 | PARTIAL | 6 |
-| PASS | 45 |
+| PASS | 49 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
 carries the applicability matrix's own per-ID evidence in the ledger, and the
@@ -35,6 +35,7 @@ digest of that matrix document is recorded beside it.
 | GEN-007 | PASS | `.agent/evidence/applicable-cases/GEN-007.md` | Hardcoded Credential Detection |
 | GEN-016 | PARTIAL | `crates/storage/tests/integration_real_dependencies.rs` | Interactive Application Security Testing (IAST) |
 | GEN-024 | PASS | `.agent/evidence/applicable-cases/GEN-024.md` | Fuzz Testing |
+| GEN-027 | PASS | `.agent/evidence/applicable-cases/GEN-027.md` | Mutation-Based Fuzzing |
 | GEN-035 | PASS | `.agent/evidence/applicable-cases/GEN-035.md` | Desktop Application Security Testing |
 | GEN-042 | PASS | `.agent/evidence/applicable-cases/GEN-042.md` | Vulnerability Scanning |
 | GEN-044 | PARTIAL | `.agent/evidence/applicable-cases/GEN-044.md` | Weakness Enumeration Mapping (CWE) |
@@ -42,7 +43,9 @@ digest of that matrix document is recorded beside it.
 | GEN-049 | PASS | `.agent/evidence/applicable-cases/GEN-049.md` | Input Validation Testing |
 | GEN-051 | NOT_RUN_BLOCKED_MATERIAL | `.agent/evidence/applicable-cases/GEN-051.md` | Authorization Testing |
 | GEN-052 | PASS | `.agent/evidence/applicable-cases/GEN-052.md` | Broken Access Control Testing |
+| GEN-057 | PASS | `.agent/evidence/applicable-cases/GEN-057.md` | Cryptographic Implementation Testing |
 | GEN-063 | PASS | `.agent/evidence/applicable-cases/GEN-063.md` | Logging and Monitoring Verification |
+| GEN-065 | PASS | `.agent/evidence/applicable-cases/GEN-065.md` | Configuration Hardening Validation |
 | GEN-071 | NOT_RUN_BLOCKED_MATERIAL | `.agent/evidence/applicable-cases/GEN-071.md` | Sandbox and Isolated Environment Security Testing |
 | GEN-072 | PASS | `.agent/evidence/applicable-cases/GEN-072.md` | Software Bill of Materials (SBOM) Generation and Verification |
 | GEN-073 | PASS | `.agent/evidence/applicable-cases/GEN-073.md` | Dependency Integrity Verification |
@@ -59,6 +62,7 @@ digest of that matrix document is recorded beside it.
 | GEN-100 | PASS | `.agent/evidence/applicable-cases/GEN-100.md` | Policy-as-Code Testing |
 | GEN-110 | PASS | `.agent/evidence/applicable-cases/GEN-110.md` | Security Regression Testing |
 | GEN-112 | PASS | `.agent/evidence/applicable-cases/GEN-112.md` | Security Baseline Validation |
+| GEN-115 | PASS | `.agent/evidence/applicable-cases/GEN-115.md` | Fault Injection Security Testing |
 | GEN-118 | PASS | `.agent/evidence/applicable-cases/GEN-118.md` | Security Observability Validation |
 | BC-111 | NOT_RUN_BLOCKED_MATERIAL | `.agent/evidence/applicable-cases/BC-111.md` | Hardware Security Module (HSM) Testing |
 | E2E-001 | PASS | `.agent/evidence/applicable-cases/E2E-001.md` | Smoke & Infrastructure Verification |

@@ -1,22 +1,22 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-17T09:06:56Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-17T09:26:31Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
 - Blocking clauses: DOD-014=PARTIAL
-- Candidate commit: `ba1bf211a00ea50efa1e2f65d8edc6be5df63d7c` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (4 changed files)
-- Epoch: `f6417988bc07a827` over 145 tracked inputs
+- Candidate commit: `6488f407abe042466d988ff3efa80e32a39dc54e` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (25 changed files)
+- Epoch: `6998dd02266c598c` over 146 tracked inputs
 
 ## Verified behavior — executed and observed
 
 - **37 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-035, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
-- **484 registry capabilities accounted**, one status each ({'PASS': 45, 'NOT_APPLICABLE': 427, 'PARTIAL': 6, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'DEFERRED_LONG_RUNNING': 1, 'EXTERNAL_REQUIRED': 1})
+- **484 registry capabilities accounted**, one status each ({'PASS': 49, 'NOT_APPLICABLE': 423, 'PARTIAL': 6, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'DEFERRED_LONG_RUNNING': 1, 'EXTERNAL_REQUIRED': 1})
 - **13 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `7e2be9703f861ebc…` (12500992 bytes), MSI `1b9d51c82a51236f…` (5709824 bytes)
+- Artifacts bound to this run: executable `c517732f8906f460…` (12500992 bytes), MSI `5916bfbc06dd9e2a…` (5709824 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -84,7 +84,7 @@ Stated as assumptions rather than results, because no measurement in this run su
 - **Update/rollback across versions is unexecuted** because only one version exists; the lanes install
   and remove the same v0.1.0 MSI, and same-version reinstall is weaker evidence than a cross-version
   upgrade.
-- **Registry capabilities**: 4 of 484 capabilities are `NOT_RUN_BLOCKED_MATERIAL`, each naming the specific material its subject requires (an authorization surface, an isolation boundary, a git hook, hardware key storage), and 427 are `NOT_APPLICABLE` on per-ID applicability evidence.
+- **Registry capabilities**: 4 of 484 capabilities are `NOT_RUN_BLOCKED_MATERIAL`, each naming the specific material its subject requires (an authorization surface, an isolation boundary, a git hook, hardware key storage), and 423 are `NOT_APPLICABLE` on per-ID applicability evidence.
 
 ## Deployment state
 

@@ -9,10 +9,10 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `f6417988bc07a827bf801befcad8ef294c16a949fc131dd3b3e091d74e2d2bb1`
-- Candidate commit at generation: `ba1bf21`
-- Total tracked inputs: 145
-- Previous epoch digest: `f6417988bc07a827bf801befcad8ef294c16a949fc131dd3b3e091d74e2d2bb1`
+- Current epoch digest: `6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5`
+- Candidate commit at generation: `6488f40`
+- Total tracked inputs: 146
+- Previous epoch digest: `6998dd02266c598c0c6b7c529500ecb50dd7579b06a040387f1dc286ddf670a5`
 - Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
@@ -37,7 +37,7 @@ definition and its PASS status is revoked until rerun.
   - `apps\desktop\src-tauri\tauri.conf.json` `950dc4ba95882312…`
   - `apps\desktop\vitest.config.ts` `d0adc5ef1e028cc9…`
 
-### `gate-script` — 67 file(s)
+### `gate-script` — 68 file(s)
 
 - invalidates: V-000 harness validation
 - invalidates: V-005 clean build
@@ -46,10 +46,10 @@ definition and its PASS status is revoked until rerun.
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
-  - `scripts\applicable-case-evidence.py` `90b94028bd0c1119…`
+  - `scripts\applicable-case-evidence.py` `b97c409ee7a783d7…`
   - `scripts\artifact-e2e.sh` `665ba19ebd5fd33f…`
   - `scripts\artifact-identity.sh` `a716cc52d026a96b…`
-  - … and 62 more
+  - … and 63 more
 
 ### `js-manifest` — 7 file(s)
 
