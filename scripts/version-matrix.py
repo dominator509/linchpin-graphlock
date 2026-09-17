@@ -85,6 +85,82 @@ def sha256_file(path: pathlib.Path) -> str:
     return h.hexdigest()
 
 
+# The tracked files the shipped artifact is derived from. Deliberately NOT the
+# whole tree: evidence and verification state are rewritten on every settle, and
+# fingerprinting them would force two full release builds per settle. These are
+# the build inputs.
+SOURCE_INPUTS = [
+    "Cargo.toml",
+    "Cargo.lock",
+    "crates",
+    "apps",
+    "packages",
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    ".cargo",
+    "rust-toolchain.toml",
+    "scripts/build.sh",
+]
+STAGE_RECORD = STAGE / "STAGE.json"
+
+
+def source_fingerprint() -> dict:
+    """Identify the source revision that the staged artifacts must correspond to.
+
+    WHY THIS EXISTS (measured defect, DOD-040): the matrix was executed against
+    artifacts built on 2026-09-16 because `staged()` only checked that the files
+    EXISTED, while production code changed on 2026-09-17. The recorded PASS then
+    described a candidate that no longer existed and nothing in any lane noticed.
+    Staged artifacts now carry the fingerprint of the source that produced them,
+    and a mismatch re-provisions instead of being reused.
+    """
+    listed = run(["git", "ls-files", "-z", "--", *SOURCE_INPUTS])
+    if listed.returncode != 0:
+        raise SystemExit(f"version-matrix: could not list source inputs: {listed.stderr}")
+    relative = sorted(path for path in listed.stdout.split("\0") if path)
+    digest = hashlib.sha256()
+    for rel in relative:
+        digest.update(rel.encode("utf-8"))
+        digest.update(b"\0")
+        path = ROOT / rel
+        digest.update(path.read_bytes() if path.exists() else b"<missing>")
+        digest.update(b"\0")
+    commit = run(["git", "rev-parse", "HEAD"]).stdout.strip()
+    return {"commit": commit, "fingerprint": digest.hexdigest(), "files": len(relative)}
+
+
+def read_stage_record() -> dict | None:
+    if not STAGE_RECORD.exists():
+        return None
+    try:
+        return json.loads(STAGE_RECORD.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+def stage_is_current() -> tuple[bool, str]:
+    recorded = read_stage_record()
+    current = source_fingerprint()
+    if recorded is None:
+        return False, "no staged-artifact provenance record exists (target/version-matrix/STAGE.json)"
+    # The record nests the provenance under "source"; reading it at the top level
+    # silently compared None against None, which is how a stale-stage check can
+    # look like it is working while measuring nothing (measured here: it printed
+    # "built from ? (fingerprint ?)" instead of failing for the right reason).
+    provenance = recorded.get("source")
+    if not isinstance(provenance, dict) or "fingerprint" not in provenance:
+        return False, "the staged-artifact provenance record carries no source fingerprint"
+    if provenance["fingerprint"] != current["fingerprint"]:
+        return False, (
+            "staged artifacts were built from "
+            f"{str(provenance.get('commit', '?'))[:9]} (fingerprint {str(provenance['fingerprint'])[:12]}) "
+            f"but the current source is {current['commit'][:9]} (fingerprint {current['fingerprint'][:12]}); "
+            f"{current['files']} build inputs fingerprinted"
+        )
+    return True, f"staged artifacts match the current source ({current['commit'][:9]}, fingerprint {current['fingerprint'][:12]})"
+
+
 def appdata_root() -> pathlib.Path:
     base = os.environ.get("LOCALAPPDATA") or str(pathlib.Path.home() / "AppData/Local")
     return pathlib.Path(base) / PRODUCT
@@ -346,10 +422,33 @@ def provision() -> dict:
             + (diff.stdout + diff.stderr)
         )
     print("version-matrix: provisioning restored every manifest and lockfile (git diff clean)")
+    # Provenance of the staged artifacts: which source revision built them. The
+    # fingerprint covers build inputs only, so it is stable across settles that
+    # touch evidence and changes the moment production source changes.
+    source = source_fingerprint()
+    STAGE.mkdir(parents=True, exist_ok=True)
+    STAGE_RECORD.write_text(
+        json.dumps({"source": source, "versions": built, "provisioned_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"version-matrix: staged artifacts bound to source {source['commit'][:9]} (fingerprint {source['fingerprint'][:12]})")
     return built
 
 
 def main() -> int:
+    # CURRENCY LANE (DOD-040). Read-only: reports whether the staged artifacts
+    # still correspond to the current source, without building anything. Wired
+    # into scripts/verify.sh so a stale matrix cannot sit in the tree claiming a
+    # PASS for a candidate that has moved.
+    if "--check-source" in sys.argv:
+        current, why = stage_is_current()
+        if not current:
+            print(f"version-matrix: FAIL -- {why}", file=sys.stderr)
+            print("  remedy: python3 scripts/version-matrix.py --provision", file=sys.stderr)
+            return 1
+        print(f"version-matrix: {why}")
+        return 0
+
     # MUTATION SUPPORT (DOD-018/DOD-035). `--mutate destructive-upgrade` injects the
     # defect this matrix exists to catch -- an upgrade that DESTROYS the user's
     # persistent state -- by deleting the seeded vault immediately after the upgrade
@@ -364,6 +463,19 @@ def main() -> int:
         built = provision()
     else:
         built = {}
+        current, why = stage_is_current()
+        if not current:
+            # DOD-040: a changed candidate obliges a RERUN, not a reuse. Measured
+            # defect this closes: staged artifacts from 2026-09-16 were reused on
+            # 2026-09-17 after production code changed, and the matrix reported PASS
+            # for a build that no longer existed.
+            print(f"version-matrix: STALE STAGE -- {why}")
+            print("version-matrix: re-provisioning both versions (DOD-040 rerun obligation)")
+            built = provision()
+        else:
+            print(f"version-matrix: {why}")
+    source = read_stage_record() or {}
+    source = source.get("source", {})
     for version in (OLD, NEW):
         msi, exe = staged(version)
         entry = built.setdefault(version, {})
@@ -541,6 +653,7 @@ def main() -> int:
         "covers": ["DOD-035", "DOD-036"],
         "harness": "scripts/version-matrix.py",
         "mutation": mutate,
+        "source": source,
         "versions": built,
         "canary": token,
         "environment": {
@@ -572,6 +685,7 @@ def main() -> int:
         "",
         f"- Verdict: **{report['verdict']}**",
         f"- Artifacts: v{OLD} `{built[OLD]['msi_sha256'][:16]}...`, v{NEW} `{built[NEW]['msi_sha256'][:16]}...`",
+        f"- Source: commit `{str(source.get('commit', '?'))[:9]}`, build-input fingerprint `{str(source.get('fingerprint', '?'))[:16]}...` over {source.get('files', '?')} tracked inputs (DOD-040: a mismatch re-provisions instead of reusing)",
         f"- Canary: `{token}`",
         "",
         "| Step | Verdict | Measured |",
@@ -590,7 +704,8 @@ def main() -> int:
         "",
         "```",
         "python3 scripts/version-matrix.py --provision   # builds both versions, then runs the matrix",
-        "python3 scripts/version-matrix.py               # reuse staged artifacts under target/version-matrix",
+        "python3 scripts/version-matrix.py               # run the matrix, re-provisioning if the source moved (DOD-040)",
+        "python3 scripts/version-matrix.py --check-source # currency only: do the staged artifacts match this source?",
         "```",
         "",
     ]

@@ -1,6 +1,34 @@
 {
-  "status": "NOT_STARTED",
-  "active_stage": null,
-  "candidate_epoch": 0,
-  "note": "Blueprint generated; product verification has not run."
+  "status": "ACCOUNTED_WITH_OPEN_GATES",
+  "active_stage": "V-004",
+  "open_stages": [
+    "V-004",
+    "V-005",
+    "V-011",
+    "V-013",
+    "V-015",
+    "V-017",
+    "V-020",
+    "V-021"
+  ],
+  "completed_stages": [
+    "V-000",
+    "V-001",
+    "V-002",
+    "V-003",
+    "V-006",
+    "V-007",
+    "V-008",
+    "V-009",
+    "V-010",
+    "V-012",
+    "V-014",
+    "V-016",
+    "V-018",
+    "V-019"
+  ],
+  "candidate_commit": "1c7092c",
+  "candidate_epoch": "3265f8fa39d12757dd7961b4030619de1e8cd8fe27174f9acf2843a95a99ffb9",
+  "stage_accounting_digest": "0926702d2b3702ca914c4a01f141977fb55331707c7ab08a4091b9850cc40dda",
+  "note": "Every stage's owned IDs carry an accounted status; the stages listed in open_stages are open only for the reason named in STAGE_ACCOUNTING.md (external participant, deferred long-run scale, or the specific owned IDs named there)."
 }
