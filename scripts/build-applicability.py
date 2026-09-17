@@ -72,17 +72,28 @@ E2E_PROBES: dict[str, tuple[str, str, str]] = {
     "E2E-005": ("cmd", "test-e2e", "regression and differential verification lane"),
     "E2E-006": ("no-cmd", "", "no ad hoc/exploratory session record exists"),
     "E2E-007": ("no-cmd", "", "no usability/a11y/DX verification exists (DOD-039 external)"),
-    "E2E-008": ("no-cmd", "", "no performance workload orchestration exists (DOD-022)"),
-    "E2E-009": ("no-cmd", "", "no systemic stress/exhaustion harness exists (DOD-038)"),
+    # FIVE STALE ABSENCES CORRECTED. These rows recorded that no harness existed, and
+    # they stayed that way after the harnesses were built in later rounds -- the same
+    # class of error as the DOD-038 disposition that claimed no soak scale was
+    # specified anywhere. Measured now: performance_gate.rs (200-event workload with
+    # enforced p50/p95/max and read-back-completeness floors), stress_concurrency.rs
+    # (8 writers x 250 events, 4 readers, a backup thread, encoded floors, three real
+    # concurrency defects found), soak_abbreviated.rs (labeled abbreviated endurance
+    # trial with heartbeats), and version-matrix.py (two released versions installed
+    # in sequence with downgrade and rollback against realistic state). Each now names
+    # a real command instead of an absence, so the matrix can be checked against the
+    # tree rather than against memory.
+    "E2E-008": ("cmd", "performance-lane", "performance workload with encoded thresholds (DOD-022)"),
+    "E2E-009": ("cmd", "stress-lane", "concurrent stress/exhaustion trial with encoded floors (DOD-038)"),
     "E2E-010": ("cmd", "test-integration", "recovery verified by reopen-after-write in the vault"),
     "E2E-011": ("no-cmd", "", "clean-room deployment requires a virgin host (PF-016)"),
     "E2E-012": ("cmd", "test-unit", "schema evolution verified by the migration tests"),
-    "E2E-013": ("no-cmd", "", "no prior released version exists to skew against"),
-    "E2E-014": ("no-cmd", "", "no rollback path exists; no prior release to downgrade to"),
+    "E2E-013": ("cmd", "version-matrix", "two released versions exist and are installed in sequence; simultaneous mixed-fleet skew is not applicable to a device-local single-user product"),
+    "E2E-014": ("cmd", "version-matrix", "downgrade and rollback executed against realistic persistent state (DOD-035)"),
     "E2E-015": ("cmd", "test-unit", "export round-trip verified by the export evidence tests"),
     "E2E-016": ("no-cmd", "", "no clock-skew or timezone verification exists"),
     "E2E-017": ("no-cmd", "", "no i18n/l10n or unicode robustness suite exists"),
-    "E2E-018": ("no-cmd", "", "no soak/endurance run exists (DOD-038)"),
+    "E2E-018": ("cmd", "soak-lane", "soak/endurance trial with heartbeats; the clause's full scale is 24/48/72+ hours per E2E-SoakResourceLeakTesting.md and remains DEFERRED_LONG_RUNNING"),
     # E2E-019 is AI/agentic safety AND capability. PF-011 is now satisfied (a
     # real loopback model is served), so a genuine runner exists: the provider
     # live-fire gate exercises both the capability (a real completion at the

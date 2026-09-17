@@ -7,12 +7,17 @@
 //! -- never PASS for the full requirement."
 //!
 //! This test exists because the clause's own wording contemplates an abbreviated
-//! trial, PROVIDED it is labeled separately. The repository specifies no soak
-//! duration or workload anywhere, so "their specified scale" has no value to
-//! complete; what this run can honestly do is execute a bounded endurance trial
-//! against the real write/read/recover paths, label it ABBREVIATED in the
-//! evidence, and record the specification gap beside it. It deliberately does NOT
-//! claim the clause.
+//! trial, PROVIDED it is labeled separately. CORRECTED: this comment used to say the
+//! repository specifies no soak duration or workload anywhere. That was WRONG -- the
+//! pack's suite library does specify it. `.agent/verification/E2E_SUITE_LIBRARY.md`
+//! carries the source of E2E-SoakResourceLeakTesting.md (the registry's own
+//! `source_file` for E2E-018), which requires 24, 48, 72+ hours of sustained nominal
+//! load with continuous telemetry and the flatline invariant, and forbids
+//! time-bounded runners. That value is NOT completed here: what this run can honestly
+//! do is execute a bounded endurance trial against the real write/read/recover paths,
+//! label it ABBREVIATED in the evidence, record that the specified scale is
+//! uncompleted, and let the clause stand as DEFERRED_LONG_RUNNING. It deliberately
+//! does NOT claim the clause.
 //!
 //! WHAT IT EXERCISES CONTINUOUSLY
 //!   * the production write path (`record_conception`) under one client key per
@@ -262,7 +267,7 @@ fn abbreviated_endurance_trial_runs_the_real_paths_and_labels_itself() {
         "harness": "apps/desktop/src-tauri/tests/soak_abbreviated.rs",
         "epoch_digest": epoch_digest(),
         "label_reason": if label == "ABBREVIATED" {
-            format!("ran the requested {seconds}s, which is above the {ABBREVIATED_FLOOR_SECONDS}s floor for an abbreviated trial; the repository specifies NO soak duration or workload, so the full-scale requirement has no value to complete")
+            format!("ran the requested {seconds}s, which is above the {ABBREVIATED_FLOOR_SECONDS}s floor for an abbreviated trial; the clause's specified full scale is 24/48/72+ hours (E2E-SoakResourceLeakTesting.md, referenced by the E2E-018 registry row) and is NOT completed by this run, so it stays labeled ABBREVIATED and DOD-038 stays DEFERRED_LONG_RUNNING")
         } else {
             format!("ran {actual_seconds}s, below the {ABBREVIATED_FLOOR_SECONDS}s floor; reported as a smoke subset rather than an endurance run")
         },
@@ -294,8 +299,23 @@ fn abbreviated_endurance_trial_runs_the_real_paths_and_labels_itself() {
             "max_bytes_per_event": MAX_BYTES_PER_EVENT,
             "errors_allowed": 0,
         },
-        "specification_gap": "no soak, endurance, fuzz or stress duration/workload is specified anywhere in the repository, so 'their specified scale' has no defined value to complete; this trial is labeled separately as the clause requires",
-        "not_claimed": "this run does NOT satisfy DOD-038 for the full requirement and DOD-038 remains PARTIAL",
+        // CORRECTED CLAIM. This field used to read "no soak, endurance, fuzz or
+        // stress duration/workload is specified anywhere in the repository, so
+        // 'their specified scale' has no defined value to complete". That was
+        // WRONG, and the error was in the measurement rather than in the wording:
+        // the pack's own suite library DOES specify the scale for this clause's
+        // soak term. `.agent/verification/E2E_SUITE_LIBRARY.md` carries the source
+        // of E2E-SoakResourceLeakTesting.md (the source_file of registry row
+        // E2E-018), which requires "an extended period (24, 48, 72+ hours)" of
+        // sustained nominal load, continuous telemetry, and the flatline invariant,
+        // and explicitly FORBIDS running it on time-bounded CI runners -- it
+        // requires dedicated, persistent infrastructure. So the full-scale value
+        // exists and is uncompleted, which is DEFERRED_LONG_RUNNING, not
+        // "unspecified". What remains unspecified is the scale of the OTHER terms
+        // (fuzz, stress, performance, recovery): no numeric duration or workload for
+        // them appears in the repository or in the suite library.
+        "specification_gap": "the soak term's scale IS specified by the pack: .agent/verification/E2E_SUITE_LIBRARY.md (source of E2E-018, E2E-SoakResourceLeakTesting.md) requires 24/48/72+ hours of sustained nominal load with continuous telemetry and requires dedicated persistent infrastructure, explicitly forbidding time-bounded runners. That value is NOT completed by this trial. No numeric scale is specified for the fuzz, stress, performance or recovery terms.",
+        "not_claimed": "this run does NOT satisfy DOD-038 for the full requirement: it is an ABBREVIATED trial, labeled separately, and the clause's 24/48/72+ hour soak scale remains uncompleted (DEFERRED_LONG_RUNNING)",
     });
 
     let evidence = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../.agent/evidence/soak");
@@ -339,10 +359,13 @@ fn abbreviated_endurance_trial_runs_the_real_paths_and_labels_itself() {
              - Errors: **{errors}**; unexpected replays: {replays}\n\
              - Vault: {final_vault_bytes} bytes for {events} events ({bytes_per_event} bytes/event)\n\
              - Working set: {first_rss:?} -> {last_rss:?} ({rss_growth:?} growth)\n\n\
-             **This is an ABBREVIATED trial and is labeled as such.** The repository\n\
-             specifies no soak/fuzz/stress duration or workload, so the full-scale\n\
-             requirement has no value to complete; DOD-038 therefore remains PARTIAL\n\
-             and this run does not claim it.\n"
+             **This is an ABBREVIATED trial and is labeled as such.** The clause's\n\
+             soak scale IS specified by the pack -- `.agent/verification/E2E_SUITE_LIBRARY.md`\n\
+             (source of E2E-018) requires 24/48/72+ hours of sustained nominal load with\n\
+             continuous telemetry on dedicated persistent infrastructure, and forbids\n\
+             time-bounded runners -- and that value is NOT completed here. Fuzz, stress,\n\
+             performance and recovery have no numeric scale in the repository or the pack.\n\
+             DOD-038 is therefore DEFERRED_LONG_RUNNING and this run does not claim it.\n"
         ),
     )
     .expect("write summary");

@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "23a373eae066f40d8ed375751a9464032f5b0d9a654bb56961ad853be8434c9b",
+  "executable_sha256": "d0b4f7f476f94f387b0e0b83275ea506c4dbca45dec4d8612178eecab7da4c19",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a claim made by a patent examiner to claim a unique feature or benefit of a new invention or process.\""
+      "observed": "\"A patent claim is a valid right to exclude others from using a patented invention for a new or improved product.\""
     },
     {
       "name": "metadata names the live model",
@@ -102,7 +102,7 @@
     {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",
       "ok": true,
-      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=15 (minimum 5)"
+      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=12 (minimum 5)"
     },
     {
       "name": "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "23a373eae066f40d -> 23a373eae066f40d"
+      "observed": "d0b4f7f476f94f38 -> d0b4f7f476f94f38"
     }
   ],
   "passed": 23,

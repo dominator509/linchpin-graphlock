@@ -515,7 +515,12 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
             "min_throughput_events_per_s": MIN_THROUGHPUT_EVENTS_PER_S,
             "hung_allowed": false,
         },
-        "specification_gap": "no stress concurrency level, duration or throughput target is specified anywhere in the repository, so 'their specified scale' has no defined value to complete; this trial defines a workload, labels itself ABBREVIATED and does not claim DOD-038",
+        // CORRECTED CLAIM: the clause's SOAK scale IS specified by the pack (see
+        // .agent/verification/E2E_SUITE_LIBRARY.md, source of E2E-018: 24/48/72+
+        // hours), which this trial neither executes nor speaks for. What is
+        // genuinely unspecified is the STRESS scale, which is what this field now
+        // says.
+        "specification_gap": "no stress concurrency level, duration or throughput target is specified in the repository or in the pack's suite library, so 'their specified scale' has no defined value for the STRESS term; this trial defines a workload, labels itself ABBREVIATED and does not claim DOD-038. (The clause's SOAK term does have a specified scale -- 24/48/72+ hours in E2E-SoakResourceLeakTesting.md -- and is DEFERRED_LONG_RUNNING because it requires dedicated persistent infrastructure and this host is a shared workstation.)",
         "limits": [
             "one machine, one disk, threads rather than separate processes or hosts",
             "busy/locked failures are reported as a locking fact only if the message says so; every other failure fails the trial",
@@ -558,9 +563,11 @@ fn abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups() {
                  concurrency defect): reads {reads_before}, backups {backups_before}\n\
                  - Peak working set: {peak_rss} bytes; vault {final_bytes} bytes ({bytes_per_event} bytes/event)\n\n\
                  **This is an ABBREVIATED trial and is labeled as such.** No stress concurrency\n\
-                 level, duration or throughput target is specified in the repository, so the\n\
-                 full-scale requirement has no value to complete; DOD-038 remains PARTIAL and\n\
-                 this run does not claim it.\n",
+                 level, duration or throughput target is specified in the repository OR in the\n\
+                 pack's suite library, so the STRESS term has no full-scale value to complete.\n\
+                 The clause's SOAK term is different: its scale IS specified (24/48/72+ hours\n\
+                 in `.agent/verification/E2E_SUITE_LIBRARY.md`) and is uncompleted; DOD-038 is\n\
+                 therefore DEFERRED_LONG_RUNNING and this run does not claim it.\n",
                 elapsed_seconds, throughput, p50, p95, worst
             ),
         )

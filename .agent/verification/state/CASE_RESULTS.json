@@ -1,7 +1,7 @@
 {
   "_comment": "Real executed case results. Only IDs whose acceptance oracle genuinely ran may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
-  "candidate_commit": "ce23990",
-  "candidate_epoch": "60f2d9a6b2b3aaf1",
+  "candidate_commit": "e8f8ef2",
+  "candidate_epoch": "179d41409f9ed80d",
   "environment": {
     "host": "Windows 10 Home 10.0.19045 x64",
     "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
@@ -49,6 +49,18 @@
       "reason": "EXECUTED: evidence artifact `.agent/verification/state/RERUN_RECORD.json` -- quoted and verified: 'epoch_digest'; first-party source `scripts/change-invalidation.py` -- quoted and verified: 'changed_classes'; evidence artifact `.agent/evidence/mutation-proof/REPORT.json` -- quoted and verified: 'MUT-OPS-037'. Regression and differential verification executed: a change to any tracked input class advances the epoch and obliges a rerun of the affected stages, recorded with commands, exit codes and output digests, while the mutation harness supplies the differential half by proving the guarded behaviour fails when the guard is removed. NOT PROVEN: Differential comparison is against the guard's absence, not against a previous release build; no historical version-to-version differential run exists (see DOD-035)."
     },
     {
+      "test_id": "E2E-008",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-008.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/performance/report.json` -- quoted and verified: '\"verdict\": \"PASS\"', 'p95_write_ms', 'total_write_ms', 'limits'; first-party source `apps/desktop/src-tauri/tests/performance_gate.rs` -- quoted and verified: 'p95', 'assert'; first-party source `scripts/performance-lane.sh` -- quoted and verified: 'performance_gate'. Performance workload verification executed through its own runnable entry point (`scripts/performance-lane.sh`): 200 conception events written one at a time through the production command into a fresh file-backed vault, every event read back through a SECOND connection, environment recorded, and encoded bounds (p50 50ms, p95 150ms, max 500ms, total write 30s, total read 2s, vault 32MiB) that FAIL the run rather than reporting an observation. The read is asserted to observe every write, so a fast but lossy path cannot pass by dropping work. NOT PROVEN: The profile is debug and the workload is single-machine, single-process and concurrency-free, so the numbers are regression bounds on this host rather than published service levels; no cost metric is encoded because the product has no metered resource. The pack specifies no numeric performance scale, so the trial defines and labels its own workload."
+    },
+    {
+      "test_id": "E2E-009",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-009.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/stress/report.json` -- quoted and verified: 'outcomes', 'thresholds', 'events_lost', 'hung_allowed'; first-party source `apps/desktop/src-tauri/tests/stress_concurrency.rs` -- quoted and verified: 'min_throughput_events_per_s', 'no backup completed during the trial'; first-party source `scripts/stress-lane.sh` -- quoted and verified: 'stress_concurrency'. Stress/exhaustion verification executed through its own runnable entry point (`scripts/stress-lane.sh`): 8 writer threads x 250 events against one vault with 4 concurrent readers and a backup thread, encoding floors that FAIL the trial (p95 write latency, minimum throughput, no hang, zero lost events, ledger count equals successful writes, zero read failures, zero backup failures) plus non-vacuity assertions that at least one read and one backup completed. The trial FOUND THREE REAL CONCURRENCY DEFECTS (concurrent first open, migration bookkeeping under a race, backup under a lock) and one flaky classification that counted a correct refusal as a failure; all were fixed, and the classification was tightened so a vault that disappears after the first commit still fails. NOT PROVEN: The workload is one machine, one disk, threads rather than separate processes or hosts, and no stress concurrency level, duration or throughput target is specified in the repository or in the pack's suite library, so the trial labels itself ABBREVIATED and does not claim the clause's full-scale requirement."
+    },
+    {
       "test_id": "E2E-010",
       "status": "PASS",
       "evidence_path": ".agent/evidence/applicable-cases/E2E-010.md",
@@ -67,10 +79,28 @@
       "reason": "BOTH RECORDED GAPS ARE CLOSED. The recorded reason ended 'single-process reopen rather than a full OS process restart, and no migration matrix from a prior released schema (DOD-016 untested)'. MEASURED: the exact-artifact lane now kills the packaged executable (waiting until its debug endpoint stops answering), relaunches it, and reads the ledger back THROUGH THE RUNTIME in the new process, with the pre-restart canary present and the count reconciled -- a real process restart, not a reopen. The migration matrix executes five prior schema states with logical data preservation and a post-migration write, and Vault::open refuses a database whose recorded migrations have no tables. Original evidence retained: the vault commit, independent read-back with version intact, and the audit chain verified after reopen, mutation-proven against the tamper guard."
     },
     {
+      "test_id": "E2E-013",
+      "status": "PARTIAL",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-013.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/version-matrix/report.json` -- quoted and verified: 'applicability_notes', 'mixed-fleet', 'versions'; first-party source `scripts/version-matrix.py` -- quoted and verified: 'mixed-fleet', 'payload_exe_sha256'. Version-skew verification is PARTIAL and the missing half is structural rather than pending work: two RELEASED versions exist (v0.1.0 and v0.2.0, each with a distinct MSI and a distinct binary payload digest) and the matrix installs each in sequence with the installed version read back from the Windows Installer registry, so the transitions 0.1.0 -> 0.2.0 -> 0.1.0 are measured rather than assumed. NOT PROVEN: NOT PASS: simultaneous mixed-fleet skew -- two different versions running at once against shared state -- is NOT APPLICABLE to this product and is recorded as such in the evidence, because it is a single-user desktop application with device-local storage, no server fleet and no shared state, so no such path exists to execute. The two releases also differ only in their version manifests, so behavioural skew between versions is not exercised."
+    },
+    {
+      "test_id": "E2E-014",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-014.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/version-matrix/report.json` -- quoted and verified: 'downgrade_attempt', 'rollback', 'matches_shipped_payload', 'state_intact'; evidence artifact `.agent/evidence/version-matrix/STATUS.md` -- quoted and verified: 'downgrade_attempt', 'rollback'; first-party source `scripts/version-matrix.py` -- quoted and verified: 'refused by Windows Installer', 'consistent_with_outcome'. Downgrade and rollback compatibility executed against realistic persistent state: the in-place downgrade from v0.2.0 to v0.1.0 was APPLIED by this installer (exit 0, version back to 0.1.0, shipped-payload digest matched, canary database and blob byte-intact), and the rollback path (uninstall, then reinstall v0.1.0) reconciled the same state. The assertion accepts either installer outcome but requires the installed version to AGREE with the measured exit code, so a refusal with no version change also passes while an exit 0 with the wrong version does not. NOT PROVEN: The two releases carry the same code with different version manifests, so this proves installer-level downgrade and rollback behaviour with realistic state, not schema downgrade behaviour -- there is no schema to downgrade because no migration was added between the releases."
+    },
+    {
       "test_id": "E2E-015",
       "status": "PASS",
       "evidence_path": ".agent/evidence/applicable-cases/E2E-015.md",
       "reason": "EXECUTED: first-party source `apps/desktop/e2e-artifact.mjs` -- quoted and verified: 'canary', 'HARD RESTART'; evidence artifact `.agent/evidence/artifact-e2e/STATUS.md` -- quoted and verified: 'confirmation'; first-party source `apps/desktop/src-tauri/src/commands.rs` -- quoted and verified: 'test_export_firewall_blocks_restricted_content'; evidence artifact `.agent/evidence/recovery-drill/report.json` -- quoted and verified: 'read_back_by'. Import/export/data-portability round-trip executed: a runtime canary generated in the product is read back from the durable vault and again after a hard restart, the evidence/package export is confirmation-gated and audited, and the disclosure firewall blocks export of restricted content. NOT PROVEN: Round-trip coverage is the product's own formats (vault, evidence bundle, filing package); no third-party patent-management or docketing interchange format is implemented or tested."
+    },
+    {
+      "test_id": "E2E-018",
+      "status": "DEFERRED_LONG_RUNNING",
+      "evidence_path": ".agent/evidence/applicable-cases/E2E-018.md",
+      "reason": "EXECUTED: evidence artifact `.agent/evidence/soak/report.json` -- quoted and verified: 'heartbeats', 'max_bytes_per_event', 'actual_seconds'; first-party source `apps/desktop/src-tauri/tests/soak_abbreviated.rs` -- quoted and verified: 'ABBREVIATED', '24/48/72+'; first-party source `scripts/soak-lane.sh` -- quoted and verified: 'soak_abbreviated'; evidence artifact `.agent/verification/E2E_SUITE_LIBRARY.md` -- quoted and verified: '24, 48, 72+ hours', 'dedicated'. The soak harness exists as a runnable entry point and its abbreviated trials execute with heartbeats and encoded bounds; the clause's specified full-scale duration is uncompleted and the unblock condition is a dedicated host. NOT PROVEN: Long-duration stability at the specified 24/48/72+ hour scale: no flatline claim is made, no P99-creep-per-day slope is measured, and the abbreviated trials are labeled separately rather than extrapolated."
     },
     {
       "test_id": "E2E-019",

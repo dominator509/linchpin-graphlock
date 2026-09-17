@@ -141,10 +141,18 @@ overwrite an abbreviated trial's report. At or above the floor it is labeled
 `ABBREVIATED` and writes `.agent/evidence/soak/report.json` with heartbeats,
 cycles, errors, vault growth, working-set growth and the epoch it ran against.
 
-**No duration or workload for a full soak is specified anywhere in this
-repository**, so the full-scale requirement has no value to complete; DOD-038
-remains PARTIAL and this trial does not claim it. Fuzzing is still absent
-(GEN-027 records that no mutation-based fuzzing engine is configured).
+**The full-soak scale IS specified, and it is not met here.** The pack's suite
+library — `.agent/verification/E2E_SUITE_LIBRARY.md`, which carries the source of
+`E2E-SoakResourceLeakTesting.md` and is the registry's own `source_file` for
+E2E-018 — requires **24, 48, 72+ hours** of sustained nominal load with continuous
+telemetry and the flatline invariant, and explicitly forbids time-bounded runners:
+it requires dedicated, persistent infrastructure. This host is a shared
+workstation, so every run of this lane is an ABBREVIATED trial labeled separately,
+and **DOD-038 is DEFERRED_LONG_RUNNING** rather than PASS. No numeric duration or
+workload is specified for the fuzz, stress, performance or recovery terms, in the
+repository or in the pack. (An earlier revision of this file claimed no scale was
+specified anywhere; that was a measurement failure — it searched the repository's
+own specs and not the suite library the registry points at.)
 
 ## Coverage gate (DOD-008)
 

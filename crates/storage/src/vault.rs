@@ -1651,17 +1651,29 @@ mod tests {
         let backup_path = dir.join("busy-backup.db");
         drop(vault);
 
-        let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
-        let writers: Vec<_> = (0..4)
+        // BOUNDED WRITER WORK, and the reason is measured rather than stylistic.
+        // This test used to run four writer threads in a free-running loop until a
+        // stop flag, while the main thread took 30 backups. Its runtime was therefore
+        // emergent: with a loaded machine -- or with `-C instrument-coverage`, which
+        // slows every write -- the writers held the database continuously, each backup
+        // consumed its whole retry budget, and the test ran for MINUTES. Measured
+        // twice: 23 minutes of wall clock in one settle and a 900 s timeout in the
+        // next, both on this test, both while the uninstrumented binary runs the same
+        // suite in 3.2 s. A gate whose duration is unbounded eventually times out and
+        // teaches nothing, so the writers now perform a FIXED amount of work and the
+        // test always terminates; the concurrency being proved is unchanged, and the
+        // non-vacuity assertion below is added so the proof cannot become empty.
+        const WRITERS: usize = 4;
+        const WRITES_PER_WRITER: u64 = 400;
+        let written = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
+        let writers: Vec<_> = (0..WRITERS)
             .map(|writer_id| {
-                let stop = stop.clone();
                 let path = path.clone();
+                let written = written.clone();
                 std::thread::spawn(move || {
                     let vault = Vault::open(&path).expect("writer open");
-                    let mut written = 0u64;
-                    while !stop.load(std::sync::atomic::Ordering::Relaxed) {
-                        written += 1;
-                        let key = format!("busy-{writer_id}-{written}");
+                    for index in 0..WRITES_PER_WRITER {
+                        let key = format!("busy-{writer_id}-{index}");
                         if vault
                             .put_conception_event_keyed(
                                 "ws-busy",
@@ -1673,28 +1685,41 @@ mod tests {
                         {
                             break;
                         }
+                        written.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                     }
-                    written
                 })
             })
             .collect();
 
         let reader = Vault::open(&path).unwrap();
         let mut backups = 0;
-        for _ in 0..30 {
+        let mut backups_while_writers_progressed = 0;
+        let mut last_seen_writes = 0u64;
+        while backups < 30 {
             reader
                 .backup_to(&backup_path)
                 .expect("a backup under concurrent writes must succeed");
             backups += 1;
+            let seen = written.load(std::sync::atomic::Ordering::Relaxed);
+            if seen > last_seen_writes {
+                backups_while_writers_progressed += 1;
+                last_seen_writes = seen;
+            }
             std::thread::sleep(std::time::Duration::from_millis(15));
         }
-        stop.store(true, std::sync::atomic::Ordering::Relaxed);
-        let written: u64 = writers
-            .into_iter()
-            .map(|handle| handle.join().expect("writer thread"))
-            .sum();
+        for handle in writers {
+            handle.join().expect("writer thread");
+        }
+        let written = written.load(std::sync::atomic::Ordering::Relaxed);
         assert!(written > 0, "the writer threads wrote nothing");
         assert_eq!(backups, 30);
+        // Non-vacuity: at least one of the 30 backups must have been taken while the
+        // writers were still making progress, or the test would prove only that a
+        // backup succeeds against an idle database.
+        assert!(
+            backups_while_writers_progressed > 0,
+            "no backup overlapped writer progress, so the concurrent-backup claim is vacuous"
+        );
         assert!(backup_path.exists());
 
         // The last backup is a usable vault, not a torn copy.

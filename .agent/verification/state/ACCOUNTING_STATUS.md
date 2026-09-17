@@ -11,11 +11,12 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 
 | Status | IDs |
 | --- | --- |
+| DEFERRED_LONG_RUNNING | 1 |
 | EXTERNAL_REQUIRED | 1 |
-| NOT_APPLICABLE | 432 |
+| NOT_APPLICABLE | 427 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
-| PARTIAL | 5 |
-| PASS | 42 |
+| PARTIAL | 6 |
+| PASS | 45 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
 carries the applicability matrix's own per-ID evidence in the ledger, and the
@@ -65,10 +66,15 @@ digest of that matrix document is recorded beside it.
 | E2E-003 | PASS | `apps/desktop/e2e/shell.spec.ts` | Full Functional Verification |
 | E2E-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | API Contract & Security Validation |
 | E2E-005 | PASS | `.agent/evidence/applicable-cases/E2E-005.md` | Regression & Differential Verification |
+| E2E-008 | PASS | `.agent/evidence/applicable-cases/E2E-008.md` | Performance & Workload Orchestration |
+| E2E-009 | PASS | `.agent/evidence/applicable-cases/E2E-009.md` | Systemic Stress & Exhaustion Testing |
 | E2E-010 | PASS | `.agent/evidence/applicable-cases/E2E-010.md` | Resilience & Recovery Verification |
 | E2E-011 | PARTIAL | `.agent/evidence/EP-009/M3/STATUS.md` | Clean-Room Deployment Verification |
 | E2E-012 | PASS | `.agent/evidence/DOD-015-016-restart-and-migrations.md` | Schema Evolution & Data Migration Verification |
+| E2E-013 | PARTIAL | `.agent/evidence/applicable-cases/E2E-013.md` | Version-Skew & Compatibility Verification |
+| E2E-014 | PASS | `.agent/evidence/applicable-cases/E2E-014.md` | Downgrade & Rollback Compatibility Verification |
 | E2E-015 | PASS | `.agent/evidence/applicable-cases/E2E-015.md` | Import / Export / Data Portability Round-Trip |
+| E2E-018 | DEFERRED_LONG_RUNNING | `.agent/evidence/applicable-cases/E2E-018.md` | Soak, Endurance & Resource-Leak Verification |
 | E2E-019 | PASS | `.agent/evidence/applicable-cases/E2E-019.md` | AI/Agentic Systems Safety & Capability Verification |
 | SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | Repository Reality / Anti-Simulation Verification |
 | SUP-002 | PASS | `.agent/evidence/applicable-cases/SUP-002.md` | Requirements-to-Release Traceability Verification |

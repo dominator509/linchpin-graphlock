@@ -456,6 +456,57 @@ CASES: dict[str, dict] = {
         "finding": "Import/export/data-portability round-trip executed: a runtime canary generated in the product is read back from the durable vault and again after a hard restart, the evidence/package export is confirmation-gated and audited, and the disclosure firewall blocks export of restricted content.",
         "not_proven": "Round-trip coverage is the product's own formats (vault, evidence bundle, filing package); no third-party patent-management or docketing interchange format is implemented or tested.",
     },
+    "E2E-008": {
+        "status": "PASS",
+        "cites": [
+            ("artifact", ".agent/evidence/performance/report.json", ['"verdict": "PASS"', "p95_write_ms", "total_write_ms", "limits"]),
+            ("source", "apps/desktop/src-tauri/tests/performance_gate.rs", ["p95", "assert"]),
+            ("source", "scripts/performance-lane.sh", ["performance_gate"]),
+        ],
+        "finding": "Performance workload verification executed through its own runnable entry point (`scripts/performance-lane.sh`): 200 conception events written one at a time through the production command into a fresh file-backed vault, every event read back through a SECOND connection, environment recorded, and encoded bounds (p50 50ms, p95 150ms, max 500ms, total write 30s, total read 2s, vault 32MiB) that FAIL the run rather than reporting an observation. The read is asserted to observe every write, so a fast but lossy path cannot pass by dropping work.",
+        "not_proven": "The profile is debug and the workload is single-machine, single-process and concurrency-free, so the numbers are regression bounds on this host rather than published service levels; no cost metric is encoded because the product has no metered resource. The pack specifies no numeric performance scale, so the trial defines and labels its own workload.",
+    },
+    "E2E-009": {
+        "status": "PASS",
+        "cites": [
+            ("artifact", ".agent/evidence/stress/report.json", ["outcomes", "thresholds", "events_lost", "hung_allowed"]),
+            ("source", "apps/desktop/src-tauri/tests/stress_concurrency.rs", ["min_throughput_events_per_s", "no backup completed during the trial"]),
+            ("source", "scripts/stress-lane.sh", ["stress_concurrency"]),
+        ],
+        "finding": "Stress/exhaustion verification executed through its own runnable entry point (`scripts/stress-lane.sh`): 8 writer threads x 250 events against one vault with 4 concurrent readers and a backup thread, encoding floors that FAIL the trial (p95 write latency, minimum throughput, no hang, zero lost events, ledger count equals successful writes, zero read failures, zero backup failures) plus non-vacuity assertions that at least one read and one backup completed. The trial FOUND THREE REAL CONCURRENCY DEFECTS (concurrent first open, migration bookkeeping under a race, backup under a lock) and one flaky classification that counted a correct refusal as a failure; all were fixed, and the classification was tightened so a vault that disappears after the first commit still fails.",
+        "not_proven": "The workload is one machine, one disk, threads rather than separate processes or hosts, and no stress concurrency level, duration or throughput target is specified in the repository or in the pack's suite library, so the trial labels itself ABBREVIATED and does not claim the clause's full-scale requirement.",
+    },
+    "E2E-013": {
+        "status": "PARTIAL",
+        "cites": [
+            ("artifact", ".agent/evidence/version-matrix/report.json", ["applicability_notes", "mixed-fleet", "versions"]),
+            ("source", "scripts/version-matrix.py", ["mixed-fleet", "payload_exe_sha256"]),
+        ],
+        "finding": "Version-skew verification is PARTIAL and the missing half is structural rather than pending work: two RELEASED versions exist (v0.1.0 and v0.2.0, each with a distinct MSI and a distinct binary payload digest) and the matrix installs each in sequence with the installed version read back from the Windows Installer registry, so the transitions 0.1.0 -> 0.2.0 -> 0.1.0 are measured rather than assumed.",
+        "not_proven": "NOT PASS: simultaneous mixed-fleet skew -- two different versions running at once against shared state -- is NOT APPLICABLE to this product and is recorded as such in the evidence, because it is a single-user desktop application with device-local storage, no server fleet and no shared state, so no such path exists to execute. The two releases also differ only in their version manifests, so behavioural skew between versions is not exercised.",
+    },
+    "E2E-014": {
+        "status": "PASS",
+        "cites": [
+            ("artifact", ".agent/evidence/version-matrix/report.json", ["downgrade_attempt", "rollback", "matches_shipped_payload", "state_intact"]),
+            ("artifact", ".agent/evidence/version-matrix/STATUS.md", ["downgrade_attempt", "rollback"]),
+            ("source", "scripts/version-matrix.py", ["refused by Windows Installer", "consistent_with_outcome"]),
+        ],
+        "finding": "Downgrade and rollback compatibility executed against realistic persistent state: the in-place downgrade from v0.2.0 to v0.1.0 was APPLIED by this installer (exit 0, version back to 0.1.0, shipped-payload digest matched, canary database and blob byte-intact), and the rollback path (uninstall, then reinstall v0.1.0) reconciled the same state. The assertion accepts either installer outcome but requires the installed version to AGREE with the measured exit code, so a refusal with no version change also passes while an exit 0 with the wrong version does not.",
+        "not_proven": "The two releases carry the same code with different version manifests, so this proves installer-level downgrade and rollback behaviour with realistic state, not schema downgrade behaviour -- there is no schema to downgrade because no migration was added between the releases.",
+    },
+    "E2E-018": {
+        "status": "DEFERRED_LONG_RUNNING",
+        "cites": [
+            ("artifact", ".agent/evidence/soak/report.json", ["heartbeats", "max_bytes_per_event", "actual_seconds"]),
+            ("source", "apps/desktop/src-tauri/tests/soak_abbreviated.rs", ["ABBREVIATED", "24/48/72+"]),
+            ("source", "scripts/soak-lane.sh", ["soak_abbreviated"]),
+            ("artifact", ".agent/verification/E2E_SUITE_LIBRARY.md", ["24, 48, 72+ hours", "dedicated"]),
+        ],
+        "material": "the specified soak scale, which EXISTS and is uncompleted. .agent/verification/E2E_SUITE_LIBRARY.md carries the source of E2E-SoakResourceLeakTesting.md -- the registry's own source_file for E2E-018 -- and it requires 'an extended period (24, 48, 72+ hours)' of sustained nominal load with continuous telemetry and the flatline invariant, and explicitly forbids time-bounded runners, requiring dedicated persistent infrastructure. This host is a shared workstation, not dedicated infrastructure, and cannot supply an uninterrupted multi-day run whose memory and latency slope would mean anything. What IS executed and labeled: an abbreviated endurance trial through the production command with per-heartbeat working-set sampling, run at 600 s in the gate and at 3 600 s as an extended trial recorded separately. DOD-038 is therefore DEFERRED_LONG_RUNNING, never PASS for the full requirement.",
+        "finding": "The soak harness exists as a runnable entry point and its abbreviated trials execute with heartbeats and encoded bounds; the clause's specified full-scale duration is uncompleted and the unblock condition is a dedicated host.",
+        "not_proven": "Long-duration stability at the specified 24/48/72+ hour scale: no flatline claim is made, no P99-creep-per-day slope is measured, and the abbreviated trials are labeled separately rather than extrapolated.",
+    },
     "E2E-019": {
         "status": "PASS",
         "cites": [

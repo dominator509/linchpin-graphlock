@@ -49,7 +49,16 @@ except (urllib.error.URLError, OSError, ValueError, TimeoutError) as e:
 PY
 then
   echo "local-provider: PF-011 UNSATISFIED -- no loopback inference server answered at $ENDPOINT" >&2
-  echo "local-provider: start one (e.g. 'ollama serve' with a pulled model) and re-run." >&2
+  # The runtime is installed at a known path but is NOT a background service, so it
+  # stops with the process and every provider-dependent stage then exits 2. MEASURED
+  # while settling round 50: the lane failed this way mid-run and the message left the
+  # operator to search COMMANDS.md for how to start it. The documented command is now
+  # printed here, because a prerequisite failure that does not say how to satisfy it
+  # costs a round every time it happens.
+  echo "local-provider: start it with the documented procedure (COMMANDS.md, 'Local provider prerequisite'):" >&2
+  echo "local-provider:   \$dir = \"\$env:LOCALAPPDATA\\linchpin-local-runtime\"" >&2
+  echo "local-provider:   \$env:OLLAMA_HOST='127.0.0.1:11434'; \$env:OLLAMA_MODELS=\"\$dir\\models\"" >&2
+  echo "local-provider:   Start-Process -FilePath \"\$dir\\ollama\\ollama.exe\" -ArgumentList 'serve' -WindowStyle Hidden" >&2
   echo "local-provider: missing prerequisite -- NOT a pass and NOT a product failure." >&2
   exit 2
 fi

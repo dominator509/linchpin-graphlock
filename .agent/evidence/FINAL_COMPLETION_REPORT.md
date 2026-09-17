@@ -1,22 +1,22 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-17T06:36:14Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-17T08:58:29Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
-- Blocking clauses: DOD-014=PARTIAL, DOD-038=PARTIAL
-- Candidate commit: `e8f8ef2bb0722072c397daa146215c9dad56001b` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (2 changed files)
-- Epoch: `179d41409f9ed80d` over 142 tracked inputs
+- Blocking clauses: DOD-014=PARTIAL
+- Candidate commit: `7e7b0e8ba9151a31da650b42e978b5f4f1e6dc7f` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (48 changed files)
+- Epoch: `f6417988bc07a827` over 145 tracked inputs
 
 ## Verified behavior — executed and observed
 
 - **37 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-035, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
-- **484 registry capabilities accounted**, one status each ({'PASS': 42, 'NOT_APPLICABLE': 432, 'PARTIAL': 5, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'EXTERNAL_REQUIRED': 1})
+- **484 registry capabilities accounted**, one status each ({'PASS': 45, 'NOT_APPLICABLE': 427, 'PARTIAL': 6, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'DEFERRED_LONG_RUNNING': 1, 'EXTERNAL_REQUIRED': 1})
 - **13 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `a63ceae61ba661c9…` (12500992 bytes), MSI `512960e1719232f2…` (5709824 bytes)
+- Artifacts bound to this run: executable `7e2be9703f861ebc…` (12500992 bytes), MSI `1b9d51c82a51236f…` (5709824 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -26,10 +26,9 @@ the whole Rust suite in an ephemeral checkout.
 
 ## Partially verified behavior — executed, with the missing half named
 
-**2 clauses**: DOD-014, DOD-038
+**1 clauses**: DOD-014
 
 - **DOD-014**: STATUS KEPT AT PARTIAL, with the gap described precisely instead of broadly. EXECUTED AND MUTATION-PROVEN: an unreachable loopback endpoint yields TransportError::Unreachable with live=false and text=null rather than fabricated output (a real transport failure, not a simulated one); a non-loopback endpoint is refused with a POLICY error and NO ATTEMPT is made, which is the SPEC-005 confidentiality…
-- **DOD-038**: STATUS DELIBERATELY UNCHANGED AT PARTIAL: the clause's own OR ELSE says an abbreviated trial 'is labeled separately' and is 'never PASS for the full requirement', so this round EXECUTED a third trial class and updated the evidence instead of the label. THREE OF THE SIX NAMED CLASSES ARE NOW EXECUTED AND LABELED. (1) ENDURANCE -- apps/desktop/src-tauri/tests/soak_abbreviated.rs, 600 s against the r…
 
 ## Blocked work
 
@@ -56,7 +55,11 @@ Stated as assumptions rather than results, because no measurement in this run su
 - **Production data volumes.** The performance gate's workload is 200 events in a local vault; the
   ledger read returns all events for a workspace with no pagination, and that has not been exercised
   at scale.
-- **Long-duration stability.** No soak, endurance or fuzz campaign at any specified scale has run.
+- **Long-duration stability.** The clause's soak scale IS specified by the pack --
+  24/48/72+ hours in `.agent/verification/E2E_SUITE_LIBRARY.md`, the source of E2E-018 -- and it is
+  NOT completed: only abbreviated trials have run, labeled separately, so DOD-038 is
+  DEFERRED_LONG_RUNNING and no flatline or P99-creep claim is made. Fuzz, stress, performance
+  and recovery have no numeric scale in the repository or in the pack.
 - **Dated behaviour of external legal sources.** Deadline rules are exercised against the locally
   stored ruleset; no live USPTO source was queried.
 
@@ -81,7 +84,7 @@ Stated as assumptions rather than results, because no measurement in this run su
 - **Update/rollback across versions is unexecuted** because only one version exists; the lanes install
   and remove the same v0.1.0 MSI, and same-version reinstall is weaker evidence than a cross-version
   upgrade.
-- **Registry capabilities**: 4 of 484 capabilities are `NOT_RUN_BLOCKED_MATERIAL`, each naming the specific material its subject requires (an authorization surface, an isolation boundary, a git hook, hardware key storage), and 432 are `NOT_APPLICABLE` on per-ID applicability evidence.
+- **Registry capabilities**: 4 of 484 capabilities are `NOT_RUN_BLOCKED_MATERIAL`, each naming the specific material its subject requires (an authorization surface, an isolation boundary, a git hook, hardware key storage), and 427 are `NOT_APPLICABLE` on per-ID applicability evidence.
 
 ## Deployment state
 
