@@ -34,18 +34,20 @@ validators run in verify.sh, and both refused to pass on first use — the patte
 
 Next candidates, each needing its own verification before any status moves:
 
-- **GEN-106 (property-based security testing)** claims none exists while
-  `test_sanitize_path_property_over_generated_corpus` generates a corpus and the fuzz
-  campaign mutates one. Verify the claim against those two before moving it; GEN-107/108
-  sit in the formal-methods cluster and stay NOT_APPLICABLE unless a real property harness
-  appears.
 - **GEN-013 (security code metrics)** and **GEN-014 (complexity)** are adjacent but
   distinct: coverage, mutation sensitivity and reachability classification are measured
   and enforced; no complexity or security-density metric exists. Do not merge them.
 - **GEN-043 (vulnerability assessment record)** — advisories are scanned and disclosed
-  under GEN-042; no severity/exploitability assessment exists.
-- **GEN-058 (weak-primitive detection)** — the implementation is tested under GEN-057;
-  nothing scans for weak primitives, and the dependency ban list names none.
+  under GEN-042; no severity/exploitability assessment exists. A genuine `assess` harness
+  would have to record per-advisory reachability and exploitability for the shipped
+  graph, which is closer to a dependency-triage tool than a scan; measure before claiming.
+- **GEN-105/107/108/109** remain the formal-methods cluster and stay NOT_APPLICABLE
+  unless a real specification language or model checker appears; GEN-108's reason now
+  points at GEN-093/GEN-106 so the boundary is explicit.
+- **NSIS byte isolation (SUP-004)**: measure which bytes differ between two NSIS builds
+  with `/Brepro` in place; the MSI residual is already characterised as WiX's per-build
+  `ProductCode`.
+
 
 Standing instruction: name the harness, add a per-ID case result whose citations
 `scripts/applicable-case-evidence.py --check` re-reads from the tree, then rebuild
