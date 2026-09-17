@@ -378,8 +378,35 @@ def main() -> int:
         # the recorded gate kept describing an artifact that no longer existed. The
         # identity fields and the reason set are compared too, so a same-verdict
         # change still fails.
-        for field in ("artifact", "blocking_clauses", "external_clauses", "inconclusive_reasons", "dod_status_tally", "registry_accounting"):
-            if current.get(field) != gate.get(field):
+        #
+        # The artifact comparison EXCLUDES the fields that legitimately move with HEAD.
+        # MEASURED: `head_commit` and `candidate_is_head` are bookkeeping about which
+        # commit is current, so every commit after a derivation -- including the settle
+        # commit itself -- made this lane unsatisfiable at a moment when nothing about
+        # the artifact had changed. Identity is what must hold; bookkeeping may move.
+        volatile = {
+            "head_commit",
+            "candidate_is_head",
+            "candidate_is_ancestor_of_head",
+            "settle_commits_after_candidate",
+        }
+
+        def identity(artifact: dict | None) -> dict:
+            return {k: v for k, v in (artifact or {}).items() if k not in volatile}
+
+        for field in (
+            "artifact",
+            "blocking_clauses",
+            "external_clauses",
+            "inconclusive_reasons",
+            "dod_status_tally",
+            "registry_accounting",
+        ):
+            recorded_value = current.get(field)
+            computed_value = gate.get(field)
+            if field == "artifact":
+                recorded_value, computed_value = identity(recorded_value), identity(computed_value)
+            if recorded_value != computed_value:
                 print(
                     f"ship-gate check: FAIL (the recorded {field} no longer matches the "
                     f"recomputed one; re-derive with python3 scripts/ship-gate.py)",
