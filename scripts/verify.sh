@@ -123,6 +123,13 @@ run "code metrics self-test" python3 scripts/code-metrics.py --self-test
 run "architecture drift" python3 scripts/architecture-drift.py
 run "architecture drift self-test" python3 scripts/architecture-drift.py --self-test
 
+# The STRICT ship-gate check lives here, after the settle refresh: the recorded
+# RELEASE_GATE.json must match the recomputed verdict, artifact identity, clause lists
+# and tallies exactly. harness-validate (stage V-000) uses --structure-only because it
+# runs before the refresh, so this lane is where the identity comparison can hold --
+# and it fails when the pinned installer's bytes move under the recorded identity.
+run "ship gate currency" python3 scripts/ship-gate.py --check
+
 # Identity check LAST, after the epoch has settled: DOD-029 requires the
 # candidate commit, base revision, epoch and artifact digests to belong to the
 # SAME run, and this lane fails when any of them has moved since the manifest was

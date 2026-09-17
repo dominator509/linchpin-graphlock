@@ -16,7 +16,14 @@ python3 scripts/build-traceability.py --check
 python3 scripts/build-dod-status.py --check --structure-only
 python3 scripts/generate-evidence-index.py --check --structure-only
 python3 scripts/test-collection-guard.py --check
-python3 scripts/ship-gate.py --check
+# Structure only: this script is stage V-000 and runs BEFORE the settle path refreshes
+# the derived state, so an equality check against the recorded gate is unsatisfiable
+# here. MEASURED: it failed with "ship-gate check: FAIL (recorded INCONCLUSIVE,
+# recomputed CONDITIONAL_EXTERNAL_GATES)" for a state that was merely not refreshed yet
+# -- the same circularity the other derived artifacts above already solve with
+# --structure-only. The strict identity check now runs in scripts/verify.sh, after the
+# refresh, so the comparison happens where it can hold instead of being dropped.
+python3 scripts/ship-gate.py --check --structure-only
 python3 scripts/build-applicability.py --check
 python3 scripts/generate-sbom.py --check
 python3 scripts/change-invalidation.py --check

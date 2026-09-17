@@ -49,6 +49,33 @@ EXE = Path("target/release/linchpin-desktop.exe")
 
 VALID_VERDICTS = {"GO", "NO_GO", "CONDITIONAL_EXTERNAL_GATES", "INCONCLUSIVE"}
 
+PRODUCT_MANIFESTS = [
+    Path("apps/desktop/src-tauri/tauri.conf.json"),
+    Path("apps/desktop/src-tauri/Cargo.toml"),
+]
+
+
+def declared_product_version() -> str:
+    """The version the repository DECLARES for the product, or "" when unreadable.
+
+    Used to reject a bound installer that carries some other version's name -- the
+    cross-version matrix legitimately builds a v0.2.0 package from this same tree
+    with the manifests temporarily bumped, and such a package must never be mistaken
+    for the release artifact.
+    """
+    conf = PRODUCT_MANIFESTS[0]
+    if conf.exists():
+        try:
+            return str(json.loads(conf.read_text("utf-8")).get("version") or "")
+        except json.JSONDecodeError:
+            pass
+    cargo = PRODUCT_MANIFESTS[1]
+    if cargo.exists():
+        for line in cargo.read_text("utf-8").splitlines():
+            if line.startswith("version") and '"' in line:
+                return line.split('"')[1]
+    return ""
+
 
 def is_ancestor(older: str, newer: str) -> bool:
     """True when `older` is an ancestor of `newer` in this repository."""
@@ -122,6 +149,18 @@ def load_accounting() -> tuple[int, dict[str, int]]:
 
 def main() -> int:
     check_only = "--check" in sys.argv
+    # STRUCTURE-ONLY mode exists for the one caller that runs MID-SETTLE.
+    #
+    # MEASURED: `sh scripts/harness-validate.sh` runs as stage V-000, before the settle
+    # path refreshes the derived state, so the recorded RELEASE_GATE.json legitimately
+    # describes the pre-rerun state and an equality check there is unsatisfiable -- it
+    # failed with "ship-gate check: FAIL (recorded INCONCLUSIVE, recomputed
+    # CONDITIONAL_EXTERNAL_GATES)" for a state that was simply not refreshed yet. That
+    # is the same circularity the other derived artifacts already solve with
+    # `--structure-only`. The STRICT equality check moved to `scripts/verify.sh`, which
+    # runs after the refresh, so nothing was weakened: structure is checked where the
+    # comparison cannot hold, and identity where it can.
+    structure_only = "--structure-only" in sys.argv
     reasons: list[str] = []
     blockers: list[str] = []
     external: list[str] = []
@@ -133,20 +172,53 @@ def main() -> int:
 
     # --- artifact identity (DOD-003, DOD-029) -----------------------------
     artifact: dict[str, str] = {}
+    manifest_data = json.loads(MANIFEST.read_text("utf-8")) if MANIFEST.exists() else {}
+    recorded_artifacts = manifest_data.get("artifacts") or {}
     if EXE.exists():
         artifact["executable"] = str(EXE)
         artifact["executable_sha256"] = sha256_file(EXE)
         artifact["executable_bytes"] = str(EXE.stat().st_size)
+        if recorded_artifacts.get("executable_sha256") not in (None, artifact["executable_sha256"]):
+            reasons.append(
+                f"the pinned executable hashes {artifact['executable_sha256'][:16]} but RUN_MANIFEST.json "
+                f"recorded {str(recorded_artifacts['executable_sha256'])[:16]}; the artifact moved under the identity"
+            )
     else:
         reasons.append("no built executable at target/release/linchpin-desktop.exe")
-
-    msis = sorted(MSI_DIR.glob("*.msi")) if MSI_DIR.exists() else []
-    if msia := (msis[-1] if msis else None):
-        artifact["msi"] = str(msia)
-        artifact["msi_sha256"] = sha256_file(msia)
-        artifact["msi_bytes"] = str(msia.stat().st_size)
+    # Bind to the installer the identity files PIN, and verify it, instead of
+    # selecting one by glob.
+    #
+    # MEASURED DEFECT THIS REPLACES: this used `sorted(MSI_DIR.glob("*.msi"))[-1]`.
+    # The cross-version matrix builds a v0.2.0 package through the production build
+    # path (with the version manifests temporarily bumped and then restored) and left
+    # it in target/release/bundle/msi, so the lexicographically-last file won and the
+    # release gate bound its identity to a TEST artifact of a version the repository
+    # does not declare. Lexicographic order is not even version order (0.9.0 sorts
+    # after 0.10.0), so the selection was wrong in principle as well as in fact.
+    pinned = recorded_artifacts.get("msi")
+    if pinned:
+        msi_path = Path(pinned)
+        if not msi_path.exists():
+            reasons.append(f"the pinned installer {pinned} does not exist")
+        else:
+            digest = sha256_file(msi_path)
+            recorded = recorded_artifacts.get("msi_sha256")
+            artifact["msi"] = str(msi_path)
+            artifact["msi_sha256"] = digest
+            artifact["msi_bytes"] = str(msi_path.stat().st_size)
+            if recorded and recorded != digest:
+                reasons.append(
+                    f"the pinned installer {pinned} hashes {digest[:16]} but RUN_MANIFEST.json "
+                    f"recorded {str(recorded)[:16]}; the artifact moved under the identity"
+                )
+            declared = declared_product_version()
+            if declared and declared not in msi_path.name:
+                reasons.append(
+                    f"the pinned installer {msi_path.name} does not carry the declared product "
+                    f"version {declared}"
+                )
     else:
-        reasons.append("no installer artifact under target/release/bundle/msi")
+        reasons.append("RUN_MANIFEST.json does not pin an installer artifact")
 
     # --- candidate identity (DOD-029) ------------------------------------
     # READ FROM THE AUTHORITATIVE IDENTITY FILES, not from CASE_RESULTS.json.
@@ -267,6 +339,33 @@ def main() -> int:
             print("ship-gate check: FAIL (no gate file)", file=sys.stderr)
             return 1
         current = json.loads(GATE.read_text("utf-8"))
+        if structure_only:
+            # Structure of BOTH: the recomputed verdict must be lawful and complete,
+            # and the recorded file must still carry a lawful verdict and the fields a
+            # reader depends on. Values are not compared here; verify.sh does that.
+            required = {"verdict", "blocking_clauses", "external_clauses", "artifact", "registry_accounting"}
+            missing = sorted(required - set(current))
+            if missing:
+                print(f"ship-gate check: FAIL (recorded gate is missing {missing})", file=sys.stderr)
+                return 1
+            if current.get("verdict") not in VALID_VERDICTS:
+                print(
+                    f"ship-gate check: FAIL (recorded verdict {current.get('verdict')!r} is not one of "
+                    f"{sorted(VALID_VERDICTS)})",
+                    file=sys.stderr,
+                )
+                return 1
+            if len(dod) != 42 or accounted != 484:
+                print(
+                    f"ship-gate check: FAIL (structure: {len(dod)}/42 clauses, {accounted}/484 IDs)",
+                    file=sys.stderr,
+                )
+                return 1
+            print(
+                f"ship-gate check: ok (structure only; recorded {current.get('verdict')}, "
+                f"recomputed {verdict}; identity is verified after the settle refresh)"
+            )
+            return 0
         if current.get("verdict") != verdict:
             print(
                 f"ship-gate check: FAIL (recorded {current.get('verdict')}, "
@@ -274,6 +373,20 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 1
+        # Comparing only the VERDICT was not enough. MEASURED: replacing the pinned
+        # installer with different bytes added the reason "the artifact moved under
+        # the identity" while the verdict stayed INCONCLUSIVE, so --check passed and
+        # the recorded gate kept describing an artifact that no longer existed. The
+        # identity fields and the reason set are compared too, so a same-verdict
+        # change still fails.
+        for field in ("artifact", "blocking_clauses", "external_clauses", "inconclusive_reasons", "dod_status_tally", "registry_accounting"):
+            if current.get(field) != gate.get(field):
+                print(
+                    f"ship-gate check: FAIL (the recorded {field} no longer matches the "
+                    f"recomputed one; re-derive with python3 scripts/ship-gate.py)",
+                    file=sys.stderr,
+                )
+                return 1
         print(f"ship-gate check: ok (verdict {verdict}, unchanged)")
         return 0
 

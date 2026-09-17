@@ -362,8 +362,18 @@ def bump(version: str) -> None:
     conf.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
+def declared_version() -> str:
+    """The version the repository itself declares, read before any bumping."""
+    conf = ROOT / "apps/desktop/src-tauri/tauri.conf.json"
+    try:
+        return str(json.loads(conf.read_text(encoding="utf-8")).get("version") or "")
+    except (OSError, json.JSONDecodeError):
+        return ""
+
+
 def provision() -> dict:
     """Build both versions without leaving the repository modified."""
+    repository_version = declared_version()
     snapshot = {}
     for rel in MANIFESTS + LOCKFILES:
         path = ROOT / rel
@@ -406,6 +416,20 @@ def provision() -> dict:
                 "target_release_exe_sha256": sha256_file(target / "linchpin-desktop.exe"),
             }
             print(f"version-matrix: staged v{version}: {msis[-1].name}")
+            # Leave the release bundle directory holding ONLY the repository's own
+            # version. MEASURED DEFECT: the bumped-version package stayed in
+            # target/release/bundle/msi, and scripts/ship-gate.py -- which used to pick
+            # the lexicographically last *.msi -- bound the RELEASE identity to this
+            # TEST package of a version the repository does not declare. The staged copy
+            # under target/version-matrix/<version>/ is what this lane installs.
+            #
+            # Only a FOREIGN version is removed: when the lane builds the repository's
+            # own version, that package IS the release artifact and must stay.
+            if repository_version and version != repository_version:
+                for bundle_dir in (ROOT / "target/release/bundle/msi", ROOT / "target/release/bundle/nsis"):
+                    for artefact in bundle_dir.glob(f"*{version}*"):
+                        artefact.unlink()
+                        print(f"version-matrix: removed foreign build output {artefact.name} from {bundle_dir.name}/")
     finally:
         # Restore every manifest and lockfile byte-for-byte, then PROVE the tree is
         # unchanged. A version bump left behind would silently re-label the product.

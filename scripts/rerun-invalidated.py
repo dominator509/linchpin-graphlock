@@ -91,6 +91,10 @@ STAGE_RUNNERS: dict[str, list[list[str]]] = {
     ],
     "V-021 final accounting": [
         ["sh", "scripts/harness-accounting.sh"],
+        # Re-derive first, then verify: this stage runs before the settle path's own
+        # refresh, so a bare --check here compared the recorded gate against a
+        # recomputed one and failed whenever the state had legitimately moved.
+        ["python3", "scripts/ship-gate.py"],
         ["python3", "scripts/ship-gate.py", "--check"],
     ],
     "DOD-007 collection guard": [
