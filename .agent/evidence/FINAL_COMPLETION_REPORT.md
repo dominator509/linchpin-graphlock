@@ -1,22 +1,22 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-17T04:25:50Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-17T06:35:37Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **NO_GO**
-- Blocking clauses: DOD-014=PARTIAL, DOD-035=FAIL, DOD-038=PARTIAL
-- Candidate commit: `9c852c84286e685d1e13a5a92a537828d860d6f6` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (2 changed files)
-- Epoch: `670cbed28da38b26` over 141 tracked inputs
+- Blocking clauses: DOD-014=PARTIAL, DOD-038=PARTIAL
+- Candidate commit: `57c562ee018d3e872405cb5b4ba03f497e9f408e` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (22 changed files)
+- Epoch: `179d41409f9ed80d` over 142 tracked inputs
 
 ## Verified behavior — executed and observed
 
-- **36 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
+- **37 of 42 DoD clauses PASS**: DOD-002, DOD-003, DOD-004, DOD-005, DOD-006, DOD-007, DOD-008, DOD-009, DOD-010, DOD-011, DOD-012, DOD-013, DOD-015, DOD-016, DOD-017, DOD-018, DOD-019, DOD-020, DOD-021, DOD-022, DOD-023, DOD-024, DOD-025, DOD-026, DOD-027, DOD-028, DOD-029, DOD-030, DOD-031, DOD-032, DOD-033, DOD-035, DOD-036, DOD-037, DOD-040, DOD-041, DOD-042
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
 - **484 registry capabilities accounted**, one status each ({'PASS': 42, 'NOT_APPLICABLE': 432, 'PARTIAL': 5, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'EXTERNAL_REQUIRED': 1})
 - **13 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `59e9498d18a8e528…` (12500992 bytes), MSI `bb27f5b3031773b7…` (5709824 bytes)
+- Artifacts bound to this run: executable `a63ceae61ba661c9…` (12500992 bytes), MSI `512960e1719232f2…` (5709824 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the
@@ -33,9 +33,8 @@ the whole Rust suite in an ephemeral checkout.
 
 ## Blocked work
 
-**1 clause(s)**: DOD-035
+**0 clause(s)**: none
 
-- **DOD-035**: The update and rollback MECHANISM is now executed; the compatibility MATRIX cannot be, because only one version exists. EXECUTED this round by scripts/vault-preservation-e2e.sh, wired as lane 3 of scripts/test-e2e.sh, against the real MSI and the product's real app-data path: install -> seed realistic persistent state (a real SQLite database at the product's real vault filename with an unpredictable per-run canary row, plus a content-addressed blob) -> UPDATE (install over existing) -> UNINSTALL…
 
 ## External gates
 

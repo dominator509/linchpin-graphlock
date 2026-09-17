@@ -13,12 +13,12 @@
   "outcomes": {
     "backup_failures": 0,
     "backup_failures_reported_busy_or_locked": 0,
-    "backups": 53,
+    "backups": 48,
     "backups_before_vault_existed": 0,
     "events_in_ledger": 2000,
     "events_lost": 0,
     "hung": false,
-    "read_backs": 988,
+    "read_backs": 810,
     "read_failures": 0,
     "reads_before_vault_existed": 1,
     "replays": 0,
@@ -28,14 +28,14 @@
     "writes_ok": 2000
   },
   "performance": {
-    "bytes_per_event": 641,
-    "elapsed_s": 20.2,
-    "final_vault_bytes": 1282048,
-    "peak_working_set_bytes": 17776640,
-    "throughput_events_per_s": 99.02,
-    "write_max_ms": 844.52,
-    "write_p50_ms": 46.01,
-    "write_p95_ms": 219.98
+    "bytes_per_event": 645,
+    "elapsed_s": 18.51,
+    "final_vault_bytes": 1290240,
+    "peak_working_set_bytes": 16232448,
+    "throughput_events_per_s": 108.03,
+    "write_max_ms": 872.6,
+    "write_p50_ms": 42.1,
+    "write_p95_ms": 204.51
   },
   "specification_gap": "no stress concurrency level, duration or throughput target is specified anywhere in the repository, so 'their specified scale' has no defined value to complete; this trial defines a workload, labels itself ABBREVIATED and does not claim DOD-038",
   "thresholds": {

@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "9c852c8",
+  "candidate_commit": "57c562e",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -28,7 +28,7 @@
       ]
     },
     "gate-script": {
-      "count": 63,
+      "count": 64,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
@@ -39,14 +39,14 @@
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "1fa5a88c4432051ff15363b2c02cbcafa5d2fff36a9e54adaa3dacfa678003f9",
         "scripts\\build-applicability.py": "9aa712921d634acd926a8e92b78ed4151c1528eda0ed854071bf72200914fde0",
-        "scripts\\build-dod-status.py": "5ad64d8c3f45f0893add2446f5c03f2eb9ed7350261d1fcab64fee244b8d5a81",
+        "scripts\\build-dod-status.py": "ecca21cf0c872e9f528424993f0875f9816bd4447dd0006f1016c55ff1034788",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
         "scripts\\change-invalidation.py": "7bb6499a61a35585e38e31e26ab4c24e07c0af4de1ae80915b40114aee879988",
         "scripts\\clean-build.sh": "b262d0333310aab42dc803355d856a1099686f981d6f3f891fd058ecbcf9dde6",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
         "scripts\\completion-report.py": "c1496b9c92b83d34883d503e74a20e532e585516c0069ac814441ed342676757",
-        "scripts\\coverage-gate.py": "856917e300a7586e28f731100be16d0c6fe08747c3137bd4ac92779e24dfc358",
+        "scripts\\coverage-gate.py": "a05d4b0cb45fcd26a46c742990d8d93c99212e14361abd4fed94e6ad171e37ce",
         "scripts\\dependency-audit.sh": "508cc370daf842ab1ea1535a658196adf677566088ca9928d3ca7d498fc9d1eb",
         "scripts\\doc-exec.py": "2e47017bc04b74b76decd60905f110280798b7668810803f1741b9857e61d516",
         "scripts\\dod-gate.sh": "26d4e578e6c62da5c946fc433be1d3d5226fd520fe062cfbf01f71aef12fd6bb",
@@ -84,7 +84,7 @@
         "scripts\\smoke-test.sh": "88d1f7261f808786804fb54245bd48e03e7d5e5ab898ef37d7c7f9fceaf1698b",
         "scripts\\test-collection-guard.py": "bfc4722f587b03e19aab38605f402e5846e475b668bb195132814555129d3044",
         "scripts\\test-collection-guard.sh": "82c46b21641211877d13314c012fc40f3a8bc7f06930a513b9a7b32a83200958",
-        "scripts\\test-e2e.sh": "44b03fcbb9dbfc41c9b355393e07e3a546b203a1536c3b3c86ca83a9cd75d880",
+        "scripts\\test-e2e.sh": "cf01271577dad42292367af88e01962cd7d114a01be556ea2f517cffaaabe0ff",
         "scripts\\test-integration.sh": "2acaa6c1f4f01d9b4c6f498bbf2a08cfd4b4797674624c5dc2277b71629fcbad",
         "scripts\\test-unit.sh": "0feb713f778b4416900735069b515d236c3dbc485271590123d6157b54d8bce4",
         "scripts\\typecheck.sh": "4ce965051793b2fec197d8b8fd86fa7e8027c30cd2c52102767f6ac1d088b904",
@@ -92,7 +92,8 @@
         "scripts\\validate-generated-pack.py": "50dc425bbcc17145e559a7fc1eccc9957b0ecbcbb6b6539a2ac5cde1cb8adf47",
         "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
         "scripts\\vault-preservation-e2e.sh": "99077fbdbbebea0d09390a2c6d0bdb67a63698e796a6f3ac884b3b12cc0fca7a",
-        "scripts\\verify.sh": "b7ee4a660dd1c1e2822b176cbc1ad1befce1b8d6bd396ec19b5287503c6064ed"
+        "scripts\\verify.sh": "b7ee4a660dd1c1e2822b176cbc1ad1befce1b8d6bd396ec19b5287503c6064ed",
+        "scripts\\version-matrix.py": "3ad61748f3c63f3fcf695fea616c0ddb5bbdad140d7e0c1a8c7eba382fc8701c"
       },
       "rules": [
         "V-000 harness validation",
@@ -238,8 +239,8 @@
       ]
     }
   },
-  "epoch_digest": "670cbed28da38b262a9a3e5ccd4d09c35f4e196bb0c04ba5a122db949a361487",
-  "prior_candidate_commit": "c317684",
-  "prior_epoch_digest": "670cbed28da38b262a9a3e5ccd4d09c35f4e196bb0c04ba5a122db949a361487",
-  "total_inputs": 141
+  "epoch_digest": "179d41409f9ed80d2ec165bcaaed6be17acaf1b674f27edfae29dba5a49460e5",
+  "prior_candidate_commit": "57c562e",
+  "prior_epoch_digest": "179d41409f9ed80d2ec165bcaaed6be17acaf1b674f27edfae29dba5a49460e5",
+  "total_inputs": 142
 }

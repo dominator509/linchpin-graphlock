@@ -1,0 +1,105 @@
+{
+  "gate": "version-matrix",
+  "covers": [
+    "DOD-035",
+    "DOD-036"
+  ],
+  "harness": "scripts/version-matrix.py",
+  "mutation": null,
+  "versions": {
+    "0.1.0": {
+      "msi": "target\\version-matrix\\0.1.0\\LINCHPIN_0.1.0_x64_en-US.msi",
+      "msi_sha256": "47c4caf2da1a7cf519a9280a0df51f13e5e0189f3e590fbf8fe3e855f75ee3d7",
+      "target_release_exe_sha256": "94c3dfb30bf9d7d79a04a7523d02aca714d12b84a681481a54e48030d7a78103",
+      "payload_exe": "target\\version-matrix\\payload-0.1.0\\PFiles\\LINCHPIN\\linchpin-desktop.exe",
+      "payload_exe_sha256": "0295f187f74e19ca22b1ee5026f28e8fa48dea4ce24e09ec59e43706949de0d5",
+      "payload_exe_bytes": 12500992
+    },
+    "0.2.0": {
+      "msi": "target\\version-matrix\\0.2.0\\LINCHPIN_0.2.0_x64_en-US.msi",
+      "msi_sha256": "e6bd4a1e5437792eb8e4347e1c6e611ebd3a238e2dd20d9f69a163127aff60b4",
+      "target_release_exe_sha256": "2d9a7083b40e2d27b2e3c03b9aaaccae4bd1b04dac6907fffb7e7eb2c7c17ec9",
+      "payload_exe": "target\\version-matrix\\payload-0.2.0\\PFiles\\LINCHPIN\\linchpin-desktop.exe",
+      "payload_exe_sha256": "0cc1e24e3f9a874923eece31414333b77549ec9af9033ff63a4c1e025ba4f0a8",
+      "payload_exe_bytes": 12500992
+    }
+  },
+  "canary": "LINCHPIN-VMATRIX-1789626865-31032",
+  "environment": {
+    "host": "DESKTOP-0RCPJ1P",
+    "appdata": "C:\\Users\\domin\\AppData\\Local\\LINCHPIN",
+    "note": "single machine, single user; no shared server state exists in this product"
+  },
+  "steps": [
+    {
+      "step": "clean_start",
+      "verdict": "PASS",
+      "msiexec_exit": 0,
+      "installed": false
+    },
+    {
+      "step": "install_old",
+      "verdict": "PASS",
+      "msiexec_exit": 0,
+      "display_version": "0.1.0",
+      "exe_sha256": "0295f187f74e19ca22b1ee5026f28e8fa48dea4ce24e09ec59e43706949de0d5",
+      "matches_shipped_payload": true
+    },
+    {
+      "step": "seed_state",
+      "verdict": "PASS",
+      "db": "C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\linchpin-vault.db",
+      "blob": "C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\vaults\\canary-blob.bin",
+      "intact": true
+    },
+    {
+      "step": "upgrade",
+      "verdict": "PASS",
+      "msiexec_exit": 0,
+      "display_version": "0.2.0",
+      "exe_sha256": "0cc1e24e3f9a874923eece31414333b77549ec9af9033ff63a4c1e025ba4f0a8",
+      "matches_shipped_payload": true,
+      "binary_replaced": true,
+      "state_intact": true,
+      "upgraded_binary_launches": true,
+      "launch_observation_seconds": 6
+    },
+    {
+      "step": "downgrade_attempt",
+      "verdict": "PASS",
+      "msiexec_exit": 0,
+      "display_version": "0.1.0",
+      "outcome": "applied",
+      "consistent_with_outcome": true,
+      "state_intact": true
+    },
+    {
+      "step": "uninstall",
+      "verdict": "PASS",
+      "msiexec_exit": 0,
+      "still_installed": false,
+      "state_intact": true
+    },
+    {
+      "step": "rollback",
+      "verdict": "PASS",
+      "msiexec_exit": 0,
+      "display_version": "0.1.0",
+      "exe_sha256": "0295f187f74e19ca22b1ee5026f28e8fa48dea4ce24e09ec59e43706949de0d5",
+      "matches_shipped_payload": true,
+      "state_intact": true
+    },
+    {
+      "step": "cleanup",
+      "verdict": "PASS",
+      "installed": false,
+      "canary_removed": true
+    }
+  ],
+  "failures": [],
+  "applicability_notes": [
+    "mixed-fleet and multi-machine version skew: NOT APPLICABLE -- a single-user desktop product with device-local storage and no server fleet; the product claims no such support, so there is no path to execute",
+    "the installed executable's UI behaviour is covered by the exact-artifact lane (DOD-004); this matrix asserts version identity, installed-binary identity and persistent-state reconciliation"
+  ],
+  "verdict": "PASS"
+}

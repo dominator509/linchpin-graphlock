@@ -84,10 +84,10 @@ PY
 }
 trap cleanup_preview EXIT
 
-echo "=== e2e lane 1/3: Playwright against the built bundle (system Edge) ==="
+echo "=== e2e lane 1/4: Playwright against the built bundle (system Edge) ==="
 pnpm --filter @linchpin/desktop exec playwright test
 
-echo "=== e2e lane 2/3: exact-artifact E2E (DOD-004) ==="
+echo "=== e2e lane 2/4: exact-artifact E2E (DOD-004) ==="
 sh scripts/artifact-e2e.sh
 
 # LANE 3 -- installer data preservation (EP-009 M4). DOD-035 requires upgrade,
@@ -97,11 +97,26 @@ sh scripts/artifact-e2e.sh
 # product's real app-data path, then proves the data survives an update
 # (install-over-install), an uninstall and a rollback (reinstall after removal).
 # Previously NOT executed; M4's "signed" half is covered by ADR-003.
-echo "=== e2e lane 3/3: installer vault preservation (EP-009 M4) ==="
+echo "=== e2e lane 3/4: installer vault preservation (EP-009 M4) ==="
 if [ ! -d target/release/bundle/msi ]; then
   echo "e2e: building the MSI first (bundle/msi absent)"
   sh scripts/build.sh
 fi
 sh scripts/vault-preservation-e2e.sh
+
+# LANE 4 -- CROSS-VERSION matrix (DOD-035). Lane 3 installs the same v0.1.0 MSI at
+# every step, so it cannot show an upgrade ACROSS versions, which is what DOD-035
+# names. This lane builds a second release (v0.2.0) when the staged artifacts are
+# absent, then executes install -> upgrade -> downgrade attempt -> uninstall ->
+# rollback against realistic persistent state, binding the installed binary to each
+# package's OWN payload digest (measured: the bundler relinks the binary, so
+# target/release is not the shipped identity) and observing the upgraded binary
+# actually launch.
+echo "=== e2e lane 4/4: cross-version upgrade/downgrade/rollback matrix (DOD-035) ==="
+if [ ! -d target/version-matrix/0.2.0 ]; then
+  python3 scripts/version-matrix.py --provision
+else
+  python3 scripts/version-matrix.py
+fi
 
 echo "e2e: ok (all lanes)"

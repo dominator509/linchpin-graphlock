@@ -1,15 +1,14 @@
 {
   "artifacts": {
-    "executable_sha256": "59e9498d18a8e528db07d905120d6cc18e51d96ce75e0ea1b71ea87c1acd61eb",
-    "msi_sha256": "bb27f5b3031773b7308e40cc264ced8178030adee8acad55cd722c9c8acfa9ad"
+    "executable_sha256": "a63ceae61ba661c91ba9cfb894febee306a84500e29a537f8569e3dc90f42032",
+    "msi_sha256": "512960e1719232f2cd34ee93c55e51715b56e85ae31181572724c8614428bfb2"
   },
   "base_revision": "3ee9c3f41795726a3c7c736b09f29f15de913d0c",
   "blocking_clauses": [
     "DOD-014=PARTIAL",
-    "DOD-035=FAIL",
     "DOD-038=PARTIAL"
   ],
-  "candidate_commit": "9c852c84286e685d1e13a5a92a537828d860d6f6",
+  "candidate_commit": "57c562ee018d3e872405cb5b4ba03f497e9f408e",
   "dod": {
     "DOD-001": "EXTERNAL_REQUIRED",
     "DOD-002": "PASS",
@@ -45,7 +44,7 @@
     "DOD-032": "PASS",
     "DOD-033": "PASS",
     "DOD-034": "EXTERNAL_REQUIRED",
-    "DOD-035": "FAIL",
+    "DOD-035": "PASS",
     "DOD-036": "PASS",
     "DOD-037": "PASS",
     "DOD-038": "PARTIAL",
@@ -54,8 +53,8 @@
     "DOD-041": "PASS",
     "DOD-042": "PASS"
   },
-  "epoch_digest": "670cbed28da38b262a9a3e5ccd4d09c35f4e196bb0c04ba5a122db949a361487",
-  "epoch_inputs": 141,
+  "epoch_digest": "179d41409f9ed80d2ec165bcaaed6be17acaf1b674f27edfae29dba5a49460e5",
+  "epoch_inputs": 142,
   "mutation_ids": [
     "MUT-COM-002-a",
     "MUT-DATA-001-a",

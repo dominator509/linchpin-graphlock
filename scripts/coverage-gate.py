@@ -46,6 +46,11 @@ REPORT = REPORT_DIR / "report.json"
 SUMMARY = REPORT_DIR / "SUMMARY.md"
 EPOCH = Path(".agent/verification/state/EPOCH.json")
 PROFILE_DIR = Path("target/coverage-profiles")
+
+# Per-binary bound. The instrumented suite's slowest member (the abbreviated soak)
+# takes ~35s on a quiet machine, so this is far above any legitimate runtime and
+# only fires on a genuine stall. Overridable for a binary with a longer workload.
+BINARY_TIMEOUT_S = float(os.environ.get("LINCHPIN_COVERAGE_BINARY_TIMEOUT_S", "900"))
 TARGET_DIR = Path("target/coverage")
 
 EXCLUDED_CRATES = {
@@ -72,7 +77,7 @@ CRATES = [
 ]
 
 
-def run(argv: list[str], env: dict | None = None) -> subprocess.CompletedProcess:
+def run(argv: list[str], env: dict | None = None, timeout: float | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(
         argv,
         capture_output=True,
@@ -81,6 +86,7 @@ def run(argv: list[str], env: dict | None = None) -> subprocess.CompletedProcess
         errors="replace",
         env=env,
         shell=False,
+        timeout=timeout,
     )
 
 
@@ -192,10 +198,30 @@ def measure() -> int:
 
     print(f"coverage: running {len(binaries)} test binaries directly to collect profiles")
     failures: list[str] = []
+    hung: list[str] = []
     for binary in binaries:
-        result = run([binary, "--test-threads=1"], env=env)
+        # BOUNDED, because a gate that can hang forever is not a gate. MEASURED: an
+        # instrumented storage test binary sat for 23 minutes on a contended machine
+        # (the same binary passes in 3.2s when the machine is quiet), and the whole
+        # verification path stalled behind it with no output. A binary that exceeds
+        # the bound is killed and reported as a TIMEOUT so the failure is named and
+        # the harness continues.
+        try:
+            result = run([binary, "--test-threads=1"], env=env, timeout=BINARY_TIMEOUT_S)
+        except subprocess.TimeoutExpired:
+            hung.append(f"{Path(binary).name} (no completion within {BINARY_TIMEOUT_S}s)")
+            continue
         if result.returncode != 0:
             failures.append(f"{Path(binary).name} (exit {result.returncode})")
+    if hung:
+        print(
+            "coverage: FAIL -- a test binary did not finish inside the bound, so the run "
+            f"was killed rather than left to stall: {', '.join(hung)}. Raise "
+            "LINCHPIN_COVERAGE_BINARY_TIMEOUT_S only for a binary with a legitimate "
+            "long-duration workload (the soak trial is one).",
+            file=sys.stderr,
+        )
+        return 1
     if failures:
         print(
             "coverage: FAIL -- a test binary failed, so a coverage number from this run "
