@@ -1,41 +1,40 @@
 # Next Action
 
-## Open measurement audit (round 50 finding, not yet closed)
+## The one blocking clause
 
-The General-pack probe table (`GEN_PROBES` in `scripts/build-applicability.py`) still
-carries 122 absence claims. Five E2E rows of the same kind were corrected in round 50
-because the harness they denied had since been built; the General table has NOT been
-audited the same way. Candidates that look stale on first inspection, each of which
-needs its own verification before any status moves:
+DOD-014 (`PARTIAL`) is the sole blocker in the ship gate. Its credential half has no
+subject to test: this architecture wires no credentialed provider (openai/anthropic/xai
+report not-wired and `configured=false` in the packaged build), and the pack's own
+governance puts credential ownership in the first-party CLI tools (SPEC-005 /
+REQ-LLM-004) with terms review preceding any integration. The dependency half is
+executed and mutation-proven (unreachable endpoint, non-loopback refusal, bounded retry
+exhaustion). Closing the clause requires either an owner decision to build a
+credentialed lane under change control, or an explicit, boundary-stated
+reclassification of the credential half. No agent may do either silently.
 
-- `GEN-027` "no mutation-based fuzzing engine is configured" — the mutation-fuzz
-  campaign exists (`apps/desktop/src-tauri/tests/fuzz_campaign.rs`, mutation-proven by
-  MUT-FUZZ-001). Whether a hand-written seeded mutator counts as an "engine" decides
-  this row; the decision must be recorded rather than assumed.
-- `GEN-115` "no fault injection harness exists" — the recovery drill injects total
-  loss and in-place corruption at the filesystem and the exact-artifact lane kills the
-  process (DOD-015/DOD-036).
-- Borderline, each needing evidence before any change: `GEN-036` (client-side security
-  suite for the WebView — Playwright + artifact lanes exist), `GEN-057`/`GEN-058`
-  (crypto usage / weak crypto tests — `evidence::threat_control_tests` exists),
-  `GEN-065` (configuration hardening baseline — release config parsing tests exist),
-  `GEN-111` (incident response rehearsal — crash-reporter incident tests and the
-  recovery drill exist), `GEN-119` (anomaly detection — diagnostics derive alerts).
+DOD-038 (`DEFERRED_LONG_RUNNING`) needs a dedicated host for the pack's 24/48/72+ hour
+soak; DOD-001/034/039 need the clean room and named human validators. The next lawful
+MANUAL action is unchanged: run the documented install on a clean machine and record it
+(REQ-REL-001).
 
-Rule for closing them: the same one applied in round 50 — name the real command in the
-probe, add a per-ID case result whose citations are re-read from the tree by
-`scripts/applicable-case-evidence.py --check`, and rebuild accounting. No row may move
-on a blanket reclassification.
+## Standing work on the applicability matrix
 
-## Immediate next action
+Rounds 50-52 corrected 13 rows whose absence claims or decisions were wrong, and added
+two guards: duplicate probe keys are rejected by `scripts/validate-generated-pack.py`,
+and a case result for an ID decided `NOT_APPLICABLE` is rejected by
+`scripts/build-accounting.py`. Both failure modes were silent before -- the second one
+was introduced by a round-51 edit and caught only because the tally was re-checked.
 
-DOD-014 remains the only blocking clause (`PARTIAL`): the credential half of
-fail-closed behaviour has no lane to test, because this architecture wires no
-credentialed provider and the pack's governance (terms review) precedes any provider
-integration. Resolving it requires either an owner decision to build such a lane under
-change control, or an explicit reclassification of that half with its boundary stated.
-DOD-038 is `DEFERRED_LONG_RUNNING` and needs a dedicated host for the pack's
-24/48/72+ hour soak scale; nothing in this repository can shorten that.
+`scripts/audit-applicability-absences.py` is a READING LIST, not a decision tool: it
+reports a keyword signal for 80 of 89 remaining absence claims, the same
+false-positive rate this repository already documented for regex probes. It is
+deliberately not a gate lane.
 
-The next lawful MANUAL action is unchanged: run the documented install on a clean
-machine and record it (REQ-REL-001, DOD-034).
+What remains is bounded, individual review of rows whose claim might have aged, in the
+style that worked: name the harness that exists, add a per-ID case result whose
+citations `scripts/applicable-case-evidence.py --check` re-reads from the tree, then
+rebuild accounting. Rows not yet examined in that style include GEN-013/014 (security
+metrics, complexity measurement), GEN-043 (vulnerability assessment record), GEN-058
+(weak-primitive detection), GEN-091 (threat-model artefact), GEN-106/107/108
+(property-based and formal verification), and SUP-004 (the reproducible-build residual,
+where the honest status stays PARTIAL until the linker metadata is eliminated).
