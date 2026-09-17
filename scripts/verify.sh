@@ -81,6 +81,11 @@ run "attack-tree currency" python3 scripts/check-attack-trees.py --check
 run "weak-crypto scan" python3 scripts/weak-crypto-scan.py
 run "weak-crypto self-test" python3 scripts/weak-crypto-scan.py --self-test
 
+# GEN-043 advisory assessment: every advisory a scanner reports must carry a decision with
+# its reachability stated. This lane re-runs both scanners, so a new advisory arriving
+# without an assessment fails here rather than sliding into the release unnoticed.
+run "advisory assessment" python3 scripts/assess-advisories.py
+
 # Identity check LAST, after the epoch has settled: DOD-029 requires the
 # candidate commit, base revision, epoch and artifact digests to belong to the
 # SAME run, and this lane fails when any of them has moved since the manifest was

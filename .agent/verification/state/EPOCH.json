@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "7fd39fa",
+  "candidate_commit": "71423bd",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -30,18 +30,19 @@
       ]
     },
     "gate-script": {
-      "count": 72,
+      "count": 73,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\applicable-case-evidence.py": "1dad055c4e0f1c658ce832457db992a7c816e3568e104e15aed7784ae88064d9",
+        "scripts\\applicable-case-evidence.py": "fd0eac3d3ff80f68c7f3f2819c33b7b32b02a6635cb08b6d36ee33d6b98631cf",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\assert-no-debug-port.py": "54b17113000ddaec872c310d5c063a3aba002cda17d03adebc8cb57b70589b44",
+        "scripts\\assess-advisories.py": "b394cfb6e32d591623b625e2592554ec10ec90cc2e130c8a233c125945aa6299",
         "scripts\\audit-applicability-absences.py": "6effc28c3fcc52bb2d6031cbabd2e3e143474ff50b51931f7f92619cb3196dac",
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "f9b4041e8f5a05373a73b4d562bcedd7a6e077d7dc85e4d85318a36ba77cf89d",
-        "scripts\\build-applicability.py": "3eb93cd15a45a93908181529b56cf98a050f005fe6c801cebe3b3a5eec3da72b",
+        "scripts\\build-applicability.py": "6688be7cf73814d5fb9e9689fbc6b5cf41de9b5f75ec32196b2e16ceeea73013",
         "scripts\\build-dod-status.py": "b48cc9a933188afd05de84dbb601116fb770877f9f2d641a7947a0fb8372ea4a",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
@@ -101,7 +102,7 @@
         "scripts\\validate-generated-pack.py": "ebefe6a81b91fcb8bc1ad030eba7e024327549bfdae601dfa5c05800aa1d75b7",
         "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
         "scripts\\vault-preservation-e2e.sh": "99077fbdbbebea0d09390a2c6d0bdb67a63698e796a6f3ac884b3b12cc0fca7a",
-        "scripts\\verify.sh": "0f1adb45d7379ab2b8180a400fb00293136d7d90f7815fdc2259a2a6efa7a02d",
+        "scripts\\verify.sh": "3c06575a484eb52776d6d4f61c4942e95b43f3e780b4822a3d776b78c151611e",
         "scripts\\version-matrix.py": "3ad61748f3c63f3fcf695fea616c0ddb5bbdad140d7e0c1a8c7eba382fc8701c",
         "scripts\\weak-crypto-scan.py": "4a5f1288970cd498145ecff24dae20997587f473ba1d05fc8c997887b24b2902"
       },
@@ -249,8 +250,8 @@
       ]
     }
   },
-  "epoch_digest": "d5114e6a4ff282e03d42f816b4d1c20996f40074fc3259f3ab7c6ccc8d628742",
-  "prior_candidate_commit": "15d88bc",
-  "prior_epoch_digest": "d5114e6a4ff282e03d42f816b4d1c20996f40074fc3259f3ab7c6ccc8d628742",
-  "total_inputs": 151
+  "epoch_digest": "6f1042e5a4102afd934a551bc380ef06ad655f55b09098c2698799ead6eba885",
+  "prior_candidate_commit": "71423bd",
+  "prior_epoch_digest": "6f1042e5a4102afd934a551bc380ef06ad655f55b09098c2698799ead6eba885",
+  "total_inputs": 152
 }

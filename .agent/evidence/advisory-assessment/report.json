@@ -1,0 +1,68 @@
+{
+  "gate": "advisory-assessment",
+  "covers": [
+    "GEN-043",
+    "DOD-021"
+  ],
+  "harness": "scripts/assess-advisories.py",
+  "scanners": {
+    "cargo-deny": "cargo-deny reported no advisories",
+    "pnpm-audit": "pnpm audit exited 1"
+  },
+  "found": [
+    {
+      "ecosystem": "npm",
+      "id": "npm:1193683",
+      "package": "3.2.7",
+      "severity": "moderate",
+      "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+      "paths": [
+        ".>vitest"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "id": "npm:1193684",
+      "package": "3.2.7",
+      "severity": "moderate",
+      "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+      "paths": [
+        ".>vitest>@vitest/mocker"
+      ]
+    }
+  ],
+  "assessments": [
+    {
+      "id": "npm:1193683",
+      "ecosystem": "npm",
+      "package": "3.2.7",
+      "severity": "moderate",
+      "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+      "decision": "ACCEPT",
+      "owner": "product owner",
+      "reachability": "NOT SHIPPED, direct devDependency path: the scanner reports '.>vitest', i.e. vitest is a devDependency of the workspace ROOT package and is not a dependency of apps/desktop or of any crate. No test-runner code is packaged into the MSI, the NSIS setup or the executable, and the artifact lanes drive the packaged binary and the installed MSI, neither of which contains vitest.",
+      "rationale": "The advisory needs a reachable Vite dev server's HMR WebSocket to register a redirect mock; the product ships no dev server, and the dev server that exists in the repository binds loopback. Fixing it requires upgrading vitest (4.1.11 or 5.x), a test-runner upgrade with its own blast radius, so it is deferred rather than ignored: the enforced audit level is --audit-level high, this finding is below it, and it is disclosed in COMMANDS.md as an accepted risk.",
+      "observed_paths": [
+        ".>vitest"
+      ],
+      "reviewed": "round 57"
+    },
+    {
+      "id": "npm:1193684",
+      "ecosystem": "npm",
+      "package": "3.2.7",
+      "severity": "moderate",
+      "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock (through @vitest/mocker)",
+      "decision": "ACCEPT",
+      "owner": "product owner",
+      "reachability": "NOT SHIPPED, transitive devDependency path: the scanner reports '.>vitest>@vitest/mocker', i.e. the vulnerable module is reached only INSIDE the vitest devDependency tree. It is the same advisory as npm:1193683 seen through the package the fix lands in, and neither the package nor the runner is packaged into any shipped artifact.",
+      "rationale": "Same subject and same disposition as npm:1193683, recorded separately because the scanner reports it as its own advisory entry with its own path: the decision to defer the vitest upgrade covers both, and both paths are devDependency paths rather than shipped ones. The first version of this register marked this entry RESOLVED as a placeholder; that was false -- the scanner does report it -- and the validator did not catch it because the RESOLVED check only ran in one direction. Both are fixed.",
+      "observed_paths": [
+        ".>vitest>@vitest/mocker"
+      ],
+      "reviewed": "round 57"
+    }
+  ],
+  "problems": [],
+  "verdict": "PASS"
+}

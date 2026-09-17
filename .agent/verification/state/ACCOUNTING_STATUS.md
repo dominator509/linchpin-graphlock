@@ -13,10 +13,10 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 | --- | --- |
 | DEFERRED_LONG_RUNNING | 1 |
 | EXTERNAL_REQUIRED | 7 |
-| NOT_APPLICABLE | 413 |
+| NOT_APPLICABLE | 412 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
 | PARTIAL | 5 |
-| PASS | 54 |
+| PASS | 55 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
 carries the applicability matrix's own per-ID evidence in the ledger, and the
@@ -40,6 +40,7 @@ digest of that matrix document is recorded beside it.
 | GEN-027 | PASS | `.agent/evidence/applicable-cases/GEN-027.md` | Mutation-Based Fuzzing |
 | GEN-035 | PASS | `.agent/evidence/applicable-cases/GEN-035.md` | Desktop Application Security Testing |
 | GEN-042 | PASS | `.agent/evidence/applicable-cases/GEN-042.md` | Vulnerability Scanning |
+| GEN-043 | PASS | `.agent/evidence/applicable-cases/GEN-043.md` | Vulnerability Assessment |
 | GEN-044 | PARTIAL | `.agent/evidence/applicable-cases/GEN-044.md` | Weakness Enumeration Mapping (CWE) |
 | GEN-045 | PASS | `.agent/evidence/applicable-cases/GEN-045.md` | Injection Testing |
 | GEN-049 | PASS | `.agent/evidence/applicable-cases/GEN-049.md` | Input Validation Testing |

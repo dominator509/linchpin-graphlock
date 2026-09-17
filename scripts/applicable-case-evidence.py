@@ -161,6 +161,17 @@ CASES: dict[str, dict] = {
         "finding": "Vulnerability scanning executed for both ecosystems against the RustSec and npm advisory databases, with the enforced threshold stated and the two moderate dev-only npm advisories disclosed rather than suppressed.",
         "not_proven": "No container or image scanning applies (there is no container), and no host-level vulnerability scan of the operator machine is performed.",
     },
+    "GEN-043": {
+        "status": "PASS",
+        "cites": [
+            ("source", "scripts/assess-advisories.py", ["def rust_advisories", "a live finding needs FIX, MITIGATE, ACCEPT or NOT_REACHABLE"]),
+            ("artifact", ".agent/evidence/advisory-assessment/STATUS.md", ["Advisories and decisions", "Rationale per advisory", "What this gate refuses"]),
+            ("artifact", ".agent/verification/state/ADVISORY_ASSESSMENTS.json", ["observed_paths", "reachability"]),
+            ("run", "deny-advisories", ["advisories ok"]),
+        ],
+        "finding": "Vulnerability assessment now runs, which is what this row denied: a scan FINDS, an assessment DECIDES. scripts/assess-advisories.py normalizes what the two scanners report (`cargo deny --format json check advisories`, `pnpm audit --json`) and binds each finding to an authored entry carrying the decision, the REACHABILITY fact that decides it (devDependency path versus shipped artefact), the owner, and the dependency paths it was assessed against. On this candidate: cargo-deny reports no advisories; pnpm audit reports two moderate advisories, BOTH reached only through the vitest devDependency tree ('.>vitest' and '.>vitest>@vitest/mocker'), so both are assessed ACCEPT with the reachability stated and the deferral of the vitest upgrade recorded. The harness FAILS when a scanner reports an advisory with no decision, when a decision lacks a rationale, reachability statement or owner, when an ACCEPT entry's observed paths no longer match the scan (the dependency moved, so the assessment is stale), when a LIVE advisory is filed as RESOLVED, and when the register carries a decision about an advisory nothing reports any more.",
+        "not_proven": "The assessment is reachability-based, not exploitability-based: it establishes where the vulnerable package sits in the graph and whether it ships, not whether a specific vulnerable code path can be driven in this configuration. No CVE severity scoring of our own, no vendor patch tracking, and no SBOM-to-advisory correlation beyond the two scanners.",
+    },
     "GEN-044": {
         "status": "PARTIAL",
         "cites": [

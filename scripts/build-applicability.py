@@ -246,6 +246,11 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-024": ("cmd", "live-fire", "negative-input injection at the IPC boundary"),
     "GEN-035": ("cmd", "test-e2e", "desktop application security at the WebView boundary"),
     "GEN-042": ("cmd", "security-check", "dependency vulnerability scanning"),
+    # GEN-043: a scan finds; an assessment DECIDES. The register now carries a decision per
+    # advisory with the reachability fact behind it (devDependency vs shipped), and the
+    # harness fails when a scanner reports an advisory with no decision, when a decision
+    # lacks its reachability statement, or when a live finding is filed as RESOLVED.
+    "GEN-043": ("cmd", "assess-advisories", "per-advisory assessment of the shipped graph: decision, reachability, owner, observed paths"),
     "GEN-044": ("cmd", "anti-gaming-scan", "defect-class enumeration over production paths"),
     "GEN-045": ("cmd", "live-fire", "input validation rejection at command boundary"),
     "GEN-049": ("cmd", "test-unit", "CommandError::Validation input rejection"),
@@ -339,7 +344,9 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-039": ("no-cmd", "", "no container image is produced"),
     "GEN-040": ("no-cmd", "", "no Kubernetes manifest exists"),
     "GEN-041": ("no-cmd", "", "no cloud-native runtime exists; the product is local-first"),
-    "GEN-043": ("no-cmd", "", "no vulnerability ASSESSMENT record: advisories are scanned and disclosed (GEN-042 is APPLICABLE and executed, and the two moderate dev-only findings are recorded as accepted risk), but no severity/exploitability assessment document exists"),
+    # GEN-043 moved to the executed-command section above: an assessment register and its
+    # harness now exist. Leaving a stale "no-cmd" entry here is exactly the defect the
+    # duplicate-key guard in scripts/validate-generated-pack.py catches.
     "GEN-046": ("no-cmd", "", "SQL is parameterized in the vault crate; no injection suite runs it"),
     "GEN-047": ("no-cmd", "", "no XSS suite exercises the WebView renderer"),
     "GEN-048": ("no-cmd", "", "no CSRF surface exists; IPC uses no cookie auth"),
