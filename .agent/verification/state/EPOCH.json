@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "408c6fd",
+  "candidate_commit": "1935a68",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -30,11 +30,11 @@
       ]
     },
     "gate-script": {
-      "count": 73,
+      "count": 74,
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\applicable-case-evidence.py": "fd0eac3d3ff80f68c7f3f2819c33b7b32b02a6635cb08b6d36ee33d6b98631cf",
+        "scripts\\applicable-case-evidence.py": "b17db2fd7a086a4b66c5b3504c5e08c82cb0c0fdff468918bea90a26ea96f39f",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\assert-no-debug-port.py": "54b17113000ddaec872c310d5c063a3aba002cda17d03adebc8cb57b70589b44",
@@ -42,7 +42,7 @@
         "scripts\\audit-applicability-absences.py": "6effc28c3fcc52bb2d6031cbabd2e3e143474ff50b51931f7f92619cb3196dac",
         "scripts\\bind-requirements.py": "3fcbf287580ccf09d5f6aabd2dc5bc1eee9f9d48908b4f4f311354feef3bad8d",
         "scripts\\build-accounting.py": "f9b4041e8f5a05373a73b4d562bcedd7a6e077d7dc85e4d85318a36ba77cf89d",
-        "scripts\\build-applicability.py": "6688be7cf73814d5fb9e9689fbc6b5cf41de9b5f75ec32196b2e16ceeea73013",
+        "scripts\\build-applicability.py": "bd5b8a128e37e36721f573e583158ea49c5a0d59a5cbfd4f87a3e1fc489d2bc7",
         "scripts\\build-dod-status.py": "b48cc9a933188afd05de84dbb601116fb770877f9f2d641a7947a0fb8372ea4a",
         "scripts\\build-traceability.py": "f0d401fe80de1d9fa0bb76a64d2eb21f7f891450738ce0bf1ccca90884badc3d",
         "scripts\\build.sh": "35942865c596789a47b0e96b47743f23b6c09da80af6523345450284ac6282b7",
@@ -50,6 +50,7 @@
         "scripts\\check-attack-trees.py": "3dea6219e7d316216c6bda82ad38ce8f852fdc51ee74113c8aa600c0bb2afc47",
         "scripts\\check-threat-model.py": "3f5785d885a5b38afe93877718a6dbecdb657143025cc6b58769096932c530f0",
         "scripts\\clean-build.sh": "b262d0333310aab42dc803355d856a1099686f981d6f3f891fd058ecbcf9dde6",
+        "scripts\\code-metrics.py": "82602f181aee0f686cb6351536bccc760361c60d327301ba46bdbe8fef2af3ba",
         "scripts\\collect-skip-report.py": "d04bc5969485b5a3fa6e1b0380855244dbb744f7c65e877a7c7075576920cf23",
         "scripts\\completion-report.py": "207e639d133c229e0051a8eaca044922a73156cd8e0d3e3a1abb8c6d768951a4",
         "scripts\\coverage-gate.py": "a05d4b0cb45fcd26a46c742990d8d93c99212e14361abd4fed94e6ad171e37ce",
@@ -102,7 +103,7 @@
         "scripts\\validate-generated-pack.py": "ebefe6a81b91fcb8bc1ad030eba7e024327549bfdae601dfa5c05800aa1d75b7",
         "scripts\\validate-hash-ledger.py": "5ea05b20011b361c562dc25e7ef7fb535f26138194894796540be4c5c5d7ca79",
         "scripts\\vault-preservation-e2e.sh": "99077fbdbbebea0d09390a2c6d0bdb67a63698e796a6f3ac884b3b12cc0fca7a",
-        "scripts\\verify.sh": "3c06575a484eb52776d6d4f61c4942e95b43f3e780b4822a3d776b78c151611e",
+        "scripts\\verify.sh": "69fd0d46ab0af1be01474bd901d083edd071d0677c51f35f0ab8f6aa115a3be0",
         "scripts\\version-matrix.py": "3ad61748f3c63f3fcf695fea616c0ddb5bbdad140d7e0c1a8c7eba382fc8701c",
         "scripts\\weak-crypto-scan.py": "4a5f1288970cd498145ecff24dae20997587f473ba1d05fc8c997887b24b2902"
       },
@@ -250,8 +251,8 @@
       ]
     }
   },
-  "epoch_digest": "6f1042e5a4102afd934a551bc380ef06ad655f55b09098c2698799ead6eba885",
-  "prior_candidate_commit": "b150c71",
-  "prior_epoch_digest": "6f1042e5a4102afd934a551bc380ef06ad655f55b09098c2698799ead6eba885",
-  "total_inputs": 152
+  "epoch_digest": "f58a4f3e286cbecdc5a4df8c6c82f60f2b4a6d75f88949e68bcbd44c74cb2e58",
+  "prior_candidate_commit": "1935a68",
+  "prior_epoch_digest": "f58a4f3e286cbecdc5a4df8c6c82f60f2b4a6d75f88949e68bcbd44c74cb2e58",
+  "total_inputs": 153
 }

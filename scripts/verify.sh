@@ -86,6 +86,11 @@ run "weak-crypto self-test" python3 scripts/weak-crypto-scan.py --self-test
 # without an assessment fails here rather than sliding into the release unnoticed.
 run "advisory assessment" python3 scripts/assess-advisories.py
 
+# GEN-013 / GEN-014 code metrics: complexity, unsafe blocks and panicking calls with
+# ENFORCED ceilings, plus a self-test that proves the measurement sees a planted defect.
+run "code metrics" python3 scripts/code-metrics.py
+run "code metrics self-test" python3 scripts/code-metrics.py --self-test
+
 # Identity check LAST, after the epoch has settled: DOD-029 requires the
 # candidate commit, base revision, epoch and artifact digests to belong to the
 # SAME run, and this lane fails when any of them has moved since the manifest was

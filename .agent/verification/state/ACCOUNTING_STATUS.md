@@ -13,10 +13,10 @@ Inputs: `MASTER_TEST_REGISTRY.csv` (484 canonical IDs),
 | --- | --- |
 | DEFERRED_LONG_RUNNING | 1 |
 | EXTERNAL_REQUIRED | 7 |
-| NOT_APPLICABLE | 412 |
+| NOT_APPLICABLE | 410 |
 | NOT_RUN_BLOCKED_MATERIAL | 4 |
 | PARTIAL | 5 |
-| PASS | 55 |
+| PASS | 57 |
 
 A status of `NOT_APPLICABLE` is a decision, not a skipped test: each such row
 carries the applicability matrix's own per-ID evidence in the ledger, and the
@@ -33,6 +33,8 @@ digest of that matrix document is recorded beside it.
 | GEN-005 | PASS | `.agent/evidence/applicable-cases/GEN-005.md` | Secrets Scanning |
 | GEN-006 | PASS | `.agent/evidence/applicable-cases/GEN-006.md` | Credential Scanning |
 | GEN-007 | PASS | `.agent/evidence/applicable-cases/GEN-007.md` | Hardcoded Credential Detection |
+| GEN-013 | PASS | `.agent/evidence/applicable-cases/GEN-013.md` | Security Code Metrics Analysis |
+| GEN-014 | PASS | `.agent/evidence/applicable-cases/GEN-014.md` | Cyclomatic Complexity Analysis |
 | GEN-018 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-018.md` | Manual Penetration Testing |
 | GEN-020 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-020.md` | Red Team Testing |
 | GEN-021 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-021.md` | Purple Team Testing |

@@ -278,6 +278,26 @@ CASES: dict[str, dict] = {
         "finding": "Fault injection IS executed, which this row denied. The drill injects two fault classes repeatedly against a live vault -- TOTAL LOSS (the vault file and its WAL siblings deleted) and CORRUPTION (the live vault overwritten in place) -- then recovers through the PRODUCTION restore command and reconciles the recovered state by content digest through an independent connection, with RPO/RTO measured against an enforced threshold. The exact-artifact lane adds a hard process kill with the ledger read back in a new process, and the stress trial injects backup destruction under concurrent load.",
         "not_proven": "The faults are filesystem-level on one host: no disk-error injection, no power-loss or kernel-level fault, and no network partition (the product serves no network). The drill covers the vault, not the whole machine.",
     },
+    "GEN-013": {
+        "status": "PASS",
+        "cites": [
+            ("source", "scripts/code-metrics.py", ["strip_test_modules", "UNSAFE_ALLOWLIST", "MAX_PRODUCTION_PANICS"]),
+            ("artifact", ".agent/evidence/code-metrics/STATUS.md", ["Counts", "Complexity hotspots", "Discrimination"]),
+            ("artifact", ".agent/evidence/code-metrics/report.json", ["totals", "breaches", "thresholds"]),
+        ],
+        "finding": "Security code metrics now run, which this row denied. scripts/code-metrics.py measures, per function and per file over first-party source: cyclomatic complexity, `unsafe` blocks, panicking calls (`unwrap`/`expect`/`panic!`) split between production paths and test code, `todo!`/`unimplemented!` on production paths, and `#[allow(...)]` suppressions. ENFORCED, not decorative: complexity ceiling 40 per production function, production panicking calls capped at 15 (a ratchet), `unsafe` blocks allowed only for the single allowlisted Win32 FFI call, and zero `todo!`/`unimplemented!` in production. MEASURED on this candidate: 410 functions (353 production, max complexity 35; 57 in test files, max 43, exempt because a stress or soak trial is a long procedure by design), 7 production panicking calls, 1 unsafe block (the allowlisted GetProcessMemoryInfo call), 0 production todos, 5 suppressions. The report carries a ranked hotspot list so the number is actionable: assess_asset_readiness (35), check_support_matrix (27), apply_research_action (24).",
+        "not_proven": "Complexity here is decision-token counting, not dataflow analysis: it ranks functions for review and enforces a ceiling, and is blind to nesting depth, state space and architecture. The panic count does not distinguish an infallible unwrap from a load-bearing one, and no defect-density or security-debt metric exists.",
+    },
+    "GEN-014": {
+        "status": "PASS",
+        "cites": [
+            ("source", "scripts/code-metrics.py", ["MAX_FUNCTION_COMPLEXITY", "DECISION_TOKENS", "def functions"]),
+            ("artifact", ".agent/evidence/code-metrics/STATUS.md", ["Complexity hotspots", "max complexity"]),
+            ("artifact", ".agent/evidence/code-metrics/report.json", ["max_complexity_production", "hotspots"]),
+        ],
+        "finding": "Cyclomatic complexity is measured and ceilinged, which this row denied. Every first-party function gets 1 + its decision points (`if`, `else if`, match arms, `&&`, `||`, `for`, `while`, `loop`, `?`), production functions must stay at or below 40, and the ranked hotspot list is printed in the evidence. MEASURED: 353 production functions with a maximum of 35 and a mean of 3.9, and 57 test-file functions with a maximum of 43 that are measured and printed but exempt from the ceiling. DISCRIMINATION IS PROVEN: --self-test measures a synthetic function with twenty `if` conditions and twenty `&&` operators and asserts the harness reports a complexity of 41, alongside a planted `unsafe` block and a `todo!`.",
+        "not_proven": "The measurement counts decision TOKENS; it does not build a control-flow graph, so it under-counts some shapes (early returns, macros, iterator chains) and cannot distinguish nesting that makes a function hard to read from branching that does not. It is a review-ranking and a ratchet, not a complexity proof.",
+    },
     "GEN-018": {
         "status": "EXTERNAL_REQUIRED",
         "cites": [

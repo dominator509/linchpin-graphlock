@@ -1,0 +1,212 @@
+{
+  "gate": "code-metrics",
+  "covers": [
+    "GEN-013",
+    "GEN-014"
+  ],
+  "harness": "scripts/code-metrics.py",
+  "thresholds": {
+    "max_function_complexity": 40,
+    "max_production_panics": 15,
+    "unsafe_allowlist": [
+      {
+        "path": "crates/platform_windows/src/lib.rs",
+        "reason": "one Win32 call, GetProcessMemoryInfo, which is the only way to read this process's working set. It is `unsafe` because it is an FFI call taking a POD out-parameter whose `cb` field must be set to its own size; the call's Result is checked (windows 0.61 returns Result rather than BOOL) and the comment above it records that the handle must not be closed. Third-party FFI is the one place this project accepts `unsafe`, and it is the only block in the workspace."
+      }
+    ]
+  },
+  "totals": {
+    "functions": 410,
+    "max_complexity": 43,
+    "mean_complexity": 3.9,
+    "unsafe_blocks": 1,
+    "panics_production": 7,
+    "panics_test": 478,
+    "allow_attributes": 5,
+    "todo_production": 0,
+    "max_complexity_production": 35,
+    "max_complexity_test": 43,
+    "functions_production": 353,
+    "functions_test": 57
+  },
+  "hotspots": [
+    {
+      "file": "apps/desktop/src-tauri/tests/stress_concurrency.rs",
+      "function": "abbreviated_stress_trial_runs_concurrent_writers_readers_and_backups",
+      "line": 206,
+      "complexity": 43,
+      "test": true
+    },
+    {
+      "file": "apps/desktop/src-tauri/tests/soak_abbreviated.rs",
+      "function": "abbreviated_endurance_trial_runs_the_real_paths_and_labels_itself",
+      "line": 113,
+      "complexity": 41,
+      "test": true
+    },
+    {
+      "file": "crates/commercialization/src/asset_readiness.rs",
+      "function": "assess_asset_readiness",
+      "line": 201,
+      "complexity": 35,
+      "test": false
+    },
+    {
+      "file": "crates/platform_windows/tests/licensing_policy.rs",
+      "function": "test_license_scanners_agree_and_the_sbom_records_spdx_and_source",
+      "line": 161,
+      "complexity": 32,
+      "test": true
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "check_support_matrix",
+      "line": 1158,
+      "complexity": 27,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "apply_research_action",
+      "line": 449,
+      "complexity": 24,
+      "test": false
+    },
+    {
+      "file": "crates/storage/src/vault.rs",
+      "function": "put_conception_event",
+      "line": 925,
+      "complexity": 20,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "advance_docket",
+      "line": 1051,
+      "complexity": 19,
+      "test": false
+    },
+    {
+      "file": "crates/platform_windows/tests/licensing_policy.rs",
+      "function": "test_dependency_versions_are_pinned_and_never_floated",
+      "line": 256,
+      "complexity": 19,
+      "test": true
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "restore_vault",
+      "line": 1466,
+      "complexity": 18,
+      "test": false
+    },
+    {
+      "file": "crates/storage/src/vault.rs",
+      "function": "digest_connection",
+      "line": 516,
+      "complexity": 18,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "record_claim_evidence",
+      "line": 1297,
+      "complexity": 17,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "run_local_inference",
+      "line": 2654,
+      "complexity": 17,
+      "test": false
+    },
+    {
+      "file": "crates/storage/src/vault.rs",
+      "function": "open",
+      "line": 354,
+      "complexity": 17,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/tests/fuzz_campaign.rs",
+      "function": "mutate",
+      "line": 103,
+      "complexity": 16,
+      "test": true
+    },
+    {
+      "file": "apps/desktop/src-tauri/tests/fuzz_campaign.rs",
+      "function": "mutation_fuzz_campaign_finds_no_panics_in_parsing_paths",
+      "line": 370,
+      "complexity": 15,
+      "test": true
+    },
+    {
+      "file": "crates/platform_windows/tests/local_first.rs",
+      "function": "test_local_first_core_works_with_a_local_model_and_no_network",
+      "line": 67,
+      "complexity": 15,
+      "test": true
+    },
+    {
+      "file": "crates/storage/src/vault.rs",
+      "function": "fmt",
+      "line": 278,
+      "complexity": 15,
+      "test": false
+    },
+    {
+      "file": "crates/storage/src/vault.rs",
+      "function": "run_migrations",
+      "line": 401,
+      "complexity": 15,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "record_conception_keyed",
+      "line": 192,
+      "complexity": 14,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "classify_research_claim",
+      "line": 770,
+      "complexity": 14,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "check_mcp_capability",
+      "line": 2877,
+      "complexity": 14,
+      "test": false
+    },
+    {
+      "file": "crates/storage/src/vault.rs",
+      "function": "put_support_anchor",
+      "line": 681,
+      "complexity": 14,
+      "test": false
+    },
+    {
+      "file": "crates/storage/src/vault.rs",
+      "function": "verify_audit_chain",
+      "line": 1122,
+      "complexity": 14,
+      "test": false
+    },
+    {
+      "file": "apps/desktop/src-tauri/src/commands.rs",
+      "function": "record_conception",
+      "line": 293,
+      "complexity": 13,
+      "test": false
+    }
+  ],
+  "breaches": [],
+  "verdict": "PASS",
+  "limits": "complexity is decision-token counting, not a dataflow analysis: it ranks functions for review and enforces a ceiling, and it is blind to nesting depth, state space and architecture. Panicking-call counts include arguments and do not distinguish an infallible unwrap from a load-bearing one."
+}

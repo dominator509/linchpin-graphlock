@@ -318,8 +318,12 @@ GEN_PROBES: dict[str, tuple[str, str, str]] = {
     "GEN-010": ("no-cmd", "", "no secure code review record exists"),
     "GEN-011": ("no-cmd", "", "no manual secure code review record exists"),
     "GEN-012": ("no-cmd", "", "no source code security audit record exists"),
-    "GEN-013": ("no-cmd", "", "no security code metrics tool is configured"),
-    "GEN-014": ("no-cmd", "", "no cyclomatic complexity measurement is recorded"),
+    # GEN-013 and GEN-014 are served by ONE measurement with two metric families, which is
+    # why both name the same command: complexity per function (GEN-014) and the
+    # security-relevant counts -- unsafe blocks, panicking calls on production paths,
+    # suppressions, hotspot ranking (GEN-013). Both had claimed no tool was configured.
+    "GEN-013": ("cmd", "code-metrics", "security code metrics: unsafe blocks, production panicking calls, suppressions, hotspot ranking"),
+    "GEN-014": ("cmd", "code-metrics", "cyclomatic complexity per function with an enforced production ceiling and a hotspot list"),
     "GEN-015": ("no-cmd", "", "no DAST tool targets the desktop IPC boundary"),
     "GEN-016": ("no-cmd", "", "no IAST instrumentation exists"),
     "GEN-017": ("no-cmd", "", "no RASP component exists in the product"),

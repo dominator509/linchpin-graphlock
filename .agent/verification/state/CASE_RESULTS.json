@@ -1,7 +1,7 @@
 {
   "_comment": "Real executed case results. Only IDs whose acceptance oracle genuinely ran may appear here. Absence means NOT_RUN_BLOCKED_MATERIAL, never PASS.",
-  "candidate_commit": "7fd39fa",
-  "candidate_epoch": "d5114e6a4ff282e0",
+  "candidate_commit": "408c6fd",
+  "candidate_epoch": "6f1042e5a4102afd",
   "environment": {
     "host": "Windows 10 Home 10.0.19045 x64",
     "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
@@ -161,6 +161,18 @@
       "status": "PASS",
       "evidence_path": ".agent/evidence/applicable-cases/GEN-007.md",
       "reason": "EXECUTED: `python3 scripts/secret-scan.py --check` -- exit 0, output sha256 `c4842551ef6d5a06...`, 45 bytes (log `secret-scan.log`); asserted: 'secret-scan check: ok (9 rules, no findings)'; first-party source `crates/crash_reporter/src/lib.rs` -- quoted and verified: 'redact_key_values', 'looks_like_secret'; architecture probe -- `concern[redaction]_tests: 21` (captured in `probes.log`). Hardcoded-credential detection executed: the tracked tree is scanned, and the shipping redactor detects credential shapes at runtime (`looks_like_secret`, `redact_key_values`) with the defect history recorded rather than tidied -- an earlier version both leaked short credentials and panicked on case-folding characters, and both were fixed with regression tests. NOT PROVEN: Pattern rules cover known provider shapes; a fabricated or unusual credential format in source would not be flagged by either layer."
+    },
+    {
+      "test_id": "GEN-013",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-013.md",
+      "reason": "EXECUTED: first-party source `scripts/code-metrics.py` -- quoted and verified: 'strip_test_modules', 'UNSAFE_ALLOWLIST', 'MAX_PRODUCTION_PANICS'; evidence artifact `.agent/evidence/code-metrics/STATUS.md` -- quoted and verified: 'Counts', 'Complexity hotspots', 'Discrimination'; evidence artifact `.agent/evidence/code-metrics/report.json` -- quoted and verified: 'totals', 'breaches', 'thresholds'. Security code metrics now run, which this row denied. scripts/code-metrics.py measures, per function and per file over first-party source: cyclomatic complexity, `unsafe` blocks, panicking calls (`unwrap`/`expect`/`panic!`) split between production paths and test code, `todo!`/`unimplemented!` on production paths, and `#[allow(...)]` suppressions. ENFORCED, not decorative: complexity ceiling 40 per production function, production panicking calls capped at 15 (a ratchet), `unsafe` blocks allowed only for the single allowlisted Win32 FFI call, and zero `todo!`/`unimplemented!` in production. MEASURED on this candidate: 410 functions (353 production, max complexity 35; 57 in test files, max 43, exempt because a stress or soak trial is a long procedure by design), 7 production panicking calls, 1 unsafe block (the allowlisted GetProcessMemoryInfo call), 0 production todos, 5 suppressions. The report carries a ranked hotspot list so the number is actionable: assess_asset_readiness (35), check_support_matrix (27), apply_research_action (24). NOT PROVEN: Complexity here is decision-token counting, not dataflow analysis: it ranks functions for review and enforces a ceiling, and is blind to nesting depth, state space and architecture. The panic count does not distinguish an infallible unwrap from a load-bearing one, and no defect-density or security-debt metric exists."
+    },
+    {
+      "test_id": "GEN-014",
+      "status": "PASS",
+      "evidence_path": ".agent/evidence/applicable-cases/GEN-014.md",
+      "reason": "EXECUTED: first-party source `scripts/code-metrics.py` -- quoted and verified: 'MAX_FUNCTION_COMPLEXITY', 'DECISION_TOKENS', 'def functions'; evidence artifact `.agent/evidence/code-metrics/STATUS.md` -- quoted and verified: 'Complexity hotspots', 'max complexity'; evidence artifact `.agent/evidence/code-metrics/report.json` -- quoted and verified: 'max_complexity_production', 'hotspots'. Cyclomatic complexity is measured and ceilinged, which this row denied. Every first-party function gets 1 + its decision points (`if`, `else if`, match arms, `&&`, `||`, `for`, `while`, `loop`, `?`), production functions must stay at or below 40, and the ranked hotspot list is printed in the evidence. MEASURED: 353 production functions with a maximum of 35 and a mean of 3.9, and 57 test-file functions with a maximum of 43 that are measured and printed but exempt from the ceiling. DISCRIMINATION IS PROVEN: --self-test measures a synthetic function with twenty `if` conditions and twenty `&&` operators and asserts the harness reports a complexity of 41, alongside a planted `unsafe` block and a `todo!`. NOT PROVEN: The measurement counts decision TOKENS; it does not build a control-flow graph, so it under-counts some shapes (early returns, macros, iterator chains) and cannot distinguish nesting that makes a function hard to read from branching that does not. It is a review-ranking and a ratchet, not a complexity proof."
     },
     {
       "test_id": "GEN-018",
