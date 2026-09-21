@@ -16,7 +16,7 @@
     ]
   },
   "totals": {
-    "functions": 411,
+    "functions": 412,
     "max_complexity": 43,
     "mean_complexity": 3.89,
     "unsafe_blocks": 1,
@@ -26,7 +26,7 @@
     "todo_production": 0,
     "max_complexity_production": 35,
     "max_complexity_test": 43,
-    "functions_production": 354,
+    "functions_production": 355,
     "functions_test": 57
   },
   "hotspots": [
@@ -75,7 +75,7 @@
     {
       "file": "crates/storage/src/vault.rs",
       "function": "put_conception_event",
-      "line": 925,
+      "line": 942,
       "complexity": 20,
       "test": false
     },
@@ -103,7 +103,7 @@
     {
       "file": "crates/storage/src/vault.rs",
       "function": "digest_connection",
-      "line": 516,
+      "line": 533,
       "complexity": 18,
       "test": false
     },
@@ -124,7 +124,7 @@
     {
       "file": "crates/storage/src/vault.rs",
       "function": "open",
-      "line": 354,
+      "line": 371,
       "complexity": 17,
       "test": false
     },
@@ -152,14 +152,14 @@
     {
       "file": "crates/storage/src/vault.rs",
       "function": "fmt",
-      "line": 278,
+      "line": 295,
       "complexity": 15,
       "test": false
     },
     {
       "file": "crates/storage/src/vault.rs",
       "function": "run_migrations",
-      "line": 401,
+      "line": 418,
       "complexity": 15,
       "test": false
     },
@@ -187,14 +187,14 @@
     {
       "file": "crates/storage/src/vault.rs",
       "function": "put_support_anchor",
-      "line": 681,
+      "line": 698,
       "complexity": 14,
       "test": false
     },
     {
       "file": "crates/storage/src/vault.rs",
       "function": "verify_audit_chain",
-      "line": 1122,
+      "line": 1139,
       "complexity": 14,
       "test": false
     },

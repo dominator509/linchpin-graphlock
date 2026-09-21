@@ -14,10 +14,10 @@ Executable: `target/release/linchpin-desktop-e2e.exe` sha256 `c6e69e28983874e80b
 | run_local_inference returned a CommandResult | PASS | `null` |
 | reached a live inference boundary (live=true) | PASS | `live=true error_class=none` |
 | transport identity is the local adapter | PASS | `"local-ollama"` |
-| completion is non-empty | PASS | `"A patent claim is a legal document providing protection for a unique and exclusive invention, feature, or process, desig"` |
+| completion is non-empty | PASS | `"A patent claim is a written document that outlines the exclusive rights to an invention or process, granted by the gover"` |
 | metadata names the live model | PASS | `"local-ollama:smollm2:135m"` |
 | completion text is not a string that already exists in the repository | PASS | `not found in tracked files` |
-| a second, differently-phrased request also returns real output | PASS | `"a legal monopoly"` |
+| a second, differently-phrased request also returns real output | PASS | `"CANARY-mub4mlqp-ckatod"` |
 | non-loopback endpoint is refused (POLICY, no attempt) | PASS | `{"class":"POLICY","message":"invalid request: local transport requires a loopback endpoint, got host \\"192.0.2.1\\""}` |
 | unreachable loopback reports a transport error, not fabricated text | PASS | `live=false class=UNREACHABLE text=null` |
 | transient failure retried under the bounded policy (REQ-OPS-002) | PASS | `class=UNREACHABLE attempts=3 retryable_exhausted=true` |
@@ -27,7 +27,7 @@ Executable: `target/release/linchpin-desktop-e2e.exe` sha256 `c6e69e28983874e80b
 | core: disclosure screening runs on-device (REQ-PLAT-002) | PASS | `allowed=false reason=Cannot export restricted payload under current firewall rules` |
 | core: docket deadline resolves from a local ruleset (REQ-PLAT-002) | PASS | `authoritative=true source=USPTO-37CFR` |
 | core: valuation range computed on-device (REQ-PLAT-002) | PASS | `range=true dominant=market size` |
-| egress sampler started and polled (harness liveness, REQ-REL-002) | PASS | `ready=true polls=13` |
+| egress sampler started and polled (harness liveness, REQ-REL-002) | PASS | `ready=true polls=14` |
 | egress sampler observes connections (positive control, REQ-REL-002) | PASS | `observed=[127.0.0.1] live_calls=5 (minimum 5)` |
 | core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002) | PASS | `observed 1 distinct endpoint(s): 127.0.0.1` |
 | core: user evidence persists to a device-local vault file (REQ-PLAT-002) | PASS | `C:\\Users\\domin\\AppData\\Local\\LINCHPIN\\linchpin-vault.db (131072)` |

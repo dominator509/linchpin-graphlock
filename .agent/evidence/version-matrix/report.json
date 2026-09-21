@@ -7,14 +7,14 @@
   "harness": "scripts/version-matrix.py",
   "mutation": null,
   "source": {
-    "commit": "b909266e6132e587d6ad88a02d9ab5249372f705",
-    "fingerprint": "349bc86b76ea35965ca866d2292e4980593b3db6902bcd267f8b70cc65f41f7a",
+    "commit": "3608d71f8177a6e64f045b22ceaf0539945bdea4",
+    "fingerprint": "de61ec6184a2907e141ed9901ed3141a931daa16e95074946cd78d9a46843038",
     "files": 82
   },
   "versions": {
     "0.1.0": {
       "msi": "target\\version-matrix\\0.1.0\\LINCHPIN_0.1.0_x64_en-US.msi",
-      "msi_sha256": "6a15972784d06e7dbc1ac9b7b86b4e0bf15dddbe71a9f4058b869c3b5778f86e",
+      "msi_sha256": "acab80f496749a4ded0f7c57675b73f777090ac40b50ccbcd8021ed6b028fe69",
       "target_release_exe_sha256": "aa3651f194e7521db57da92cf781dc2cffb4593a7ad2ddbac37edd77c4ab4176",
       "payload_exe": "target\\version-matrix\\payload-0.1.0\\PFiles\\LINCHPIN\\linchpin-desktop.exe",
       "payload_exe_sha256": "5b40f9ebbe44c2bdcc018b2e6239fa58eac17074edbbb28fe8530e8510fa0c53",
@@ -22,14 +22,14 @@
     },
     "0.2.0": {
       "msi": "target\\version-matrix\\0.2.0\\LINCHPIN_0.2.0_x64_en-US.msi",
-      "msi_sha256": "542164bc2bf0dd76bfa9d9649ae6fc6ddfa675c173d58e7dcfe57ec96054daf9",
+      "msi_sha256": "a43f6ac4d425485f0ecd6d20a522c336ae29aac1efbe1c3508af68b3dbaf0321",
       "target_release_exe_sha256": "289bd76cbe2c1a6b61d0d5946f3bb5e21450538e53c0fa1ee49481a06ba4de6d",
       "payload_exe": "target\\version-matrix\\payload-0.2.0\\PFiles\\LINCHPIN\\linchpin-desktop.exe",
       "payload_exe_sha256": "69065dc68899f4a2c7a4d1502217d66c85d844f8523ca1a597bb633330f519d8",
       "payload_exe_bytes": 12508672
     }
   },
-  "canary": "LINCHPIN-VMATRIX-1789977057-55208",
+  "canary": "LINCHPIN-VMATRIX-1789989211-57140",
   "environment": {
     "host": "DESKTOP-0RCPJ1P",
     "appdata": "C:\\Users\\domin\\AppData\\Local\\LINCHPIN",

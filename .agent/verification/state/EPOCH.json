@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "b909266",
+  "candidate_commit": "3608d71",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -34,7 +34,7 @@
       "files": {
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
-        "scripts\\applicable-case-evidence.py": "b17db2fd7a086a4b66c5b3504c5e08c82cb0c0fdff468918bea90a26ea96f39f",
+        "scripts\\applicable-case-evidence.py": "202d41b5505951c412bf33dca02ca597f0946c53141e0b0d5813028b63a5c282",
         "scripts\\architecture-drift.py": "33a601a4e5edd1fc0ed1478074467b186bf40901671e469c1e3aee379f856157",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
@@ -230,7 +230,7 @@
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
         ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "0d5093616d55dead9cd6f843896de8071b618911b62a0bbef780fbe1b3e7e803",
         "apps\\desktop\\e2e-artifact.mjs": "722caeaece29ddcca0c585cd2f48b1286d15d9db0f42658e30d164a48d9e5e49",
-        "apps\\desktop\\e2e-local-provider.mjs": "4554e597bd9884de60841721467d1bbc9cdefdb0c10163ef3a7a9fc1e4f1b3ff",
+        "apps\\desktop\\e2e-local-provider.mjs": "f09734314796218921eabd7edcfbd23a856c94290f71604ccaf9657369fb7d61",
         "apps\\desktop\\e2e\\shell.spec.ts": "d4a08469939173f196d158de33d1c00b91c5ccc9785ac995e4589e3864641eb2",
         "apps\\desktop\\src-tauri\\tests\\fuzz_campaign.rs": "403e7ae8bc39e52db7bdbd65032366626d84eefdf894274421d738e632574972",
         "apps\\desktop\\src-tauri\\tests\\performance_gate.rs": "d2db51b86e4c130c00257e539dd4d9c056e00eb1eb60e6a664928df3876c9f3c",
@@ -254,8 +254,8 @@
       ]
     }
   },
-  "epoch_digest": "3bf54a3714dc32f9b9e23fc2fce07703f2886b27831766af298cfbd99909d333",
-  "prior_candidate_commit": "5ecce14",
-  "prior_epoch_digest": "ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74",
+  "epoch_digest": "a639086301ff52fd9af1b68e6dff473a68b7100520126e1517287833dc2ea559",
+  "prior_candidate_commit": "3608d71",
+  "prior_epoch_digest": "a639086301ff52fd9af1b68e6dff473a68b7100520126e1517287833dc2ea559",
   "total_inputs": 156
 }

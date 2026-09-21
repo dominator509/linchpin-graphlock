@@ -27,8 +27,8 @@
     "V-018",
     "V-019"
   ],
-  "candidate_commit": "18203a8",
-  "candidate_epoch": "9b4b5bb04ea28788a9edbbaa1fabd0b47517b9f3c7f9ab245690b52543a109ef",
-  "stage_accounting_digest": "0926702d2b3702ca914c4a01f141977fb55331707c7ab08a4091b9850cc40dda",
+  "candidate_commit": "3608d71",
+  "candidate_epoch": "a639086301ff52fd9af1b68e6dff473a68b7100520126e1517287833dc2ea559",
+  "stage_accounting_digest": "2a146a1698ace773a5a65c03fb65e85ff1b8bc356af3f10bb7e267f4348b3c85",
   "note": "Every stage's owned IDs carry an accounted status; the stages listed in open_stages are open only for the reason named in STAGE_ACCOUNTING.md (external participant, deferred long-run scale, or the specific owned IDs named there)."
 }

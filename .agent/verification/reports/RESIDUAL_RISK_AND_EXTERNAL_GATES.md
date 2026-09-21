@@ -9,8 +9,8 @@ the advisory register and `RELEASE_GATE.json`.
 - Blocking clauses: none
 - DoD clauses: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 3, "PASS": 38}
 - Registry IDs: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 7, "NOT_APPLICABLE": 410, "NOT_RUN_BLOCKED_MATERIAL": 4, "PARTIAL": 4, "PASS": 58}
-- Candidate: `a612eb4`, epoch `ff66d326b022152c…` over 156 inputs
-- Artifacts: executable `2c94241d1e10f1f2…`, MSI `f9ac3296af27494f…`
+- Candidate: `3608d71`, epoch `a639086301ff52fd…` over 156 inputs
+- Artifacts: executable `289bd76cbe2c1a6b…`, MSI `acab80f496749a4d…`
 
 ## Clause-level gates that are not PASS
 
@@ -57,8 +57,7 @@ the advisory register and `RELEASE_GATE.json`.
 
 | Advisory | Package | Decision | Reachability |
 | --- | --- | --- | --- |
-| npm:1193683 | vitest | ACCEPT | NOT SHIPPED, direct devDependency path: the scanner reports '.>vitest', i.e. |
-| npm:1193684 | @vitest/mocker | ACCEPT | NOT SHIPPED, transitive devDependency path: the scanner reports '.>vitest>@vitest/mocker', i.e. |
+| — | — | no open advisory | — |
 
 ## Scope exclusions that are decisions, not omissions
 

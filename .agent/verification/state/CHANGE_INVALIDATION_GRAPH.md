@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `3bf54a3714dc32f9b9e23fc2fce07703f2886b27831766af298cfbd99909d333`
-- Candidate commit at generation: `b909266`
+- Current epoch digest: `a639086301ff52fd9af1b68e6dff473a68b7100520126e1517287833dc2ea559`
+- Candidate commit at generation: `3608d71`
 - Total tracked inputs: 156
-- Previous epoch digest: `ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74`
-- **Changed input classes since that epoch: rust-source, rust-manifest, js-manifest, lockfile, gate-script, test-oracle**
+- Previous epoch digest: `a639086301ff52fd9af1b68e6dff473a68b7100520126e1517287833dc2ea559`
+- Changed input classes since that epoch: none
 
 ## Input classes and what a change invalidates
 
@@ -48,7 +48,7 @@ definition and its PASS status is revoked until rerun.
 
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
-  - `scripts\applicable-case-evidence.py` `b17db2fd7a086a4b…`
+  - `scripts\applicable-case-evidence.py` `202d41b5505951c4…`
   - `scripts\architecture-drift.py` `33a601a4e5edd1fc…`
   - `scripts\artifact-e2e.sh` `665ba19ebd5fd33f…`
   - … and 72 more
@@ -130,7 +130,7 @@ definition and its PASS status is revoked until rerun.
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
   - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `0d5093616d55dead…`
   - `apps\desktop\e2e-artifact.mjs` `722caeaece29ddcc…`
-  - `apps\desktop\e2e-local-provider.mjs` `4554e597bd9884de…`
+  - `apps\desktop\e2e-local-provider.mjs` `f097343147962189…`
   - … and 12 more
 
 ## Rerun obligations on epoch change

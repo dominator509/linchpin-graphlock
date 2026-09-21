@@ -8,7 +8,7 @@
   "harness": "scripts/stage-accounting.py",
   "inputs": {
     ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
-    ".agent\\verification\\reports\\COMPLETE_TEST_ACCOUNTING.csv": "49750b7f44683db90df2ab280f933108d6cf587ca182807c562e5ebce7b26b15",
+    ".agent\\verification\\reports\\COMPLETE_TEST_ACCOUNTING.csv": "67c7a9e4c54c4bf55dad98e693a4224961679ee4fd938a18878ef44fefc155f1",
     ".agent\\verification\\APPLICABILITY_MATRIX.csv": "4729f66e56f2bc540abd459342252210eecfec8f260e9f49d4302f4f5e21b5f1"
   },
   "stages": [
@@ -1013,5 +1013,5 @@
     "deferred_long_running": 1,
     "blocked_or_partial": 6
   },
-  "digest": "0926702d2b3702ca914c4a01f141977fb55331707c7ab08a4091b9850cc40dda"
+  "digest": "2a146a1698ace773a5a65c03fb65e85ff1b8bc356af3f10bb7e267f4348b3c85"
 }

@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a legal document providing protection for a unique and exclusive invention, feature, or process, desig\""
+      "observed": "\"A patent claim is a written document that outlines the exclusive rights to an invention or process, granted by the gover\""
     },
     {
       "name": "metadata names the live model",
@@ -47,7 +47,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"a legal monopoly\""
+      "observed": "\"CANARY-mub4mlqp-ckatod\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -97,7 +97,7 @@
     {
       "name": "egress sampler started and polled (harness liveness, REQ-REL-002)",
       "ok": true,
-      "observed": "ready=true polls=13"
+      "observed": "ready=true polls=14"
     },
     {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",

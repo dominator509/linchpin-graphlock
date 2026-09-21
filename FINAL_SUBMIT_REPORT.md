@@ -15,8 +15,8 @@ milestones executed and DoD dispositions recorded — it is **not** a release GO
 
 - 42 DoD clauses: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 3, "PASS": 38}
 - 484 registry IDs: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 7, "NOT_APPLICABLE": 410, "NOT_RUN_BLOCKED_MATERIAL": 4, "PARTIAL": 4, "PASS": 58}
-- Candidate `a612eb4`, epoch `ff66d326b022152c…` over 156 inputs
-- Artifact: `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `f9ac3296af27494f…` with the installed executable bound to the package payload
+- Candidate `3608d71`, epoch `a639086301ff52fd…` over 156 inputs
+- Artifact: `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `acab80f496749a4d…` with the installed executable bound to the package payload
 - Ship gate: **CONDITIONAL_EXTERNAL_GATES**, blocking clauses: none
 
 ## Not verified, not claimed

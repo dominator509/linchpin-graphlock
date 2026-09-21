@@ -4,8 +4,8 @@ Derived by `scripts/residual-risk-report.py` from the executed V-000..V-021 acco
 and the machine ship gate. Do not hand-edit.
 
 - Verdict: **CONDITIONAL_EXTERNAL_GATES** (from `scripts/ship-gate.py`, no blocking clause: none)
-- Candidate: `a612eb4`, epoch `ff66d326b022152c…` over 156 tracked inputs
-- Artifact under test: `target\release\linchpin-desktop.exe` `2c94241d1e10f1f2…`; installer `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `f9ac3296af27494f…`
+- Candidate: `3608d71`, epoch `a639086301ff52fd…` over 156 tracked inputs
+- Artifact under test: `target\release\linchpin-desktop.exe` `289bd76cbe2c1a6b…`; installer `target\release\bundle\msi\LINCHPIN_0.1.0_x64_en-US.msi` `acab80f496749a4d…`
 - DoD clauses: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 3, "PASS": 38}
 - Registry IDs: {"DEFERRED_LONG_RUNNING": 1, "EXTERNAL_REQUIRED": 7, "NOT_APPLICABLE": 410, "NOT_RUN_BLOCKED_MATERIAL": 4, "PARTIAL": 4, "PASS": 58}
 

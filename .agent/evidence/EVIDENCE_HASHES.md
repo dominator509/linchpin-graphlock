@@ -18,14 +18,14 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-001 | EXTERNAL_REQUIRED | `.agent/evidence/DOD-001-unbound-requirements.md` | `8f743cacca116464` | 12712 |
 | DOD-002 | PASS | `.agent/evidence/clean-build/STATUS.md` | `c2a15dfd459315e9` | 2093 |
 | DOD-003 | PASS | `.agent/evidence/sbom/linchpin.cdx.json` | `6047c018887034c1` | 497142 |
-| DOD-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` | 7000 |
+| DOD-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `81a727bbda33b0d4` | 7090 |
 | DOD-005 | PASS | `.agent/evidence/clean-build/ENVIRONMENT.json` | `b600f03bc797581a` | 3755 |
 | DOD-006 | PASS | `.agent/verification/reports/TEST_COLLECTION_SKIP_REPORT.md` | `1a39d097092d002e` | 553 |
 | DOD-007 | PASS | `.agent/verification/state/TEST_COLLECTION_MANIFEST.json` | `0d5093616d55dead` | 1009 |
 | DOD-008 | PASS | `scripts/coverage-gate.py` | `a05d4b0cb45fcd26` | 15700 |
 | DOD-009 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `b3ea3072bd3b3eeb` | 8879 |
-| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `db10153a19bc7c54` | 3567 |
-| DOD-011 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` | 7000 |
+| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `0e8cf90f0bddb5c5` | 3569 |
+| DOD-011 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `81a727bbda33b0d4` | 7090 |
 | DOD-012 | PASS | `.agent/evidence/EP-009/M3/STATUS.md` | `7bd34ad1de9f0ec2` | 5302 |
 | DOD-013 | PASS | `.agent/evidence/DOD-013-canary-propagation.md` | `8e3512be92a45f01` | 5163 |
 | DOD-014 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
@@ -33,20 +33,20 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-016 | PASS | `.agent/evidence/DOD-015-016-restart-and-migrations.md` | `8ae14098a18a924f` | 5876 |
 | DOD-017 | PASS | `.agent/evidence/DOD-017-idempotency.md` | `a292bc32b80efc1d` | 5055 |
 | DOD-018 | PASS | `.agent/evidence/mutation-proof/REPORT.json` | `6104c325609a51bb` | 30968 |
-| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `db10153a19bc7c54` | 3567 |
-| DOD-020 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` | 7000 |
+| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `0e8cf90f0bddb5c5` | 3569 |
+| DOD-020 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `81a727bbda33b0d4` | 7090 |
 | DOD-021 | PASS | `.agent/verification/reports/TEST_COLLECTION_SKIP_REPORT.md` | `1a39d097092d002e` | 553 |
 | DOD-022 | PASS | `.agent/evidence/DOD-022-performance-thresholds.md` | `79df98d7a63ba85b` | 3175 |
 | DOD-023 | PASS | `scripts/doc-exec.py` | `2e47017bc04b74b7` | 14107 |
 | DOD-024 | PASS | `.agent/evidence/EP-009/M1/STATUS.md` | `d9a88c360fbed821` | 8118 |
-| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `94a98dd8059b980b` | 196281 |
+| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `b8142e97e53f18e5` | 196281 |
 | DOD-026 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `b3ea3072bd3b3eeb` | 8879 |
 | DOD-027 | PASS | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
 | DOD-028 | PASS | `scripts/completion-report.py` | `207e639d133c229e` | 16579 |
 | DOD-029 | PASS | `scripts/run-manifest.py` | `bd6ff561ed6a4d8a` | 11487 |
-| DOD-030 | PASS | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `49750b7f44683db9` | 268677 |
+| DOD-030 | PASS | `.agent/verification/reports/COMPLETE_TEST_ACCOUNTING.csv` | `67c7a9e4c54c4bf5` | 269636 |
 | DOD-031 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `b3ea3072bd3b3eeb` | 8879 |
-| DOD-032 | PASS | `.agent/verification/state/CASE_RESULTS.json` | `d320b8d0378c724f` | 89748 |
+| DOD-032 | PASS | `.agent/verification/state/CASE_RESULTS.json` | `83c47626e85b389e` | 90707 |
 | DOD-033 | PASS | `.agent/evidence/clean-build/ENVIRONMENT.json` | `b600f03bc797581a` | 3755 |
 | DOD-034 | EXTERNAL_REQUIRED | `.agent/evidence/EP-009/M3/STATUS.md` | `7bd34ad1de9f0ec2` | 5302 |
 | DOD-035 | PASS | `scripts/version-matrix.py` | `f0df1fdb835d645f` | 35792 |
@@ -54,7 +54,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
 | DOD-038 | DEFERRED_LONG_RUNNING | `apps/desktop/src-tauri/tests/soak_abbreviated.rs` | `faaeeb26a9bae7e4` | 17998 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `8a31eaf4cbe10c35` | 7956 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `6cd82fa7a74a6ac5` | 5078 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` | 147646 |
 | DOD-042 | PASS | `scripts/ship-gate.py` | `1cbffb092d52e58b` | 20191 |
 
@@ -66,11 +66,11 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 
 | Test ID | Status | Evidence | sha256 |
 | --- | --- | --- | --- |
-| GEN-001 | PASS | `.agent/evidence/applicable-cases/GEN-001.md` | `9261464e08b0f0d6` |
-| GEN-002 | PASS | `.agent/evidence/applicable-cases/GEN-002.md` | `a9a2a21ca2d0f327` |
-| GEN-003 | PASS | `.agent/evidence/applicable-cases/GEN-003.md` | `e46763f0f244428c` |
-| GEN-004 | PASS | `.agent/evidence/applicable-cases/GEN-004.md` | `7475eceb3a256975` |
-| GEN-005 | PASS | `.agent/evidence/applicable-cases/GEN-005.md` | `82cf537abff72bef` |
+| GEN-001 | PASS | `.agent/evidence/applicable-cases/GEN-001.md` | `155170a2905b3ee4` |
+| GEN-002 | PASS | `.agent/evidence/applicable-cases/GEN-002.md` | `9be4c8e6d41237d3` |
+| GEN-003 | PASS | `.agent/evidence/applicable-cases/GEN-003.md` | `c920156b55f28d9a` |
+| GEN-004 | PASS | `.agent/evidence/applicable-cases/GEN-004.md` | `b6dde94537a8560e` |
+| GEN-005 | PASS | `.agent/evidence/applicable-cases/GEN-005.md` | `20f789b06446b82d` |
 | GEN-006 | PASS | `.agent/evidence/applicable-cases/GEN-006.md` | `f412f1714662e736` |
 | GEN-007 | PASS | `.agent/evidence/applicable-cases/GEN-007.md` | `b1db65671e3ae7d5` |
 | GEN-008 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
@@ -107,8 +107,8 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | GEN-039 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-040 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-041 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
-| GEN-042 | PASS | `.agent/evidence/applicable-cases/GEN-042.md` | `acf5bae42b934d7c` |
-| GEN-043 | PASS | `.agent/evidence/applicable-cases/GEN-043.md` | `e97930e225afe1b2` |
+| GEN-042 | PASS | `.agent/evidence/applicable-cases/GEN-042.md` | `78f7617e2a8c357b` |
+| GEN-043 | PASS | `.agent/evidence/applicable-cases/GEN-043.md` | `b226b987994aabe3` |
 | GEN-044 | PARTIAL | `.agent/evidence/applicable-cases/GEN-044.md` | `28b5ac0245e23fd6` |
 | GEN-045 | PASS | `.agent/evidence/applicable-cases/GEN-045.md` | `2a017706bf69b97b` |
 | GEN-046 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
@@ -137,8 +137,8 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | GEN-069 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-070 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-071 | NOT_RUN_BLOCKED_MATERIAL | `.agent/evidence/applicable-cases/GEN-071.md` | `e147453fbe1e9f08` |
-| GEN-072 | PASS | `.agent/evidence/applicable-cases/GEN-072.md` | `9fa8e641856a6956` |
-| GEN-073 | PASS | `.agent/evidence/applicable-cases/GEN-073.md` | `9d0a6538d410ddd2` |
+| GEN-072 | PASS | `.agent/evidence/applicable-cases/GEN-072.md` | `46df3c8c71ecd724` |
+| GEN-073 | PASS | `.agent/evidence/applicable-cases/GEN-073.md` | `c1b4048327afbb8f` |
 | GEN-074 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-075 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-076 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
@@ -146,13 +146,13 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | GEN-078 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-079 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-080 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
-| GEN-081 | PARTIAL | `.agent/evidence/applicable-cases/GEN-081.md` | `c6c84f09281f8aca` |
+| GEN-081 | PARTIAL | `.agent/evidence/applicable-cases/GEN-081.md` | `ae3288888f68ad23` |
 | GEN-082 | NOT_RUN_BLOCKED_MATERIAL | `.agent/evidence/applicable-cases/GEN-082.md` | `df2364ea78d7acc8` |
 | GEN-083 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-084 | PASS | `.agent/evidence/applicable-cases/GEN-084.md` | `85a592a7fec223f0` |
 | GEN-085 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-086 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
-| GEN-087 | PASS | `.agent/evidence/applicable-cases/GEN-087.md` | `e0b24cfb8ba94476` |
+| GEN-087 | PASS | `.agent/evidence/applicable-cases/GEN-087.md` | `dc9ac62d621d4e7a` |
 | GEN-088 | PASS | `.agent/evidence/applicable-cases/GEN-088.md` | `5157ceba2bb0e063` |
 | GEN-089 | PASS | `.agent/evidence/applicable-cases/GEN-089.md` | `04f3d41137eaf01b` |
 | GEN-090 | PASS | `.agent/evidence/applicable-cases/GEN-090.md` | `4d80478a64c25ac7` |
@@ -165,7 +165,7 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | GEN-097 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-098 | PASS | `.agent/evidence/applicable-cases/GEN-098.md` | `157df135789dcdd4` |
 | GEN-099 | PASS | `.agent/evidence/applicable-cases/GEN-099.md` | `fc3fb0f426005c3b` |
-| GEN-100 | PASS | `.agent/evidence/applicable-cases/GEN-100.md` | `55e18b38bf8198ec` |
+| GEN-100 | PASS | `.agent/evidence/applicable-cases/GEN-100.md` | `f507869e1517d3ee` |
 | GEN-101 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-102 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-103 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/GEN-103.md` | `4534b4d2ab835eb1` |
@@ -177,7 +177,7 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | GEN-109 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-110 | PASS | `.agent/evidence/applicable-cases/GEN-110.md` | `7da83acff05dccca` |
 | GEN-111 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
-| GEN-112 | PASS | `.agent/evidence/applicable-cases/GEN-112.md` | `8b829a5a46005750` |
+| GEN-112 | PASS | `.agent/evidence/applicable-cases/GEN-112.md` | `fb858e4119bf5b3a` |
 | GEN-113 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-114 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | GEN-115 | PASS | `.agent/evidence/applicable-cases/GEN-115.md` | `bb53e6c2746f793e` |
@@ -518,7 +518,7 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | E2E-001 | PASS | `.agent/evidence/applicable-cases/E2E-001.md` | `e51be32043d994ba` |
 | E2E-002 | PASS | `apps/desktop/e2e/shell.spec.ts` | `d4a08469939173f1` |
 | E2E-003 | PASS | `apps/desktop/e2e/shell.spec.ts` | `d4a08469939173f1` |
-| E2E-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` |
+| E2E-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `81a727bbda33b0d4` |
 | E2E-005 | PASS | `.agent/evidence/applicable-cases/E2E-005.md` | `5b991660a4e8b0f2` |
 | E2E-006 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | E2E-007 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/E2E-007.md` | `08a8bef353a3b2fb` |
@@ -535,9 +535,9 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | E2E-018 | DEFERRED_LONG_RUNNING | `.agent/evidence/applicable-cases/E2E-018.md` | `d2941de98e6f198b` |
 | E2E-019 | PASS | `.agent/evidence/applicable-cases/E2E-019.md` | `8926d54f1ca4aa2f` |
 | E2E-020 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/E2E-020.md` | `7972b8a8e0308a55` |
-| SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` |
+| SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `81a727bbda33b0d4` |
 | SUP-002 | PASS | `.agent/evidence/applicable-cases/SUP-002.md` | `11152e761fd05ada` |
-| SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` |
+| SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `81a727bbda33b0d4` |
 | SUP-004 | PASS | `.agent/evidence/SUP-004-reproducible-build-verification.md` | `6f9ab42f63f34572` |
 | SUP-005 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | SUP-006 | PASS | `.agent/evidence/DOD-017-idempotency.md` | `a292bc32b80efc1d` |
