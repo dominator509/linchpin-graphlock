@@ -1,0 +1,111 @@
+# Dependabot configuration.
+#
+# SCOPE, MEASURED, NOT ASSUMED: this repository has exactly three ecosystems, and
+# each is declared once because each has exactly one lockfile at the root:
+#
+#   cargo           Cargo.lock      (workspace: crates/*, apps/desktop/src-tauri)
+#   npm             pnpm-lock.yaml  (pnpm workspace: apps/desktop, packages/*)
+#   github-actions  .github/workflows/*.yml
+#
+# There is no pip/uv lockfile, no go.mod, no Gemfile and no Dockerfile in this
+# tree, so no entry exists for those ecosystems -- configuration for an absent
+# ecosystem is noise that hides the ones that matter. For the two workspace
+# ecosystems the lockfile lives at the repository root, so `directory` is "/" for
+# both; one entry per member package would be wrong and would produce duplicate,
+# conflicting update PRs against the same lockfile.
+#
+# GROUPING POLICY: groups batch ONLY minor and patch updates. MAJOR updates are
+# deliberately left ungrouped so each arrives as its own PR and its own CI run.
+# This is not theoretical for this repository: a naive major bump is
+# peer-incompatible here -- vitest 4 requires vite >= 6 while this tree was on
+# vite 5, and the combination fails with
+#   ERR_PACKAGE_PATH_NOT_EXPORTED: './module-runner'
+# Grouping majors would have hidden exactly the failure that needs to be seen on
+# its own. A security update and a version update for the same package are
+# separate PRs by design (e.g. vite -> patched 6.4.3 and vite -> latest 8), so the
+# same package legitimately appearing twice is expected, not a duplicate.
+#
+# The schedule is weekly with an explicit day/time/timezone so the run time does
+# not depend on the reader's locale.
+version: 2
+updates:
+  # ---------------------------------------------------------------- cargo ----
+  - package-ecosystem: cargo
+    directory: "/"
+    target-branch: main
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:17"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps-cargo)"
+      include: scope
+    labels:
+      - dependencies
+      - rust
+    groups:
+      # Minor and patch only; majors stay individual.
+      cargo-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # ------------------------------------------------------------------ npm ----
+  # pnpm is the npm ecosystem as far as Dependabot is concerned, and it updates
+  # pnpm-lock.yaml in place.
+  - package-ecosystem: npm
+    directory: "/"
+    target-branch: main
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:23"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps-npm)"
+      include: scope
+    labels:
+      - dependencies
+      - javascript
+    groups:
+      npm-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # ------------------------------------------------------- github-actions ----
+  - package-ecosystem: github-actions
+    directory: "/"
+    target-branch: main
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:29"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps-actions)"
+      include: scope
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # NOTE ON PINNING: the workflows pin actions to exact versions
+  # (actions/checkout@v6.1.0, actions/dependency-review-action@v5.0.0) rather than
+  # to floating major tags, so an upstream tag cannot move under us. This
+  # ecosystem's updates are what keeps those pins current, which is why the
+  # github-actions entry above must stay.

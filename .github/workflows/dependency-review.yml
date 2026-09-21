@@ -1,0 +1,85 @@
+# Dependency review: fails a pull request that introduces a HIGH or CRITICAL known
+# vulnerability, using GitHub's dependency-graph diff API.
+#
+# WHY THE VERSIONS ARE EXACT. Upstream's own README shows
+# `actions/dependency-review-action@v5`, but no floating `v4`/`v5` tag exists:
+# `gh api repos/actions/dependency-review-action/git/ref/tags/v5` returns 404 and
+# `.../git/matching-refs/tags/v5` lists only `refs/tags/v5.0.0`. A workflow written
+# with `@v5` would fail to resolve the action at run time. Every action here is
+# therefore pinned to a specific version that was confirmed to exist, with the
+# commit it resolves to recorded for audit:
+#
+#   actions/dependency-review-action@v5.0.0 -> a1d282b36b6f3519aa1f3fc636f609c47dddb294
+#   actions/checkout@v6.1.0                 -> d23441a48e516b6c34aea4fa41551a30e30af803
+#
+# Option values come from the action's own action.yml and README at that tag, not
+# from prose or from memory:
+#   fail-on-severity  default `low`      -> set to `high`, explicitly
+#   fail-on-scopes    default `runtime`  -> widened to runtime+development (see below)
+#   license-check     default `true`     -> left ON, with an explicit allow list
+#   vulnerability-check default `true`   -> left ON
+# `comment-summary-in-pr` is deliberately NOT used: it requires
+# `pull-requests: write`, and this workflow keeps read-only permissions.
+#
+# SCOPE CHOICE. `fail-on-scopes` is widened from the default `runtime` to
+# `runtime, development`. That is stricter, not looser, and it matches the policy
+# this repository already enforces: `scripts/security-check.sh` runs
+# `pnpm audit --audit-level high`, which fails on a high advisory regardless of
+# whether the path is shipped. Dependency review should not be the weaker of the
+# two gates. (The two moderate advisories this tree carries are below the
+# threshold and are dev-only, so they neither fail here nor there.)
+#
+# LICENCE CHOICE. `license-check` stays ON, with `allow-licenses` transcribed from
+# LICENSE_ALLOWLIST.md -- the repository's own policy file, which states the
+# default redistributed-core allowlist and records MPL-2.0 as permitted for six
+# named crates by ADR-002. Transcribing it keeps one policy expressed in two
+# enforcement points instead of inventing a second policy that cannot see
+# LICENSE_ALLOWLIST.md's structure; if that file changes, this list must change
+# with it. `cargo deny check licenses` and the SBOM lane remain authoritative.
+#
+# PREREQUISITES, stated because they are real failure modes rather than details:
+#   * the repository dependency graph must be enabled, or the diff does not exist;
+#   * this file must be on the DEFAULT branch (main) before a PR can be checked by
+#     it -- PRs opened before it landed never run it;
+#   * a pull request with no dependency changes may report nothing to review, so
+#     the trigger is proved with a real diff and the run is read back.
+name: Dependency Review
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+# Least privilege: the action reads the dependency graph and PR metadata and
+# reports through its exit status, so nothing needs write access.
+permissions:
+  contents: read
+  pull-requests: read
+
+# A new push to the same PR makes the previous run obsolete.
+concurrency:
+  group: dependency-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    name: Dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the pull request base
+        uses: actions/checkout@v6.1.0
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@v5.0.0
+        with:
+          fail-on-severity: high
+          fail-on-scopes: runtime, development
+          license-check: true
+          vulnerability-check: true
+          allow-licenses: >-
+            MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Zlib, MPL-2.0
