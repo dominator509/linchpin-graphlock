@@ -190,6 +190,23 @@ pub struct UnsupportedClaim {
     pub label: String,
 }
 
+/// Lowercase hex encoding of a digest.
+///
+/// `sha2` 0.11 returns `hybrid_array::Array`, which does not implement `LowerHex`
+/// (0.10 returned `GenericArray`, which did), so the digest is encoded explicitly
+/// instead of with `{:x}`. The output is byte-identical to the previous format --
+/// `test_sha256_known_vector` pins it against the published FIPS 180-4 vectors for
+/// "abc" and the empty input, so a change here fails that test rather than silently
+/// re-addressing every stored blob.
+fn hex_lower(bytes: &[u8]) -> String {
+    use std::fmt::Write as _;
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        let _ = write!(out, "{byte:02x}");
+    }
+    out
+}
+
 /// SHA-256 content address, hex-encoded.
 ///
 /// `REQ-DATA-002`. Unlike the FNV-1a fingerprint used for IPC identity, this is
@@ -197,7 +214,7 @@ pub struct UnsupportedClaim {
 pub fn sha256_hex(data: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(data);
-    format!("sha256:{:x}", hasher.finalize())
+    format!("sha256:{}", hex_lower(&hasher.finalize()))
 }
 
 /// A stored conception event.
@@ -553,7 +570,7 @@ impl Vault {
             hasher.update(row?.as_bytes());
             hasher.update(b"\n");
         }
-        Ok(format!("sha256:{:x}", hasher.finalize()))
+        Ok(format!("sha256:{}", hex_lower(&hasher.finalize())))
     }
 
     /// Write a consistent backup of this vault to `dest`.
