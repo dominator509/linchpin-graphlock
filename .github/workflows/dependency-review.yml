@@ -1,16 +1,20 @@
 # Dependency review: fails a pull request that introduces a HIGH or CRITICAL known
 # vulnerability, using GitHub's dependency-graph diff API.
 #
-# WHY THE VERSIONS ARE EXACT. Upstream's own README shows
-# `actions/dependency-review-action@v5`, but no floating `v4`/`v5` tag exists:
-# `gh api repos/actions/dependency-review-action/git/ref/tags/v5` returns 404 and
-# `.../git/matching-refs/tags/v5` lists only `refs/tags/v5.0.0`. A workflow written
-# with `@v5` would fail to resolve the action at run time. Every action here is
-# therefore pinned to a specific version that was confirmed to exist, with the
-# commit it resolves to recorded for audit:
+# WHY THE VERSIONS ARE FULL COMMIT SHAS. A tag is a mutable pointer: whoever controls
+# the action's repository can move `v7` onto different code after this file was
+# reviewed, and this workflow runs on every pull request. Pinning the exact commit
+# removes that. The audit trail is the comment beside each `uses:`, which names the
+# release the SHA was resolved from, and each SHA was resolved through the API:
 #
-#   actions/dependency-review-action@v5.0.0 -> a1d282b36b6f3519aa1f3fc636f609c47dddb294
-#   actions/checkout@v6.1.0                 -> d23441a48e516b6c34aea4fa41551a30e30af803
+#   gh api repos/actions/checkout/git/ref/tags/v7.0.1                -> commit 3d3c42e5…
+#   gh api repos/actions/dependency-review-action/git/ref/tags/v5.0.0 -> commit a1d282b3…
+#
+# The dependency-review action has no floating `v4`/`v5` tag at all
+# (`git/ref/tags/v5` returns 404 and `matching-refs/tags/v5` lists only `v5.0.0`), so
+# an exact version was already mandatory there. Both are now SHA pins, and the
+# repository setting `sha_pinning_required` enforces that for any added workflow
+# instead of relying on review.
 #
 # Option values come from the action's own action.yml and README at that tag, not
 # from prose or from memory:
@@ -72,10 +76,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check out the pull request base
-        uses: actions/checkout@v7.0.1
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Review dependency changes
-        uses: actions/dependency-review-action@v5.0.0
+        # actions/dependency-review-action v5.0.0
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
         with:
           fail-on-severity: high
           fail-on-scopes: runtime, development

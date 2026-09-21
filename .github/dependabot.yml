@@ -104,8 +104,9 @@ updates:
           - minor
           - patch
 
-  # NOTE ON PINNING: the workflows pin actions to exact versions
-  # (actions/checkout@v6.1.0, actions/dependency-review-action@v5.0.0) rather than
-  # to floating major tags, so an upstream tag cannot move under us. This
-  # ecosystem's updates are what keeps those pins current, which is why the
-  # github-actions entry above must stay.
+  # NOTE ON PINNING: the workflows pin every action to a full commit SHA with the
+  # release it was resolved from in the comment above it, and the repository setting
+  # `sha_pinning_required` enforces that for any workflow added later. Dependabot
+  # reads the version comment and opens a PR that moves the SHA, so this ecosystem's
+  # entry is what keeps SHA pins current without anyone tracking tags by hand --
+  # which is why it must stay even though the pins are not tags.
