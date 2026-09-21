@@ -16,4 +16,4 @@ tantivy = "0.26.2"
 uuid = { version = "1.26.0", features = ["v4", "v7"] }
 # Already in the workspace Cargo.lock (sha2 0.10.9). Required by REQ-DATA-002:
 # "Evidence blobs are content-addressed SHA-256". No new transitive package.
-sha2 = "0.10.9"
+sha2 = "0.11.0"
