@@ -17,15 +17,15 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | --- | --- | --- | --- | --- |
 | DOD-001 | EXTERNAL_REQUIRED | `.agent/evidence/DOD-001-unbound-requirements.md` | `8f743cacca116464` | 12712 |
 | DOD-002 | PASS | `.agent/evidence/clean-build/STATUS.md` | `c2a15dfd459315e9` | 2093 |
-| DOD-003 | PASS | `.agent/evidence/sbom/linchpin.cdx.json` | `4c68dff3ae720d1f` | 467090 |
-| DOD-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `8ce071792cf9eec3` | 6999 |
+| DOD-003 | PASS | `.agent/evidence/sbom/linchpin.cdx.json` | `6047c018887034c1` | 497142 |
+| DOD-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` | 7000 |
 | DOD-005 | PASS | `.agent/evidence/clean-build/ENVIRONMENT.json` | `b600f03bc797581a` | 3755 |
 | DOD-006 | PASS | `.agent/verification/reports/TEST_COLLECTION_SKIP_REPORT.md` | `1a39d097092d002e` | 553 |
 | DOD-007 | PASS | `.agent/verification/state/TEST_COLLECTION_MANIFEST.json` | `0d5093616d55dead` | 1009 |
 | DOD-008 | PASS | `scripts/coverage-gate.py` | `a05d4b0cb45fcd26` | 15700 |
 | DOD-009 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `b3ea3072bd3b3eeb` | 8879 |
-| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `e875ce31050f0df7` | 3562 |
-| DOD-011 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `8ce071792cf9eec3` | 6999 |
+| DOD-010 | PASS | `.agent/evidence/local-provider/STATUS.md` | `db10153a19bc7c54` | 3567 |
+| DOD-011 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` | 7000 |
 | DOD-012 | PASS | `.agent/evidence/EP-009/M3/STATUS.md` | `7bd34ad1de9f0ec2` | 5302 |
 | DOD-013 | PASS | `.agent/evidence/DOD-013-canary-propagation.md` | `8e3512be92a45f01` | 5163 |
 | DOD-014 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
@@ -33,13 +33,13 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-016 | PASS | `.agent/evidence/DOD-015-016-restart-and-migrations.md` | `8ae14098a18a924f` | 5876 |
 | DOD-017 | PASS | `.agent/evidence/DOD-017-idempotency.md` | `a292bc32b80efc1d` | 5055 |
 | DOD-018 | PASS | `.agent/evidence/mutation-proof/REPORT.json` | `6104c325609a51bb` | 30968 |
-| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `e875ce31050f0df7` | 3562 |
-| DOD-020 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `8ce071792cf9eec3` | 6999 |
+| DOD-019 | PASS | `.agent/evidence/local-provider/STATUS.md` | `db10153a19bc7c54` | 3567 |
+| DOD-020 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` | 7000 |
 | DOD-021 | PASS | `.agent/verification/reports/TEST_COLLECTION_SKIP_REPORT.md` | `1a39d097092d002e` | 553 |
 | DOD-022 | PASS | `.agent/evidence/DOD-022-performance-thresholds.md` | `79df98d7a63ba85b` | 3175 |
 | DOD-023 | PASS | `scripts/doc-exec.py` | `2e47017bc04b74b7` | 14107 |
 | DOD-024 | PASS | `.agent/evidence/EP-009/M1/STATUS.md` | `d9a88c360fbed821` | 8118 |
-| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `e251316e3144d5bf` | 196281 |
+| DOD-025 | PASS | `.agent/verification/state/TEST_LEDGER.jsonl` | `94a98dd8059b980b` | 196281 |
 | DOD-026 | PASS | `.agent/verification/state/ACCOUNTING_STATUS.md` | `b3ea3072bd3b3eeb` | 8879 |
 | DOD-027 | PASS | `.agent/evidence/ANTI_GAMING_FINDINGS.md` | `f88bb1b610363ac5` | 29902 |
 | DOD-028 | PASS | `scripts/completion-report.py` | `207e639d133c229e` | 16579 |
@@ -54,7 +54,7 @@ so a PASS cannot outlive the evidence that justified it (DOD-040).
 | DOD-037 | PASS | `.agent/evidence/DOD-037-operator-diagnostics.md` | `fa117744c0fc28ae` | 4725 |
 | DOD-038 | DEFERRED_LONG_RUNNING | `apps/desktop/src-tauri/tests/soak_abbreviated.rs` | `faaeeb26a9bae7e4` | 17998 |
 | DOD-039 | EXTERNAL_REQUIRED | `.agent/evidence/ADR-005-external-signoff-gates.md` | `5d2576290af473fa` | 2869 |
-| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `a1a78bad1f60b516` | 187 |
+| DOD-040 | PASS | `.agent/verification/state/RERUN_RECORD.json` | `8a31eaf4cbe10c35` | 7956 |
 | DOD-041 | PASS | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` | 147646 |
 | DOD-042 | PASS | `scripts/ship-gate.py` | `1cbffb092d52e58b` | 20191 |
 
@@ -518,7 +518,7 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | E2E-001 | PASS | `.agent/evidence/applicable-cases/E2E-001.md` | `e51be32043d994ba` |
 | E2E-002 | PASS | `apps/desktop/e2e/shell.spec.ts` | `d4a08469939173f1` |
 | E2E-003 | PASS | `apps/desktop/e2e/shell.spec.ts` | `d4a08469939173f1` |
-| E2E-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `8ce071792cf9eec3` |
+| E2E-004 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` |
 | E2E-005 | PASS | `.agent/evidence/applicable-cases/E2E-005.md` | `5b991660a4e8b0f2` |
 | E2E-006 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | E2E-007 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/E2E-007.md` | `08a8bef353a3b2fb` |
@@ -535,9 +535,9 @@ in `COMPLETE_TEST_ACCOUNTING.csv` rather than hidden.
 | E2E-018 | DEFERRED_LONG_RUNNING | `.agent/evidence/applicable-cases/E2E-018.md` | `d2941de98e6f198b` |
 | E2E-019 | PASS | `.agent/evidence/applicable-cases/E2E-019.md` | `8926d54f1ca4aa2f` |
 | E2E-020 | EXTERNAL_REQUIRED | `.agent/evidence/applicable-cases/E2E-020.md` | `7972b8a8e0308a55` |
-| SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `8ce071792cf9eec3` |
+| SUP-001 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` |
 | SUP-002 | PASS | `.agent/evidence/applicable-cases/SUP-002.md` | `11152e761fd05ada` |
-| SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `8ce071792cf9eec3` |
+| SUP-003 | PASS | `.agent/evidence/artifact-e2e/STATUS.md` | `41d292322039981b` |
 | SUP-004 | PASS | `.agent/evidence/SUP-004-reproducible-build-verification.md` | `6f9ab42f63f34572` |
 | SUP-005 | NOT_APPLICABLE | `.agent/verification/APPLICABILITY_MATRIX.csv` | `4729f66e56f2bc54` |
 | SUP-006 | PASS | `.agent/evidence/DOD-017-idempotency.md` | `a292bc32b80efc1d` |

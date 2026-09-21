@@ -9,11 +9,11 @@ definition and its PASS status is revoked until rerun.
 
 ## Epoch identity
 
-- Current epoch digest: `ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74`
-- Candidate commit at generation: `5ecce14`
+- Current epoch digest: `3bf54a3714dc32f9b9e23fc2fce07703f2886b27831766af298cfbd99909d333`
+- Candidate commit at generation: `b909266`
 - Total tracked inputs: 156
 - Previous epoch digest: `ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74`
-- Changed input classes since that epoch: none
+- **Changed input classes since that epoch: rust-source, rust-manifest, js-manifest, lockfile, gate-script, test-oracle**
 
 ## Input classes and what a change invalidates
 
@@ -49,7 +49,7 @@ definition and its PASS status is revoked until rerun.
   - `scripts\add-requirement-markers.py` `284170077e1fd416…`
   - `scripts\anti-gaming-scan.py` `32508faf211dc751…`
   - `scripts\applicable-case-evidence.py` `b17db2fd7a086a4b…`
-  - `scripts\architecture-drift.py` `1df01d0b2864fea1…`
+  - `scripts\architecture-drift.py` `33a601a4e5edd1fc…`
   - `scripts\artifact-e2e.sh` `665ba19ebd5fd33f…`
   - … and 72 more
 
@@ -58,9 +58,9 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-004 supply chain
 - invalidates: V-005 clean build
 
-  - `apps\desktop\package.json` `d18a1ec62a81c654…`
+  - `apps\desktop\package.json` `3610b6896dbf300a…`
   - `apps\desktop\tsconfig.json` `1103540815beff5b…`
-  - `package.json` `a134a377a798dbc2…`
+  - `package.json` `1d4b93f3c093c28e…`
   - `packages\contracts\package.json` `590af66611d4d9a6…`
   - `packages\contracts\tsconfig.json` `53c70f0a66f811ad…`
   - … and 2 more
@@ -84,8 +84,8 @@ definition and its PASS status is revoked until rerun.
 - invalidates: V-005 clean build
 - invalidates: DOD-021 license gate
 
-  - `Cargo.lock` `771d4279475074c6…`
-  - `pnpm-lock.yaml` `45b0fad113529e45…`
+  - `Cargo.lock` `2eaa1beb54674feb…`
+  - `pnpm-lock.yaml` `ad1d2b6b478f636a…`
 
 ### `rust-manifest` — 15 file(s)
 
@@ -129,8 +129,8 @@ definition and its PASS status is revoked until rerun.
   - `.agent\verification\DOD_REGISTRY.csv` `00f5c07371e18341…`
   - `.agent\verification\MASTER_TEST_REGISTRY.csv` `d8a5389cfb296885…`
   - `.agent\verification\state\TEST_COLLECTION_MANIFEST.json` `0d5093616d55dead…`
-  - `apps\desktop\e2e-artifact.mjs` `9d2d096495635d89…`
-  - `apps\desktop\e2e-local-provider.mjs` `d965a00c05c3eec4…`
+  - `apps\desktop\e2e-artifact.mjs` `722caeaece29ddcc…`
+  - `apps\desktop\e2e-local-provider.mjs` `4554e597bd9884de…`
   - … and 12 more
 
 ## Rerun obligations on epoch change

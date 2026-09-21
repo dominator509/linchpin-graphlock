@@ -6,20 +6,20 @@ after any dependency change.
 ## Inventory
 
 - Rust (cargo) first-party packages: 12
-- Rust (cargo) third-party components: 495
+- Rust (cargo) third-party components: 507
 - JavaScript (npm) first-party packages: 3
-- JavaScript (npm) third-party components: 210
-- Total components across both ecosystems: 720
+- JavaScript (npm) third-party components: 249
+- Total components across both ecosystems: 771
 
 ## Artifact identity
 
-- `target\release\linchpin-desktop.exe` sha256 `016f542676e055053bf5ad3a771f6e8b060ff637baa6adf23fa3825f767588c5`
-- `Cargo.lock` sha256 `621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4`
-- `pnpm-lock.yaml` sha256 `45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf`
+- `target\release\linchpin-desktop.exe` sha256 `2c94241d1e10f1f23163c673b15e8c9d377a73f8a77f16d0eb674a8fed64bcb3`
+- `Cargo.lock` sha256 `2eaa1beb54674feb35f3befcdd5a18812ec9cd2e7adddedd92e89355d4bd4c2f`
+- `pnpm-lock.yaml` sha256 `ad1d2b6b478f636ac8bf340e86b870cbe3290675386a743414584564c027ba9f`
 
 ## License inventory (Rust)
 
-- `choice, allowlisted alternative available`: 346 component(s) — every alternative on the allowlist, so no review needed
+- `choice, allowlisted alternative available`: 358 component(s) — every alternative on the allowlist, so no review needed
 - `MIT`: 126 component(s)
 - `Unicode-3.0`: 18 component(s)
 - `Apache-2.0`: 6 component(s)
@@ -42,13 +42,14 @@ after any dependency change.
 
 ## License inventory (JavaScript)
 
-- `MIT`: 165 component(s)
-- `Apache-2.0`: 19 component(s)
+- `MIT`: 190 component(s)
+- `Apache-2.0`: 29 component(s)
 - `ISC`: 12 component(s)
-- `BSD-2-Clause`: 6 component(s)
+- `BSD-2-Clause`: 8 component(s)
 - `Apache-2.0 OR MIT (allowlisted alternative)`: 3 component(s) — **not on the LICENSE_ALLOWLIST.md default allowlist**
 - `NOASSERTION`: 3 component(s)
 - `BSD-3-Clause`: 2 component(s)
+- `MPL-2.0`: 2 component(s)
 - `BlueOak-1.0.0`: 1 component(s) — **not on the LICENSE_ALLOWLIST.md default allowlist**
 - `CC-BY-4.0`: 1 component(s) — **not on the LICENSE_ALLOWLIST.md default allowlist**
 - `Python-2.0`: 1 component(s) — **not on the LICENSE_ALLOWLIST.md default allowlist**

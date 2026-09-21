@@ -74,10 +74,10 @@ CASES: dict[str, dict] = {
             ("run", "deny-advisories", ["advisories ok"]),
             ("run", "deny-bans", []),
             ("run", "deny-sources", ["sources ok"]),
-            ("run", "pnpm-audit", ["Severity: 2 moderate"]),
+            ("run", "pnpm-audit", ["No known vulnerabilities found"]),
         ],
-        "finding": "Composition analysis executed against the locked graphs of both ecosystems: cargo-deny advisories/bans/sources and `pnpm audit --audit-level high`, all exit 0.",
-        "not_proven": "The npm audit reports 2 moderate advisories; they are below the enforced high threshold and are dev-only, which is a disclosed accepted risk rather than a clean bill.",
+        "finding": "Composition analysis executed against the locked graphs of both ecosystems: cargo-deny advisories/bans/sources and `pnpm audit`, all exit 0. The npm audit reports no known vulnerabilities at all, not merely none above the enforced threshold: the two moderate advisories it used to report (GHSA-82fw-gwwq-j7x9 through vitest and @vitest/mocker) were REMEDIATED by the vitest upgrade (3.2.7 -> 5.0.1 via Dependabot PRs #7 and #11), and the register entries that assessed them are marked RESOLVED because no scanner reports them any more.",
+        "not_proven": "Scanning is per-candidate, not continuous in this harness: an advisory published after this run is only seen on the next one. (Continuous coverage is what the repository's Dependabot alerts and weekly version updates provide, and they are configured separately.)",
     },
     "GEN-003": {
         "status": "PASS",
@@ -155,7 +155,7 @@ CASES: dict[str, dict] = {
         "status": "PASS",
         "cites": [
             ("run", "deny-advisories", ["advisories ok"]),
-            ("run", "pnpm-audit", ["2 vulnerabilities found"]),
+            ("run", "pnpm-audit", ["No known vulnerabilities found"]),
             ("run", "security-check", ["security-check: ok"]),
         ],
         "finding": "Vulnerability scanning executed for both ecosystems against the RustSec and npm advisory databases, with the enforced threshold stated and the two moderate dev-only npm advisories disclosed rather than suppressed.",
@@ -169,7 +169,7 @@ CASES: dict[str, dict] = {
             ("artifact", ".agent/verification/state/ADVISORY_ASSESSMENTS.json", ["observed_paths", "reachability"]),
             ("run", "deny-advisories", ["advisories ok"]),
         ],
-        "finding": "Vulnerability assessment now runs, which is what this row denied: a scan FINDS, an assessment DECIDES. scripts/assess-advisories.py normalizes what the two scanners report (`cargo deny --format json check advisories`, `pnpm audit --json`) and binds each finding to an authored entry carrying the decision, the REACHABILITY fact that decides it (devDependency path versus shipped artefact), the owner, and the dependency paths it was assessed against. On this candidate: cargo-deny reports no advisories; pnpm audit reports two moderate advisories, BOTH reached only through the vitest devDependency tree ('.>vitest' and '.>vitest>@vitest/mocker'), so both are assessed ACCEPT with the reachability stated and the deferral of the vitest upgrade recorded. The harness FAILS when a scanner reports an advisory with no decision, when a decision lacks a rationale, reachability statement or owner, when an ACCEPT entry's observed paths no longer match the scan (the dependency moved, so the assessment is stale), when a LIVE advisory is filed as RESOLVED, and when the register carries a decision about an advisory nothing reports any more.",
+        "finding": "Vulnerability assessment now runs, which is what this row denied: a scan FINDS, an assessment DECIDES. scripts/assess-advisories.py normalizes what the two scanners report (`cargo deny --format json check advisories`, `pnpm audit --json`) and binds each finding to an authored entry carrying the decision, the REACHABILITY fact that decides it (devDependency path versus shipped artefact), the owner, and the dependency paths it was assessed against. On this candidate BOTH scanners report nothing: cargo-deny has no advisories, and the two moderate npm advisories this lane used to assess ACCEPT are gone, because the vitest upgrade (3.2.7 -> 5.0.1, Dependabot PRs #7 and #11) remediated them -- GitHub marks the three corresponding alerts `fixed`. The register entries were therefore moved to RESOLVED with the remediation recorded, which is the state the harness demands: an entry describing an advisory nothing reports any more must say RESOLVED. The harness FAILS when a scanner reports an advisory with no decision, when a decision lacks a rationale, reachability statement or owner, when an ACCEPT entry's observed paths no longer match the scan (the dependency moved, so the assessment is stale), when a LIVE advisory is filed as RESOLVED, and when the register carries a decision about an advisory nothing reports any more.",
         "not_proven": "The assessment is reachability-based, not exploitability-based: it establishes where the vulnerable package sits in the graph and whether it ships, not whether a specific vulnerable code path can be driven in this configuration. No CVE severity scoring of our own, no vendor patch tracking, and no SBOM-to-advisory correlation beyond the two scanners.",
     },
     "GEN-044": {
@@ -430,11 +430,11 @@ CASES: dict[str, dict] = {
     "GEN-072": {
         "status": "PASS",
         "cites": [
-            ("run", "sbom-currency", ["sbom check: ok (720 components, current)"]),
+            ("run", "sbom-currency", ["sbom check: ok (771 components, current)"]),
             ("run", "security-check", ["security-check: ok"]),
             ("artifact", ".agent/evidence/sbom/linchpin.cdx.json", ['"bomFormat"', '"CycloneDX"', '"licenses"', "purl"]),
         ],
-        "finding": "SBOM generation and verification executed: CycloneDX 1.5 with 720 components and purls on every component, generated from the committed locks by scripts/generate-sbom.py, with a currency check enforced as a lane (it fails if the SBOM drifts from the locks). An earlier defect in which 0 of 720 components carried a purl was measured and fixed.",
+        "finding": "SBOM generation and verification executed: CycloneDX 1.5 with 771 components and purls on every component, generated from the committed locks by scripts/generate-sbom.py, with a currency check enforced as a lane (it fails if the SBOM drifts from the locks). The count moves with the dependency graph and is quoted from the gate's own output rather than remembered: it was 720 before the dependency upgrade campaign (vitest 5, vite 8, @vitejs/plugin-react 6, eslint 10, typescript 6, sha2 0.11, windows 0.62) and is 771 after it. An earlier defect in which 0 of the components carried a purl was measured and fixed.",
         "not_proven": "The SBOM covers Rust and npm components; OS-level and toolchain components are recorded in the environment manifest rather than the SBOM, and no VEX document accompanies it.",
     },
     "GEN-073": {

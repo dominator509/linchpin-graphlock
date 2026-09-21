@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "5ecce14",
+  "candidate_commit": "b909266",
   "classes": {
     "artifact-inputs": {
       "count": 3,
@@ -35,7 +35,7 @@
         "scripts\\add-requirement-markers.py": "284170077e1fd416877c2a519a5b25c579acfa145e79be1c29676db6a7c84b77",
         "scripts\\anti-gaming-scan.py": "32508faf211dc751ce214a30f0a06c45d097abd8748be9f935b8fae715ea848c",
         "scripts\\applicable-case-evidence.py": "b17db2fd7a086a4b66c5b3504c5e08c82cb0c0fdff468918bea90a26ea96f39f",
-        "scripts\\architecture-drift.py": "1df01d0b2864fea1ba094b2df67f1bcd236e60c2a42b9630bfec1502244c15e2",
+        "scripts\\architecture-drift.py": "33a601a4e5edd1fc0ed1478074467b186bf40901671e469c1e3aee379f856157",
         "scripts\\artifact-e2e.sh": "665ba19ebd5fd33fea01dd9f0c7c8801099110df397ebd10cefc5f403ec78468",
         "scripts\\artifact-identity.sh": "a716cc52d026a96ba73ccc81595b48604694550c86b636706ed7145f5b22cd65",
         "scripts\\assert-no-debug-port.py": "54b17113000ddaec872c310d5c063a3aba002cda17d03adebc8cb57b70589b44",
@@ -120,9 +120,9 @@
     "js-manifest": {
       "count": 7,
       "files": {
-        "apps\\desktop\\package.json": "d18a1ec62a81c654e8c4185395c9595c77b1757095623c65cf72c6358911c766",
+        "apps\\desktop\\package.json": "3610b6896dbf300a8a606bcea0e6a2030cf83ea88377228082870d540bf47fd2",
         "apps\\desktop\\tsconfig.json": "1103540815beff5bd5ee7c657bdf30c87f5692de58bd983721bcd4f088207887",
-        "package.json": "a134a377a798dbc2a903d6fabbeab711d074ffda8d84fa2bbef3ee71ee17ba6e",
+        "package.json": "1d4b93f3c093c28ef70328fc7d3c30996ccaddfb3fca4112f3c9e3ab33ab061f",
         "packages\\contracts\\package.json": "590af66611d4d9a6db19829961e7edcca9d86f88266c58b83c9d274888714cb3",
         "packages\\contracts\\tsconfig.json": "53c70f0a66f811ad34ffaa5ee2f0353ac04d087a2911262dadbe7c03ae7d25f5",
         "packages\\ui\\package.json": "e4b3caf000781a3fa96745c133013258c8aece4c83240d9d4bfa913e6e08052f",
@@ -155,8 +155,8 @@
     "lockfile": {
       "count": 2,
       "files": {
-        "Cargo.lock": "771d4279475074c646a42fda91814f3cf5cabc8618e9be86a13849af0bc1d0a3",
-        "pnpm-lock.yaml": "45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf"
+        "Cargo.lock": "2eaa1beb54674feb35f3befcdd5a18812ec9cd2e7adddedd92e89355d4bd4c2f",
+        "pnpm-lock.yaml": "ad1d2b6b478f636ac8bf340e86b870cbe3290675386a743414584564c027ba9f"
       },
       "rules": [
         "V-004 supply chain",
@@ -176,10 +176,10 @@
         "crates\\evidence\\Cargo.toml": "ce1616d9781c52937a83e40b9968dcfdcfdbe0fe572c2866fa6a590d1b23c97d",
         "crates\\mcp_hub\\Cargo.toml": "93fa1c930b882292a38ea2b333b3786b805c04ad3630759bb1703b40a9449ff4",
         "crates\\patent\\Cargo.toml": "bb4d8802e8d730d5aca824d8bb1a6d9b0b70cc857d7252cf692d3f8b8b9e2835",
-        "crates\\platform_windows\\Cargo.toml": "7093b1a68c8424b6a2a617bfd6c4f357a6c03348bf244c0d87d378bdf1924012",
+        "crates\\platform_windows\\Cargo.toml": "be6127c4b4b2cb544e4d75e02d3af8bfd888f5a8b42132229717be1db57cb7a8",
         "crates\\provider_transport\\Cargo.toml": "c373ec6b9be27b1f7f2bb83425ddb3444dd4bce6294644ed5d3acf5e528b4937",
         "crates\\research\\Cargo.toml": "231cd899881a14253d8caf831a95fe6dd7bd1184b3abbe6d9204c495f95bfd10",
-        "crates\\storage\\Cargo.toml": "0a565a2e5dd5e92f234242b2ab3a7a5d05bdc6c68c29632b4a42def3956723e0",
+        "crates\\storage\\Cargo.toml": "b9bed8eb37ac7367b49d641fee4ab6b7c6f15612165a414b4643166e96360410",
         "deny.toml": "280e8e73e6e7d076b955bdc21f3c4d564971343275bbf4141427603d380ff569",
         "rust-toolchain.toml": "89d9c3c3266967c0be43405f082a94cda8eab9b2cfdf28538eda48fa5e08c398"
       },
@@ -210,7 +210,7 @@
         "crates\\provider_transport\\src\\lib.rs": "4ce5b57353114dc11689fdc0e3808fce576bdf8c063638bbcb8045856868e3c1",
         "crates\\research\\src\\lib.rs": "d13a774154e3b9a8551e802a8b2eb0836740c9fca20dc6f407f0ca36fd8b6a12",
         "crates\\storage\\src\\lib.rs": "2120d9e12f59677ec1be5b0d27bf3530d767a91bf898431fef0ae57af467db35",
-        "crates\\storage\\src\\vault.rs": "0867936570fd44ef675c67f7f81d98eb8edcb1f9f23c4639243ffd622f5487d6",
+        "crates\\storage\\src\\vault.rs": "14b5a90bb9429b2d8cf467a70151c72e2d6b28cc692c1072bd396eb7bbb7ecef",
         "crates\\storage\\tests\\integration_real_dependencies.rs": "f1a3c433b86e22cdddfaaa95d1658e76b1c2a81414a06bd33299da73f7d51539"
       },
       "rules": [
@@ -229,8 +229,8 @@
         ".agent\\verification\\DOD_REGISTRY.csv": "00f5c07371e18341a65c9aa91a3106e0b7327d825459ed47166fe10434eeb0c4",
         ".agent\\verification\\MASTER_TEST_REGISTRY.csv": "d8a5389cfb2968855b88a0e7f78bdbb1f0c65851c8d400c8c04224e161cd1b95",
         ".agent\\verification\\state\\TEST_COLLECTION_MANIFEST.json": "0d5093616d55dead9cd6f843896de8071b618911b62a0bbef780fbe1b3e7e803",
-        "apps\\desktop\\e2e-artifact.mjs": "9d2d096495635d89e0c6d9ea198b5ae900c3034cab0e18275e3e6ac67af3b625",
-        "apps\\desktop\\e2e-local-provider.mjs": "d965a00c05c3eec4868e0984d6e35bf150bc34fa072cddd35172dd1749ddc671",
+        "apps\\desktop\\e2e-artifact.mjs": "722caeaece29ddcca0c585cd2f48b1286d15d9db0f42658e30d164a48d9e5e49",
+        "apps\\desktop\\e2e-local-provider.mjs": "4554e597bd9884de60841721467d1bbc9cdefdb0c10163ef3a7a9fc1e4f1b3ff",
         "apps\\desktop\\e2e\\shell.spec.ts": "d4a08469939173f196d158de33d1c00b91c5ccc9785ac995e4589e3864641eb2",
         "apps\\desktop\\src-tauri\\tests\\fuzz_campaign.rs": "403e7ae8bc39e52db7bdbd65032366626d84eefdf894274421d738e632574972",
         "apps\\desktop\\src-tauri\\tests\\performance_gate.rs": "d2db51b86e4c130c00257e539dd4d9c056e00eb1eb60e6a664928df3876c9f3c",
@@ -254,8 +254,8 @@
       ]
     }
   },
-  "epoch_digest": "ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74",
-  "prior_candidate_commit": "a612eb4",
+  "epoch_digest": "3bf54a3714dc32f9b9e23fc2fce07703f2886b27831766af298cfbd99909d333",
+  "prior_candidate_commit": "5ecce14",
   "prior_epoch_digest": "ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74",
   "total_inputs": 156
 }

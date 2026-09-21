@@ -113,6 +113,7 @@ get_system_health,desktop,apps/desktop/src-tauri/src/lib.rs,ENTRY_POINT,register
 get_traces_for,crash_reporter,crates/crash_reporter/src/lib.rs,TEST_ONLY,named only from tests: crates\crash_reporter\src\lib.rs
 get_value,storage,crates/storage/src/lib.rs,TEST_ONLY,named only from tests: crates\storage\src\lib.rs
 grant_capability,mcp_hub,crates/mcp_hub/src/lib.rs,REACHABLE,named from apps\desktop\src-tauri\src\commands.rs
+hex_lower,storage,crates/storage/src/vault.rs,REACHABLE,named from crates\storage\src\vault.rs
 identity,provider_transport,crates/provider_transport/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\domain\src\lib.rs, crates\evidence\src\lib.rs"
 import,patent,crates/patent/src/lib.rs,REACHABLE,"named from apps\desktop\src-tauri\src\commands.rs, crates\application\src\lib.rs, crates\patent\src\lib.rs"
 import_receipt,desktop,apps/desktop/src-tauri/src/commands.rs,ENTRY_POINT,registered in generate_handler![...]

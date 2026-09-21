@@ -1,6 +1,6 @@
 {
   "executable": "target/release/linchpin-desktop-e2e.exe",
-  "executable_sha256": "eefdf3324d356813a3a1278b454d279b40c3f0fd02c26e116100c30fd965c324",
+  "executable_sha256": "c6e69e28983874e80bbc587ecb0f5250b2cc8360882b9c9ceb1d24212942149a",
   "endpoint": "http://127.0.0.1:11434",
   "model": "smollm2:135m",
   "checks": [
@@ -32,7 +32,7 @@
     {
       "name": "completion is non-empty",
       "ok": true,
-      "observed": "\"A patent claim is a legally protected work of art, created by a person or entity, that is intended to be made, used, dis\""
+      "observed": "\"A patent claim is a legal document providing protection for a unique and exclusive invention, feature, or process, desig\""
     },
     {
       "name": "metadata names the live model",
@@ -47,7 +47,7 @@
     {
       "name": "a second, differently-phrased request also returns real output",
       "ok": true,
-      "observed": "\"is a legal monopoly\""
+      "observed": "\"a legal monopoly\""
     },
     {
       "name": "non-loopback endpoint is refused (POLICY, no attempt)",
@@ -97,17 +97,17 @@
     {
       "name": "egress sampler started and polled (harness liveness, REQ-REL-002)",
       "ok": true,
-      "observed": "ready=true heartbeats=2"
+      "observed": "ready=true polls=13"
     },
     {
       "name": "egress sampler observes connections (positive control, REQ-REL-002)",
       "ok": true,
-      "observed": "observed=[0.0.0.0,127.0.0.1] live_calls=11 (minimum 5)"
+      "observed": "observed=[127.0.0.1] live_calls=5 (minimum 5)"
     },
     {
       "name": "core: no non-loopback egress during core workflows (REQ-PLAT-002, REQ-REL-002)",
       "ok": true,
-      "observed": "observed 2 distinct endpoint(s): 0.0.0.0,127.0.0.1"
+      "observed": "observed 1 distinct endpoint(s): 127.0.0.1"
     },
     {
       "name": "core: user evidence persists to a device-local vault file (REQ-PLAT-002)",
@@ -117,7 +117,7 @@
     {
       "name": "artifact digest unchanged across the run",
       "ok": true,
-      "observed": "eefdf3324d356813 -> eefdf3324d356813"
+      "observed": "c6e69e28983874e8 -> c6e69e28983874e8"
     }
   ],
   "passed": 23,

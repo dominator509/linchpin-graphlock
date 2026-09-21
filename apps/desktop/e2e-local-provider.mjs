@@ -369,52 +369,72 @@ try {
   // least one loopback endpoint observed (positive control) and zero non-loopback
   // endpoints (the requirement).
   const observed = new Set();
-  let samplerReady = false;
-  let heartbeats = 0;
-  const sampler = spawn(
-    "powershell",
-    [
-      "-NoProfile",
-      "-Command",
-      // A heartbeat per poll, not every fifth: each poll costs a
-      // Get-NetTCPConnection call, so a short window can complete fewer than
-      // five iterations, and a liveness check that cannot observe a genuinely
-      // working sampler is a false failure. Measured: every fifth poll reported
-      // heartbeats=0 while the sampler had already observed two real endpoints.
-      //
-      // The explicit flush matters for the same reason: without it PowerShell's
-      // redirected stdout is buffered, so observations reached the caller in
-      // late bursts and the inference loop ran its full 25-call cap before the
-      // loopback connection it was waiting for appeared.
-      `$deadline = (Get-Date).AddSeconds(180)
-$polls = 0
-Write-Output "READY"
-[Console]::Out.Flush()
-while ((Get-Date) -lt $deadline) {
-  $polls++
-  Get-NetTCPConnection -OwningProcess ${app.pid} -ErrorAction SilentlyContinue |
-    ForEach-Object { $_.RemoteAddress }
-  Write-Output "HEARTBEAT $polls"
-  [Console]::Out.Flush()
-  Start-Sleep -Milliseconds 20
-}`,
-    ],
-    { stdio: ["ignore", "pipe", "ignore"] },
-  );
-  sampler.stdout.on("data", (buf) => {
-    for (const line of String(buf).split(/\r?\n/)) {
-      const addr = line.trim();
-      if (!addr) continue;
-      if (addr === "READY") samplerReady = true;
-      else if (addr.startsWith("HEARTBEAT")) heartbeats += 1;
-      else observed.add(addr);
+  let polls = 0;
+  let samplerRunning = true;
+  const samplerErrors = [];
+  // The sampler runs `netstat -ano` repeatedly instead of the
+  // `Get-NetTCPConnection` cmdlet in a PowerShell loop.
+  //
+  // MEASURED FAILURE, which is why this changed: a settle run reported
+  // `ready=true heartbeats=0` and `observed=[] live_calls=25`. The PowerShell script
+  // printed READY and then never completed a single poll inside its 180 s window,
+  // because every iteration is a CIM/WMI query and the machine was busy running 25
+  // real (CPU-bound) inference calls. The connection it exists to witness is
+  // short-lived, so a poll that takes seconds cannot see it. `netstat -ano` is a
+  // native binary that returns in tens of milliseconds, so the positive control can
+  // win that race. The assertions are UNCHANGED: at least one loopback endpoint
+  // observed and zero non-loopback endpoints.
+  //
+  // stderr is captured rather than discarded. The same run gave no reason at all for
+  // the silence because stdio dropped it, and a harness that cannot say why its own
+  // instrument failed is the kind of gate that gets weakened later.
+  const appPid = String(app.pid);
+  const parseNetstat = (text) => {
+    for (const line of text.split(/\r?\n/)) {
+      const parts = line.trim().split(/\s+/);
+      // Proto  Local Address  Foreign Address  State  PID
+      if (parts.length < 5 || parts[0].toUpperCase() !== "TCP") continue;
+      if (parts[4] !== appPid) continue;
+      // netstat prints `127.0.0.1:11434`, `[::1]:11434`, or a bare address.
+      const host = (parts[2] ?? "")
+        .replace(/:\d+$/, "")
+        .replace(/^\[|\]$/g, "");
+      if (host) observed.add(host);
     }
-  });
+  };
+  const pollOnce = () => {
+    if (!samplerRunning) return;
+    const child = spawn("netstat", ["-ano", "-p", "tcp"], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let out = "";
+    child.stdout.on("data", (buf) => {
+      out += String(buf);
+    });
+    child.stderr.on("data", (buf) => {
+      const text = String(buf).trim();
+      if (text) samplerErrors.push(text.split(/\r?\n/)[0]);
+    });
+    child.on("error", (err) =>
+      samplerErrors.push(`spawn failed: ${err.message}`),
+    );
+    child.on("close", () => {
+      polls += 1;
+      parseNetstat(out);
+      if (samplerRunning) {
+        const next = setTimeout(pollOnce, 20);
+        next.unref?.();
+      }
+    });
+  };
+  pollOnce();
 
-  // Wait (bounded) for the sampler to prove it is polling BEFORE generating the
-  // connections it is supposed to see.
+  // Wait (bounded) for at least one completed poll BEFORE generating the connections
+  // the sampler is supposed to see, so a slow first poll cannot be mistaken for a
+  // product that makes no loopback connection.
   const readyDeadline = Date.now() + 30000;
-  while (!samplerReady && Date.now() < readyDeadline) await sleep(50);
+  while (polls === 0 && Date.now() < readyDeadline) await sleep(20);
+  const samplerReady = polls > 0;
 
   // Several real inference calls, repeated until the loopback connection is
   // actually observed rather than hoped for.
@@ -434,7 +454,7 @@ while ((Get-Date) -lt $deadline) {
     if (Date.now() > observeDeadline) break;
   }
   await sleep(300);
-  sampler.kill();
+  samplerRunning = false;
   await sleep(200);
 
   const addrs = [...observed];
@@ -455,11 +475,14 @@ while ((Get-Date) -lt $deadline) {
   );
 
   // Liveness of the harness itself, recorded separately so a sampler that never
-  // started is never reported as a product finding.
+  // started is never reported as a product finding. The reason for a silent sampler
+  // is included when there is one, because "heartbeats=0" with no explanation is how
+  // a harness failure gets mistaken for a product result.
   record(
     "egress sampler started and polled (harness liveness, REQ-REL-002)",
-    samplerReady && heartbeats > 0,
-    `ready=${samplerReady} heartbeats=${heartbeats}`,
+    samplerReady && polls > 0,
+    `ready=${samplerReady} polls=${polls}` +
+      (samplerErrors.length ? ` sampler_error=${samplerErrors[0]}` : ""),
   );
   record(
     "egress sampler observes connections (positive control, REQ-REL-002)",

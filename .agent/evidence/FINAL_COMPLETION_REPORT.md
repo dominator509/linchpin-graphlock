@@ -1,14 +1,14 @@
 # LINCHPIN — final completion report (DOD-028)
 
-Derived by `scripts/completion-report.py` at 2026-09-17T23:26:07Z from the verification state. Every number below is read from a state file, not transcribed.
+Derived by `scripts/completion-report.py` at 2026-09-21T07:53:21Z from the verification state. Every number below is read from a state file, not transcribed.
 
 ## Release verdict
 
 - Machine-validated verdict: **CONDITIONAL_EXTERNAL_GATES**
 - Blocking clauses: none
-- Candidate commit: `a612eb47dd41d9f9f60f4add12abe9798b65dc8c` (base `3ee9c3f41795`)
-- Working tree at manifest time: DIRTY (9 changed files)
-- Epoch: `ff66d326b022152c` over 156 tracked inputs
+- Candidate commit: `b909266e6132e587d6ad88a02d9ab5249372f705` (base `3ee9c3f41795`)
+- Working tree at manifest time: DIRTY (21 changed files)
+- Epoch: `3bf54a3714dc32f9` over 156 tracked inputs
 
 ## Verified behavior — executed and observed
 
@@ -16,7 +16,7 @@ Derived by `scripts/completion-report.py` at 2026-09-17T23:26:07Z from the verif
 - **57 of 59 requirements are bound to executed acceptance tests** (.agent/verification/REQUIREMENT_TRACEABILITY.csv)
 - **484 registry capabilities accounted**, one status each ({'PASS': 58, 'NOT_APPLICABLE': 410, 'EXTERNAL_REQUIRED': 7, 'PARTIAL': 4, 'NOT_RUN_BLOCKED_MATERIAL': 4, 'DEFERRED_LONG_RUNNING': 1})
 - **14 controlled defect(s)** are applied, caught by their guarding test, restored byte-for-byte and rerun green (`scripts/mutation-proof.py`)
-- Artifacts bound to this run: executable `2c94241d1e10f1f2…` (12500992 bytes), MSI `f9ac3296af27494f…` (5709824 bytes)
+- Artifacts bound to this run: executable `289bd76cbe2c1a6b…` (12508672 bytes), MSI `6a15972784d06e7d…` (5713920 bytes)
 
 Evidence for the executed lanes, each bindable to the digests above: the browser suite, the
 exact-artifact lane over CDP, the provider live-fire against a real loopback model, the

@@ -617,6 +617,33 @@
       "version": "0.10.4"
     },
     {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#block-buffer@0.12.1",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.12.1",
+      "scope": "required",
+      "type": "library",
+      "version": "0.12.1"
+    },
+    {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#block2@0.6.2",
       "externalReferences": [
         {
@@ -1286,6 +1313,33 @@
       "version": "0.1.0"
     },
     {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#const-oid@0.10.2",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0 OR MIT"
+          }
+        }
+      ],
+      "name": "const-oid",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/const-oid@0.10.2",
+      "scope": "required",
+      "type": "library",
+      "version": "0.10.2"
+    },
+    {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#cookie@0.18.2",
       "externalReferences": [
         {
@@ -1446,6 +1500,33 @@
       "scope": "required",
       "type": "library",
       "version": "0.2.17"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#cpufeatures@0.3.1",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "cpufeatures",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/cpufeatures@0.3.1",
+      "scope": "required",
+      "type": "library",
+      "version": "0.3.1"
     },
     {
       "bom-ref": "path+file:///C:/dev/linchpin-graphlock/crates/crash_reporter#0.1.0",
@@ -1656,6 +1737,33 @@
       "scope": "required",
       "type": "library",
       "version": "0.1.7"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#crypto-common@0.2.2",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.2.2",
+      "scope": "required",
+      "type": "library",
+      "version": "0.2.2"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#cssparser@0.36.0",
@@ -2088,6 +2196,33 @@
       "scope": "required",
       "type": "library",
       "version": "0.10.7"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#digest@0.11.3",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "digest",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.11.3",
+      "scope": "required",
+      "type": "library",
+      "version": "0.11.3"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#dirs@6.0.0",
@@ -4236,6 +4371,33 @@
       "scope": "required",
       "type": "library",
       "version": "1.10.1"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#hybrid-array@0.4.15",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "hybrid-array",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/hybrid-array@0.4.15",
+      "scope": "required",
+      "type": "library",
+      "version": "0.4.15"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#hyper@1.11.1",
@@ -8846,6 +9008,33 @@
       "version": "0.10.9"
     },
     {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#sha2@0.11.0",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.11.0",
+      "scope": "required",
+      "type": "library",
+      "version": "0.11.0"
+    },
+    {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#shlex@2.0.1",
       "externalReferences": [
         {
@@ -11324,7 +11513,7 @@
       "version": "1.0.4"
     },
     {
-      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.26.0",
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.26.1",
       "externalReferences": [
         {
           "type": "distribution",
@@ -11345,10 +11534,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:cargo/uuid@1.26.0",
+      "purl": "pkg:cargo/uuid@1.26.1",
       "scope": "required",
       "type": "library",
-      "version": "1.26.0"
+      "version": "1.26.1"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#vcpkg@0.2.15",
@@ -12107,6 +12296,33 @@
       "version": "0.61.3"
     },
     {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows@0.62.2",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "windows",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/windows@0.62.2",
+      "scope": "required",
+      "type": "library",
+      "version": "0.62.2"
+    },
+    {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-collections@0.2.0",
       "externalReferences": [
         {
@@ -12132,6 +12348,33 @@
       "scope": "required",
       "type": "library",
       "version": "0.2.0"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-collections@0.3.2",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "windows-collections",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/windows-collections@0.3.2",
+      "scope": "required",
+      "type": "library",
+      "version": "0.3.2"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-core@0.61.2",
@@ -12213,6 +12456,33 @@
       "scope": "required",
       "type": "library",
       "version": "0.2.1"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-future@0.3.2",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "windows-future",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/windows-future@0.3.2",
+      "scope": "required",
+      "type": "library",
+      "version": "0.3.2"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-implement@0.60.2",
@@ -12348,6 +12618,33 @@
       "scope": "required",
       "type": "library",
       "version": "0.2.0"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-numerics@0.3.1",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "windows-numerics",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/windows-numerics@0.3.1",
+      "scope": "required",
+      "type": "library",
+      "version": "0.3.1"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-result@0.3.4",
@@ -12618,6 +12915,33 @@
       "scope": "required",
       "type": "library",
       "version": "0.1.0"
+    },
+    {
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-threading@0.2.1",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT OR Apache-2.0"
+          }
+        }
+      ],
+      "name": "windows-threading",
+      "properties": [
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:cargo/windows-threading@0.2.1",
+      "scope": "required",
+      "type": "library",
+      "version": "0.2.1"
     },
     {
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#windows-version@0.1.7",
@@ -14419,6 +14743,156 @@
       "version": "7.29.7"
     },
     {
+      "bom-ref": "npm:@cacheable/memory@2.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@cacheable/memory",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40cacheable/memory@2.2.0",
+      "scope": "required",
+      "type": "library",
+      "version": "2.2.0"
+    },
+    {
+      "bom-ref": "npm:@cacheable/utils@2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@cacheable/utils",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40cacheable/utils@2.5.0",
+      "scope": "required",
+      "type": "library",
+      "version": "2.5.0"
+    },
+    {
+      "bom-ref": "npm:@keyv/bigmap@1.3.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@keyv/bigmap",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40keyv/bigmap@1.3.1",
+      "scope": "required",
+      "type": "library",
+      "version": "1.3.1"
+    },
+    {
+      "bom-ref": "npm:hookified@1.15.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "hookified",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/hookified@1.15.1",
+      "scope": "required",
+      "type": "library",
+      "version": "1.15.1"
+    },
+    {
+      "bom-ref": "npm:keyv@5.6.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "keyv",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/keyv@5.6.0",
+      "scope": "required",
+      "type": "library",
+      "version": "5.6.0"
+    },
+    {
+      "bom-ref": "npm:hashery@1.5.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "hashery",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/hashery@1.5.1",
+      "scope": "required",
+      "type": "library",
+      "version": "1.5.1"
+    },
+    {
       "bom-ref": "npm:@esbuild/win32-x64@0.25.12",
       "licenses": [
         {
@@ -14519,6 +14993,81 @@
       "version": "3.1.5"
     },
     {
+      "bom-ref": "npm:@eslint/config-array@0.23.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "@eslint/config-array",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/config-array@0.23.5",
+      "scope": "required",
+      "type": "library",
+      "version": "0.23.5"
+    },
+    {
+      "bom-ref": "npm:@eslint/object-schema@3.0.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "@eslint/object-schema",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/object-schema@3.0.5",
+      "scope": "required",
+      "type": "library",
+      "version": "3.0.5"
+    },
+    {
+      "bom-ref": "npm:minimatch@10.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "BlueOak-1.0.0"
+          }
+        }
+      ],
+      "name": "minimatch",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/minimatch@10.2.6",
+      "scope": "required",
+      "type": "library",
+      "version": "10.2.6"
+    },
+    {
       "bom-ref": "npm:@eslint/config-helpers@0.4.2",
       "licenses": [
         {
@@ -14567,6 +15116,56 @@
       "scope": "required",
       "type": "library",
       "version": "0.17.0"
+    },
+    {
+      "bom-ref": "npm:@eslint/config-helpers@0.7.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "@eslint/config-helpers",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/config-helpers@0.7.0",
+      "scope": "required",
+      "type": "library",
+      "version": "0.7.0"
+    },
+    {
+      "bom-ref": "npm:@eslint/core@1.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "@eslint/core",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/core@1.2.1",
+      "scope": "required",
+      "type": "library",
+      "version": "1.2.1"
     },
     {
       "bom-ref": "npm:@types/json-schema@7.0.15",
@@ -14869,6 +15468,31 @@
       "version": "0.4.1"
     },
     {
+      "bom-ref": "npm:@eslint/plugin-kit@0.7.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "@eslint/plugin-kit",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/plugin-kit@0.7.3",
+      "scope": "required",
+      "type": "library",
+      "version": "0.7.3"
+    },
+    {
       "bom-ref": "npm:@eslint-community/eslint-utils@4.10.1",
       "licenses": [
         {
@@ -14894,7 +15518,7 @@
       "version": "4.10.1"
     },
     {
-      "bom-ref": "npm:eslint@9.39.5",
+      "bom-ref": "npm:eslint@10.10.0",
       "licenses": [
         {
           "license": {
@@ -14913,10 +15537,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/eslint@9.39.5",
+      "purl": "pkg:npm/eslint@10.10.0",
       "scope": "required",
       "type": "library",
-      "version": "9.39.5"
+      "version": "10.10.0"
     },
     {
       "bom-ref": "npm:eslint-visitor-keys@3.4.3",
@@ -14942,6 +15566,31 @@
       "scope": "required",
       "type": "library",
       "version": "3.4.3"
+    },
+    {
+      "bom-ref": "npm:eslint@9.39.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "eslint",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/eslint@9.39.5",
+      "scope": "required",
+      "type": "library",
+      "version": "9.39.5"
     },
     {
       "bom-ref": "npm:@eslint-community/regexpp@4.12.2",
@@ -15144,6 +15793,56 @@
       "version": "3.1.2"
     },
     {
+      "bom-ref": "npm:@keyv/serialize@1.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@keyv/serialize",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40keyv/serialize@1.1.1",
+      "scope": "required",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "npm:@oxc-project/types@0.150.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@oxc-project/types",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40oxc-project/types@0.150.0",
+      "scope": "required",
+      "type": "library",
+      "version": "0.150.0"
+    },
+    {
       "bom-ref": "npm:@playwright/test@1.56.1",
       "licenses": [
         {
@@ -15194,6 +15893,81 @@
       "version": "1.56.1"
     },
     {
+      "bom-ref": "npm:@playwright/test@1.63.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "@playwright/test",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40playwright/test@1.63.0",
+      "scope": "required",
+      "type": "library",
+      "version": "1.63.0"
+    },
+    {
+      "bom-ref": "npm:playwright@1.63.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "playwright",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/playwright@1.63.0",
+      "scope": "required",
+      "type": "library",
+      "version": "1.63.0"
+    },
+    {
+      "bom-ref": "npm:@rolldown/binding-win32-x64-msvc@1.2.9",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@rolldown/binding-win32-x64-msvc",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40rolldown/binding-win32-x64-msvc@1.2.9",
+      "scope": "required",
+      "type": "library",
+      "version": "1.2.9"
+    },
+    {
       "bom-ref": "npm:@rolldown/pluginutils@1.0.0-beta.27",
       "licenses": [
         {
@@ -15217,6 +15991,31 @@
       "scope": "required",
       "type": "library",
       "version": "1.0.0-beta.27"
+    },
+    {
+      "bom-ref": "npm:@rolldown/pluginutils@1.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@rolldown/pluginutils",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40rolldown/pluginutils@1.0.1",
+      "scope": "required",
+      "type": "library",
+      "version": "1.0.1"
     },
     {
       "bom-ref": "npm:@rollup/rollup-win32-x64-gnu@4.63.1",
@@ -15267,6 +16066,31 @@
       "scope": "required",
       "type": "library",
       "version": "4.63.1"
+    },
+    {
+      "bom-ref": "npm:@standard-schema/spec@1.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@standard-schema/spec",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40standard-schema/spec@1.1.0",
+      "scope": "required",
+      "type": "library",
+      "version": "1.1.0"
     },
     {
       "bom-ref": "npm:@tauri-apps/api@2.11.1",
@@ -15519,6 +16343,31 @@
       "version": "2.0.1"
     },
     {
+      "bom-ref": "npm:@types/esrecurse@4.3.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@types/esrecurse",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40types/esrecurse@4.3.1",
+      "scope": "required",
+      "type": "library",
+      "version": "4.3.1"
+    },
+    {
       "bom-ref": "npm:@types/estree@1.0.9",
       "licenses": [
         {
@@ -15592,6 +16441,56 @@
       "scope": "required",
       "type": "library",
       "version": "19.2.7"
+    },
+    {
+      "bom-ref": "npm:@types/react@19.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@types/react",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40types/react@19.3.0",
+      "scope": "required",
+      "type": "library",
+      "version": "19.3.0"
+    },
+    {
+      "bom-ref": "npm:@types/react-dom@19.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@types/react-dom",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40types/react-dom@19.3.0",
+      "scope": "required",
+      "type": "library",
+      "version": "19.3.0"
     },
     {
       "bom-ref": "npm:csstype@3.2.3",
@@ -15844,6 +16743,31 @@
       "version": "2.5.0"
     },
     {
+      "bom-ref": "npm:typescript@6.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "typescript",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/typescript@6.0.3",
+      "scope": "required",
+      "type": "library",
+      "version": "6.0.3"
+    },
+    {
       "bom-ref": "npm:typescript@5.9.3",
       "licenses": [
         {
@@ -15967,31 +16891,6 @@
       "scope": "required",
       "type": "library",
       "version": "8.70.0"
-    },
-    {
-      "bom-ref": "npm:minimatch@10.2.6",
-      "licenses": [
-        {
-          "license": {
-            "id": "BlueOak-1.0.0"
-          }
-        }
-      ],
-      "name": "minimatch",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/minimatch@10.2.6",
-      "scope": "required",
-      "type": "library",
-      "version": "10.2.6"
     },
     {
       "bom-ref": "npm:semver@7.8.5",
@@ -16144,7 +17043,57 @@
       "version": "6.4.3"
     },
     {
-      "bom-ref": "npm:@vitest/expect@3.2.7",
+      "bom-ref": "npm:vite@8.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "vite",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/vite@8.3.0",
+      "scope": "required",
+      "type": "library",
+      "version": "8.3.0"
+    },
+    {
+      "bom-ref": "npm:@vitejs/plugin-react@6.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@vitejs/plugin-react",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40vitejs/plugin-react@6.1.1",
+      "scope": "required",
+      "type": "library",
+      "version": "6.1.1"
+    },
+    {
+      "bom-ref": "npm:@vitest/expect@4.1.11",
       "licenses": [
         {
           "license": {
@@ -16163,13 +17112,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/%40vitest/expect@3.2.7",
+      "purl": "pkg:npm/%40vitest/expect@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
+      "version": "4.1.11"
     },
     {
-      "bom-ref": "npm:@vitest/spy@3.2.7",
+      "bom-ref": "npm:@vitest/spy@4.1.11",
       "licenses": [
         {
           "license": {
@@ -16188,13 +17137,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/%40vitest/spy@3.2.7",
+      "purl": "pkg:npm/%40vitest/spy@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
+      "version": "4.1.11"
     },
     {
-      "bom-ref": "npm:@vitest/utils@3.2.7",
+      "bom-ref": "npm:@vitest/utils@4.1.11",
       "licenses": [
         {
           "license": {
@@ -16213,13 +17162,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/%40vitest/utils@3.2.7",
+      "purl": "pkg:npm/%40vitest/utils@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
+      "version": "4.1.11"
     },
     {
-      "bom-ref": "npm:chai@5.3.3",
+      "bom-ref": "npm:chai@6.2.2",
       "licenses": [
         {
           "license": {
@@ -16238,13 +17187,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/chai@5.3.3",
+      "purl": "pkg:npm/chai@6.2.2",
       "scope": "required",
       "type": "library",
-      "version": "5.3.3"
+      "version": "6.2.2"
     },
     {
-      "bom-ref": "npm:tinyrainbow@2.0.0",
+      "bom-ref": "npm:tinyrainbow@3.1.1",
       "licenses": [
         {
           "license": {
@@ -16263,13 +17212,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/tinyrainbow@2.0.0",
+      "purl": "pkg:npm/tinyrainbow@3.1.1",
       "scope": "required",
       "type": "library",
-      "version": "2.0.0"
+      "version": "3.1.1"
     },
     {
-      "bom-ref": "npm:@vitest/mocker@3.2.7",
+      "bom-ref": "npm:@vitest/mocker@4.1.11",
       "licenses": [
         {
           "license": {
@@ -16288,10 +17237,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/%40vitest/mocker@3.2.7",
+      "purl": "pkg:npm/%40vitest/mocker@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
+      "version": "4.1.11"
     },
     {
       "bom-ref": "npm:estree-walker@3.0.3",
@@ -16344,7 +17293,82 @@
       "version": "0.30.21"
     },
     {
-      "bom-ref": "npm:@vitest/pretty-format@3.2.7",
+      "bom-ref": "npm:@vitest/mocker@5.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@vitest/mocker",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40vitest/mocker@5.0.1",
+      "scope": "required",
+      "type": "library",
+      "version": "5.0.1"
+    },
+    {
+      "bom-ref": "npm:@vitest/spy@5.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "@vitest/spy",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/%40vitest/spy@5.0.1",
+      "scope": "required",
+      "type": "library",
+      "version": "5.0.1"
+    },
+    {
+      "bom-ref": "npm:magic-string@1.4.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "magic-string",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/magic-string@1.4.1",
+      "scope": "required",
+      "type": "library",
+      "version": "1.4.1"
+    },
+    {
+      "bom-ref": "npm:@vitest/pretty-format@4.1.11",
       "licenses": [
         {
           "license": {
@@ -16363,13 +17387,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/%40vitest/pretty-format@3.2.7",
+      "purl": "pkg:npm/%40vitest/pretty-format@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
+      "version": "4.1.11"
     },
     {
-      "bom-ref": "npm:@vitest/runner@3.2.7",
+      "bom-ref": "npm:@vitest/runner@4.1.11",
       "licenses": [
         {
           "license": {
@@ -16388,10 +17412,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/%40vitest/runner@3.2.7",
+      "purl": "pkg:npm/%40vitest/runner@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
+      "version": "4.1.11"
     },
     {
       "bom-ref": "npm:pathe@2.0.3",
@@ -16419,32 +17443,7 @@
       "version": "2.0.3"
     },
     {
-      "bom-ref": "npm:strip-literal@3.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "strip-literal",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/strip-literal@3.1.0",
-      "scope": "required",
-      "type": "library",
-      "version": "3.1.0"
-    },
-    {
-      "bom-ref": "npm:@vitest/snapshot@3.2.7",
+      "bom-ref": "npm:@vitest/snapshot@4.1.11",
       "licenses": [
         {
           "license": {
@@ -16463,60 +17462,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/%40vitest/snapshot@3.2.7",
+      "purl": "pkg:npm/%40vitest/snapshot@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
-    },
-    {
-      "bom-ref": "npm:tinyspy@4.0.6",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "tinyspy",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/tinyspy@4.0.6",
-      "scope": "required",
-      "type": "library",
-      "version": "4.0.6"
-    },
-    {
-      "bom-ref": "npm:loupe@3.2.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "loupe",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/loupe@3.2.1",
-      "scope": "required",
-      "type": "library",
-      "version": "3.2.1"
+      "version": "4.1.11"
     },
     {
       "bom-ref": "npm:acorn@8.18.0",
@@ -16994,7 +17943,7 @@
       "version": "1.3.2"
     },
     {
-      "bom-ref": "npm:cac@6.7.14",
+      "bom-ref": "npm:cacheable@2.5.0",
       "licenses": [
         {
           "license": {
@@ -17002,7 +17951,7 @@
           }
         }
       ],
-      "name": "cac",
+      "name": "cacheable",
       "properties": [
         {
           "name": "linchpin:ecosystem",
@@ -17013,10 +17962,35 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/cac@6.7.14",
+      "purl": "pkg:npm/cacheable@2.5.0",
       "scope": "required",
       "type": "library",
-      "version": "6.7.14"
+      "version": "2.5.0"
+    },
+    {
+      "bom-ref": "npm:qified@0.10.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "qified",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/qified@0.10.1",
+      "scope": "required",
+      "type": "library",
+      "version": "0.10.1"
     },
     {
       "bom-ref": "npm:callsites@3.1.0",
@@ -17042,81 +18016,6 @@
       "scope": "required",
       "type": "library",
       "version": "3.1.0"
-    },
-    {
-      "bom-ref": "npm:check-error@2.1.3",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "check-error",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/check-error@2.1.3",
-      "scope": "required",
-      "type": "library",
-      "version": "2.1.3"
-    },
-    {
-      "bom-ref": "npm:deep-eql@5.0.2",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "deep-eql",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/deep-eql@5.0.2",
-      "scope": "required",
-      "type": "library",
-      "version": "5.0.2"
-    },
-    {
-      "bom-ref": "npm:pathval@2.0.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "pathval",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/pathval@2.0.1",
-      "scope": "required",
-      "type": "library",
-      "version": "2.0.1"
     },
     {
       "bom-ref": "npm:chalk@4.1.2",
@@ -17344,7 +18243,32 @@
       "version": "0.1.4"
     },
     {
-      "bom-ref": "npm:es-module-lexer@1.7.0",
+      "bom-ref": "npm:detect-libc@2.1.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "detect-libc",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/detect-libc@2.1.2",
+      "scope": "required",
+      "type": "library",
+      "version": "2.1.2"
+    },
+    {
+      "bom-ref": "npm:es-module-lexer@2.3.2",
       "licenses": [
         {
           "license": {
@@ -17363,10 +18287,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/es-module-lexer@1.7.0",
+      "purl": "pkg:npm/es-module-lexer@2.3.2",
       "scope": "required",
       "type": "library",
-      "version": "1.7.0"
+      "version": "2.3.2"
     },
     {
       "bom-ref": "npm:esbuild@0.25.12",
@@ -17519,6 +18443,31 @@
       "version": "5.3.0"
     },
     {
+      "bom-ref": "npm:eslint-scope@9.1.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        }
+      ],
+      "name": "eslint-scope",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/eslint-scope@9.1.2",
+      "scope": "required",
+      "type": "library",
+      "version": "9.1.2"
+    },
+    {
       "bom-ref": "npm:eslint-visitor-keys@4.2.1",
       "licenses": [
         {
@@ -17542,6 +18491,31 @@
       "scope": "required",
       "type": "library",
       "version": "4.2.1"
+    },
+    {
+      "bom-ref": "npm:espree@11.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        }
+      ],
+      "name": "espree",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/espree@11.2.0",
+      "scope": "required",
+      "type": "library",
+      "version": "11.2.0"
     },
     {
       "bom-ref": "npm:esquery@1.7.0",
@@ -17594,7 +18568,7 @@
       "version": "2.0.3"
     },
     {
-      "bom-ref": "npm:file-entry-cache@8.0.0",
+      "bom-ref": "npm:file-entry-cache@11.1.5",
       "licenses": [
         {
           "license": {
@@ -17613,10 +18587,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/file-entry-cache@8.0.0",
+      "purl": "pkg:npm/file-entry-cache@11.1.5",
       "scope": "required",
       "type": "library",
-      "version": "8.0.0"
+      "version": "11.1.5"
     },
     {
       "bom-ref": "npm:find-up@5.0.0",
@@ -17744,31 +18718,6 @@
       "version": "1.0.1"
     },
     {
-      "bom-ref": "npm:lodash.merge@4.6.2",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "lodash.merge",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/lodash.merge@4.6.2",
-      "scope": "required",
-      "type": "library",
-      "version": "4.6.2"
-    },
-    {
       "bom-ref": "npm:optionator@0.9.4",
       "licenses": [
         {
@@ -17792,6 +18741,56 @@
       "scope": "required",
       "type": "library",
       "version": "0.9.4"
+    },
+    {
+      "bom-ref": "npm:file-entry-cache@8.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "file-entry-cache",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/file-entry-cache@8.0.0",
+      "scope": "required",
+      "type": "library",
+      "version": "8.0.0"
+    },
+    {
+      "bom-ref": "npm:lodash.merge@4.6.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "lodash.merge",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/lodash.merge@4.6.2",
+      "scope": "required",
+      "type": "library",
+      "version": "4.6.2"
     },
     {
       "bom-ref": "npm:expect-type@1.4.0",
@@ -17892,6 +18891,31 @@
       "scope": "required",
       "type": "library",
       "version": "4.0.7"
+    },
+    {
+      "bom-ref": "npm:flat-cache@6.1.23",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "flat-cache",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/flat-cache@6.1.23",
+      "scope": "required",
+      "type": "library",
+      "version": "6.1.23"
     },
     {
       "bom-ref": "npm:flat-cache@4.0.1",
@@ -18044,6 +19068,31 @@
       "version": "4.0.0"
     },
     {
+      "bom-ref": "npm:hookified@2.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "hookified",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/hookified@2.2.0",
+      "scope": "required",
+      "type": "library",
+      "version": "2.2.0"
+    },
+    {
       "bom-ref": "npm:parent-module@1.0.1",
       "licenses": [
         {
@@ -18144,31 +19193,6 @@
       "version": "2.0.0"
     },
     {
-      "bom-ref": "npm:js-tokens@9.0.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "js-tokens",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/js-tokens@9.0.1",
-      "scope": "required",
-      "type": "library",
-      "version": "9.0.1"
-    },
-    {
       "bom-ref": "npm:json-buffer@3.0.1",
       "licenses": [
         {
@@ -18244,6 +19268,56 @@
       "version": "0.4.0"
     },
     {
+      "bom-ref": "npm:lightningcss-win32-x64-msvc@1.33.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MPL-2.0"
+          }
+        }
+      ],
+      "name": "lightningcss-win32-x64-msvc",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/lightningcss-win32-x64-msvc@1.33.0",
+      "scope": "required",
+      "type": "library",
+      "version": "1.33.0"
+    },
+    {
+      "bom-ref": "npm:lightningcss@1.33.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MPL-2.0"
+          }
+        }
+      ],
+      "name": "lightningcss",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/lightningcss@1.33.0",
+      "scope": "required",
+      "type": "library",
+      "version": "1.33.0"
+    },
+    {
       "bom-ref": "npm:p-locate@5.0.0",
       "licenses": [
         {
@@ -18317,6 +19391,56 @@
       "scope": "required",
       "type": "library",
       "version": "3.3.18"
+    },
+    {
+      "bom-ref": "npm:nanoid@3.3.19",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "nanoid",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/nanoid@3.3.19",
+      "scope": "required",
+      "type": "library",
+      "version": "3.3.19"
+    },
+    {
+      "bom-ref": "npm:obug@2.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "obug",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/obug@2.2.1",
+      "scope": "required",
+      "type": "library",
+      "version": "2.2.1"
     },
     {
       "bom-ref": "npm:word-wrap@1.2.5",
@@ -18419,6 +19543,31 @@
       "version": "1.56.1"
     },
     {
+      "bom-ref": "npm:playwright-core@1.63.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "playwright-core",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/playwright-core@1.63.0",
+      "scope": "required",
+      "type": "library",
+      "version": "1.63.0"
+    },
+    {
       "bom-ref": "npm:postcss@8.5.28",
       "licenses": [
         {
@@ -18492,6 +19641,31 @@
       "scope": "required",
       "type": "library",
       "version": "3.9.6"
+    },
+    {
+      "bom-ref": "npm:prettier@3.9.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "prettier",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/prettier@3.9.8",
+      "scope": "required",
+      "type": "library",
+      "version": "3.9.8"
     },
     {
       "bom-ref": "npm:punycode@2.3.1",
@@ -18594,6 +19768,106 @@
       "version": "0.27.0"
     },
     {
+      "bom-ref": "npm:react@19.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "react",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/react@19.3.0",
+      "scope": "required",
+      "type": "library",
+      "version": "19.3.0"
+    },
+    {
+      "bom-ref": "npm:react-dom@19.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "react-dom",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/react-dom@19.3.0",
+      "scope": "required",
+      "type": "library",
+      "version": "19.3.0"
+    },
+    {
+      "bom-ref": "npm:scheduler@0.28.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "scheduler",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/scheduler@0.28.0",
+      "scope": "required",
+      "type": "library",
+      "version": "0.28.0"
+    },
+    {
+      "bom-ref": "npm:rolldown@1.2.9",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "rolldown",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/rolldown@1.2.9",
+      "scope": "required",
+      "type": "library",
+      "version": "1.2.9"
+    },
+    {
       "bom-ref": "npm:rollup@4.63.1",
       "licenses": [
         {
@@ -18694,7 +19968,7 @@
       "version": "0.0.2"
     },
     {
-      "bom-ref": "npm:std-env@3.10.0",
+      "bom-ref": "npm:std-env@4.2.0",
       "licenses": [
         {
           "license": {
@@ -18713,10 +19987,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/std-env@3.10.0",
+      "purl": "pkg:npm/std-env@4.2.0",
       "scope": "required",
       "type": "library",
-      "version": "3.10.0"
+      "version": "4.2.0"
     },
     {
       "bom-ref": "npm:tinybench@2.9.0",
@@ -18744,7 +20018,32 @@
       "version": "2.9.0"
     },
     {
-      "bom-ref": "npm:tinyexec@0.3.2",
+      "bom-ref": "npm:tinybench@6.1.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "tinybench",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/tinybench@6.1.4",
+      "scope": "required",
+      "type": "library",
+      "version": "6.1.4"
+    },
+    {
+      "bom-ref": "npm:tinyexec@1.3.0",
       "licenses": [
         {
           "license": {
@@ -18763,13 +20062,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/tinyexec@0.3.2",
+      "purl": "pkg:npm/tinyexec@1.3.0",
       "scope": "required",
       "type": "library",
-      "version": "0.3.2"
+      "version": "1.3.0"
     },
     {
-      "bom-ref": "npm:tinypool@1.1.1",
+      "bom-ref": "npm:tinyexec@1.3.1",
       "licenses": [
         {
           "license": {
@@ -18777,7 +20076,7 @@
           }
         }
       ],
-      "name": "tinypool",
+      "name": "tinyexec",
       "properties": [
         {
           "name": "linchpin:ecosystem",
@@ -18788,38 +20087,13 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/tinypool@1.1.1",
+      "purl": "pkg:npm/tinyexec@1.3.1",
       "scope": "required",
       "type": "library",
-      "version": "1.1.1"
+      "version": "1.3.1"
     },
     {
-      "bom-ref": "npm:vite-node@3.2.4",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "name": "vite-node",
-      "properties": [
-        {
-          "name": "linchpin:ecosystem",
-          "value": "npm"
-        },
-        {
-          "name": "linchpin:first_party",
-          "value": "false"
-        }
-      ],
-      "purl": "pkg:npm/vite-node@3.2.4",
-      "scope": "required",
-      "type": "library",
-      "version": "3.2.4"
-    },
-    {
-      "bom-ref": "npm:vitest@3.2.7",
+      "bom-ref": "npm:vitest@4.1.11",
       "licenses": [
         {
           "license": {
@@ -18838,10 +20112,10 @@
           "value": "false"
         }
       ],
-      "purl": "pkg:npm/vitest@3.2.7",
+      "purl": "pkg:npm/vitest@4.1.11",
       "scope": "required",
       "type": "library",
-      "version": "3.2.7"
+      "version": "4.1.11"
     },
     {
       "bom-ref": "npm:why-is-node-running@2.3.0",
@@ -18867,6 +20141,31 @@
       "scope": "required",
       "type": "library",
       "version": "2.3.0"
+    },
+    {
+      "bom-ref": "npm:vitest@5.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "vitest",
+      "properties": [
+        {
+          "name": "linchpin:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "linchpin:first_party",
+          "value": "false"
+        }
+      ],
+      "purl": "pkg:npm/vitest@5.0.1",
+      "scope": "required",
+      "type": "library",
+      "version": "5.0.1"
     },
     {
       "bom-ref": "npm:@linchpin/desktop@0.1.0",
@@ -18960,19 +20259,19 @@
     "properties": [
       {
         "name": "linchpin:artifact",
-        "value": "{\"artifact\": \"target\\\\release\\\\linchpin-desktop.exe\", \"sha256\": \"016f542676e055053bf5ad3a771f6e8b060ff637baa6adf23fa3825f767588c5\"}"
+        "value": "{\"artifact\": \"target\\\\release\\\\linchpin-desktop.exe\", \"sha256\": \"2c94241d1e10f1f23163c673b15e8c9d377a73f8a77f16d0eb674a8fed64bcb3\"}"
       },
       {
         "name": "linchpin:cargo_lock",
-        "value": "{\"path\": \"Cargo.lock\", \"sha256\": \"621c52cd81b62799edc55ee3af16e3e44a83445b25838b8a397335f9813fbab4\"}"
+        "value": "{\"path\": \"Cargo.lock\", \"sha256\": \"2eaa1beb54674feb35f3befcdd5a18812ec9cd2e7adddedd92e89355d4bd4c2f\"}"
       },
       {
         "name": "linchpin:pnpm_lock",
-        "value": "{\"path\": \"pnpm-lock.yaml\", \"sha256\": \"45b0fad113529e45d9cf45320cf25c5c19ebd43d43cdb3d2facf9af0a5f08ecf\"}"
+        "value": "{\"path\": \"pnpm-lock.yaml\", \"sha256\": \"ad1d2b6b478f636ac8bf340e86b870cbe3290675386a743414584564c027ba9f\"}"
       },
       {
         "name": "linchpin:ecosystems",
-        "value": "{\"cargo\": {\"components\": 507}, \"npm\": {\"components\": 213}}"
+        "value": "{\"cargo\": {\"components\": 519}, \"npm\": {\"components\": 252}}"
       }
     ]
   },

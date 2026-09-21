@@ -12,7 +12,8 @@ gh auth status
   ✓ Logged in to github.com account dominator509 (keyring)
   - Token scopes: 'gist', 'read:org', 'repo', 'workflow'
 gh repo view --json visibility,defaultBranchRef
-  {"visibility":"PUBLIC","defaultBranchRef":{"name":"main"}}
+  visibility      PUBLIC
+  defaultBranchRef main
 ```
 
 `workflow` is present, which is what allows pushing `.github/workflows/`.
@@ -289,7 +290,115 @@ that would lapse immediately are therefore unlimited minutes, CodeQL and secret
 scanning with push protection. Nothing in this document should be read as a promise
 that these keep running after a visibility change.
 
-## 10. How to re-verify
+## 10. Follow-up: the PRs were merged, and every action is now SHA-pinned
+
+Added after the campaign below was executed. Sections 5, 7 and 8 describe the state
+before it; where they differ from this section, this section is current.
+
+### 10.1 Merge campaign — 12 PRs, in the recommended order, each validated
+
+All Dependabot PRs were merged in the order recorded in section 8, and four
+`@dependabot rebase` requests were needed because each lockfile-touching merge made the
+next branch conflict. Every merge was validated locally with the repository's own
+lanes, because **no workflow compiles this repository** (section 8):
+
+| Merge | Change | Local validation |
+| --- | --- | --- |
+| #7 | vitest 3.2.7 → 4.1.11 (security) | `pnpm install --frozen-lockfile`, `pnpm -r test:unit` → 32 passed |
+| #4 | cargo group: uuid → 1.26.1 | `cargo build --workspace --locked` → exit 0 |
+| #8 | npm group: react 19.3, @playwright/test 1.63, prettier 3.9.8, … | install, `pnpm -r test:unit` 32 passed, `typecheck.sh`, `lint.sh` |
+| #10 | vite 6.4.3 → 8.3.0 | build (`vite v8.3.0`, dist emitted), Playwright **22 passed**, unit 32 passed |
+| #11 | vitest 4.1.11 → 5.0.1 | install, `pnpm -r test:unit` → 32 passed |
+| #9 | typescript 5.9.3 → 6.0.3 | `typecheck.sh` → both packages Done |
+| #12 | eslint 9.39.5 → 10.10.0 | `lint.sh` → all three packages Done |
+| #13 | @vitejs/plugin-react 4.7.0 → 6.1.1 | build + unit 32 passed |
+| #3 | actions/checkout 6.1.0 → 7.0.1 | workflow parses; superseded by the SHA pin in §10.2 |
+| #5 | sha2 0.10.9 → 0.11.0 | **did not compile** — see §10.3 |
+| #6 | windows 0.61.3 → 0.62.2 | `cargo build --workspace --locked` exit 0, `cargo test -p platform_windows` 13 passed |
+
+`pnpm -r test:unit`, `typecheck.sh`, `lint.sh`, `dependency-audit.sh` and
+`cargo build --workspace --locked` were re-run on the fully merged tree: all exit 0.
+
+### 10.2 SHA pinning, enabled and proven
+
+Both actions are now pinned to full commit SHAs, each resolved through the API and
+named in a comment beside the `uses:`:
+
+```
+actions/checkout v7.0.1                 -> 3d3c42e5aac5ba805825da76410c181273ba90b1
+actions/dependency-review-action v5.0.0 -> a1d282b36b6f3519aa1f3fc636f609c47dddb294
+```
+
+`sha_pinning_required` is enabled and read back:
+
+```
+gh api repos/{o}/{r}/actions/permissions
+  {"enabled":true,"allowed_actions":"all","sha_pinning_required":true}
+```
+
+Proven, not assumed. A real pull request (#14, the root Vitest config in §10.4) ran the
+SHA-pinned workflow while the setting was on, and the run log shows the exact commits
+being downloaded rather than a tag being resolved:
+
+```
+Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5…)
+Download action repository 'actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294' (SHA:a1d282b3…)
+Dependency review  pass  42s
+```
+
+CodeQL, whose workflow is managed by GitHub rather than by this repository, kept
+working with the setting on: three consecutive `CodeQL` runs on `main` completed
+`success`, and the pull request's `Analyze (actions)`, `Analyze (javascript-typescript)`
+and `Analyze (python)` jobs all passed.
+
+### 10.3 The one bump that needed code, and the proof it did not change behaviour
+
+`sha2` 0.11.0 does not compile against this tree:
+
+```
+error[E0277]: the trait bound `Array<u8, UInt<…>>: LowerHex` is not satisfied
+  --> crates/storage/src/vault.rs:200:28
+   |     format!("sha256:{:x}", hasher.finalize())
+```
+
+0.11 returns `hybrid_array::Array` (0.10 returned `GenericArray`), which does not
+implement `LowerHex`. Both content-address call sites now encode through a `hex_lower`
+helper. The output is unchanged, and that is proven rather than asserted:
+`test_sha256_known_vector` pins the result to the published FIPS 180-4 vectors
+(`sha256:ba7816bf…015ad` for "abc") and still passes, so no stored blob address moved.
+`cargo test -p storage --locked` → 29 passed, 0 failed.
+
+This is the failure mode section 8 predicted: the dependency PR was green in GitHub's
+checks because nothing here compiles, and only a local build caught it.
+
+### 10.4 A latent footgun removed while proving the workflow
+
+The root `pnpm test:unit` script is not part of any lane (`scripts/test-unit.sh` runs
+`pnpm -r test:unit`, which excludes the workspace root), but it was broken: with no
+Vitest config the root walked the monorepo and collected
+`apps/desktop/e2e/shell.spec.ts`, failing with `Playwright Test did not expect
+test.describe() to be called here`. A root `vitest.config.ts` now scopes collection the
+same way the desktop package already did. Nothing is de-tested: the E2E specs still run
+under Playwright in `scripts/test-e2e.sh`, `pnpm -r test:unit` is unaffected (each
+package resolves its own config), and the root script went from `1 failed file` to
+`3 files, 32 tests passed`.
+
+### 10.5 Alert outcome after the campaign
+
+```
+gh api repos/{o}/{r}/dependabot/alerts?state=open   ->  1
+gh api repos/{o}/{r}/dependabot/alerts?state=fixed  ->  3
+```
+
+The three npm advisories (`vitest` ×2, `@vitest/mocker`) are **fixed** — that is the
+vitest upgrade doing what the security-update PR was for. The single remaining open
+alert is `rust/glib` (medium, `fixed_in 0.20.0`), which stays open deliberately and is
+unreachable on the shipping target per the `cargo tree` evidence in section 6: it
+arrives only through the GTK/WebKit Linux stack, and moving it means the GTK 0.20 line,
+not a dependency bump. Alerts are not dismissed; the reachability fact is recorded
+instead.
+
+## 11. How to re-verify
 
 ```
 gh auth status
@@ -299,9 +408,12 @@ gh api repos/dominator509/linchpin-graphlock/vulnerability-alerts -i
 gh api repos/dominator509/linchpin-graphlock/automated-security-fixes
 gh api repos/dominator509/linchpin-graphlock/private-vulnerability-reporting
 gh api repos/dominator509/linchpin-graphlock/code-scanning/default-setup
+gh api repos/dominator509/linchpin-graphlock/actions/permissions
 gh api "repos/dominator509/linchpin-graphlock/code-scanning/alerts?state=open"
 gh api "repos/dominator509/linchpin-graphlock/dependabot/alerts?state=open&per_page=100"
+gh api "repos/dominator509/linchpin-graphlock/dependabot/alerts?state=fixed&per_page=100"
 gh run list --workflow 'Dependency Review' --limit 20
 gh run list --workflow 'Dependabot Updates' --limit 20
 gh run list --workflow 'CodeQL' --limit 10
+grep -n 'uses:' .github/workflows/dependency-review.yml
 ```

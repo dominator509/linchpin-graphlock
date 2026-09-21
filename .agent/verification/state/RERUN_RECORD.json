@@ -1,6 +1,207 @@
 {
-  "epoch_digest": "ff66d326b022152cac6f9907172b07c8c109212e6f6944825443b70a5c543f74",
-  "changed_classes": [],
-  "results": [],
-  "note": "no epoch change; no rerun obligation"
+  "changed_classes": [
+    "rust-source",
+    "rust-manifest",
+    "js-manifest",
+    "lockfile",
+    "gate-script",
+    "test-oracle"
+  ],
+  "epoch_digest": "3bf54a3714dc32f9b9e23fc2fce07703f2886b27831766af298cfbd99909d333",
+  "failures": 2,
+  "results": [
+    {
+      "command": "sh scripts/build.sh",
+      "duration_s": 526.65,
+      "exit_code": 0,
+      "output_sha256": "18b038b0b5f8a04bf233d08fd27a47a6a484322eddeb4550b518c328f4d534b6",
+      "output_tail": [
+        "    Finished 2 bundles at:",
+        "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\msi\\LINCHPIN_0.1.0_x64_en-US.msi",
+        "        C:\\dev\\linchpin-graphlock\\target\\release\\bundle\\nsis\\LINCHPIN_0.1.0_x64-setup.exe"
+      ],
+      "stage": "V-005 clean build",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/smoke-test.sh",
+      "duration_s": 46.35,
+      "exit_code": 0,
+      "output_sha256": "4659670289af3f84fc439c1ebe5a1a415d3f20de5e5783133adeaa4c6db17cf1",
+      "output_tail": [
+        "smoke: verifying removal",
+        "smoke: clean removal confirmed",
+        "smoke: ok (artifact 1a1ae6d31a71a76b1962b5f627fea7c60fe337d03a4da5155b300906056ffb1e verified through install/launch/uninstall)"
+      ],
+      "stage": "V-006 smoke",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/typecheck.sh",
+      "duration_s": 244.85,
+      "exit_code": 0,
+      "output_sha256": "7d83977d157a400c77b875f6247525f867764e33dd84441a041f35729551ef48",
+      "output_tail": [
+        "    Checking tauri v2.11.5",
+        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3m 56s"
+      ],
+      "stage": "V-007 sanity",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/test-unit.sh",
+      "duration_s": 265.61,
+      "exit_code": 0,
+      "output_sha256": "2add09be1e175abe7372560671f337046f29f328654d68621bd8e2f7db3d883a",
+      "output_tail": [
+        "   Doc-tests provider_transport",
+        "   Doc-tests research",
+        "   Doc-tests storage"
+      ],
+      "stage": "V-008 full functionality",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/test-integration.sh",
+      "duration_s": 4.38,
+      "exit_code": 0,
+      "output_sha256": "110e0d94a2dcd67c72cd4975020c2ae7224dbd6738ab1ca12c3c955f1b8e6b23",
+      "output_tail": [
+        "integration: ok (5 real-dependency tests)",
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.20s",
+        "     Running tests\\integration_real_dependencies.rs (target\\debug\\deps\\integration_real_dependencies-c417d44c0ddece79.exe)"
+      ],
+      "stage": "V-009 integration/concurrency",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/lint.sh",
+      "duration_s": 64.68,
+      "exit_code": 0,
+      "output_sha256": "eee7a9190e33b3157c6cc349f15f577e245b12682fdf72a86f8422eaceb55bd1",
+      "output_tail": [
+        "    Checking application v0.1.0 (C:\\dev\\linchpin-graphlock\\crates\\application)",
+        "    Checking linchpin-desktop v0.1.0 (C:\\dev\\linchpin-graphlock\\apps\\desktop\\src-tauri)",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 25.32s"
+      ],
+      "stage": "V-012 regression/mutation",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/live-fire-local-provider.sh",
+      "duration_s": 599.75,
+      "exit_code": 1,
+      "output_sha256": "136d4d6d0192160c846fd261aa1677aaaed50fc66798bad824f20cdcb21d2808",
+      "output_tail": [
+        "local-provider: restored the production artifact",
+        "local-provider: rebuilding the production artifact from the committed config",
+        "assert-no-debug-port: ok -- target/release/linchpin-desktop.exe opens no port 9222"
+      ],
+      "stage": "V-013 dynamic security/domain packs",
+      "status": "FAIL"
+    },
+    {
+      "command": "sh scripts/security-check.sh",
+      "duration_s": 151.01,
+      "exit_code": 0,
+      "output_sha256": "0a09acda3a42fd9eb19fbe1030632c3f7f234d3d2c0bba485328a1c1bb50d8f6",
+      "output_tail": [
+        "   \u2502",
+        "60 \u2502     \"Unicode-DFS-2016\",",
+        "   \u2502      \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 unmatched license allowance"
+      ],
+      "stage": "V-004 supply chain",
+      "status": "PASS"
+    },
+    {
+      "command": "python3 scripts/generate-sbom.py --check",
+      "duration_s": 6.09,
+      "exit_code": 0,
+      "output_sha256": "4a6f33a7590f4da4095192643949e4f281f96b2555c40b32eeb1c94e02c10419",
+      "output_tail": [
+        "sbom check: ok (771 components, current)"
+      ],
+      "stage": "V-004 supply chain",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/artifact-e2e.sh",
+      "duration_s": 256.99,
+      "exit_code": 0,
+      "output_sha256": "10b6c33b72b1a0861e0ed6061937470a7fb763acb73542e56731e2731c273395",
+      "output_tail": [
+        "  PASS: artifact digest unchanged across the run -- 0a32f7f1117dd379",
+        "artifact-e2e: wrote .agent/evidence/artifact-e2e/STATUS.md",
+        "artifact-e2e: ok"
+      ],
+      "stage": "V-020 exact artifact",
+      "status": "PASS"
+    },
+    {
+      "command": "cargo deny check licenses",
+      "duration_s": 3.49,
+      "exit_code": 0,
+      "output_sha256": "399cddd063c637ba1d14b992b05e5b5171a1f6ce1c9065e79e49e0ba021d3618",
+      "output_tail": [
+        "   \u2502",
+        "60 \u2502     \"Unicode-DFS-2016\",",
+        "   \u2502      \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 unmatched license allowance"
+      ],
+      "stage": "DOD-021 license gate",
+      "status": "PASS"
+    },
+    {
+      "command": "sh scripts/harness-validate.sh",
+      "duration_s": 44.83,
+      "exit_code": 1,
+      "output_sha256": "f719e0d34b72c444561ac12643bbb570c9047a2c8eb2b4c514f7e0671891fcbd",
+      "output_tail": [
+        "WARN: possible incomplete prose/code in .agent\\state\\verify-r45c.log",
+        "WARN: possible incomplete prose/code in .agent\\evidence\\applicable-cases\\logs\\anti-gaming.log",
+        "WARN: possible incomplete prose/code in .agent\\evidence\\applicable-cases\\logs\\security-check.log"
+      ],
+      "stage": "V-000 harness validation",
+      "status": "FAIL"
+    },
+    {
+      "command": "sh scripts/test-e2e.sh",
+      "duration_s": 608.06,
+      "exit_code": 0,
+      "output_sha256": "f189f2f6d51d70050709fdcbd3606e0dee6e03ec8e78004b57f96932b536fd63",
+      "output_tail": [
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:31212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)"
+      ],
+      "stage": "V-015 usability/accessibility",
+      "status": "PASS"
+    },
+    {
+      "command": "python3 scripts/test-collection-guard.py --check",
+      "duration_s": 0.09,
+      "exit_code": 0,
+      "output_sha256": "8f5e078751de9c15245a62b51a40a04abdb62e0ce60d9fa200ec05278a71c208",
+      "output_tail": [
+        "collection guard manifest: ok (min 217 passed)"
+      ],
+      "stage": "DOD-007 collection guard",
+      "status": "PASS"
+    }
+  ],
+  "stages": [
+    "V-005 clean build",
+    "V-006 smoke",
+    "V-007 sanity",
+    "V-008 full functionality",
+    "V-009 integration/concurrency",
+    "V-012 regression/mutation",
+    "V-013 dynamic security/domain packs",
+    "V-004 supply chain",
+    "V-020 exact artifact",
+    "DOD-021 license gate",
+    "V-000 harness validation",
+    "V-015 usability/accessibility",
+    "DOD-007 collection guard"
+  ]
 }

@@ -67,14 +67,19 @@ written.
 | Command | Exit | Cause | Unblock |
 | --- | --- | --- | --- |
 | `sh scripts/production-readiness-check.sh` | 1 | verdict is NO_GO (correct behavior, not a defect) | release readiness |
-| `pnpm audit` | 1 | 2 moderate advisories (see below) | dependency upgrade decision |
 
 **Resolved since the previous revision of this table** (all now exit 0):
 `sh scripts/security-check.sh`, `sh scripts/dependency-audit.sh` and
 `sh scripts/verify.sh` were failing on the MPL-2.0 licences check — closed by
 ADR-002. `sh scripts/live-fire.sh` was exiting 2 because
 `scripts/run-live-fire-real.sh` did not exist; that real production-path runner
-now exists and the gate passes.
+now exists and the gate passes. `pnpm audit` used to exit 1 on 2 moderate
+advisories; both were **remediated rather than waived** — vitest was upgraded
+3.2.7 → 4.1.11 (the first patched version, Dependabot security PR #7) and then
+5.0.1 (PR #11), and the command now prints `No known vulnerabilities found` with
+exit 0. The register entries in `.agent/verification/state/ADVISORY_ASSESSMENTS.json`
+are marked RESOLVED with the remediation recorded, and GitHub marks the three
+corresponding Dependabot alerts as `fixed`.
 
 **Ordering caveat for `sh scripts/verify.sh`.** It ends with the change-
 invalidation and rerun-obligation checks, so it legitimately FAILS if it is run
@@ -82,13 +87,6 @@ after something that changed a tracked input in the same sequence — including
 `sh scripts/build.sh`, which `scripts/doc-exec.py` executes earlier in its list.
 That is DOD-040 working, not a defect. Run `scripts/change-invalidation.py` and
 `scripts/rerun-invalidated.py` to settle first, then `scripts/verify.sh` passes.
-
-`pnpm audit` reports 2 moderate advisories (GHSA-82fw-gwwq-j7x9 in `vitest` and
-`@vitest/mocker`, fixed in >= 4.1.11; this repository pins 3.2.7). The enforced
-level in `scripts/security-check.sh` is `--audit-level high`, so these do not
-fail the lane. The affected package is dev-only and is not embedded in any
-shipped artifact. No waiver row exists for this advisory, so it is listed here
-as an accepted, documented risk rather than a silent pass.
 
 The E2E lane binds a fixed port (`4173`) with `--strictPort` and
 `reuseExistingServer: false`, so a server squatting that port fails the lane
