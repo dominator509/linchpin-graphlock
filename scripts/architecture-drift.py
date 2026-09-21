@@ -281,6 +281,17 @@ def iter_production_sources(root: Path):
 URL_RE = re.compile(r"https?://[^\s\"'`)]*")
 
 
+def redact_credentials(url: str) -> str:
+    """Strip any userinfo from a URL before it is written anywhere.
+
+    CodeQL reported `py/clear-text-logging-sensitive-data` for a finding message
+    that carries a URL literal from source. A URL can embed a credential
+    (`https://user:token@host/`), and a drift report is written to a file that is
+    committed, so the credential is removed here rather than trusted not to exist.
+    """
+    return re.sub(r"^(https?://)[^/@]*@", r"\1", url)
+
+
 def check_confidentiality(root: Path) -> list[str]:
     findings: list[str] = []
     for path in iter_production_sources(root):
@@ -298,7 +309,7 @@ def check_confidentiality(root: Path) -> list[str]:
             if (rel, literal) in URL_ALLOWLIST:
                 continue
             findings.append(
-                f"{rel}: non-loopback URL literal {literal!r} in production source "
+                f"{rel}: non-loopback URL literal {redact_credentials(literal)!r} in production source "
                 "(local-first product: shipped defaults must be loopback)"
             )
     return findings
@@ -388,7 +399,16 @@ def self_test() -> int:
             failures.append("import-law check did not catch application -> storage")
         if not any("dead dependency edge" in f for f in checks["import_law"]):
             failures.append("import-law check did not catch the dead dependency edge")
-        if not any("api.example.com" in f for f in checks["local_confidentiality"]):
+        # Assert on the fixture path and an exact-host pattern rather than on a bare
+        # URL substring: CodeQL reported `py/incomplete-url-substring-sanitization`
+        # for `"host" in text`, which is the same loose shape that lets
+        # `http://tauri.localhost.evil.example` pass a hostname check. Matching with
+        # word boundaries on the finding from the planted fixture keeps the assertion
+        # honest without modelling that anti-pattern.
+        if not any(
+            "client.rs" in f and re.search(r"\bapi\.example\.com\b", f)
+            for f in checks["local_confidentiality"]
+        ):
             failures.append("confidentiality check did not catch a non-loopback default URL")
         if not checks["bindings"]:
             failures.append("binding check did not catch missing bound evidence")
@@ -508,9 +528,18 @@ def main() -> int:
     OUT_MD.write_text("\n".join(lines), encoding="utf-8")
 
     if result["findings"]:
-        print("architecture-drift: DRIFT", file=sys.stderr)
-        for finding in result["findings"]:
-            print(f"  {finding}", file=sys.stderr)
+        # Print a classified summary, not the raw finding text. CodeQL reported
+        # `py/clear-text-logging-sensitive-data` for printing a string derived from
+        # source-file contents; the text can carry a URL literal and a URL can carry
+        # a credential. The full findings are written to the report file, which is
+        # what a reader is pointed at, so nothing is lost and nothing sensitive is
+        # echoed into a log.
+        groups = ", ".join(sorted(name for name, items in result["checks"].items() if items))
+        print(
+            f"architecture-drift: DRIFT -- {len(result['findings'])} finding(s) in: {groups}. "
+            f"Details: {OUT_MD}",
+            file=sys.stderr,
+        )
         return 1
     print(
         f"architecture-drift: ok -- {len(result['checks'])} check groups, no drift; "

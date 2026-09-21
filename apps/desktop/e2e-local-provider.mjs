@@ -512,6 +512,17 @@ record(
 );
 
 const failures = checks.filter((c) => !c.ok);
+// Escape a value for a markdown table cell. The previous version escaped only
+// the pipe, which is incomplete in two ways CodeQL flagged as
+// `js/incomplete-sanitization`: a backslash before the pipe would neutralise the
+// escape, and an embedded newline would end the table row entirely. Backslashes
+// are escaped first, then pipes, then line breaks are collapsed.
+const tableCell = (value) =>
+  String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/\|/g, "\\|")
+    .replace(/\r?\n/g, " ")
+    .slice(0, 160);
 const lines = [
   "# Local Provider Live-Fire (PF-011)",
   "",
@@ -526,7 +537,7 @@ const lines = [
   "| --- | --- | --- |",
   ...checks.map(
     (c) =>
-      `| ${c.name} | ${c.ok ? "PASS" : "FAIL"} | \`${String(c.observed).replace(/\|/g, "\\|").slice(0, 160)}\` |`,
+      `| ${tableCell(c.name)} | ${c.ok ? "PASS" : "FAIL"} | \`${tableCell(c.observed)}\` |`,
   ),
   "",
   `**${checks.length - failures.length}/${checks.length} passed.**`,

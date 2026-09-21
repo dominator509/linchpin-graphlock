@@ -120,9 +120,25 @@ try {
   await page.waitForSelector("h1", { timeout: 20000 }).catch(() => {});
 
   const url = page.url();
+  // Parse the URL and compare the host EXACTLY rather than testing a prefix:
+  // CodeQL reported `js/incomplete-url-substring-sanitization` for
+  // `url.startsWith("http://tauri.localhost")`, a shape that also accepts
+  // `http://tauri.localhost.attacker.example`. This assertion is about identity,
+  // so it compares protocol and hostname.
+  const loadedEmbeddedFrontend = (() => {
+    try {
+      const parsed = new URL(url);
+      return (
+        parsed.protocol === "tauri:" ||
+        (parsed.protocol === "http:" && parsed.hostname === "tauri.localhost")
+      );
+    } catch {
+      return false;
+    }
+  })();
   record(
     "loads the embedded frontend, not a dev server",
-    url.startsWith("http://tauri.localhost") || url.startsWith("tauri://"),
+    loadedEmbeddedFrontend,
     url,
   );
 
